@@ -1,6 +1,6 @@
 'use server'
 
-import { createClient } from '@/lib/supabase/server'
+import { createClient } from '@/lib/supabase'
 import { revalidatePath } from 'next/cache'
 
 export async function getLevels() {

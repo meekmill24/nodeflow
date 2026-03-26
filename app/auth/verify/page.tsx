@@ -4,7 +4,7 @@ import { CheckCircle, ShieldCheck, ArrowRight, Zap } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
-import { createClient } from '@/lib/supabase/client';
+import { createClient } from '@/lib/supabase';
 
 function VerifyContent() {
     const router = useRouter();
