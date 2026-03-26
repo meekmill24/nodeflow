@@ -315,7 +315,7 @@ export default function AdminTasksPage() {
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="bg-slate-900/40 p-6 rounded-[32px] border border-white/5 backdrop-blur-md">
                     <div className="flex items-center gap-3 mb-2">
-                        <div className="w-8 h-8 rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-400">
+                        <div className="w-8 h-8 rounded-xl bg-[#3DD6C8]/10 flex items-center justify-center text-[#3DD6C8]">
                             <Layers size={18} />
                         </div>
                         <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Global Catalog</span>
@@ -368,16 +368,16 @@ export default function AdminTasksPage() {
 
             {/* Filter & Actions Bar */}
             <div className="bg-slate-900/40 p-4 md:p-8 rounded-[32px] md:rounded-[40px] border border-white/5 backdrop-blur-xl relative z-40 group">
-                <div className="absolute top-0 right-0 w-64 h-64 bg-purple-500/5 rounded-full blur-[100px] -mr-32 -mt-32 opacity-0 group-hover:opacity-100 transition-opacity" />
+                <div className="absolute top-0 right-0 w-64 h-64 bg-[#3DD6C8]/5 rounded-full blur-[100px] -mr-32 -mt-32 opacity-0 group-hover:opacity-100 transition-opacity" />
                 
                 <div className="flex flex-col xl:flex-row gap-6 items-center justify-between relative z-10">
                     <div className="flex flex-wrap items-center gap-4 w-full xl:w-auto">
                         <div className="relative group/search flex-1 xl:flex-initial xl:min-w-[320px]">
-                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within/search:text-purple-400 transition-colors" size={18} />
+                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within/search:text-[#3DD6C8] transition-colors" size={18} />
                             <input 
                                 type="text"
                                 placeholder="Search title, level or category..."
-                                className="w-full bg-slate-950 border border-white/10 rounded-2xl py-3 pl-12 pr-4 text-sm text-white focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all placeholder:text-slate-800 font-bold uppercase tracking-wider"
+                                className="w-full bg-slate-950 border border-white/10 rounded-2xl py-3 pl-12 pr-4 text-sm text-white focus:outline-none focus:ring-2 focus:ring-[#3DD6C8]/20 focus:border-[#3DD6C8] transition-all placeholder:text-slate-800 font-bold uppercase tracking-wider"
                                 value={searchQuery}
                                 onChange={e => setSearchQuery(e.target.value)}
                             />
@@ -387,10 +387,10 @@ export default function AdminTasksPage() {
                             <button 
                                 onClick={() => setShowLevelDropdown(!showLevelDropdown)}
                                 className={`w-full bg-slate-950 border rounded-2xl py-3 px-5 flex items-center justify-between text-[11px] font-black uppercase tracking-widest transition-all ${
-                                    showLevelDropdown ? 'border-purple-500 ring-2 ring-purple-500/20' : 'border-white/10 hover:border-white/20'
+                                    showLevelDropdown ? 'border-[#3DD6C8] ring-2 ring-purple-500/20' : 'border-white/10 hover:border-white/20'
                                 }`}
                             >
-                                <span className={filterLevel === 'all' ? 'text-slate-500' : 'text-purple-400'}>
+                                <span className={filterLevel === 'all' ? 'text-slate-500' : 'text-[#3DD6C8]'}>
                                     {filterLevel === 'all' ? 'All VIP Levels' : `VIP Level ${filterLevel}`}
                                 </span>
                                 <ChevronDown className={`w-4 h-4 text-slate-500 transition-transform ${showLevelDropdown ? 'rotate-180' : ''}`} />
@@ -400,7 +400,7 @@ export default function AdminTasksPage() {
                                 <div className="absolute z-[1000] top-full mt-2 w-full rounded-2xl bg-slate-950 border border-white/10 shadow-2xl overflow-hidden animate-in slide-in-from-top-2 duration-300">
                                     <div 
                                         onClick={() => { setFilterLevel('all'); setShowLevelDropdown(false); }}
-                                        className={`px-5 py-3 text-[10px] font-black uppercase tracking-widest cursor-pointer hover:bg-white/5 transition-colors border-b border-white/5 flex items-center justify-between ${filterLevel === 'all' ? 'text-purple-400 bg-purple-500/5' : 'text-slate-500'}`}
+                                        className={`px-5 py-3 text-[10px] font-black uppercase tracking-widest cursor-pointer hover:bg-white/5 transition-colors border-b border-white/5 flex items-center justify-between ${filterLevel === 'all' ? 'text-[#3DD6C8] bg-[#3DD6C8]/5' : 'text-slate-500'}`}
                                     >
                                         <span>All VIP Levels</span>
                                         {filterLevel === 'all' && <CheckCircle size={14} />}
@@ -409,7 +409,7 @@ export default function AdminTasksPage() {
                                         <div 
                                             key={l.id}
                                             onClick={() => { setFilterLevel(l.id); setShowLevelDropdown(false); }}
-                                            className={`px-5 py-3 text-[10px] font-black uppercase tracking-widest cursor-pointer hover:bg-white/5 transition-colors flex items-center justify-between ${filterLevel === l.id ? 'text-purple-400 bg-purple-500/5' : 'text-slate-300'}`}
+                                            className={`px-5 py-3 text-[10px] font-black uppercase tracking-widest cursor-pointer hover:bg-white/5 transition-colors flex items-center justify-between ${filterLevel === l.id ? 'text-[#3DD6C8] bg-[#3DD6C8]/5' : 'text-slate-300'}`}
                                         >
                                             <div className="flex items-center gap-3">
                                                 <span>Level {l.id}</span>
@@ -430,7 +430,7 @@ export default function AdminTasksPage() {
                                         onClick={() => setFilterSet(s as any)}
                                         className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
                                             filterSet === s
-                                                ? 'bg-purple-600 text-white shadow-lg shadow-purple-900/40'
+                                                ? 'bg-[#3DD6C8] text-white shadow-lg shadow-[#3DD6C8]/20'
                                                 : 'text-slate-600 hover:text-slate-300 hover:bg-white/5'
                                         }`}
                                     >
@@ -448,7 +448,7 @@ export default function AdminTasksPage() {
                         <button onClick={handleBulkGenerateAll} className="flex-1 xl:flex-none flex items-center justify-center gap-2 px-6 py-3 bg-slate-950 text-slate-400 border border-white/10 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:border-white/30 transition-all">
                             <RefreshCw size={16} /> Auto-Sync
                         </button>
-                        <button onClick={() => { setShowCreate(!showCreate); setPreviewUrl(''); setNewItem({ ...emptyForm }); }} className="flex-1 xl:flex-none flex items-center justify-center gap-2 px-8 py-3 bg-purple-600 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl shadow-purple-900/40 hover:scale-105 active:scale-95 transition-all">
+                        <button onClick={() => { setShowCreate(!showCreate); setPreviewUrl(''); setNewItem({ ...emptyForm }); }} className="flex-1 xl:flex-none flex items-center justify-center gap-2 px-8 py-3 bg-[#3DD6C8] text-white rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl shadow-[#3DD6C8]/20 hover:scale-105 active:scale-95 transition-all">
                             <Plus size={18} /> New Product
                         </button>
                     </div>
@@ -460,20 +460,20 @@ export default function AdminTasksPage() {
                             <span className="text-[9px] font-black text-slate-500 uppercase tracking-[0.3em]">Batch generation protocols</span>
                             <div className="flex items-center gap-4">
                                 <span className="text-xs font-bold text-white uppercase italic">Targeting VIP Level {filterLevel}</span>
-                                <div className="h-1 w-1 rounded-full bg-purple-500/40" />
+                                <div className="h-1 w-1 rounded-full bg-[#3DD6C8]/40" />
                                 <span className="text-xs text-slate-500 font-medium italic">{levels.find(l => l.id === filterLevel)?.tasks_per_set} tasks/set</span>
                             </div>
                         </div>
 
-                        <div className="flex items-center gap-1 bg-slate-950 border border-purple-500/20 rounded-2xl overflow-hidden shadow-2xl">
+                        <div className="flex items-center gap-1 bg-slate-950 border border-[#3DD6C8]/20 rounded-2xl overflow-hidden shadow-2xl">
                             <div className="flex items-center">
-                                <button onClick={() => setSetsToGenerate(v => Math.max(1, v - 1))} className="w-12 h-12 flex items-center justify-center text-purple-400 hover:bg-white/5 transition-colors font-black text-lg">−</button>
+                                <button onClick={() => setSetsToGenerate(v => Math.max(1, v - 1))} className="w-12 h-12 flex items-center justify-center text-[#3DD6C8] hover:bg-white/5 transition-colors font-black text-lg">−</button>
                                 <div className="w-12 text-center text-sm font-black text-white">{setsToGenerate}</div>
-                                <button onClick={() => setSetsToGenerate(v => Math.min(50, v + 1))} className="w-12 h-12 flex items-center justify-center text-purple-400 hover:bg-white/5 transition-colors font-black text-lg">+</button>
+                                <button onClick={() => setSetsToGenerate(v => Math.min(50, v + 1))} className="w-12 h-12 flex items-center justify-center text-[#3DD6C8] hover:bg-white/5 transition-colors font-black text-lg">+</button>
                             </div>
                             <button 
                                 onClick={handleBulkGenerateCurrentLevel}
-                                className="h-12 px-8 bg-purple-900/30 text-purple-400 hover:bg-purple-900/50 text-[10px] font-black uppercase tracking-widest transition-all border-l border-purple-500/10 flex items-center gap-3"
+                                className="h-12 px-8 bg-purple-900/30 text-[#3DD6C8] hover:bg-purple-900/50 text-[10px] font-black uppercase tracking-widest transition-all border-l border-[#3DD6C8]/10 flex items-center gap-3"
                             >
                                 <Zap size={14} className="fill-purple-400/20" /> 
                                 Deploy Units
@@ -485,7 +485,7 @@ export default function AdminTasksPage() {
 
             {/* Create Item Overlay */}
             {showCreate && (
-                <div className="bg-slate-900/60 border border-purple-500/20 p-10 rounded-[48px] backdrop-blur-3xl animate-in slide-in-from-top-4 duration-500 relative overflow-hidden group">
+                <div className="bg-slate-900/60 border border-[#3DD6C8]/20 p-10 rounded-[48px] backdrop-blur-3xl animate-in slide-in-from-top-4 duration-500 relative overflow-hidden group">
                     <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-purple-500/50 to-transparent" />
                     
                     <div className="flex items-center justify-between mb-10">
@@ -503,7 +503,7 @@ export default function AdminTasksPage() {
                             <div className="space-y-2">
                                 <label className="text-[11px] font-black text-slate-500 uppercase tracking-widest ml-1">Asset Identity</label>
                                 <input 
-                                    className="w-full bg-slate-950 border border-white/10 rounded-2xl px-6 py-4 text-white focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all font-bold" 
+                                    className="w-full bg-slate-950 border border-white/10 rounded-2xl px-6 py-4 text-white focus:outline-none focus:ring-2 focus:ring-[#3DD6C8]/20 focus:border-[#3DD6C8] transition-all font-bold" 
                                     value={newItem.title}
                                     onChange={e => setNewItem({ ...newItem, title: e.target.value })}
                                 />
@@ -513,7 +513,7 @@ export default function AdminTasksPage() {
                                 <div className="space-y-2">
                                     <label className="text-[11px] font-black text-slate-500 uppercase tracking-widest ml-1">Classification</label>
                                     <div className="relative">
-                                        <select className="w-full bg-slate-950 border border-white/10 rounded-2xl px-6 py-4 text-white hover:border-purple-500/30 transition-all cursor-pointer font-bold appearance-none" value={newItem.category} onChange={e => setNewItem({ ...newItem, category: e.target.value })}>
+                                        <select className="w-full bg-slate-950 border border-white/10 rounded-2xl px-6 py-4 text-white hover:border-[#3DD6C8]/30 transition-all cursor-pointer font-bold appearance-none" value={newItem.category} onChange={e => setNewItem({ ...newItem, category: e.target.value })}>
                                             {['electrical', 'furniture', 'gym', 'fashion', 'automotive', 'general'].map(c => <option key={c} value={c}>{c.toUpperCase()}</option>)}
                                         </select>
                                         <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none" size={16} />
@@ -522,7 +522,7 @@ export default function AdminTasksPage() {
                                 <div className="space-y-2 relative">
                                     <label className="text-[11px] font-black text-slate-500 uppercase tracking-widest ml-1">VIP Tier</label>
                                     <div className="relative">
-                                        <select className="w-full bg-slate-950 border border-white/10 rounded-2xl px-6 py-4 text-white hover:border-purple-500/30 transition-all cursor-pointer font-bold appearance-none" value={newItem.level_id} onChange={e => setNewItem({ ...newItem, level_id: parseInt(e.target.value) })}>
+                                        <select className="w-full bg-slate-950 border border-white/10 rounded-2xl px-6 py-4 text-white hover:border-[#3DD6C8]/30 transition-all cursor-pointer font-bold appearance-none" value={newItem.level_id} onChange={e => setNewItem({ ...newItem, level_id: parseInt(e.target.value) })}>
                                             {levels.map(l => <option key={l.id} value={l.id}>VIP LEVEL {l.id} - ${l.price}</option>)}
                                         </select>
                                         <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none" size={16} />
@@ -533,7 +533,7 @@ export default function AdminTasksPage() {
                             <div className="space-y-2">
                                 <label className="text-[11px] font-black text-slate-500 uppercase tracking-widest ml-1">Asset Description</label>
                                 <textarea 
-                                    className="w-full bg-slate-950 border border-white/10 rounded-2xl px-6 py-4 text-white focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all h-32 resize-none" 
+                                    className="w-full bg-slate-950 border border-white/10 rounded-2xl px-6 py-4 text-white focus:outline-none focus:ring-2 focus:ring-[#3DD6C8]/20 focus:border-[#3DD6C8] transition-all h-32 resize-none" 
                                     value={newItem.description}
                                     onChange={e => setNewItem({ ...newItem, description: e.target.value })}
                                 />
@@ -561,7 +561,7 @@ export default function AdminTasksPage() {
 
                             <ImagePreview url={previewUrl || newItem.image_url} alt={newItem.title} size="lg" />
 
-                            <button onClick={handleCreate} disabled={saving || !newItem.title} className="w-full h-16 bg-purple-600 text-white rounded-2xl font-black uppercase tracking-widest shadow-xl shadow-purple-900/40 hover:scale-[1.02] active:scale-95 transition-all">
+                            <button onClick={handleCreate} disabled={saving || !newItem.title} className="w-full h-16 bg-[#3DD6C8] text-white rounded-2xl font-black uppercase tracking-widest shadow-xl shadow-[#3DD6C8]/20 hover:scale-[1.02] active:scale-95 transition-all">
                                 Commit to Matrix
                             </button>
                         </div>
@@ -578,7 +578,7 @@ export default function AdminTasksPage() {
                     </div>
                 ) : (
                     finalItems.map(item => (
-                        <div key={item.id} className={`bg-slate-900/40 rounded-[40px] border border-white/5 overflow-hidden transition-all duration-500 group flex flex-col h-full ${!item.is_active ? 'grayscale opacity-40' : 'hover:border-purple-500/30 hover:-translate-y-2'}`}>
+                        <div key={item.id} className={`bg-slate-900/40 rounded-[40px] border border-white/5 overflow-hidden transition-all duration-500 group flex flex-col h-full ${!item.is_active ? 'grayscale opacity-40' : 'hover:border-[#3DD6C8]/30 hover:-translate-y-2'}`}>
                             <div className="aspect-video overflow-hidden relative">
                                 <img src={item.image_url || generateFallbackUrl(item.title || '')} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" alt="" />
                                 <div className="absolute top-4 left-4 flex gap-2">
@@ -590,7 +590,7 @@ export default function AdminTasksPage() {
                                 <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest line-clamp-2 leading-relaxed opacity-60 mb-6">{item.description}</p>
                                 <div className="mt-auto pt-6 border-t border-white/5 flex gap-3">
                                     <button onClick={() => { setEditingId(item.id); setEditData(item); }} className="flex-1 py-3 bg-white/5 text-slate-400 rounded-2xl font-black uppercase tracking-widest text-[9px] hover:text-white transition-colors">Edit</button>
-                                    <button onClick={() => toggleActive(item.id, item.is_active)} className={`w-12 h-12 flex items-center justify-center rounded-2xl transition-all ${item.is_active ? 'text-purple-500 bg-purple-500/10' : 'text-slate-600 bg-slate-900'}`}>{item.is_active ? <Eye size={16} /> : <EyeOff size={16} />}</button>
+                                    <button onClick={() => toggleActive(item.id, item.is_active)} className={`w-12 h-12 flex items-center justify-center rounded-2xl transition-all ${item.is_active ? 'text-[#3DD6C8] bg-[#3DD6C8]/10' : 'text-slate-600 bg-slate-900'}`}>{item.is_active ? <Eye size={16} /> : <EyeOff size={16} />}</button>
                                     <button onClick={() => handleDelete(item.id)} className="w-12 h-12 flex items-center justify-center rounded-2xl bg-slate-900 border border-white/5 text-slate-600 hover:text-red-500 transition-all"><Trash2 size={16} /></button>
                                 </div>
                             </div>

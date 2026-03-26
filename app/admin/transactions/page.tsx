@@ -43,20 +43,20 @@ export default function AdminTransactionsPage() {
           <h1 className="text-3xl font-black text-white tracking-tight italic uppercase">Financial Ledger</h1> 
           <p className="text-slate-400 mt-1">Audit log of all platform financial movements.</p>
         </div>
-        <button onClick={fetchTransactions} className="p-3 bg-slate-900/50 border border-slate-800 text-slate-400 rounded-2xl hover:text-purple-400 transition-all">
+        <button onClick={fetchTransactions} className="p-3 bg-slate-900/50 border border-slate-800 text-slate-400 rounded-2xl hover:text-[#3DD6C8] transition-all">
           <RefreshCcw size={20} className={loading ? 'animate-spin' : ''} />
         </button>
       </div> 
 
       <div className="flex flex-col md:flex-row gap-4"> 
         <div className="relative flex-1 group">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-purple-400 transition-colors" size={18} />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-[#3DD6C8] transition-colors" size={18} />
           <input 
             type="text" 
             placeholder="Search by user or description..." 
             value={search} 
             onChange={e => setSearch(e.target.value)} 
-            className="w-full pl-12 pr-4 py-3 bg-slate-900/50 border border-slate-800 rounded-2xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500/20 transition-all" 
+            className="w-full pl-12 pr-4 py-3 bg-slate-900/50 border border-slate-800 rounded-2xl text-white focus:outline-none focus:ring-2 focus:ring-[#3DD6C8]/20 transition-all" 
           /> 
         </div>
         <div className="relative">
@@ -64,7 +64,7 @@ export default function AdminTransactionsPage() {
           <select 
             value={typeFilter} 
             onChange={e => setTypeFilter(e.target.value)} 
-            className="pl-12 pr-10 py-3 bg-slate-900/50 border border-slate-800 rounded-2xl text-white appearance-none focus:outline-none focus:ring-2 focus:ring-purple-500/20 transition-all font-bold uppercase tracking-widest text-xs"
+            className="pl-12 pr-10 py-3 bg-slate-900/50 border border-slate-800 rounded-2xl text-white appearance-none focus:outline-none focus:ring-2 focus:ring-[#3DD6C8]/20 transition-all font-bold uppercase tracking-widest text-xs"
           > 
             <option value="all">Global Ledger</option> 
             <option value="deposit">Deposits Only</option> 
@@ -104,7 +104,7 @@ export default function AdminTransactionsPage() {
                        {tx.type === 'deposit' ? <ArrowDownLeft className="text-green-500" size={14} /> : 
                         tx.type === 'withdrawal' ? <ArrowUpRight className="text-rose-500" size={14} /> :
                         tx.type === 'freeze' ? <Snowflake className="text-blue-400" size={14} /> :
-                        <DollarSign className="text-purple-400" size={14} />}
+                        <DollarSign className="text-[#3DD6C8]" size={14} />}
                        <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">{tx.type}</span>
                     </div>
                   </td> 
@@ -117,7 +117,7 @@ export default function AdminTransactionsPage() {
                         href={tx.proof_url} 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className="px-3 py-1.5 bg-purple-500/10 text-purple-400 border border-purple-500/20 rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-purple-500 hover:text-white transition-all flex items-center gap-2 w-fit"
+                        className="px-3 py-1.5 bg-[#3DD6C8]/10 text-[#3DD6C8] border border-[#3DD6C8]/20 rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-[#3DD6C8] hover:text-white transition-all flex items-center gap-2 w-fit"
                       >
                         <Eye size={12} />
                         View Proof

@@ -37,8 +37,8 @@ export function BottomNav() {
                    <Link
                       href={item.href}
                       className={cn(
-                        'absolute -top-10 left-1/2 -translate-x-1/2 w-20 h-20 bg-gradient-to-tr from-purple-600 to-blue-500 rounded-full flex items-center justify-center shadow-[0_0_30px_rgba(147,51,234,0.4)] border-4 border-black hover:scale-110 active:scale-95 transition-all',
-                        active && 'from-cyan-600 to-blue-600'
+                        'absolute -top-10 left-1/2 -translate-x-1/2 w-20 h-20 rounded-full flex items-center justify-center border-4 border-black hover:scale-110 active:scale-95 transition-all',
+                        active ? 'bg-[#E34304] shadow-[0_0_30px_rgba(227,67,4,0.4)]' : 'bg-slate-800 shadow-none'
                       )}
                     >
                       <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
@@ -48,7 +48,7 @@ export function BottomNav() {
                     <div className="mt-8 text-center">
                         <span className={cn(
                             'text-[9px] font-black tracking-widest',
-                            active ? 'text-cyan-400' : 'text-white/30'
+                            active ? 'text-[var(--nf-teal)]' : 'text-white/30'
                         )}>{item.label}</span>
                     </div>
               </div>
@@ -61,7 +61,7 @@ export function BottomNav() {
               className={cn(
                 'flex flex-col items-center justify-center px-4 py-2 transition-all duration-300',
                 active
-                  ? 'text-cyan-400 scale-110'
+                  ? 'text-[var(--nf-teal)] scale-110'
                   : 'text-white/30 hover:text-white'
               )}
             >

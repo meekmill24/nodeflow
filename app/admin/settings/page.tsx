@@ -60,7 +60,7 @@ export default function AdminSettingsPage() {
           disabled={saving} 
           className={`
             flex items-center gap-2 px-8 py-3 rounded-2xl font-black uppercase tracking-widest text-sm transition-all
-            ${success ? 'bg-green-500 text-white' : 'bg-purple-600 text-white hover:bg-purple-700 shadow-lg shadow-purple-900/30'}
+            ${success ? 'bg-green-500 text-white' : 'bg-[#3DD6C8] text-white hover:bg-[#3DD6C8]/90 shadow-lg shadow-[#3DD6C8]/20'}
             ${saving ? 'opacity-50 cursor-not-allowed' : 'active:scale-95'}
           `}
         >
@@ -92,7 +92,7 @@ export default function AdminSettingsPage() {
                 return (
                   <div key={cfg.key} className="flex items-center justify-between p-4 bg-slate-950/40 rounded-2xl border border-slate-800/50">
                     <div className="flex gap-4">
-                      <div className={`p-2 rounded-xl h-fit ${isActive ? 'bg-purple-500/10 text-purple-400' : 'bg-slate-800 text-slate-600'}`}>
+                      <div className={`p-2 rounded-xl h-fit ${isActive ? 'bg-[#3DD6C8]/10 text-[#3DD6C8]' : 'bg-slate-800 text-slate-600'}`}>
                         <cfg.icon size={18} />
                       </div>
                       <div>
@@ -104,7 +104,7 @@ export default function AdminSettingsPage() {
                       onClick={() => handleUpdate(cfg.key, !isActive)}
                       className={`
                         w-12 h-6 rounded-full relative transition-all duration-300
-                        ${isActive ? 'bg-purple-600 shadow-lg shadow-purple-900/20' : 'bg-slate-800'}
+                        ${isActive ? 'bg-[#3DD6C8] shadow-lg shadow-purple-900/20' : 'bg-slate-800'}
                       `}
                     >
                       <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all duration-300 ${isActive ? 'left-7' : 'left-1'}`} />
@@ -193,14 +193,14 @@ export default function AdminSettingsPage() {
                           className="w-16 h-12 bg-slate-950 border border-slate-800 rounded-2xl p-1 cursor-pointer"
                         />
                         <input 
-                          className="flex-1 bg-slate-950 border border-slate-800 rounded-2xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple-500/20 font-mono"
+                          className="flex-1 bg-slate-950 border border-slate-800 rounded-2xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#3DD6C8]/20 font-mono"
                           value={item.value}
                           onChange={(e) => handleUpdate(cfg.key, e.target.value)}
                         />
                       </div>
                     ) : (
                       <input 
-                        className="w-full bg-slate-950 border border-slate-800 rounded-2xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple-500/20 transition-all font-medium"
+                        className="w-full bg-slate-950 border border-slate-800 rounded-2xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#3DD6C8]/20 transition-all font-medium"
                         value={item.value}
                         onChange={(e) => handleUpdate(cfg.key, e.target.value)}
                         placeholder={cfg.placeholder}
@@ -277,7 +277,7 @@ export default function AdminSettingsPage() {
                     <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 pl-1">{cfg.label}</label>
                     <input 
                       type={cfg.type || 'text'}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-2xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple-500/20 transition-all font-bold text-lg"
+                      className="w-full bg-slate-950 border border-slate-800 rounded-2xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#3DD6C8]/20 transition-all font-bold text-lg"
                       value={item.value}
                       onChange={(e) => handleUpdate(cfg.key, e.target.value)}
                       placeholder={cfg.placeholder}

@@ -10,7 +10,7 @@ export type CurrencyCode = 'USD' | 'EUR' | 'GBP' | 'JPY' | 'CAD' | 'CHF' | 'AUD'
 interface Currency {
     code: CurrencyCode;
     symbol: string;
-    rate: number; 
+    rate: number; // Rate relative to USD
 }
 
 const currencies: Record<CurrencyCode, Currency> = {
@@ -26,7 +26,7 @@ const currencies: Record<CurrencyCode, Currency> = {
     ZAR: { code: 'ZAR', symbol: 'R', rate: 19.05 },
     BRL: { code: 'BRL', symbol: 'R$', rate: 4.97 },
     GHC: { code: 'GHC', symbol: 'GH₵', rate: 12.85 },
-    BTC: { code: 'BTC', symbol: '₿', rate: 0.000015 },
+    BTC: { code: 'BTC', symbol: '₿', rate: 0.000015 }, // Example rate
 };
 
 interface CurrencyContextType {
@@ -46,6 +46,7 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
     useEffect(() => {
         if (loading) return;
         
+        // If the admin has defined a global override, use it as default
         const defaultCurrency = backendCurrency?.default && currencies[backendCurrency.default as CurrencyCode] 
             ? { ...currencies[backendCurrency.default as CurrencyCode], symbol: backendCurrency.symbol || currencies[backendCurrency.default as CurrencyCode].symbol }
             : currencies.USD;

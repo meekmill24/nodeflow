@@ -57,13 +57,13 @@ export default function AdminReferralsPage() {
 
       <div className="flex gap-4"> 
         <div className="relative flex-1 group">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-purple-400 transition-colors" size={18} />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-[#3DD6C8] transition-colors" size={18} />
           <input 
             type="text" 
             placeholder="Search by code or affiliate username..." 
             value={searchQuery} 
             onChange={e => setSearchQuery(e.target.value)} 
-            className="w-full pl-12 pr-4 py-4 bg-slate-900/50 border border-slate-800 rounded-3xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500/20 transition-all font-medium italic" 
+            className="w-full pl-12 pr-4 py-4 bg-slate-900/50 border border-slate-800 rounded-3xl text-white focus:outline-none focus:ring-2 focus:ring-[#3DD6C8]/20 transition-all font-medium italic" 
           /> 
         </div>
       </div> 
@@ -97,10 +97,10 @@ export default function AdminReferralsPage() {
                   <td className="px-8 py-6">
                     <button 
                       onClick={() => copyCode(ref.referral_code)}
-                      className="group flex items-center gap-3 bg-slate-950 border border-slate-800 px-4 py-2 rounded-2xl hover:border-purple-500/50 transition-all active:scale-95"
+                      className="group flex items-center gap-3 bg-slate-950 border border-slate-800 px-4 py-2 rounded-2xl hover:border-[#3DD6C8]/50 transition-all active:scale-95"
                     >
-                       <span className="font-mono font-black text-purple-400 italic tracking-widest text-lg">{ref.referral_code}</span>
-                       <Copy size={14} className="text-slate-700 group-hover:text-purple-500 transition-colors" />
+                       <span className="font-mono font-black text-[#3DD6C8] italic tracking-widest text-lg">{ref.referral_code}</span>
+                       <Copy size={14} className="text-slate-700 group-hover:text-[#3DD6C8] transition-colors" />
                     </button>
                   </td> 
                   <td className="px-8 py-6 text-center">

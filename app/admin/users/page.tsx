@@ -181,16 +181,16 @@ export default function AdminUsersPage() {
     <div className="space-y-8 animate-in fade-in duration-500 pb-20"> 
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h2 className="text-3xl font-black text-white italic uppercase tracking-tighter">NODE REGISTRY</h2>
+          <h2 className="text-3xl font-black text-white italic uppercase tracking-tighter">PARTICIPANT REGISTRY</h2>
           <p className="text-slate-500 text-[10px] font-black uppercase tracking-[0.4em] mt-1">Matrix Participant Control Panel</p>
         </div>
         <div className="flex gap-3">
           <div className="relative group">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-600 group-focus-within:text-purple-400 transition-colors" size={16} />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-600 group-focus-within:text-[#3DD6C8] transition-colors" size={16} />
             <input 
               type="text" 
               placeholder="Filter by Node/Identity/ID..." 
-              className="pl-10 pr-4 py-3 bg-slate-900/50 border border-slate-800 rounded-2xl focus:outline-none focus:ring-4 focus:ring-purple-500/10 focus:border-purple-500/50 w-full md:w-80 transition-all text-sm placeholder:text-slate-800"
+              className="pl-10 pr-4 py-3 bg-slate-900/50 border border-slate-800 rounded-2xl focus:outline-none focus:ring-4 focus:ring-[#3DD6C8]/10 focus:border-[#3DD6C8]/50 w-full md:w-80 transition-all text-sm placeholder:text-slate-800"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -227,7 +227,7 @@ export default function AdminUsersPage() {
                       <div>
                         {editingId === user.id ? (
                           <input 
-                            className="bg-black/40 border border-purple-500/50 rounded-xl px-3 py-1.5 text-white text-xs focus:outline-none"
+                            className="bg-black/40 border border-[#3DD6C8]/50 rounded-xl px-3 py-1.5 text-white text-xs focus:outline-none"
                             value={editData.username || ''}
                             onChange={(e) => setEditData({...editData, username: e.target.value})}
                           />
@@ -257,7 +257,7 @@ export default function AdminUsersPage() {
                     <div className="flex flex-col gap-2">
                       <div className="flex items-center gap-2">
                         {user.role === 'admin' ? (
-                          <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-500/10 text-purple-400 text-[9px] font-black uppercase tracking-widest border border-purple-500/20">
+                          <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#3DD6C8]/10 text-[#3DD6C8] text-[9px] font-black uppercase tracking-widest border border-[#3DD6C8]/20">
                             <Shield size={10} /> ADMIN_ROOT
                           </span>
                         ) : (
@@ -269,7 +269,7 @@ export default function AdminUsersPage() {
                       <div className="flex items-center gap-2">
                         {editingId === user.id ? (
                           <select 
-                            className="bg-black/40 border border-purple-500/50 rounded-xl px-3 py-1.5 text-blue-400 text-xs focus:outline-none appearance-none cursor-pointer font-bold uppercase"
+                            className="bg-black/40 border border-[#3DD6C8]/50 rounded-xl px-3 py-1.5 text-blue-400 text-xs focus:outline-none appearance-none cursor-pointer font-bold uppercase"
                             value={editData.level_id || 1}
                             onChange={(e) => setEditData({...editData, level_id: parseInt(e.target.value)})}
                           >
@@ -291,7 +291,7 @@ export default function AdminUsersPage() {
                               <div className="relative">
                                 <Wallet className="absolute left-2 top-1/2 -translate-y-1/2 text-slate-700" size={10} />
                                 <input 
-                                    className="bg-black/40 border border-purple-500/50 rounded-lg pl-6 pr-2 py-1 text-white text-[11px] font-bold focus:outline-none w-32"
+                                    className="bg-black/40 border border-[#3DD6C8]/50 rounded-lg pl-6 pr-2 py-1 text-white text-[11px] font-bold focus:outline-none w-32"
                                     type="number"
                                     value={editData.wallet_balance ?? ''}
                                     onChange={(e) => setEditData({...editData, wallet_balance: e.target.value === '' ? undefined : parseFloat(e.target.value)})}
@@ -311,7 +311,7 @@ export default function AdminUsersPage() {
                               <div className="relative">
                                 <TrendingUp className="absolute left-2 top-1/2 -translate-y-1/2 text-slate-700" size={10} />
                                 <input 
-                                    className="bg-black/40 border border-purple-500/50 rounded-lg pl-6 pr-2 py-1 text-white text-[11px] font-bold focus:outline-none w-32"
+                                    className="bg-black/40 border border-[#3DD6C8]/50 rounded-lg pl-6 pr-2 py-1 text-white text-[11px] font-bold focus:outline-none w-32"
                                     type="number"
                                     value={editData.profit ?? ''}
                                     onChange={(e) => setEditData({...editData, profit: e.target.value === '' ? undefined : parseFloat(e.target.value)})}
@@ -322,7 +322,7 @@ export default function AdminUsersPage() {
                                 <div className="relative flex-1">
                                   <CheckCircle className="absolute left-2 top-1/2 -translate-y-1/2 text-slate-700" size={10} />
                                   <input 
-                                      className="bg-black/40 border border-purple-500/50 rounded-lg pl-6 pr-2 py-1 text-white text-[11px] font-bold focus:outline-none w-full"
+                                      className="bg-black/40 border border-[#3DD6C8]/50 rounded-lg pl-6 pr-2 py-1 text-white text-[11px] font-bold focus:outline-none w-full"
                                       type="number"
                                       value={editData.completed_count ?? ''}
                                       onChange={(e) => setEditData({...editData, completed_count: e.target.value === '' ? undefined : parseInt(e.target.value)})}
@@ -332,7 +332,7 @@ export default function AdminUsersPage() {
                                 <div className="relative flex-1">
                                   <Layers className="absolute left-2 top-1/2 -translate-y-1/2 text-slate-700" size={10} />
                                   <input 
-                                      className="bg-black/40 border border-purple-500/50 rounded-lg pl-6 pr-2 py-1 text-white text-[11px] font-bold focus:outline-none w-full"
+                                      className="bg-black/40 border border-[#3DD6C8]/50 rounded-lg pl-6 pr-2 py-1 text-white text-[11px] font-bold focus:outline-none w-full"
                                       type="number"
                                       value={editData.current_set ?? ''}
                                       onChange={(e) => setEditData({...editData, current_set: e.target.value === '' ? undefined : parseInt(e.target.value)})}
@@ -342,7 +342,7 @@ export default function AdminUsersPage() {
                               </div>
 
                               <div className="mt-2 pt-2 border-t border-slate-800 space-y-2">
-                                <p className="text-[8px] font-black text-purple-400 uppercase tracking-widest px-1">Internal Sequence Config</p>
+                                <p className="text-[8px] font-black text-[#3DD6C8] uppercase tracking-widest px-1">Internal Sequence Config</p>
                                 <div className="grid grid-cols-1 gap-1.5">
                                   <div className="relative">
                                     <Target className="absolute left-2 top-1/2 -translate-y-1/2 text-slate-700" size={10} />
@@ -434,7 +434,7 @@ export default function AdminUsersPage() {
                             </button>
                             <button 
                                 onClick={() => { setEditingId(user.id); setEditData(user); }}
-                                className="p-2.5 bg-purple-500/10 text-purple-400 rounded-xl hover:bg-purple-500/20 transition-all border border-purple-500/10"
+                                className="p-2.5 bg-[#3DD6C8]/10 text-[#3DD6C8] rounded-xl hover:bg-[#3DD6C8]/20 transition-all border border-[#3DD6C8]/10"
                                 title="Edit Node Parameters"
                             >
                                 <Edit2 size={16} />
@@ -491,7 +491,7 @@ export default function AdminUsersPage() {
                             <label className="text-[10px] font-black text-slate-600 uppercase tracking-widest ml-1">Identity Handle</label>
                             <input 
                                 required
-                                className="w-full bg-black/40 border border-white/5 rounded-2xl px-5 py-4 text-white text-sm focus:border-purple-500/50 transition-all"
+                                className="w-full bg-black/40 border border-white/5 rounded-2xl px-5 py-4 text-white text-sm focus:border-[#3DD6C8]/50 transition-all"
                                 value={newUser.username}
                                 onChange={e => setNewUser({...newUser, username: e.target.value})}
                                 placeholder="neo_core"
@@ -500,7 +500,7 @@ export default function AdminUsersPage() {
                         <div className="space-y-2">
                             <label className="text-[10px] font-black text-slate-600 uppercase tracking-widest ml-1">Authorization Role</label>
                             <select 
-                                className="w-full bg-black/40 border border-white/5 rounded-2xl px-5 py-4 text-white text-sm focus:border-purple-500/50 transition-all appearance-none"
+                                className="w-full bg-black/40 border border-white/5 rounded-2xl px-5 py-4 text-white text-sm focus:border-[#3DD6C8]/50 transition-all appearance-none"
                                 value={newUser.role}
                                 onChange={e => setNewUser({...newUser, role: e.target.value as any})}
                             >
@@ -515,7 +515,7 @@ export default function AdminUsersPage() {
                         <input 
                             required
                             type="email"
-                            className="w-full bg-black/40 border border-white/5 rounded-2xl px-5 py-4 text-white text-sm focus:border-purple-500/50 transition-all"
+                            className="w-full bg-black/40 border border-white/5 rounded-2xl px-5 py-4 text-white text-sm focus:border-[#3DD6C8]/50 transition-all"
                             value={newUser.email}
                             onChange={e => setNewUser({...newUser, email: e.target.value})}
                             placeholder="entity@matrix.hub"
@@ -528,7 +528,7 @@ export default function AdminUsersPage() {
                             <input 
                                 required
                                 type="password"
-                                className="w-full bg-black/40 border border-white/5 rounded-2xl px-5 py-4 text-white text-sm focus:border-purple-500/50 transition-all"
+                                className="w-full bg-black/40 border border-white/5 rounded-2xl px-5 py-4 text-white text-sm focus:border-[#3DD6C8]/50 transition-all"
                                 value={newUser.password}
                                 onChange={e => setNewUser({...newUser, password: e.target.value})}
                                 placeholder="••••••••"
@@ -537,7 +537,7 @@ export default function AdminUsersPage() {
                         <div className="space-y-2">
                             <label className="text-[10px] font-black text-slate-600 uppercase tracking-widest ml-1">Encrypted Line (Phone)</label>
                             <input 
-                                className="w-full bg-black/40 border border-white/5 rounded-2xl px-5 py-4 text-white text-sm focus:border-purple-500/50 transition-all"
+                                className="w-full bg-black/40 border border-white/5 rounded-2xl px-5 py-4 text-white text-sm focus:border-[#3DD6C8]/50 transition-all"
                                 value={newUser.phone}
                                 onChange={e => setNewUser({...newUser, phone: e.target.value})}
                                 placeholder="+1 000 000..."
@@ -547,7 +547,7 @@ export default function AdminUsersPage() {
 
                     <button 
                         disabled={creating}
-                        className="w-full bg-white text-black py-5 rounded-2xl font-black text-xs uppercase tracking-[0.3em] hover:bg-purple-500 hover:text-white transition-all shadow-xl active:scale-[0.98] disabled:opacity-50"
+                        className="w-full bg-white text-black py-5 rounded-2xl font-black text-xs uppercase tracking-[0.3em] hover:bg-[#3DD6C8] hover:text-white transition-all shadow-xl active:scale-[0.98] disabled:opacity-50"
                     >
                         {creating ? 'COMMITTING DATA...' : 'INITIALIZE PARTICIPANT'}
                     </button>

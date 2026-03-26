@@ -352,7 +352,7 @@ export default function AdminBundlesPage() {
                     <button onClick={() => { fetchBundles(); fetchUsers(); fetchTaskItems(); }} className="p-3 rounded-2xl bg-slate-900 border border-slate-800 text-slate-400 hover:text-white transition-all">
                         <RefreshCcw size={18} className={loading ? 'animate-spin' : ''} />
                     </button>
-                    <button onClick={() => { setEditingId('new'); setFormData(emptyBundle); }} className="flex items-center gap-2 px-6 py-3 rounded-2xl bg-purple-600 text-white font-black text-xs uppercase tracking-widest hover:bg-purple-700 shadow-lg shadow-purple-900/30 active:scale-95 transition-all">
+                    <button onClick={() => { setEditingId('new'); setFormData(emptyBundle); }} className="flex items-center gap-2 px-6 py-3 rounded-2xl bg-[#3DD6C8] text-white font-black text-xs uppercase tracking-widest hover:bg-[#3DD6C8]/90 shadow-lg shadow-[#3DD6C8]/20 active:scale-95 transition-all">
                         <Plus size={16} /> New Catalog Item
                     </button>
                 </div>
@@ -366,9 +366,9 @@ export default function AdminBundlesPage() {
                     <h3 className="text-3xl font-black text-white italic">{stats.activeQueued} <span className="text-xs text-amber-500 not-italic ml-2 uppercase">Live Bundles</span></h3>
                 </div>
                 <div className="bg-slate-900/40 border border-slate-800 p-8 rounded-[32px] backdrop-blur-sm relative overflow-hidden group">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/5 rounded-full -mr-16 -mt-16 blur-2xl group-hover:bg-purple-500/10 transition-colors" />
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-[#3DD6C8]/5 rounded-full -mr-16 -mt-16 blur-2xl group-hover:bg-[#3DD6C8]/10 transition-colors" />
                     <p className="text-[10px] font-black uppercase text-slate-500 tracking-[0.2em] mb-1">Total Catalog</p>
-                    <h3 className="text-3xl font-black text-white italic">{stats.catalogTotal} <span className="text-xs text-purple-400 not-italic ml-2 uppercase">Configs</span></h3>
+                    <h3 className="text-3xl font-black text-white italic">{stats.catalogTotal} <span className="text-xs text-[#3DD6C8] not-italic ml-2 uppercase">Configs</span></h3>
                 </div>
                 <div className="bg-slate-900/40 border border-slate-800 p-8 rounded-[32px] backdrop-blur-sm relative overflow-hidden group">
                     <div className="absolute top-0 right-0 w-32 h-32 bg-green-500/5 rounded-full -mr-16 -mt-16 blur-2xl group-hover:bg-green-500/10 transition-colors" />
@@ -399,7 +399,7 @@ export default function AdminBundlesPage() {
                                         className="w-full bg-slate-950/60 border border-slate-800 rounded-2xl px-5 py-4 text-left flex items-center justify-between group transition-all"
                                     >
                                         <div className="flex items-center gap-3">
-                                            <div className={`p-2 rounded-xl h-fit ${selectedUser ? 'bg-purple-500/20 text-purple-400' : 'bg-slate-800 text-slate-600'}`}>
+                                            <div className={`p-2 rounded-xl h-fit ${selectedUser ? 'bg-[#3DD6C8]/20 text-[#3DD6C8]' : 'bg-slate-800 text-slate-600'}`}>
                                                 <Users size={18} />
                                             </div>
                                             <span className={selectedUser ? 'text-white font-bold' : 'text-slate-600 text-sm'}>
@@ -413,7 +413,7 @@ export default function AdminBundlesPage() {
                                         <div className="absolute top-full mt-2 w-full bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2">
                                             <div className="p-3 bg-slate-950/40 border-b border-slate-800">
                                                 <input 
-                                                    className="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-purple-500/30"
+                                                    className="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-[#3DD6C8]/30"
                                                     placeholder="Search user..."
                                                     value={userSearchQuery}
                                                     onChange={e => setUserSearchQuery(e.target.value)}
@@ -458,14 +458,14 @@ export default function AdminBundlesPage() {
                                                 <div 
                                                     key={t.id}
                                                     onClick={() => toggleTaskSelect(t.id)}
-                                                    className={`flex items-center gap-3 p-2 rounded-xl cursor-pointer transition-all border ${isSelected ? 'bg-purple-500/10 border-purple-500/30' : 'border-transparent hover:bg-slate-800/50'}`}
+                                                    className={`flex items-center gap-3 p-2 rounded-xl cursor-pointer transition-all border ${isSelected ? 'bg-[#3DD6C8]/10 border-[#3DD6C8]/30' : 'border-transparent hover:bg-slate-800/50'}`}
                                                 >
                                                     <img src={t.image_url} className="w-8 h-8 rounded-lg object-cover" />
                                                     <div className="flex-1 min-w-0">
-                                                        <div className={`text-xs font-bold truncate ${isSelected ? 'text-purple-400' : 'text-slate-200'}`}>{t.title}</div>
+                                                        <div className={`text-xs font-bold truncate ${isSelected ? 'text-[#3DD6C8]' : 'text-slate-200'}`}>{t.title}</div>
                                                         <div className="text-[8px] text-slate-500 uppercase font-black tracking-widest">VIP {t.level_id} • {t.category}</div>
                                                     </div>
-                                                    {isSelected && <CheckCircle size={14} className="text-purple-500" />}
+                                                    {isSelected && <CheckCircle size={14} className="text-[#3DD6C8]" />}
                                                 </div>
                                             );
                                         })}
@@ -478,7 +478,7 @@ export default function AdminBundlesPage() {
                                     <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-1">Bundle Total ($)</label>
                                     <input 
                                         type="number"
-                                        className="w-full bg-slate-950/60 border border-slate-800 rounded-2xl px-5 py-4 text-white font-black italic focus:outline-none focus:border-purple-500/30"
+                                        className="w-full bg-slate-950/60 border border-slate-800 rounded-2xl px-5 py-4 text-white font-black italic focus:outline-none focus:border-[#3DD6C8]/30"
                                         placeholder="0.00"
                                         value={assignForm.productAmount}
                                         onChange={e => setAssignForm({ ...assignForm, productAmount: e.target.value })}
@@ -488,7 +488,7 @@ export default function AdminBundlesPage() {
                                     <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-1">Task Hit Index (1-40)</label>
                                     <input 
                                         type="number"
-                                        className="w-full bg-slate-950/60 border border-slate-800 rounded-2xl px-5 py-4 text-white font-black italic focus:outline-none focus:border-purple-500/30"
+                                        className="w-full bg-slate-950/60 border border-slate-800 rounded-2xl px-5 py-4 text-white font-black italic focus:outline-none focus:border-[#3DD6C8]/30"
                                         placeholder="35"
                                         value={assignForm.targetIndex}
                                         onChange={e => setAssignForm({ ...assignForm, targetIndex: e.target.value })}
@@ -503,7 +503,7 @@ export default function AdminBundlesPage() {
                                         <button 
                                             key={p.value} 
                                             onClick={() => setBonusPreset(p.value)}
-                                            className={`py-2 px-1 rounded-xl text-[9px] font-black tracking-widest transition-all border ${bonusPreset === p.value ? 'bg-purple-600 border-purple-500 text-white shadow-lg' : 'bg-slate-950/40 border-slate-800 text-slate-500 hover:bg-slate-800'}`}
+                                            className={`py-2 px-1 rounded-xl text-[9px] font-black tracking-widest transition-all border ${bonusPreset === p.value ? 'bg-[#3DD6C8] border-[#3DD6C8] text-white shadow-lg' : 'bg-slate-950/40 border-slate-800 text-slate-500 hover:bg-slate-800'}`}
                                         >
                                             {p.label}
                                         </button>
@@ -513,15 +513,15 @@ export default function AdminBundlesPage() {
                                 {bonusPreset === 'custom_pct' && (
                                     <div className="mt-3 animate-in slide-in-from-top-2 duration-300">
                                         <div className="relative group">
-                                            <Percent className="absolute left-3 top-1/2 -translate-y-1/2 text-purple-400" size={12} />
+                                            <Percent className="absolute left-3 top-1/2 -translate-y-1/2 text-[#3DD6C8]" size={12} />
                                             <input 
                                                 type="number"
-                                                className="w-full bg-slate-950/90 border border-purple-500/30 rounded-xl pl-10 pr-4 py-3 text-white text-[11px] font-black italic focus:border-purple-500/60 focus:ring-4 focus:ring-purple-500/10 transition-all outline-none"
+                                                className="w-full bg-slate-950/90 border border-[#3DD6C8]/30 rounded-xl pl-10 pr-4 py-3 text-white text-[11px] font-black italic focus:border-[#3DD6C8]/60 focus:ring-4 focus:ring-[#3DD6C8]/10 transition-all outline-none"
                                                 placeholder="Enter yield % (e.g. 20)..."
                                                 value={assignForm.rate}
                                                 onChange={e => setAssignForm({ ...assignForm, rate: e.target.value })}
                                             />
-                                            <div className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-black text-purple-500/40 uppercase tracking-widest">Rate %</div>
+                                            <div className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-black text-[#3DD6C8]/40 uppercase tracking-widest">Rate %</div>
                                         </div>
                                     </div>
                                 )}
@@ -529,15 +529,15 @@ export default function AdminBundlesPage() {
                                 {bonusPreset === 'custom' && (
                                     <div className="mt-3 animate-in slide-in-from-top-2 duration-300">
                                         <div className="relative group">
-                                            <TrendingUp className="absolute left-3 top-1/2 -translate-y-1/2 text-purple-400" size={12} />
+                                            <TrendingUp className="absolute left-3 top-1/2 -translate-y-1/2 text-[#3DD6C8]" size={12} />
                                             <input 
                                                 type="number"
-                                                className="w-full bg-slate-950/90 border border-purple-500/30 rounded-xl pl-10 pr-4 py-3 text-white text-[11px] font-black italic focus:border-purple-500/60 focus:ring-4 focus:ring-purple-500/10 transition-all outline-none"
+                                                className="w-full bg-slate-950/90 border border-[#3DD6C8]/30 rounded-xl pl-10 pr-4 py-3 text-white text-[11px] font-black italic focus:border-[#3DD6C8]/60 focus:ring-4 focus:ring-[#3DD6C8]/10 transition-all outline-none"
                                                 placeholder="Enter fixed amount ($50.00)..."
                                                 value={customBonus}
                                                 onChange={e => setCustomBonus(e.target.value)}
                                             />
-                                            <div className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-black text-purple-500/40 uppercase tracking-widest">Fixed Yield</div>
+                                            <div className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-black text-[#3DD6C8]/40 uppercase tracking-widest">Fixed Yield</div>
                                         </div>
                                     </div>
                                 )}
@@ -545,7 +545,7 @@ export default function AdminBundlesPage() {
 
                             {/* Impact Summary */}
                             {selectedUser && parseFloat(assignForm.productAmount as string) > 0 && (
-                                <div className="p-4 bg-purple-500/5 rounded-2xl border border-purple-500/10 space-y-2">
+                                <div className="p-4 bg-[#3DD6C8]/5 rounded-2xl border border-[#3DD6C8]/10 space-y-2">
                                     <div className="flex justify-between text-[10px] font-bold uppercase tracking-widest text-slate-500">
                                         <span>Agent Deficit</span>
                                         <span className="text-red-400">${Math.max(0, parseFloat(assignForm.productAmount as string) - selectedUser.wallet_balance).toFixed(2)}</span>
@@ -560,7 +560,7 @@ export default function AdminBundlesPage() {
                             <button 
                                 onClick={handleAssignBundle}
                                 disabled={assigning || !selectedUserId}
-                                className="w-full py-5 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-2xl text-white font-black uppercase tracking-[0.2em] text-xs shadow-xl shadow-purple-900/30 active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-3"
+                                className="w-full py-5 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-2xl text-white font-black uppercase tracking-[0.2em] text-xs shadow-xl shadow-[#3DD6C8]/20 active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-3"
                             >
                                 {assigning ? <Loader2 className="animate-spin" /> : <Zap size={18} fill="currentColor" />}
                                 Deploy Special Bundle
@@ -771,7 +771,7 @@ export default function AdminBundlesPage() {
                                     <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1">Hit Index (1-40)</label>
                                     <input 
                                         type="number" 
-                                        className="w-full bg-slate-900 border border-slate-800 rounded-2xl px-5 py-4 text-white font-bold italic focus:border-purple-500/50 outline-none transition-colors"
+                                        className="w-full bg-slate-900 border border-slate-800 rounded-2xl px-5 py-4 text-white font-bold italic focus:border-[#3DD6C8]/50 outline-none transition-colors"
                                         value={(editingQueueUser.pending_bundle as any).targetIndex}
                                         onChange={e => setEditingQueueUser({
                                             ...editingQueueUser,
@@ -783,7 +783,7 @@ export default function AdminBundlesPage() {
                                     <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1">Package Cost ($)</label>
                                     <input 
                                         type="number" 
-                                        className="w-full bg-slate-900 border border-slate-800 rounded-2xl px-5 py-4 text-white font-bold italic focus:border-purple-500/50 outline-none transition-colors"
+                                        className="w-full bg-slate-900 border border-slate-800 rounded-2xl px-5 py-4 text-white font-bold italic focus:border-[#3DD6C8]/50 outline-none transition-colors"
                                         value={(editingQueueUser.pending_bundle as any).totalAmount}
                                         onChange={e => setEditingQueueUser({
                                             ...editingQueueUser,
@@ -797,7 +797,7 @@ export default function AdminBundlesPage() {
                                 <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1">Yield Payout ($)</label>
                                 <input 
                                     type="number" 
-                                    className="w-full bg-slate-900 border border-slate-800 rounded-2xl px-5 py-4 text-green-500 font-bold italic focus:border-purple-500/50 outline-none transition-colors"
+                                    className="w-full bg-slate-900 border border-slate-800 rounded-2xl px-5 py-4 text-green-500 font-bold italic focus:border-[#3DD6C8]/50 outline-none transition-colors"
                                     value={(editingQueueUser.pending_bundle as any).bonusAmount}
                                     onChange={e => setEditingQueueUser({
                                         ...editingQueueUser,

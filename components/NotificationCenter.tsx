@@ -133,7 +133,7 @@ export default function NotificationCenter() {
       >
         <Bell className={cn('w-6 h-6 transition-transform', isOpen ? 'rotate-12' : 'group-hover:rotate-12')} />
         {unreadCount > 0 && (
-          <span className="absolute -top-1 -right-1 w-5 h-5 bg-cyan-500 rounded-full border-2 border-slate-950 flex items-center justify-center text-[10px] font-black text-slate-950">
+          <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full border-2 border-slate-950 flex items-center justify-center text-[10px] font-black text-slate-950" style={{background: 'var(--nf-teal)'}}>
             {unreadCount}
           </span>
         )}
@@ -157,9 +157,9 @@ export default function NotificationCenter() {
                 <button 
                   onClick={() => setFilter(filter === 'all' ? 'unread' : 'all')}
                   className={cn(
-                    "p-2 rounded-xl border border-white/5 transition-all",
-                    filter === 'unread' ? "bg-cyan-500/10 text-cyan-400 border-cyan-500/20" : "bg-white/5 text-zinc-400"
+                    filter === 'unread' ? "bg-[var(--nf-teal-dim)] border-[var(--nf-teal)]/20" : "bg-white/5 text-zinc-400"
                   )}
+                  style={filter === 'unread' ? {color: 'var(--nf-teal)'} : {}}
                   title={filter === 'all' ? "Show Unread" : "Show All"}
                 >
                   <Filter size={14} />
@@ -183,7 +183,7 @@ export default function NotificationCenter() {
                       key={notification.id}
                       className={cn(
                         "p-6 hover:bg-white/[0.02] transition-all cursor-pointer group relative",
-                        !notification.is_read && "bg-cyan-500/[0.03]"
+                        !notification.is_read && "bg-[var(--nf-teal-dim)]"
                       )}
                       onClick={() => {
                           if (!notification.is_read) markAsRead(notification.id);
@@ -196,8 +196,8 @@ export default function NotificationCenter() {
                           notification.type === 'success' ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400" :
                           notification.type === 'warning' ? "bg-amber-500/10 border-amber-500/20 text-amber-400" :
                           notification.type === 'error' ? "bg-rose-500/10 border-rose-500/20 text-rose-400" :
-                          "bg-cyan-500/10 border-cyan-500/20 text-cyan-400"
-                        )}>
+                          "bg-[var(--nf-teal-dim)] border-[var(--nf-teal)]/20"
+                        )} style={notification.type === 'info' ? {color: 'var(--nf-teal)'} : {}}>
                           {notification.type === 'success' ? <ShieldCheck size={18} /> :
                            notification.type === 'warning' ? <AlertCircle size={18} /> :
                            notification.type === 'error' ? <X size={18} /> :
@@ -225,7 +225,7 @@ export default function NotificationCenter() {
                         </div>
                       </div>
                       {!notification.is_read && (
-                        <div className="absolute top-1/2 -right-1 w-1 h-8 bg-cyan-500 rounded-full -translate-y-1/2" />
+                        <div className="absolute top-1/2 -right-1 w-1 h-8 rounded-full -translate-y-1/2" style={{background: 'var(--nf-teal)'}} />
                       )}
                     </div>
                   ))}
@@ -248,7 +248,7 @@ export default function NotificationCenter() {
                   className="group flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 hover:border-white/10 transition-all font-black text-[10px] uppercase tracking-widest text-zinc-400 hover:text-white"
                 >
                   <div className="flex items-center gap-3">
-                    <History size={16} className="text-cyan-500" />
+                    <History size={16} style={{color: 'var(--nf-teal)'}} />
                     <span>View Audit Trail</span>
                   </div>
                   <ChevronRight size={16} className="transition-transform group-hover:translate-x-1" />

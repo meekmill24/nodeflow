@@ -126,7 +126,7 @@ export default function AdminDashboard() {
       {/* Main Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {statCards.map((stat, i) => (
-          <div key={i} className="bg-slate-900/40 border border-slate-800 p-6 rounded-3xl backdrop-blur-sm group hover:border-purple-500/50 transition-all duration-300">
+          <div key={i} className="bg-slate-900/40 border border-slate-800 p-6 rounded-3xl backdrop-blur-sm group hover:border-[#3DD6C8]/50 transition-all duration-300">
             <div className={`p-3 rounded-2xl bg-${stat.color}-500/10 text-${stat.color}-400 w-fit mb-4 group-hover:scale-110 transition-transform duration-300`}>
               <stat.icon size={24} />
             </div>
@@ -181,7 +181,7 @@ export default function AdminDashboard() {
           { icon: Activity, label: 'Activity', href: '/admin/activity' },
         ].map((item, i) => (
           <Link key={i} href={item.href} className="bg-slate-900/40 border border-slate-800 p-4 rounded-2xl flex flex-col items-center justify-center text-center hover:border-slate-600 transition-colors group">
-            <item.icon className="text-slate-500 mb-2 group-hover:text-purple-400 transition-colors" size={20} />
+            <item.icon className="text-slate-500 mb-2 group-hover:text-[#3DD6C8] transition-colors" size={20} />
             <span className="text-xs font-medium text-slate-400">{item.label}</span>
             {item.value !== undefined && <span className="text-sm font-bold text-white mt-0.5">{item.value}</span>}
           </Link>
@@ -192,7 +192,7 @@ export default function AdminDashboard() {
       <div className="bg-slate-900/40 border border-slate-800 rounded-3xl overflow-hidden backdrop-blur-sm">
         <div className="p-6 border-b border-slate-800 flex items-center justify-between">
           <h3 className="text-xl font-bold text-white">Recent Transactions</h3>
-          <Link href="/admin/transactions" className="text-purple-400 text-sm font-semibold hover:text-purple-300">View All</Link>
+          <Link href="/admin/transactions" className="text-[#3DD6C8] text-sm font-semibold hover:text-purple-300">View All</Link>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full">

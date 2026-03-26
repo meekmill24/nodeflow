@@ -22,21 +22,21 @@ export function StatCard({
   variant = 'blue',
 }: StatCardProps) {
   const glowColors = {
-    blue: 'shadow-cyan-500/10 border-cyan-500/20',
+    blue: 'shadow-[var(--nf-teal-dim)] border-[var(--nf-teal)]/20',
     green: 'shadow-emerald-500/10 border-emerald-500/20',
-    purple: 'shadow-purple-500/10 border-purple-500/20',
+    purple: 'shadow-[var(--nf-teal-dim)] border-[var(--nf-teal)]/20',
     orange: 'shadow-orange-500/10 border-orange-500/20',
     red: 'shadow-red-500/10 border-red-500/20',
-    cyan: 'shadow-cyan-400/10 border-cyan-400/20',
+    cyan: 'shadow-[var(--nf-teal-dim)] border-[var(--nf-teal)]/20',
   }
 
-  const iconColors = {
-    blue: 'text-cyan-400',
+  const textColors = {
+    blue: 'text-[var(--nf-teal)]',
     green: 'text-emerald-400',
-    purple: 'text-purple-400',
+    purple: 'text-[var(--nf-teal)]',
     orange: 'text-orange-400',
     red: 'text-red-400',
-    cyan: 'text-cyan-300',
+    cyan: 'text-[var(--nf-teal)]',
   }
 
   return (
@@ -63,11 +63,11 @@ export function BalanceCard({
 }: BalanceCardProps) {
   return (
     <div className="glass-dark rounded-[40px] p-8 border border-white/5 shadow-2xl relative overflow-hidden group">
-      <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/5 rounded-full blur-[60px] translate-x-10 translate-y-[-10px]" />
+      <div className="absolute top-0 right-0 w-32 h-32 rounded-full blur-[60px] translate-x-10 translate-y-[-10px]" style={{background: 'var(--nf-teal-dim)'}} />
       <div className='flex items-start justify-between relative z-10'>
         <div className='space-y-4'>
           <div className='space-y-1'>
-            <p className='text-[10px] font-black uppercase tracking-[0.2em] text-cyan-400 italic'>{label}</p>
+            <p className='text-[10px] font-black uppercase tracking-[0.2em] italic' style={{color: 'var(--nf-teal)'}}>{label}</p>
             <div className='flex items-baseline gap-2'>
               <span className='text-4xl font-black text-white italic tracking-tighter'>
                 ${typeof amount === 'number' ? amount.toFixed(2) : amount}
@@ -81,8 +81,8 @@ export function BalanceCard({
           </div>
         </div>
         {Icon && (
-          <div className='w-16 h-16 rounded-[24px] bg-white/5 border border-white/5 flex items-center justify-center shadow-inner group-hover:border-cyan-500/30 transition-all duration-700'>
-            <Icon className='w-8 h-8 text-cyan-400' />
+          <div className='w-16 h-16 rounded-[24px] bg-white/5 border border-white/5 flex items-center justify-center shadow-inner transition-all duration-700' style={{border: '1px solid var(--nf-teal-dim)'}}>
+            <Icon className='w-8 h-8' style={{color: 'var(--nf-teal)'}} />
           </div>
         )}
       </div>
@@ -111,7 +111,7 @@ export function TransactionItem({
   return (
     <div className='flex items-center gap-3 py-3'>
       <div className={`rounded-full p-2 bg-white/5 border border-white/5`}>
-        <Icon className={`w-5 h-5 text-cyan-400`} />
+        <Icon className={`w-5 h-5`} style={{color: 'var(--nf-teal)'}} />
       </div>
       <div className='flex-1'>
         <p className='font-black uppercase tracking-widest text-[#8px] text-white italic'>{title}</p>

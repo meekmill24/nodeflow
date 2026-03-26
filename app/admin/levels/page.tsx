@@ -82,7 +82,7 @@ export default function AdminLevelsPage() {
         </div>
         <button 
           onClick={() => setShowCreate(!showCreate)} 
-          className="flex items-center gap-2 px-6 py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-2xl font-bold transition-all shadow-lg shadow-purple-900/30 active:scale-95 w-fit"
+          className="flex items-center gap-2 px-6 py-2.5 bg-[#3DD6C8] hover:bg-[#3DD6C8]/90 text-white rounded-2xl font-bold transition-all shadow-lg shadow-[#3DD6C8]/20 active:scale-95 w-fit"
         > 
           <Plus size={20} /> Add Tier 
         </button> 
@@ -95,7 +95,7 @@ export default function AdminLevelsPage() {
             <div className="space-y-1.5"> 
               <label className="text-xs font-bold text-slate-500 uppercase tracking-widest pl-1">Tier Name</label> 
               <input 
-                className="w-full bg-slate-950 border border-slate-800 rounded-2xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all font-medium" 
+                className="w-full bg-slate-950 border border-slate-800 rounded-2xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#3DD6C8]/20 focus:border-[#3DD6C8] transition-all font-medium" 
                 value={newLevel.name} 
                 onChange={(e) => setNewLevel({ ...newLevel, name: e.target.value })} 
                 placeholder="e.g. VIP 1 Platinum" 
@@ -105,7 +105,7 @@ export default function AdminLevelsPage() {
               <label className="text-xs font-bold text-slate-500 uppercase tracking-widest pl-1">Activation Price ($)</label> 
               <input 
                 type="number" 
-                className="w-full bg-slate-950 border border-slate-800 rounded-2xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all font-medium" 
+                className="w-full bg-slate-950 border border-slate-800 rounded-2xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#3DD6C8]/20 focus:border-[#3DD6C8] transition-all font-medium" 
                 value={newLevel.price} 
                 onChange={(e) => setNewLevel({ ...newLevel, price: parseFloat(e.target.value) })} 
               /> 
@@ -115,7 +115,7 @@ export default function AdminLevelsPage() {
               <input 
                 type="number" 
                 step="0.0001" 
-                className="w-full bg-slate-950 border border-slate-800 rounded-2xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all font-medium" 
+                className="w-full bg-slate-950 border border-slate-800 rounded-2xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#3DD6C8]/20 focus:border-[#3DD6C8] transition-all font-medium" 
                 value={newLevel.commission_rate} 
                 onChange={(e) => setNewLevel({ ...newLevel, commission_rate: parseFloat(e.target.value) })} 
               /> 
@@ -124,7 +124,7 @@ export default function AdminLevelsPage() {
               <label className="text-xs font-bold text-slate-500 uppercase tracking-widest pl-1">Tasks per Set</label> 
               <input 
                 type="number" 
-                className="w-full bg-slate-950 border border-slate-800 rounded-2xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all font-medium" 
+                className="w-full bg-slate-950 border border-slate-800 rounded-2xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#3DD6C8]/20 focus:border-[#3DD6C8] transition-all font-medium" 
                 value={newLevel.tasks_per_set} 
                 onChange={(e) => setNewLevel({ ...newLevel, tasks_per_set: parseInt(e.target.value) })} 
               /> 
@@ -133,7 +133,7 @@ export default function AdminLevelsPage() {
               <label className="text-xs font-bold text-slate-500 uppercase tracking-widest pl-1">Daily Sets</label> 
               <input 
                 type="number" 
-                className="w-full bg-slate-950 border border-slate-800 rounded-2xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all font-medium" 
+                className="w-full bg-slate-950 border border-slate-800 rounded-2xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#3DD6C8]/20 focus:border-[#3DD6C8] transition-all font-medium" 
                 value={newLevel.sets_per_day} 
                 onChange={(e) => setNewLevel({ ...newLevel, sets_per_day: parseInt(e.target.value) })} 
               /> 
@@ -148,7 +148,7 @@ export default function AdminLevelsPage() {
                   className="w-16 h-12 bg-slate-950 border border-slate-800 rounded-2xl p-1 cursor-pointer" 
                 /> 
                 <input 
-                  className="flex-1 bg-slate-950 border border-slate-800 rounded-2xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all font-mono" 
+                  className="flex-1 bg-slate-950 border border-slate-800 rounded-2xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#3DD6C8]/20 focus:border-[#3DD6C8] transition-all font-mono" 
                   value={newLevel.badge_color} 
                   onChange={(e) => setNewLevel({ ...newLevel, badge_color: e.target.value })} 
                 /> 
@@ -157,7 +157,7 @@ export default function AdminLevelsPage() {
           </div> 
           <div className="flex gap-3 justify-end mt-8"> 
             <button onClick={() => setShowCreate(false)} className="px-6 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-2xl font-bold transition-all">Cancel</button> 
-            <button onClick={handleCreate} className="px-8 py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-2xl font-bold transition-all shadow-lg shadow-purple-900/30">Activate Tier</button> 
+            <button onClick={handleCreate} className="px-8 py-2.5 bg-[#3DD6C8] hover:bg-[#3DD6C8]/90 text-white rounded-2xl font-bold transition-all shadow-lg shadow-[#3DD6C8]/20">Activate Tier</button> 
           </div> 
         </div> 
       )} 
@@ -166,7 +166,7 @@ export default function AdminLevelsPage() {
         {levels.map((level) => ( 
           <div 
             key={level.id} 
-            className="group relative bg-slate-900/40 border border-slate-800 p-8 rounded-[40px] backdrop-blur-sm transition-all duration-500 hover:border-purple-500/30 overflow-hidden"
+            className="group relative bg-slate-900/40 border border-slate-800 p-8 rounded-[40px] backdrop-blur-sm transition-all duration-500 hover:border-[#3DD6C8]/30 overflow-hidden"
           > 
             <div 
               className="absolute top-0 right-0 w-32 h-32 blur-[60px] opacity-20 transition-opacity group-hover:opacity-40" 
@@ -176,7 +176,7 @@ export default function AdminLevelsPage() {
             <div className="relative z-10">
               {editingId === level.id ? ( 
                 <div className="space-y-4"> 
-                  <input className="w-full bg-slate-950 border border-purple-500/50 rounded-2xl px-4 py-2 text-white font-bold" value={editData.name || ''} onChange={(e) => setEditData({ ...editData, name: e.target.value })} /> 
+                  <input className="w-full bg-slate-950 border border-[#3DD6C8]/50 rounded-2xl px-4 py-2 text-white font-bold" value={editData.name || ''} onChange={(e) => setEditData({ ...editData, name: e.target.value })} /> 
                   <div className="grid grid-cols-2 gap-3"> 
                     <div className="space-y-1">
                       <label className="text-[10px] font-bold text-slate-500 uppercase">Price</label>
@@ -213,7 +213,7 @@ export default function AdminLevelsPage() {
                       <h3 className="text-2xl font-black text-white italic tracking-tight">{level.name.toUpperCase()}</h3> 
                     </div> 
                     <div className="flex gap-1.5"> 
-                      <button onClick={() => { setEditingId(level.id); setEditData({ ...level }); }} className="p-2.5 rounded-2xl bg-slate-800/50 text-slate-400 hover:text-purple-400 hover:bg-slate-800 transition-all"><Edit2 size={16} /></button> 
+                      <button onClick={() => { setEditingId(level.id); setEditData({ ...level }); }} className="p-2.5 rounded-2xl bg-slate-800/50 text-slate-400 hover:text-[#3DD6C8] hover:bg-slate-800 transition-all"><Edit2 size={16} /></button> 
                       <button onClick={() => handleDelete(level.id)} className="p-2.5 rounded-2xl bg-slate-800/50 text-slate-400 hover:text-red-400 hover:bg-slate-800 transition-all"><Trash2 size={16} /></button> 
                     </div> 
                   </div> 

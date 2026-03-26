@@ -108,13 +108,13 @@ export default function AdminNotifyPage() {
         <div className="lg:col-span-2 space-y-10">
           {/* Form */}
           <form onSubmit={handleSend} className="bg-slate-900/40 border border-slate-800 p-8 rounded-[40px] backdrop-blur-sm space-y-6 shadow-2xl"> 
-            <div className="p-4 bg-purple-500/10 border border-purple-500/20 rounded-3xl flex items-center gap-4 mb-2">
-               <div className="w-12 h-12 bg-purple-600 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-purple-900/40">
+            <div className="p-4 bg-[#3DD6C8]/10 border border-[#3DD6C8]/20 rounded-3xl flex items-center gap-4 mb-2">
+               <div className="w-12 h-12 bg-[#3DD6C8] rounded-2xl flex items-center justify-center text-white shadow-xl shadow-[#3DD6C8]/20">
                   <MessageSquare size={24} />
                </div>
                <div>
                   <h3 className="font-bold text-white uppercase italic tracking-widest text-sm">Compose Transmission</h3>
-                  <p className="text-[10px] text-purple-400 font-bold uppercase tracking-[0.1em]">Target: {loading ? 'Scanning...' : `${users.length} Active Agents`}</p>
+                  <p className="text-[10px] text-[#3DD6C8] font-bold uppercase tracking-[0.1em]">Target: {loading ? 'Scanning...' : `${users.length} Active Agents`}</p>
                </div>
             </div>
 
@@ -122,7 +122,7 @@ export default function AdminNotifyPage() {
                 <div className="space-y-2">
                     <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 pl-1">Protocol Title</label>
                     <input 
-                        className="w-full bg-slate-950 border border-slate-800 rounded-2xl px-6 py-4 text-white font-bold focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all italic text-lg" 
+                        className="w-full bg-slate-950 border border-slate-800 rounded-2xl px-6 py-4 text-white font-bold focus:outline-none focus:ring-2 focus:ring-[#3DD6C8]/20 focus:border-[#3DD6C8] transition-all italic text-lg" 
                         value={title} 
                         onChange={e => setTitle(e.target.value)} 
                         placeholder="INCIDENT_REPORT_X" 
@@ -133,7 +133,7 @@ export default function AdminNotifyPage() {
                 <div className="space-y-2">
                     <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 pl-1">Encrypted Payload</label>
                     <textarea 
-                        className="w-full bg-slate-950 border border-slate-800 rounded-3xl px-6 py-5 text-slate-400 font-medium focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all h-32 leading-relaxed text-sm" 
+                        className="w-full bg-slate-950 border border-slate-800 rounded-3xl px-6 py-5 text-slate-400 font-medium focus:outline-none focus:ring-2 focus:ring-[#3DD6C8]/20 focus:border-[#3DD6C8] transition-all h-32 leading-relaxed text-sm" 
                         value={message} 
                         onChange={e => setMessage(e.target.value)} 
                         placeholder="Enter detailed notification content here..." 
@@ -147,7 +147,7 @@ export default function AdminNotifyPage() {
               disabled={sending || loading || users.length === 0} 
               className={`
                 w-full py-5 rounded-[24px] font-black uppercase tracking-[0.3em] italic text-lg transition-all flex items-center justify-center gap-4
-                ${sending ? 'bg-slate-800 text-slate-500' : 'bg-purple-600 text-white hover:bg-purple-700 shadow-xl shadow-purple-900/30 active:scale-95'}
+                ${sending ? 'bg-slate-800 text-slate-500' : 'bg-[#3DD6C8] text-white hover:bg-[#3DD6C8]/90 shadow-xl shadow-[#3DD6C8]/20 active:scale-95'}
               `}
             >
               {sending ? <Loader2 className="animate-spin" size={24} /> : <Zap size={24} />}
@@ -158,7 +158,7 @@ export default function AdminNotifyPage() {
           {/* History Ledger */}
           <div className="space-y-6">
             <h3 className="text-[11px] font-black uppercase tracking-[0.4em] text-slate-500 pl-2 flex items-center gap-2 italic">
-               <History size={14} className="text-purple-500" />
+               <History size={14} className="text-[#3DD6C8]" />
                Transmission Ledger
             </h3>
             
@@ -169,7 +169,7 @@ export default function AdminNotifyPage() {
                    <div className="p-12 text-center bg-slate-900/20 border border-dashed border-slate-800 rounded-[32px] text-slate-600 font-bold uppercase tracking-widest text-[10px]">No historical protocols found.</div>
                ) : (
                 history.map((item, idx) => (
-                    <div key={idx} className="bg-slate-900/40 border border-slate-800/50 p-6 rounded-[32px] group hover:border-purple-500/30 transition-all">
+                    <div key={idx} className="bg-slate-900/40 border border-slate-800/50 p-6 rounded-[32px] group hover:border-[#3DD6C8]/30 transition-all">
                         <div className="flex items-start justify-between gap-4">
                             <div className="flex gap-5">
                                 <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center text-slate-500 shrink-0">
@@ -178,7 +178,7 @@ export default function AdminNotifyPage() {
                                 <div className="space-y-1">
                                     <div className="flex items-center gap-2">
                                         <h4 className="text-sm font-black text-white italic uppercase">{item.title}</h4>
-                                        <span className="px-2 py-0.5 rounded-full bg-purple-500/10 border border-purple-500/20 text-[8px] font-black text-purple-400 uppercase tracking-widest">{item.count} NODES</span>
+                                        <span className="px-2 py-0.5 rounded-full bg-[#3DD6C8]/10 border border-[#3DD6C8]/20 text-[8px] font-black text-[#3DD6C8] uppercase tracking-widest">{item.count} NODES</span>
                                     </div>
                                     <p className="text-[10px] text-slate-500 font-medium leading-relaxed max-w-xl">{item.message}</p>
                                     <div className="flex items-center gap-3 pt-2">
@@ -203,7 +203,7 @@ export default function AdminNotifyPage() {
         <div className="space-y-6">
            <div className="bg-slate-900/40 border border-slate-800 p-8 rounded-[40px] backdrop-blur-sm sticky top-8">
               <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-6 flex items-center gap-2">
-                 <Users size={14} className="text-purple-500" />
+                 <Users size={14} className="text-[#3DD6C8]" />
                  Engagement Status
               </h4>
               
@@ -213,7 +213,7 @@ export default function AdminNotifyPage() {
                     <span className="text-lg font-black text-white italic">{users.length} Agents</span>
                  </div>
                  <div className="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
-                    <div className="bg-purple-500 h-full w-full shadow-[0_0_10px_rgba(168,85,247,0.5)]" />
+                    <div className="bg-[#3DD6C8] h-full w-full shadow-[0_0_10px_rgba(168,85,247,0.5)]" />
                  </div>
                  <p className="text-[10px] text-slate-600 italic leading-relaxed">System protocols are distributed horizontally across all authorized nodes instantly upon execution.</p>
               </div>

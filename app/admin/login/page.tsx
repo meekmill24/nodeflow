@@ -52,7 +52,7 @@ export default function AdminLogin() {
       
       {/* Decorative Background */}
       <div className="absolute top-0 left-0 w-full h-full z-0 opacity-20">
-          <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-purple-600/20 rounded-full blur-[120px] animate-pulse" />
+          <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-[#3DD6C8]/20 rounded-full blur-[120px] animate-pulse" />
           <div className="absolute bottom-[-10%] right-[-10%] w-[400px] h-[400px] bg-blue-600/20 rounded-full blur-[100px]" />
       </div>
 
@@ -80,7 +80,7 @@ export default function AdminLogin() {
               <div className="space-y-2">
                 <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Admin Identifier</label>
                 <div className="relative group/input">
-                    <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none text-slate-600 group-focus-within/input:text-purple-400 transition-colors">
+                    <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none text-slate-600 group-focus-within/input:text-[#3DD6C8] transition-colors">
                         <User size={18} />
                     </div>
                     <input 
@@ -89,7 +89,7 @@ export default function AdminLogin() {
                       onChange={e => setEmail(e.target.value)}
                       placeholder="admin@sys.cap" 
                       required
-                      className="w-full bg-black/40 border border-white/5 text-white rounded-2xl py-4 pl-12 pr-5 outline-none focus:border-purple-500/50 focus:ring-4 focus:ring-purple-500/10 transition-all text-sm placeholder:text-slate-700" 
+                      className="w-full bg-black/40 border border-white/5 text-white rounded-2xl py-4 pl-12 pr-5 outline-none focus:border-[#3DD6C8]/50 focus:ring-4 focus:ring-[#3DD6C8]/10 transition-all text-sm placeholder:text-slate-700" 
                     />
                 </div>
               </div>
@@ -97,7 +97,7 @@ export default function AdminLogin() {
               <div className="space-y-2">
                 <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Secure Passphrase</label>
                 <div className="relative group/input">
-                    <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none text-slate-600 group-focus-within/input:text-purple-400 transition-colors">
+                    <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none text-slate-600 group-focus-within/input:text-[#3DD6C8] transition-colors">
                         <Lock size={18} />
                     </div>
                     <input 
@@ -106,7 +106,7 @@ export default function AdminLogin() {
                       onChange={e => setPassword(e.target.value)}
                       placeholder="••••••••" 
                       required
-                      className="w-full bg-black/40 border border-white/5 text-white rounded-2xl py-4 pl-12 pr-5 outline-none focus:border-purple-500/50 focus:ring-4 focus:ring-purple-500/10 transition-all text-sm placeholder:text-slate-700" 
+                      className="w-full bg-black/40 border border-white/5 text-white rounded-2xl py-4 pl-12 pr-5 outline-none focus:border-[#3DD6C8]/50 focus:ring-4 focus:ring-[#3DD6C8]/10 transition-all text-sm placeholder:text-slate-700" 
                     />
                 </div>
               </div>

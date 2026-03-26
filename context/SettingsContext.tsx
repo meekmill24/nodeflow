@@ -46,6 +46,7 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
         const root = document.documentElement;
         Object.entries(colors).forEach(([key, color]) => {
             if (color) {
+                // Change underscores to hyphens for CSS variable naming convention
                 const cssVarName = `--${key.replace(/_/g, '-')}`;
                 root.style.setProperty(cssVarName, color as string);
             }
@@ -60,6 +61,7 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
                     .select('key, value');
 
                 if (error) {
+                    console.warn('Site settings table may be missing or inaccessible. Using defaults.', error.message);
                     setSettings(prev => ({ ...prev, loading: false }));
                     return;
                 }
@@ -72,19 +74,23 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
                     
                     setSettings(newSettings);
 
+                    // Apply colors immediately
                     if (newSettings.theme_colors) {
                         applyThemeColors(newSettings.theme_colors);
                     }
                 } else {
+                    // No data found, but no error (might be empty table)
                     setSettings(prev => ({ ...prev, loading: false }));
                 }
             } catch (err) {
+                console.error('Unexpected error fetching site settings:', err);
                 setSettings(prev => ({ ...prev, loading: false }));
             }
         }
 
         fetchSettings();
 
+        // Optional: Subscribe to changes for live admin updates
         const channel = supabase
             .channel('site-settings-changes')
             .on('postgres_changes', { 
