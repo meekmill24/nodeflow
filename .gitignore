@@ -1,6 +1,6 @@
 # Internal Blueprints & Private Intelligence
 .blueprints/
-supabase/
+/supabase/
 *.sql
 *.patch
 *.ts.temp
