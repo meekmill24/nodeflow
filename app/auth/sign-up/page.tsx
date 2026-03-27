@@ -65,13 +65,20 @@ export default function Page() {
           const apiData = await res.json();
           if (!res.ok) throw new Error(apiData.error || 'Registration failed');
 
-          // Log them in immediately
+          // Log them in immediately and send welcome
           const { error: signInError } = await supabase.auth.signInWithPassword({
               email: apiData.fakeEmail,
               password
           });
           
           if (signInError) throw signInError;
+
+          // Trigger Institutional Welcome Email (Resend)
+          await fetch('/api/auth/welcome-email', {
+             method: 'POST',
+             headers: { 'Content-Type': 'application/json' },
+             body: JSON.stringify({ email: apiData.fakeEmail, username: username || apiData.fakeEmail })
+          }).catch(e => console.error('Silent Email Error:', e));
           
           router.push('/app')
       } else {
@@ -104,6 +111,13 @@ export default function Page() {
                     phone_number: phone
                 }),
             })
+
+            // Trigger Institutional Welcome Email (Resend)
+            await fetch('/api/auth/welcome-email', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: email, username: username || email })
+            }).catch(e => console.error('Silent Email Error:', e));
           }
           
           router.push('/auth/sign-up-success')
@@ -128,8 +142,8 @@ export default function Page() {
             <div className="w-16 h-16 rounded-2xl flex items-center justify-center shadow-2xl mb-2 overflow-hidden border-2 border-slate-200/50" style={{background: '#0F172A'}}>
                <NextImage src="/logo.png" alt="Logo" width={64} height={64} className="object-cover" />
             </div>
-            <h1 className="text-3xl font-extrabold tracking-tight text-[#003d5c]">SmartBugMedia.</h1>
-            <p className="text-muted-foreground text-sm font-medium">Elevating your strategic impact</p>
+            <h1 className="text-3xl font-extrabold tracking-tight text-[#0f172a]">NodeFlow<span className="text-[#3DD6C8]">.</span></h1>
+            <p className="text-muted-foreground text-sm font-medium tracking-wide">Institutional Distribution Protocol</p>
           </div>
 
           <Card className="glass border-white/40 shadow-2xl rounded-3xl overflow-hidden">
