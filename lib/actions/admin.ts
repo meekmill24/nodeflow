@@ -93,7 +93,7 @@ export async function updateTransactionStatus(id: string, status: 'approved' | '
 
   // If it was a deposit and was approved, we need to update the user balance?
   // Actually, usually the RPC add_transaction handles this or a trigger.
-  // But for simple-money parity, we might need manual logic if not handled by DB triggers.
+  // But for NodeFlow parity, we might need manual logic if not handled by DB triggers.
   
   revalidatePath('/admin/transactions')
   return data
