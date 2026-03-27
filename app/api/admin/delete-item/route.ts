@@ -15,12 +15,12 @@ export async function DELETE(req: NextRequest) {
         if (!id) return NextResponse.json({ error: 'ID required' }, { status: 400 });
 
         const supabaseAdmin = getAdminClient();
-        const table = type === 'level' ? 'levels' : 'task_items';
+        const table = type === 'level' ? 'levels' : (type === 'profile' ? 'profiles' : 'task_items');
 
         const { error } = await supabaseAdmin
             .from(table)
             .delete()
-            .eq('id', id);
+            .eq(type === 'profile' ? 'id' : 'id', id);
 
         if (error) throw error;
         return NextResponse.json({ success: true });

@@ -101,9 +101,9 @@ export default function Header({ onMenuClick }: HeaderProps) {
                     {/* Branding (Mobile only, as Sidebar shows it on Desktop) */}
                     <div className="flex items-center gap-2 md:gap-3 whitespace-nowrap md:hidden">
                         <div className="w-10 h-10 rounded-full bg-slate-900 border border-white/10 flex items-center justify-center p-1.5 shadow-lg shadow-cyan-500/20 overflow-hidden">
-                            <img src="/logo.png" alt="SmartBugMedia Logo" className="w-full h-full object-contain" />
+                            <img src="/logo.png" alt="NodeFlow Logo" className="w-full h-full object-contain" />
                         </div>
-                        <span className="text-sm md:text-xl font-bold text-slate-950 dark:text-white tracking-tight">SmartBugMedia.</span>
+                        <span className="text-sm md:text-xl font-bold text-slate-950 dark:text-white tracking-tight">NodeFlow.</span>
                     </div>
                 </div>
                 <div className="flex items-center gap-2 md:gap-4 ml-auto">

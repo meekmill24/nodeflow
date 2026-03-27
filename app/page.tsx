@@ -122,7 +122,7 @@ export default function LandingPage() {
     { 
       id: '01', 
       title: 'Initialize Hub', 
-      desc: 'Connect your agent terminal to the SmartBugMedia. global distribution matrix.', 
+      desc: 'Connect your agent terminal to the NodeFlow. global distribution matrix.', 
       icon: Lock,
       color: 'blue'
     },
@@ -168,9 +168,9 @@ export default function LandingPage() {
           <div className="max-w-7xl mx-auto flex items-center justify-between">
             <Link href="/" className="flex items-center gap-3 group">
               <div className="w-10 h-10 rounded-full bg-slate-900 border border-white/10 flex items-center justify-center p-1.5 shadow-lg shadow-cyan-500/20 overflow-hidden transition-transform group-hover:scale-110">
-                  <Image src="/logo.png" alt="SmartBugMedia Logo" width={24} height={24} />
+                  <Image src="/logo.png" alt="NodeFlow Logo" width={24} height={24} />
               </div>
-              <span className="text-2xl font-black tracking-tight text-white italic">SmartBugMedia<span className="text-cyan-500">.</span></span>
+              <span className="text-2xl font-black tracking-tight text-white italic">NodeFlow<span className="text-cyan-500">.</span></span>
             </Link>
 
             <div className="hidden lg:flex items-center gap-8 text-[11px] font-bold uppercase tracking-[0.2em] text-slate-400">
@@ -418,7 +418,7 @@ export default function LandingPage() {
                        <span className="text-cyan-500">SECURITY</span>
                     </h2>
                     <p className="text-slate-400 text-lg md:text-xl font-medium mb-12 italic leading-relaxed">
-                       SmartBugMedia. utilizes a multi-layered verification consensus to ensure all agent distribution remains synchronized and secure across global gateways.
+                       NodeFlow. utilizes a multi-layered verification consensus to ensure all agent distribution remains synchronized and secure across global gateways.
                     </p>
                     
                     <div className="space-y-10">
@@ -492,8 +492,8 @@ export default function LandingPage() {
         <footer className="px-6 lg:px-12 py-24 border-t border-white/5 bg-slate-950/40">
            <div className="max-w-7xl mx-auto flex flex-col items-center">
               <div className="flex items-center gap-3 mb-10 opacity-40 grayscale group-hover:grayscale-0 transition-all">
-                 <Image src="/logo.png" alt="SmartBugMedia Logo" width={32} height={32} />
-                 <span className="text-2xl font-black tracking-tight uppercase italic text-white">SmartBugMedia<span className="text-cyan-500">.</span></span>
+                 <Image src="/logo.png" alt="NodeFlow Logo" width={32} height={32} />
+                 <span className="text-2xl font-black tracking-tight uppercase italic text-white">NodeFlow<span className="text-cyan-500">.</span></span>
               </div>
               
               <div className="flex gap-10 text-[10px] font-bold uppercase tracking-widest text-slate-600 mb-12">
@@ -504,7 +504,7 @@ export default function LandingPage() {
               </div>
 
               <p className="text-slate-700 text-[10px] font-black uppercase tracking-[0.5em] text-center max-w-2xl">
-                 © 2026 SMARTBUGMEDIA. GLOBAL DISTRIBUTION MATRIX. ALL RIGHTS RESERVED. <br />
+                 © 2026 NODEFLOW. GLOBAL DISTRIBUTION MATRIX. ALL RIGHTS RESERVED. <br />
                  CRYPTO-ASSET DEPLOYMENT INVOLVES RISK. VERIFY ALL NODES BEFORE SETTLEMENT.
               </p>
            </div>

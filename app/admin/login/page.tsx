@@ -64,7 +64,7 @@ export default function AdminLogin() {
                 <div className="w-16 h-16 rounded-full bg-slate-900 border border-slate-700/50 flex items-center justify-center mb-6 shadow-lg shadow-cyan-500/20 group-hover:scale-110 transition-transform duration-500 overflow-hidden p-2">
                     <img src="/logo.png" alt="Logo" className="w-full h-full object-cover" />
                 </div>
-                <h1 className="text-3xl font-black tracking-tighter italic uppercase text-white mb-2">SmartBugMedia Terminal</h1>
+                <h1 className="text-3xl font-black tracking-tighter italic uppercase text-white mb-2">NodeFlow Terminal</h1>
                 <p className="text-[#3DD6C8] text-[9px] font-black uppercase tracking-[0.4em] opacity-70">Secured Node Authority</p>
             
             {error && (
@@ -124,7 +124,7 @@ export default function AdminLogin() {
             </form>
 
             <div className="mt-10 pt-8 border-t border-white/5 text-center">
-                <p className="text-[9px] font-black text-slate-700 uppercase tracking-[0.4em]">© 2026 SmartBugMedia. Global Matrix</p>
+                <p className="text-[9px] font-black text-slate-700 uppercase tracking-[0.4em]">© 2026 NodeFlow. Global Matrix</p>
             </div>
         </div>
       </div>

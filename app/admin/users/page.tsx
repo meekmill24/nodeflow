@@ -150,23 +150,19 @@ export default function AdminUsersPage() {
     }
   };
 
-  const handleDeleteUser = async (id: string, name: string) => {
+  const handlePurge = async (id: string, name: string) => {
     if (!confirm(`Are you absolutely sure you want to PURGE node ${name}? This action is irreversible and will delete all account data and auth credentials.`)) return;
-    
     try {
-        const res = await fetch('/api/admin/delete-user', {
-            method: 'DELETE',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ userId: id })
-        });
-
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Failed to terminate node');
-
-        toast.success(`Node ${name} terminated from matrix.`);
-        fetchUsers();
+      const res = await fetch('/api/admin/delete-item', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, type: 'profile' })
+      });
+      if (!res.ok) throw new Error('Dismantle sequence failure in the auth matrix.');
+      toast.success('Matrix node neutralized.');
+      fetchUsers();
     } catch (err: any) {
-        toast.error(err.message);
+      toast.error(err.message);
     }
   };
 
@@ -449,7 +445,7 @@ export default function AdminUsersPage() {
                         </>
                       )}
                       <button 
-                        onClick={() => handleDeleteUser(user.id, user.username || 'unknown')}
+                        onClick={() => handlePurge(user.id, user.username || 'unknown')}
                         className="p-2.5 bg-red-500/10 text-red-500 rounded-xl hover:bg-red-500/20 transition-all border border-red-500/10"
                       >
                         <Trash2 size={16} />

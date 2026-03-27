@@ -107,7 +107,7 @@ export function Testimonials() {
             </span>
           </h2>
           <p className="mt-6 text-lg text-muted-foreground">
-            Join thousands of members who are already building their income on SmartBugMedia.
+            Join thousands of members who are already building their income on NodeFlow.
           </p>
         </motion.div>
 

@@ -16,7 +16,7 @@ export default function AboutPage() {
             
             {/* Header */}
             <div className="text-center space-y-2">
-                <h1 className="text-4xl font-black text-white uppercase tracking-tighter">About SmartBugMedia.</h1>
+                <h1 className="text-4xl font-black text-white uppercase tracking-tighter">About NodeFlow.</h1>
                 <p className="text-text-secondary text-sm font-bold uppercase tracking-[0.3em] opacity-60">Architecting the Decentralized Workforce</p>
             </div>
 
@@ -30,7 +30,7 @@ export default function AboutPage() {
                     <div className="space-y-6">
                         <h2 className="text-2xl font-black text-white uppercase tracking-tight">Governance & Innovation</h2>
                         <p className="text-text-secondary text-sm leading-relaxed font-medium italic">
-                            SmartBugMedia. is a global leader in human-augmented AI verification. Founded in 2019, our mission is to provide 
+                            NodeFlow. is a global leader in human-augmented AI verification. Founded in 2019, our mission is to provide 
                             scalable, reliable, and fair income opportunities to digital contributors worldwide while assisting 
                             institutional partners in optimizing their neural networks.
                         </p>

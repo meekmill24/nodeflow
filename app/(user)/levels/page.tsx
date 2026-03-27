@@ -236,7 +236,7 @@ export default function LevelsPage() {
                             <Check size={18} className="text-success" />
                         </div>
                         <p className="text-[10px] font-black text-text-secondary leading-relaxed uppercase tracking-[0.15em]">
-                            Rewards and commission structures are audited monthly to ensure maximum profitability for all SmartBugMedia. partners.
+                            Rewards and commission structures are audited monthly to ensure maximum profitability for all NodeFlow. partners.
                         </p>
                     </div>
                     <button 

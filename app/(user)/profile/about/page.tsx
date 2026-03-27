@@ -21,7 +21,7 @@ export default function AboutPage() {
                         <DollarSign className="w-8 h-8 text-text-primary" />
                     </div>
                     <h2 className="text-2xl font-bold bg-gradient-to-r from-primary-light to-accent-light bg-clip-text text-transparent">
-                        SmartBugMedia.
+                        NodeFlow.
                     </h2>
                     <p className="text-text-secondary text-sm mt-2">Making Everything Simple</p>
                 </div>
@@ -31,7 +31,7 @@ export default function AboutPage() {
             <div className="glass-card p-5 animate-slide-up" style={{ animationDelay: '0.15s' }}>
                 <h3 className="font-bold text-text-primary mb-3">Our Mission</h3>
                 <p className="text-sm text-text-secondary leading-relaxed">
-                    SmartBugMedia. is dedicated to providing a simple, secure, and efficient platform for users
+                    NodeFlow. is dedicated to providing a simple, secure, and efficient platform for users
                     to earn commissions through collaborative task completion. Our AI-powered system ensures
                     fair distribution and transparent operations.
                 </p>
@@ -77,7 +77,7 @@ export default function AboutPage() {
             </div>
 
             <div className="text-center py-4 text-xs text-text-secondary/50 border-t border-text-primary/5">
-                <p>© 2026 All Rights Reserved | SmartBugMedia. v1.0.0</p>
+                <p>© 2026 All Rights Reserved | NodeFlow. v1.0.0</p>
             </div>
         </div>
     );

@@ -102,7 +102,7 @@ export default function ConciergeHubPage() {
                         </a>
 
                         <a 
-                            href="mailto:support@simplemoney.com"
+                            href="mailto:support@nodeflow.com"
                             className="bg-accent/20 border border-accent/30 text-accent-light px-8 py-3.5 rounded-2xl font-black uppercase tracking-widest text-xs flex items-center gap-3 hover:bg-accent/30 transition-all active:scale-95"
                         >
                             Email Support

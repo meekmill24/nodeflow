@@ -113,8 +113,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       `} style={{background:'rgba(15,15,35,0.95)', borderRight:'1px solid rgba(61,214,200,0.12)'}}>
         <div className="h-full flex flex-col p-6">
           <div className="mb-10 px-2 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-slate-900 border border-slate-700/50 flex items-center justify-center p-1.5 overflow-hidden">
-               <img src="/logo.png" alt="Logo" className="w-full h-full object-cover" />
+            <div className="min-w-[40px] h-10 rounded-xl bg-slate-900 border border-[#3DD6C8]/20 flex items-center justify-center p-1.5 overflow-hidden shadow-[0_0_15px_rgba(61,214,200,0.1)]">
+               <img src="/logo.png" alt="Logo" className="w-full h-full object-contain" />
             </div>
             <div>
               <h1 className="text-xl font-black" style={{color:'#3DD6C8', fontFamily:'Montserrat, sans-serif'}}>
@@ -172,8 +172,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <main className="flex-1 flex flex-col lg:ml-64 relative z-10 min-h-screen"> 
         <header className="p-6 md:p-8 flex items-center justify-between lg:justify-end border-b backdrop-blur-md sticky top-0 z-30" style={{borderColor:'rgba(61,214,200,0.1)', background:'rgba(15,15,35,0.6)'}}>
           <div className="lg:hidden flex items-center gap-2">
-            <div className="w-8 h-8 rounded-full bg-slate-900 border border-slate-700/50 flex items-center justify-center p-1.5 overflow-hidden">
-               <img src="/logo.png" alt="Logo" className="w-full h-full object-cover" />
+            <div className="w-9 h-9 rounded-xl bg-slate-900 border border-[#3DD6C8]/20 flex items-center justify-center p-1.5 overflow-hidden">
+               <img src="/logo.png" alt="Logo" className="w-full h-full object-contain" />
             </div>
             <div className="text-xl font-black" style={{color:'#3DD6C8', fontFamily:'Montserrat,sans-serif'}}>SmartBugMedia<span style={{color:'#E34304'}}>.</span></div>
           </div>

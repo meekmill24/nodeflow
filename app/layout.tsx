@@ -15,9 +15,9 @@ import { NotificationProvider } from '@/context/NotificationContext'
 import { Toaster } from 'sonner'
 
 export const metadata: Metadata = {
-  title: 'SmartBugMedia. | Precision Optimization & Amplified Returns',
-  description: 'SmartBugMedia. — The intelligent marketplace optimization platform for high-performance distributed task management.',
-  generator: 'SmartBugMedia.',
+  title: 'NodeFlow. | Precision Optimization & Amplified Returns',
+  description: 'NodeFlow. — The intelligent marketplace optimization platform for high-performance distributed task management.',
+  generator: 'NodeFlow.',
 }
 
 export default function RootLayout({

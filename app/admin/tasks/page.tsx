@@ -26,16 +26,18 @@ import {
 import { toast } from 'sonner';
 
 const PROFESSIONAL_PHOTO_PATHS = [
-    '/items/premium/maxresdefault.jpg',
-    '/items/premium/whitr_bg.jpg',
-    '/items/premium/13.jpg',
-    '/items/premium/14.jpg',
-    '/items/premium/15.jpg',
-    '/items/premium/16.jpg',
-    '/items/premium/2.jpeg',
-    '/items/premium/1a98ee99a0281cea19aed5243c9dea58.jpg',
-    '/items/premium/20201026_WEB-Sound-Bar-Guide-Lifestyle-Images-1-Mobile.jpg',
-    '/items/premium/1460282850_4621-1_760.jpg'
+    '/items/premium/Artboard-1.png',
+    '/items/premium/laptop.png',
+    '/items/premium/headphones.png',
+    '/items/premium/treadmill.png',
+    '/items/premium/smartwatch.png',
+    '/items/premium/AavanteBar480.png',
+    '/items/premium/SAMSUNG-32-Class-FHD-1080P-Smart-LED-TV-UN32N5300_2b2943fd-73d6-4d7b-9c54-e22db0c660f1_4.e79d68ec3a718064170de6cbd82e6030.jpeg',
+    '/items/premium/61Zm6dZB4ZL._AC_SL1500_.jpg',
+    '/items/premium/81ayaRfEIzL.jpg',
+    '/items/premium/91H82-mQZLL._AC_UF894,1000_QL80_.jpg',
+    '/items/premium/il_fullxfull.2134943175_objx.jpg',
+    '/items/premium/il_fullxfull.2338225562_eyfo.jpg'
 ];
 
 function ImagePreview({ url, alt, size = 'md' }: { url: string; alt: string; size?: 'sm' | 'md' | 'lg' }) {
@@ -172,14 +174,25 @@ export default function AdminTasksPage() {
     const handlePurgeAll = async () => {
         if (!confirm('EXTREME WARNING: This will PERMANENTLY DELETE ALL items in the entire catalog. Are you absolutely sure?')) return;
         setLoading(true);
-        await supabase.from('task_items').delete().neq('id', -1);
-        await fetchItems();
-        alert('All items have been purged from the database.');
+        try {
+            const res = await fetch('/api/admin/bulk-tasks', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'purge_all' })
+            });
+            if (!res.ok) throw new Error('Purge failed');
+            toast.success('Catalog wiped clean.');
+            await fetchItems();
+        } catch (err: any) {
+            toast.error(err.message);
+        } finally {
+            setLoading(false);
+        }
     };
 
     const handleBulkGenerateAll = async () => {
         if (levels.length === 0) {
-            alert('Levels data not loaded yet.');
+            toast.error('Levels data not loaded yet.');
             return;
         }
 
@@ -194,52 +207,74 @@ export default function AdminTasksPage() {
         
         setLoading(true);
 
-        if (clearExisting) {
-            await supabase.from('task_items').delete().neq('id', -1);
-        }
-        
-        let allGeneratedItems: any[] = [];
-        let poolIndex = 0;
-
-        for (const config of generationMap) {
-            const pool = productPool.length > 0 ? productPool : [{ name: 'Premium Product', cat: 'general', path: '/items/premium/headphones.png' }];
-            let levelPool = pool;
-            
-            if (config.level === 1) levelPool = pool.filter(p => p.cat === 'electrical');
-            else if (config.level === 2) levelPool = pool.filter(p => p.cat === 'furniture');
-            else if (config.level === 3) levelPool = pool.filter(p => p.cat === 'gym' || p.cat === 'fashion');
-            else if (config.level === 4) levelPool = pool.filter(p => p.cat === 'automotive' || p.cat === 'electrical');
-            
-            if (levelPool.length === 0) levelPool = pool;
-
-            for (let i = 0; i < config.count; i++) {
-                const product = levelPool[poolIndex % levelPool.length];
-                poolIndex++;
-                const seqId = (i + 1).toString().padStart(3, '0');
-
-                allGeneratedItems.push({
-                    title: `LVL ${config.level} - #${seqId} - ${product.name}`,
-                    description: `Premium grade ${product.cat} product curated for VIP ${config.level}. High authority and verified quality for decentralized marketplace optimization.`,
-                    category: product.cat,
-                    level_id: config.level,
-                    image_url: product.path,
-                    is_active: true
+        try {
+            if (clearExisting) {
+                await fetch('/api/admin/bulk-tasks', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'purge_all' })
                 });
             }
-        }
+            
+            let allGeneratedItems: any[] = [];
+            let poolIndex = 0;
 
-        for (let i = 0; i < allGeneratedItems.length; i += 50) {
-            const batch = allGeneratedItems.slice(i, i + 50);
-            await supabase.from('task_items').insert(batch);
+            for (const config of generationMap) {
+                const pool = productPool.length > 0 ? productPool : PROFESSIONAL_PHOTO_PATHS.map(p => ({ name: 'Premium Asset', cat: 'general', path: p }));
+                // Shuffle the local pool for this level to avoid repetitive patterns
+                let levelPool = [...pool].sort(() => Math.random() - 0.5);
+                
+                if (config.level === 1) levelPool = levelPool.filter(p => p.cat === 'electrical');
+                else if (config.level === 2) levelPool = levelPool.filter(p => p.cat === 'furniture');
+                else if (config.level === 3) levelPool = levelPool.filter(p => p.cat === 'gym' || p.cat === 'fashion');
+                else if (config.level === 4) levelPool = levelPool.filter(p => p.cat === 'automotive' || p.cat === 'electrical');
+                
+                if (levelPool.length === 0) levelPool = pool.sort(() => Math.random() - 0.5);
+
+                const descSeeds = [
+                    "High authority and verified quality for decentralized marketplace optimization.",
+                    "Premium architectural grade asset curated for high-volume matrix distribution.",
+                    "Institutional-tech certified unit for optimized participant performance.",
+                    "Advanced cryptographic asset integration for premium task fulfillment.",
+                    "Optimized for high-fidelity synchronization within the NodeFlow ecosystem."
+                ];
+
+                for (let i = 0; i < config.count; i++) {
+                    const product = levelPool[i % levelPool.length];
+                    const seqId = (i + 1).toString().padStart(3, '0');
+                    const desc = descSeeds[Math.floor(Math.random() * descSeeds.length)];
+
+                    allGeneratedItems.push({
+                        title: `T${config.level} - #${seqId} - ${product.name || 'Premium Unit'}`,
+                        description: `Industrial grade ${product.cat || 'matrix'} unit. ${desc}`,
+                        category: product.cat || 'general',
+                        level_id: config.level,
+                        image_url: product.path,
+                        is_active: true
+                    });
+                }
+            }
+
+            const res = await fetch('/api/admin/bulk-tasks', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'bulk_insert', items: allGeneratedItems })
+            });
+
+            if (!res.ok) throw new Error('Bulk insert failed');
+            
+            toast.success(`Successfully deployed ${allGeneratedItems.length} units!`);
+            await fetchItems();
+        } catch (err: any) {
+            toast.error(err.message);
+        } finally {
+            setLoading(false);
         }
-        
-        await fetchItems();
-        alert(`Successfully generated ${allGeneratedItems.length} items across VIP Levels!`);
     };
 
     const handleBulkGenerateCurrentLevel = async () => {
         if (filterLevel === 'all') {
-            alert('Please select a specific VIP Level first.');
+            toast.error('Please select a specific VIP Level first.');
             return;
         }
 
@@ -247,44 +282,66 @@ export default function AdminTasksPage() {
         const tasksPerSet = levelInfo?.tasks_per_set || 40;
         const count = tasksPerSet * Math.max(1, setsToGenerate);
         
-        const pool = productPool.length > 0 ? productPool : [{ name: 'Premium Product', cat: 'general', path: '/items/premium/headphones.png' }];
-        let levelPool = pool;
-        if (filterLevel === 1) levelPool = pool.filter(p => p.cat === 'electrical');
-        else if (filterLevel === 2) levelPool = pool.filter(p => p.cat === 'furniture');
-        else if (filterLevel === 3) levelPool = pool.filter(p => p.cat === 'gym' || p.cat === 'fashion');
-        else if (filterLevel === 4) levelPool = pool.filter(p => p.cat === 'automotive' || p.cat === 'electrical');
-        if (levelPool.length === 0) levelPool = pool;
-
         const clearExisting = confirm(`Generate ${count} new products for VIP Level ${filterLevel} (${setsToGenerate} set${setsToGenerate > 1 ? 's' : ''} × ${tasksPerSet} tasks)?\n\nClick OK to clear existing items for this level first, or Cancel to just add more.`);
         
         setLoading(true);
 
-        if (clearExisting) {
-            await supabase.from('task_items').delete().eq('level_id', filterLevel);
+        try {
+            if (clearExisting) {
+                await fetch('/api/admin/bulk-tasks', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'purge_level', levelId: filterLevel })
+                });
+            }
+
+            const pool = productPool.length > 0 ? productPool : PROFESSIONAL_PHOTO_PATHS.map(p => ({ name: 'Premium Asset', cat: 'general', path: p }));
+            let levelPool = [...pool].sort(() => Math.random() - 0.5);
+            if (filterLevel === 1) levelPool = levelPool.filter(p => p.cat === 'electrical');
+            else if (filterLevel === 2) levelPool = levelPool.filter(p => p.cat === 'furniture');
+            else if (filterLevel === 3) levelPool = levelPool.filter(p => p.cat === 'gym' || p.cat === 'fashion');
+            else if (filterLevel === 4) levelPool = levelPool.filter(p => p.cat === 'automotive' || p.cat === 'electrical');
+            if (levelPool.length === 0) levelPool = pool.sort(() => Math.random() - 0.5);
+
+            const descSeeds = [
+                "Advanced cryptographic asset integration for premium task fulfillment.",
+                "High authority and verified quality for decentralized marketplace optimization.",
+                "Premium architectural grade asset curated for high-volume matrix distribution.",
+                "Institutional-tech certified unit for optimized participant performance.",
+                "Optimized for high-fidelity synchronization within the NodeFlow ecosystem."
+            ];
+
+            const newItems = Array.from({ length: count }).map((_, i) => {
+                const product = levelPool[i % levelPool.length];
+                const imgUrl = product.path;
+                const seqId = (i + 1).toString().padStart(3, '0');
+                const desc = descSeeds[Math.floor(Math.random() * descSeeds.length)];
+
+                return {
+                    title: `T${filterLevel} - #${seqId} - ${product.name || 'Premium Unit'}`,
+                    description: `Industrial grade ${product.cat || 'matrix'} unit. ${desc}`,
+                    category: product.cat || 'general',
+                    level_id: filterLevel,
+                    image_url: imgUrl,
+                    is_active: true
+                };
+            });
+
+            const res = await fetch('/api/admin/bulk-tasks', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'bulk_insert', items: newItems })
+            });
+
+            if (!res.ok) throw new Error('Bulk deployment failed');
+            
+            toast.success(`Successfully deployed ${count} units for VIP Level ${filterLevel}!`);
+            await fetchItems();
+        } catch (err: any) {
+            toast.error(err.message);
+        } finally {
+            setLoading(false);
         }
-
-        const newItems = Array.from({ length: count }).map((_, i) => {
-            const product = levelPool[Math.floor(Math.random() * levelPool.length)];
-            const imgUrl = product.path;
-            const seqId = (i + 1).toString().padStart(3, '0');
-
-            return {
-                title: `LVL ${filterLevel} - #${seqId} - ${product.name}`,
-                description: `A premium, high-rated ${product.cat} product specifically curated for VIP Level ${filterLevel}. Featured in top-selling categories globally for high-volume optimization.`,
-                category: product.cat,
-                level_id: filterLevel,
-                image_url: imgUrl,
-                is_active: true
-            };
-        });
-
-        for (let i = 0; i < newItems.length; i += 50) {
-            const batch = newItems.slice(i, i + 50);
-            await supabase.from('task_items').insert(batch);
-        }
-        
-        await fetchItems();
-        alert(`Successfully generated ${count} items for VIP Level ${filterLevel}!`);
     };
 
     const filteredItems = items
