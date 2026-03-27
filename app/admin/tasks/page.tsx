@@ -642,29 +642,94 @@ export default function AdminTasksPage() {
                 </div>
             )}
 
-            {/* Catalog Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+            {/* Catalog Visualization Matrix */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-10">
                 {loading ? (
-                    <div className="col-span-full py-40 flex flex-col items-center justify-center opacity-40">
-                        <RefreshCw size={48} className="animate-spin mb-4" />
-                        <span className="font-black uppercase tracking-widest">Synchronizing...</span>
+                    <div className="col-span-full py-60 flex flex-col items-center justify-center">
+                        <div className="w-20 h-20 rounded-full border-2 border-dashed border-[#3DD6C8] animate-spin mb-8 flex items-center justify-center">
+                             <RefreshCw size={32} className="text-[#3DD6C8]" />
+                        </div>
+                        <span className="font-black uppercase tracking-[0.4em] text-slate-500 text-sm animate-pulse">Synchronizing Nodes...</span>
                     </div>
                 ) : (
                     finalItems.map(item => (
-                        <div key={item.id} className={`bg-slate-900/40 rounded-[40px] border border-white/5 overflow-hidden transition-all duration-500 group flex flex-col h-full ${!item.is_active ? 'grayscale opacity-40' : 'hover:border-[#3DD6C8]/30 hover:-translate-y-2'}`}>
-                            <div className="aspect-video overflow-hidden relative">
-                                <img src={item.image_url || generateFallbackUrl(item.title || '')} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" alt="" />
-                                <div className="absolute top-4 left-4 flex gap-2">
-                                    <span className="px-3 py-1.5 bg-black/60 backdrop-blur-md rounded-xl text-[9px] font-black uppercase tracking-widest text-white border border-white/10">LVL {item.level_id}</span>
+                        <div 
+                            key={item.id} 
+                            className={`group relative flex flex-col bg-slate-900/20 rounded-[48px] border border-white/5 overflow-hidden transition-all duration-700 h-full ${
+                                !item.is_active ? 'grayscale opacity-30 px-2' : 'hover:border-[#3DD6C8]/40 hover:bg-slate-900/40 hover:-translate-y-3 hover:shadow-[0_40px_80px_-20px_rgba(61,214,200,0.15)] focus-within:ring-2 focus-within:ring-[#3DD6C8]/20'
+                            }`}
+                        >
+                            {/* Card Header: Image Node */}
+                            <div className="p-4">
+                                <div className="aspect-[16/10] rounded-[36px] overflow-hidden relative bg-black/40 border border-white/5 ring-4 ring-black/20 group-hover:ring-[#3DD6C8]/5 transition-all duration-700 shadow-2xl">
+                                    <img 
+                                        src={item.image_url || generateFallbackUrl(item.title || '')} 
+                                        className="w-full h-full object-cover transition-all duration-1000 group-hover:scale-110 group-hover:rotate-1" 
+                                        alt={item.title} 
+                                    />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity" />
+                                    
+                                    {/* Shard Badge */}
+                                    <div className="absolute top-5 right-5 flex gap-2">
+                                        <div className="px-5 py-2.5 bg-black/60 backdrop-blur-xl rounded-2xl text-[10px] font-black uppercase tracking-widest text-[#3DD6C8] border border-[#3DD6C8]/20 shadow-xl group-hover:bg-[#3DD6C8] group-hover:text-black transition-all duration-500">
+                                            VIP {item.level_id}
+                                        </div>
+                                    </div>
+                                    
+                                    {/* Action Shortcuts (Overlay) */}
+                                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 translate-y-10 group-hover:translate-y-0 transition-all duration-500 pointer-events-none group-hover:pointer-events-auto">
+                                        <div className="flex bg-black/80 backdrop-blur-2xl p-2.5 rounded-3xl border border-white/10 shadow-2xl ring-1 ring-[#3DD6C8]/10">
+                                            <button 
+                                                onClick={() => { setEditingId(item.id); setEditData(item); }}
+                                                className="w-12 h-12 flex items-center justify-center text-white hover:text-[#3DD6C8] hover:bg-white/5 rounded-2xl transition-all"
+                                                title="Edit Node"
+                                            >
+                                                <Edit2 size={18} />
+                                            </button>
+                                            <div className="w-px h-6 bg-white/10 self-center mx-1" />
+                                            <button 
+                                                onClick={() => toggleActive(item.id, item.is_active)}
+                                                className={`w-12 h-12 flex items-center justify-center rounded-2xl transition-all ${
+                                                    item.is_active ? 'text-[#3DD6C8] hover:bg-[#3DD6C8]/10' : 'text-slate-500 hover:bg-slate-500/10'
+                                                }`}
+                                                title={item.is_active ? "Suspend Shard" : "Activate Shard"}
+                                            >
+                                                {item.is_active ? <Eye size={18} /> : <EyeOff size={18} />}
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                            <div className="p-8 flex-1 flex flex-col">
-                                <h4 className="font-black text-white text-lg uppercase tracking-tighter italic mb-2">{item.title}</h4>
-                                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest line-clamp-2 leading-relaxed opacity-60 mb-6">{item.description}</p>
-                                <div className="mt-auto pt-6 border-t border-white/5 flex gap-3">
-                                    <button onClick={() => { setEditingId(item.id); setEditData(item); }} className="flex-1 py-3 bg-white/5 text-slate-400 rounded-2xl font-black uppercase tracking-widest text-[9px] hover:text-white transition-colors">Edit</button>
-                                    <button onClick={() => toggleActive(item.id, item.is_active)} className={`w-12 h-12 flex items-center justify-center rounded-2xl transition-all ${item.is_active ? 'text-[#3DD6C8] bg-[#3DD6C8]/10' : 'text-slate-600 bg-slate-900'}`}>{item.is_active ? <Eye size={16} /> : <EyeOff size={16} />}</button>
-                                    <button onClick={() => handleDelete(item.id)} className="w-12 h-12 flex items-center justify-center rounded-2xl bg-slate-900 border border-white/5 text-slate-600 hover:text-red-500 transition-all"><Trash2 size={16} /></button>
+                            
+                            {/* Card Body: Identity Metadata */}
+                            <div className="p-8 pb-10 flex-1 flex flex-col">
+                                <div className="flex items-center gap-2 mb-4">
+                                     <div className={`w-1.5 h-1.5 rounded-full ${item.is_active ? 'bg-[#3DD6C8]' : 'bg-red-500'} animate-pulse`} />
+                                     <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 opacity-60">
+                                         {item.category || 'Generic'} // Unit ID: {item.id}
+                                     </span>
+                                </div>
+                                <h4 className="text-xl font-black text-white leading-tight italic tracking-tight mb-4 group-hover:text-[#3DD6C8] transition-colors duration-500 line-clamp-2">
+                                    {item.title}
+                                </h4>
+                                <p className="text-[11px] text-slate-400 font-medium leading-relaxed opacity-60 line-clamp-3 mb-8">
+                                    {item.description}
+                                </p>
+                                
+                                <div className="mt-auto flex items-center gap-4">
+                                    <button 
+                                        onClick={() => { setEditingId(item.id); setEditData(item); }}
+                                        className="flex-1 py-4 bg-white/5 hover:bg-white/10 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all border border-white/5 active:scale-95"
+                                    >
+                                        Modify Identity
+                                    </button>
+                                    <button 
+                                        onClick={() => handleDelete(item.id)}
+                                        className="w-14 h-14 flex items-center justify-center rounded-2xl bg-red-500/5 border border-red-500/10 text-red-500/40 hover:text-red-500 hover:bg-red-500/10 transition-all hover:border-red-500/20 shadow-2xl active:scale-95"
+                                        title="Terminte Shard"
+                                    >
+                                        <Trash2 size={20} />
+                                    </button>
                                 </div>
                             </div>
                         </div>
