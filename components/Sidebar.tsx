@@ -89,8 +89,10 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                 </div>
 
 
-            <div className="px-6 py-2 text-[10px] text-text-secondary font-bold opacity-50">
-                Dashboard
+            <div className={`mt-2 mb-4 h-px transition-colors duration-300 ${theme === 'dark' ? 'bg-gradient-to-r from-transparent via-white/5 to-transparent' : 'bg-gradient-to-r from-transparent via-black/5 to-transparent'}`} />
+
+            <div className="px-6 py-2 text-[10px] text-text-secondary font-bold opacity-50 uppercase tracking-widest">
+                Dashboard Protocol
             </div>
 
             <nav className="flex-1 px-4 space-y-1 mt-2">
@@ -118,7 +120,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                                     }}
                                     className="w-full sidebar-nav-item text-text-secondary hover:text-text-primary"
                                 >
-                                    <item.icon size={20} className="opacity-70" />
+                                    <item.icon size={18} className="opacity-70" />
                                     <span className="font-medium">{translatedLabel}</span>
                                 </button>
                             );
@@ -131,10 +133,10 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                                 onClick={onClose}
                                 className={`sidebar-nav-item ${isActive ? 'active' : 'text-text-secondary hover:text-text-primary'}`}
                             >
-                                <item.icon size={20} className={isActive ? 'text-primary' : 'opacity-70'} />
+                                <item.icon size={18} className={isActive ? 'text-primary' : 'opacity-70'} />
                                 <span className="font-medium">{translatedLabel}</span>
                                 {isActive && (
-                                    <div className="ml-auto w-1.5 h-1.5 rounded-full bg-primary shadow-[0_0_8px_var(--color-primary)]" />
+                                    <div className="ml-auto w-1.5 h-1.5 rounded-full bg-primary shadow-[0_0_8px_var(--color-primary)] animate-pulse" />
                                 )}
                             </Link>
                         );
@@ -143,8 +145,11 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                     return (
                         <div key={item.label}>
                             {isQuickStart && (
-                                <div className="px-2 py-4 mt-2 text-[10px] text-text-secondary font-bold opacity-50">
-                                    Quick menu
+                                <div className="mt-8 mb-4">
+                                    <div className={`h-px transition-colors duration-300 ${theme === 'dark' ? 'bg-gradient-to-r from-transparent via-white/5 to-transparent' : 'bg-gradient-to-r from-transparent via-black/5 to-transparent'}`} />
+                                    <div className="px-2 pt-6 pb-2 text-[10px] text-text-secondary font-bold opacity-50 uppercase tracking-widest">
+                                        Quick Hub
+                                    </div>
                                 </div>
                             )}
                             {renderItem()}

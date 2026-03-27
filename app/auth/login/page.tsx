@@ -54,7 +54,7 @@ export default function Page() {
         password,
       })
       if (error) throw error
-      router.push('/app')
+      router.push('/home')
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : 'An error occurred')
     } finally {

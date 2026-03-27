@@ -264,7 +264,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
                                         onClick={async () => {
                                             setIsProfileOpen(false);
                                             await signOut();
-                                            router.push('/login');
+                                            router.push('/auth/login');
                                         }}
                                         className="w-full flex items-center justify-between p-3 rounded-xl bg-danger/5 hover:bg-danger/10 border border-danger/10 transition-all active:scale-[0.98] group/logout"
                                     >

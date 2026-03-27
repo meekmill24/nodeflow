@@ -225,7 +225,7 @@ export default function LandingPage() {
               </p>
 
               <div className="hero-cta flex flex-col sm:flex-row items-center gap-6 justify-center lg:justify-start">
-                <Link href="/auth/login" className="w-full sm:w-auto">
+                <Link href="/home" className="w-full sm:w-auto">
                   <button className="w-full sm:w-auto px-12 py-5 bg-white text-slate-950 rounded-2xl font-black text-xs uppercase tracking-[0.3em] shadow-2xl hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-3">
                     Launch Hub <Play size={16} fill="currentColor" />
                   </button>
@@ -394,7 +394,7 @@ export default function LandingPage() {
                     ))}
                   </div>
 
-                  <Link href="/auth/login">
+                  <Link href="/home">
                     <button className={cn(
                       "w-full py-5 rounded-[24px] font-black text-[10px] uppercase tracking-[0.3em] transition-all",
                       tier.popular ? "bg-cyan-500 text-slate-950 hover:bg-cyan-400" : "bg-white/5 border border-white/10 hover:bg-white/10"
@@ -480,7 +480,7 @@ export default function LandingPage() {
                           Get Started Now
                        </button>
                     </Link>
-                    <Link href="/auth/login" className="w-full sm:w-auto">
+                    <Link href="/home" className="w-full sm:w-auto">
                        <button className="w-full sm:w-auto px-12 py-6 bg-slate-950/5 border border-slate-950/10 rounded-3xl font-black text-[10px] uppercase tracking-[0.4em] hover:bg-slate-950 hover:text-white transition-all">
                           Access Registry
                        </button>
