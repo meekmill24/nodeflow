@@ -120,7 +120,7 @@ export default function RulesPage() {
                     <div className="glass-card p-8 space-y-6 h-full flex flex-col justify-between border-success/20 bg-success/[0.02]">
                         <div className="space-y-4">
                             <p className="text-xs font-bold text-text-secondary leading-relaxed uppercase tracking-wider opacity-60">
-                                Expand the NodeFlow. network. Direct referrals grant a perpetual yields optimization fee based on their productivity.
+                                Expand the SmartBugMedia. network. Direct referrals grant a perpetual yields optimization fee based on their productivity.
                             </p>
                             <div className="flex items-end justify-between">
                                 <span className="text-4xl font-black text-success">20%</span>

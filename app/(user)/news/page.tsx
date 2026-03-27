@@ -69,7 +69,7 @@ export default function NewsPage() {
                              </div>
                              <span className="text-[10px] font-black text-primary-light uppercase tracking-widest">Network Status: Nominal</span>
                         </div>
-                        <h2 className="text-3xl font-black text-white uppercase tracking-tighter leading-none max-w-xl">NodeFlow. reaches 2.5 million verified nodes milestone.</h2>
+                        <h2 className="text-3xl font-black text-white uppercase tracking-tighter leading-none max-w-xl">SmartBugMedia. reaches 2.5 million verified nodes milestone.</h2>
                         <p className="text-text-secondary text-sm font-medium leading-relaxed max-w-2xl">
                             Our collective decentralised workforce has successfully verified over 100 million neural tasks in the past quarter, 
                             advancing the global AI landscape at unprecedented scales.

@@ -94,7 +94,7 @@ export default function FirstDepositRewardPage() {
                 <FileText size={40} className="text-accent-light mb-6 opacity-40" />
                 <h3 className="text-xl font-black text-white uppercase tracking-tight mb-4">Official Disclaimer</h3>
                 <p className="text-xs font-bold text-text-secondary uppercase tracking-widest leading-relaxed max-w-lg mb-10 opacity-60">
-                    All rewards are subject to internal audit and account verification. To claim your bonus manually, please contact the NodeFlow. Concierge Desk.
+                    All rewards are subject to internal audit and account verification. To claim your bonus manually, please contact the SmartBugMedia. Concierge Desk.
                 </p>
                 <button 
                     onClick={() => (window as any).Tawk_API?.maximize()}

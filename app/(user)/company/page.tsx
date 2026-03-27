@@ -15,7 +15,7 @@ const timeline = [
     { year: '2021', event: 'Scale: Cross-border liquidity integration enabled' },
     { year: '2023', event: 'Milestone: 1 Million nodes successfully synchronized' },
     { year: '2024', event: 'Innovation: AI-assisted neural task optimization v1.0' },
-    { year: '2026', event: 'NodeFlow.: Global release of consumer-facing match hub' },
+    { year: '2026', event: 'SmartBugMedia.: Global release of consumer-facing match hub' },
 ];
 
 export default function CompanyProfilePage() {
@@ -26,7 +26,7 @@ export default function CompanyProfilePage() {
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-2xl font-black text-white uppercase tracking-tight">Institutional Profile</h1>
-                    <p className="text-text-secondary text-xs mt-1 font-bold uppercase tracking-widest font-mono opacity-60">NodeFlow. Global Ops</p>
+                    <p className="text-text-secondary text-xs mt-1 font-bold uppercase tracking-widest font-mono opacity-60">SmartBugMedia. Global Ops</p>
                 </div>
                 <div className="px-4 py-2 rounded-xl bg-primary/10 border border-primary/20 flex items-center gap-2">
                     <Activity size={16} className="text-primary-light" />
@@ -50,7 +50,7 @@ export default function CompanyProfilePage() {
                     <div className="space-y-4 text-center md:text-left">
                         <h2 className="text-3xl font-black text-white uppercase tracking-tighter">Revolutionizing AI Training</h2>
                         <p className="text-text-secondary text-sm leading-relaxed max-w-xl font-medium">
-                            NodeFlow. operates at the intersection of decentralised workforce management and cutting-edge neural network optimization. 
+                            SmartBugMedia. operates at the intersection of decentralised workforce management and cutting-edge neural network optimization. 
                             We facilitate the human-in-the-loop verification required for the next generation of LLMs and autonomous systems.
                         </p>
                         <div className="flex flex-wrap justify-center md:justify-start gap-4">

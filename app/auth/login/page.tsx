@@ -43,7 +43,7 @@ export default function Page() {
           .single() as { data: { email: string } | null, error: any };
 
         if (profileError || !profile || !profile.email) {
-          loginEmail = `${email}@nodeflow.io`;
+          loginEmail = `${email}@smartbugmedia.io`;
         } else {
           loginEmail = profile.email;
         }
@@ -90,9 +90,9 @@ export default function Page() {
           {/* Logo Section */}
           <div className="flex flex-col items-center gap-2">
             <div className="w-20 h-20 rounded-3xl flex items-center justify-center shadow-2xl mb-4 overflow-hidden" style={{background: 'rgba(61,214,200,0.15)', border: '2px solid rgba(61,214,200,0.4)', boxShadow: '0 0 32px rgba(61,214,200,0.2)'}}>
-               <NextImage src="/logo.png" alt="NodeFlow Logo" width={80} height={80} className="object-cover transition-transform hover:scale-110" />
+               <NextImage src="/logo.png" alt="SmartBugMedia Logo" width={80} height={80} className="object-cover transition-transform hover:scale-110" />
             </div>
-             <h1 className="text-4xl font-black tracking-tighter text-white">NodeFlow<span style={{color:'#3DD6C8'}}>.</span></h1>
+             <h1 className="text-4xl font-black tracking-tighter text-white">SmartBugMedia<span style={{color:'#3DD6C8'}}>.</span></h1>
              <p className="text-[10px] font-black uppercase tracking-[0.4em]" style={{color:'rgba(61,214,200,0.6)'}}>Precision Optimization Platform</p>
           </div>
 
@@ -170,7 +170,7 @@ export default function Page() {
                     </>
                   ) : (
                     <>
-                      Access NodeFlow <ArrowRight className="w-4 h-4" />
+                      Access SmartBugMedia <ArrowRight className="w-4 h-4" />
                     </>
                   )}
                 </button>
@@ -184,7 +184,7 @@ export default function Page() {
                     className="hover:underline font-black"
                     style={{color:'#E34304'}}
                   >
-                    Join NodeFlow.
+                    Join SmartBugMedia.
                   </Link>
                 </p>
               </div>
@@ -192,7 +192,7 @@ export default function Page() {
           </Card>
           
           <div className="text-center">
-             <p className="text-[8px] text-zinc-600 font-black uppercase tracking-[0.4em]">© 2025 NodeFlow. Platform • v1.0.0</p>
+             <p className="text-[8px] text-zinc-600 font-black uppercase tracking-[0.4em]">© 2025 SmartBugMedia. Platform • v1.0.0</p>
           </div>
         </div>
       </div>

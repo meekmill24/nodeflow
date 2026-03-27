@@ -128,7 +128,7 @@ export default function Page() {
             <div className="w-16 h-16 rounded-2xl flex items-center justify-center shadow-2xl mb-2 overflow-hidden border-2 border-slate-200/50" style={{background: '#0F172A'}}>
                <NextImage src="/logo.png" alt="Logo" width={64} height={64} className="object-cover" />
             </div>
-            <h1 className="text-3xl font-extrabold tracking-tight text-[#003d5c]">NodeFlow.</h1>
+            <h1 className="text-3xl font-extrabold tracking-tight text-[#003d5c]">SmartBugMedia.</h1>
             <p className="text-muted-foreground text-sm font-medium">Elevating your strategic impact</p>
           </div>
 
@@ -342,7 +342,7 @@ export default function Page() {
           </Card>
           
           <div className="text-center pt-4">
-             <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em]">© 2024 NodeFlow.  Platform</p>
+             <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em]">© 2024 SmartBugMedia.  Platform</p>
           </div>
         </div>
       </div>

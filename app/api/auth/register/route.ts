@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
             process.env.SUPABASE_SERVICE_ROLE_KEY!
         );
 
-        const fakeEmail = `${username}@nodeflow.io`;
+        const fakeEmail = `${username}@smartbugmedia.io`;
 
         const { data, error } = await supabaseAdmin.auth.admin.createUser({
             email: fakeEmail,

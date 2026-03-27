@@ -10,19 +10,19 @@
   --card-foreground: #0F172A;
   --popover: #FFFFFF;
   --popover-foreground: #0F172A;
-  --primary: #0EA5E9; /* Sky Blue */
+  --primary: #10B981; /* Bug Green */
   --primary-foreground: #FFFFFF;
   --secondary: #F1F5F9;
   --secondary-foreground: #1E293B;
   --muted: #F1F5F9;
   --muted-foreground: #64748B;
-  --accent: #22D3EE; /* Cyan */
+  --accent: #0284C7; /* Sky Blue */
   --accent-foreground: #0F172A;
   --destructive: #EF4444;
   --destructive-foreground: #FFFFFF;
   --border: #E2E8F0;
   --input: #E2E8F0;
-  --ring: #0EA5E9;
+  --ring: #10B981;
   --radius: 1.25rem;
 }
 
@@ -33,19 +33,19 @@
   --card-foreground: #F8FAFC;
   --popover: #1E293B;
   --popover-foreground: #F8FAFC;
-  --primary: #22D3EE; /* Cyan */
+  --primary: #10B981; /* Bug Green */
   --primary-foreground: #0F172A;
   --secondary: #334155;
   --secondary-foreground: #F8FAFC;
   --muted: #334155;
   --muted-foreground: #94A3B8;
-  --accent: #10B981; /* Emerald */
+  --accent: #22D3EE; /* Cyan */
   --accent-foreground: #0F172A;
   --destructive: #7F1D1D;
   --destructive-foreground: #F8FAFC;
   --border: #334155;
   --input: #334155;
-  --ring: #22D3EE;
+  --ring: #10B981;
 }
 
 @theme inline {

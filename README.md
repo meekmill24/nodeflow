@@ -1,10 +1,10 @@
-# NodeFlow - Task-Based Marketplace Optimization Platform
+# SmartBugMedia - Task-Based Marketplace Optimization Platform
 
-NodeFlow is a premium, full-fidelity decentralized marketplace optimization platform. Built with Next.js, Supabase, and modern engineering patterns, it provides an immersive desktop and mobile experience for distributed task management and financial auditing.
+SmartBugMedia is a premium, full-fidelity decentralized marketplace optimization platform. Built with Next.js, Supabase, and modern engineering patterns, it provides an immersive desktop and mobile experience for distributed task management and financial auditing.
 
 ## 🚀 Vision
 
-NodeFlow empowers a global network of agents to synchronize with decentralized marketplaces, providing high-authority product validation and optimization services through a high-fidelity, military-grade interface.
+SmartBugMedia empowers a global network of agents to synchronize with decentralized marketplaces, providing high-authority product validation and optimization services through a high-fidelity, military-grade interface.
 
 ## 🛠 Technology Stack
 
@@ -57,7 +57,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 
 ## 🔐 Security & Privacy
 
-NodeFlow is engineered with a "Security-First" philosophy. All data transmissions are encrypted, and access to the neural registry is strictly governed by polymorphic authorization protocols.
+SmartBugMedia is engineered with a "Security-First" philosophy. All data transmissions are encrypted, and access to the neural registry is strictly governed by polymorphic authorization protocols.
 
 ## 📄 License
 

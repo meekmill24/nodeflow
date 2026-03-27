@@ -4,7 +4,7 @@ import { HeadphonesIcon, ChevronLeft, MessageSquare, Mail, Phone, Clock, Chevron
 import Link from 'next/link';
 
 const WHATSAPP_NUMBER = '1234567890';
-const WHATSAPP_MESSAGE = 'Hello, I need help with my NodeFlow. account.';
+const WHATSAPP_MESSAGE = 'Hello, I need help with my SmartBugMedia. account.';
 const TAWK_TO_LINK = '#tawk';
 
 const channels = [
@@ -73,7 +73,7 @@ export default function CustomerServicePage() {
                         <div className="space-y-2">
                             <h2 className="text-3xl font-black text-white uppercase tracking-tighter leading-none">How can we assist your node today?</h2>
                             <p className="text-text-secondary text-xs uppercase font-bold tracking-[0.15em] opacity-60">
-                                NodeFlow. technicians are monitoring system processes in real-time. Choose a dedicated channel below.
+                                SmartBugMedia. technicians are monitoring system processes in real-time. Choose a dedicated channel below.
                             </p>
                         </div>
                     </div>

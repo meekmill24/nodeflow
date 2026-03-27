@@ -53,7 +53,7 @@ export function Footer() {
                 <DollarSign className="h-5 w-5 text-primary-foreground" />
               </div>
               <span className="font-bold text-xl text-foreground">
-                NodeFlow.
+                SmartBugMedia.
               </span>
             </Link>
             <p className="text-sm text-muted-foreground leading-relaxed mb-6 max-w-xs">
@@ -155,7 +155,7 @@ export function Footer() {
         <div className="mt-16 pt-8 border-t border-border">
           <div className="flex flex-col md:flex-row justify-between items-center gap-6">
             <p className="text-sm text-muted-foreground">
-              &copy; {new Date().getFullYear()} NodeFlow.. All rights reserved.
+              &copy; {new Date().getFullYear()} SmartBugMedia.. All rights reserved.
             </p>
             
             {/* Crypto accepted */}

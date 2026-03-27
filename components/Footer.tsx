@@ -13,7 +13,7 @@ export default function Footer() {
     return (
         <footer className="mt-20 pb-10 border-t border-white/5 pt-10 flex flex-col md:flex-row items-center justify-between gap-6 opacity-60">
             <p className="text-[10px] font-black text-text-secondary uppercase tracking-[0.2em]">
-                © 2026 All Rights Reserved | NodeFlow.
+                © 2026 All Rights Reserved | SmartBugMedia.
             </p>
             <div className="flex items-center gap-6">
                 {links.map((link) => (

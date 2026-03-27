@@ -366,7 +366,7 @@ export default function HomePage() {
                                 <span className="text-text-primary/70 dark:text-white/70">earn together</span>
                             </h3>
                             <p className="text-[10px] font-bold text-text-primary/60 dark:text-white/60 uppercase tracking-widest leading-relaxed max-w-sm">
-                                Expand the NodeFlow. network. Direct referrals grant a perpetual yields optimization fee based on their productivity.
+                                Expand the SmartBugMedia. network. Direct referrals grant a perpetual yields optimization fee based on their productivity.
                             </p>
                         </div>
                         <div className="flex gap-4 pt-2">

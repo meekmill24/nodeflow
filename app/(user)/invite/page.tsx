@@ -61,8 +61,8 @@ export default function InvitePage() {
         if (navigator.share) {
             try {
                 await navigator.share({
-                    title: 'Join NodeFlow.',
-                    text: 'Start earning today with NodeFlow. AI optimization network!',
+                    title: 'Join SmartBugMedia.',
+                    text: 'Start earning today with SmartBugMedia. AI optimization network!',
                     url: referralLink,
                 });
             } catch (err) {

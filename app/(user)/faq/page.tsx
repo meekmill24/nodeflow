@@ -8,8 +8,8 @@ const FAQS = [
     {
         category: "Platform Architecture",
         icon: Globe,
-        q: "What is NodeFlow.?",
-        a: "NodeFlow. is an AI collaboration platform that bridges the gap between neural network models and human verification. We provide structured data verify by global contributors to ensure the accuracy and safety of modern AI systems."
+        q: "What is SmartBugMedia.?",
+        a: "SmartBugMedia. is an AI collaboration platform that bridges the gap between neural network models and human verification. We provide structured data verify by global contributors to ensure the accuracy and safety of modern AI systems."
     },
     {
         category: "Financial Settlements",
