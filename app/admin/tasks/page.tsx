@@ -21,7 +21,9 @@ import {
     Layers,
     Activity,
     Database,
-    Zap
+    Zap,
+    AlertCircle,
+    Layers as LayersIcon
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -83,6 +85,7 @@ export default function AdminTasksPage() {
     const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
     const [filterSet, setFilterSet] = useState<number | 'all'>('all');
     const [setsToGenerate, setSetsToGenerate] = useState(1);
+    const [confirmModal, setConfirmModal] = useState<{show: boolean, title: string, message: string, onConfirm: () => void} | null>(null);
 
     const fetchItems = async () => {
         setLoading(true);
@@ -172,22 +175,29 @@ export default function AdminTasksPage() {
     };
 
     const handlePurgeAll = async () => {
-        if (!confirm('EXTREME WARNING: This will PERMANENTLY DELETE ALL items in the entire catalog. Are you absolutely sure?')) return;
-        setLoading(true);
-        try {
-            const res = await fetch('/api/admin/bulk-tasks', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action: 'purge_all' })
-            });
-            if (!res.ok) throw new Error('Purge failed');
-            toast.success('Catalog wiped clean.');
-            await fetchItems();
-        } catch (err: any) {
-            toast.error(err.message);
-        } finally {
-            setLoading(false);
-        }
+        setConfirmModal({
+            show: true,
+            title: 'Wipe Global Matrix?',
+            message: 'CRITICAL: This will PERMANENTLY DELETE ALL items in the entire catalog node. This operation is irreversible.',
+            onConfirm: async () => {
+                setLoading(true);
+                try {
+                    const res = await fetch('/api/admin/bulk-tasks', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ action: 'purge_all' })
+                    });
+                    if (!res.ok) throw new Error('Purge failed');
+                    toast.success('Catalog wiped clean.');
+                    await fetchItems();
+                } catch (err: any) {
+                    toast.error(err.message);
+                } finally {
+                    setLoading(false);
+                    setConfirmModal(null);
+                }
+            }
+        });
     };
 
     const handleBulkGenerateAll = async () => {
@@ -203,73 +213,76 @@ export default function AdminTasksPage() {
 
         const totalToGenerate = generationMap.reduce((acc, curr) => acc + curr.count, 0);
 
-        const clearExisting = confirm(`CRITICAL: This will DELETE ALL current ${items.length} items and generate exactly ${totalToGenerate} premium products across ${levels.length} VIP Levels. \n\nClick OK to start fresh.`);
-        
-        setLoading(true);
-
-        try {
-            if (clearExisting) {
-                await fetch('/api/admin/bulk-tasks', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ action: 'purge_all' })
-                });
-            }
-            
-            let allGeneratedItems: any[] = [];
-            let poolIndex = 0;
-
-            for (const config of generationMap) {
-                const pool = productPool.length > 0 ? productPool : PROFESSIONAL_PHOTO_PATHS.map(p => ({ name: 'Premium Asset', cat: 'general', path: p }));
-                // Shuffle the local pool for this level to avoid repetitive patterns
-                let levelPool = [...pool].sort(() => Math.random() - 0.5);
-                
-                if (config.level === 1) levelPool = levelPool.filter(p => p.cat === 'electrical');
-                else if (config.level === 2) levelPool = levelPool.filter(p => p.cat === 'furniture');
-                else if (config.level === 3) levelPool = levelPool.filter(p => p.cat === 'gym' || p.cat === 'fashion');
-                else if (config.level === 4) levelPool = levelPool.filter(p => p.cat === 'automotive' || p.cat === 'electrical');
-                
-                if (levelPool.length === 0) levelPool = pool.sort(() => Math.random() - 0.5);
-
-                const descSeeds = [
-                    "High authority and verified quality for decentralized marketplace optimization.",
-                    "Premium architectural grade asset curated for high-volume matrix distribution.",
-                    "Institutional-tech certified unit for optimized participant performance.",
-                    "Advanced cryptographic asset integration for premium task fulfillment.",
-                    "Optimized for high-fidelity synchronization within the NodeFlow ecosystem."
-                ];
-
-                for (let i = 0; i < config.count; i++) {
-                    const product = levelPool[i % levelPool.length];
-                    const seqId = (i + 1).toString().padStart(3, '0');
-                    const desc = descSeeds[Math.floor(Math.random() * descSeeds.length)];
-
-                    allGeneratedItems.push({
-                        title: `T${config.level} - #${seqId} - ${product.name || 'Premium Unit'}`,
-                        description: `Industrial grade ${product.cat || 'matrix'} unit. ${desc}`,
-                        category: product.cat || 'general',
-                        level_id: config.level,
-                        image_url: product.path,
-                        is_active: true
+        setConfirmModal({
+            show: true,
+            title: 'Global Re-Synchronization?',
+            message: `This will deploy exactly ${totalToGenerate} premium products across ${levels.length} VIP Levels. You can choose to clear current items first or append to them.`,
+            onConfirm: async () => {
+                setLoading(true);
+                try {
+                    // Always start fresh for global sync to ensure zero duplicates
+                    await fetch('/api/admin/bulk-tasks', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ action: 'purge_all' })
                     });
+                    
+                    let allGeneratedItems: any[] = [];
+
+                    for (const config of generationMap) {
+                        const pool = productPool.length > 0 ? productPool : PROFESSIONAL_PHOTO_PATHS.map(p => ({ name: 'Premium Asset', cat: 'general', path: p }));
+                        // Shuffle the local pool for this level to avoid repetitive patterns
+                        let levelPool = [...pool].sort(() => Math.random() - 0.5);
+                        
+                        if (config.level === 1) levelPool = levelPool.filter(p => p.cat === 'electrical');
+                        else if (config.level === 2) levelPool = levelPool.filter(p => p.cat === 'furniture');
+                        else if (config.level === 3) levelPool = levelPool.filter(p => p.cat === 'gym' || p.cat === 'fashion');
+                        else if (config.level === 4) levelPool = levelPool.filter(p => p.cat === 'automotive' || p.cat === 'electrical');
+                        
+                        if (levelPool.length === 0) levelPool = pool.sort(() => Math.random() - 0.5);
+
+                        const descSeeds = [
+                            "High authority and verified quality for decentralized marketplace optimization.",
+                            "Premium architectural grade asset curated for high-volume matrix distribution.",
+                            "Institutional-tech certified unit for optimized participant performance.",
+                            "Advanced cryptographic asset integration for premium task fulfillment.",
+                            "Optimized for high-fidelity synchronization within the NodeFlow ecosystem."
+                        ];
+
+                        for (let i = 0; i < config.count; i++) {
+                            const product = levelPool[i % levelPool.length];
+                            const seqId = (i + 1).toString().padStart(3, '0');
+                            const desc = descSeeds[Math.floor(Math.random() * descSeeds.length)];
+
+                            allGeneratedItems.push({
+                                title: `T${config.level} - #${seqId} - ${product.name || 'Premium Unit'}`,
+                                description: `Industrial grade ${product.cat || 'matrix'} unit. ${desc}`,
+                                category: product.cat || 'general',
+                                level_id: config.level,
+                                image_url: product.path,
+                                is_active: true
+                            });
+                        }
+                    }
+
+                    const res = await fetch('/api/admin/bulk-tasks', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ action: 'bulk_insert', items: allGeneratedItems })
+                    });
+
+                    if (!res.ok) throw new Error('Bulk insert failed');
+                    
+                    toast.success(`Successfully deployed ${allGeneratedItems.length} units!`);
+                    await fetchItems();
+                } catch (err: any) {
+                    toast.error(err.message);
+                } finally {
+                    setLoading(false);
+                    setConfirmModal(null);
                 }
             }
-
-            const res = await fetch('/api/admin/bulk-tasks', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action: 'bulk_insert', items: allGeneratedItems })
-            });
-
-            if (!res.ok) throw new Error('Bulk insert failed');
-            
-            toast.success(`Successfully deployed ${allGeneratedItems.length} units!`);
-            await fetchItems();
-        } catch (err: any) {
-            toast.error(err.message);
-        } finally {
-            setLoading(false);
-        }
+        });
     };
 
     const handleBulkGenerateCurrentLevel = async () => {
@@ -282,66 +295,69 @@ export default function AdminTasksPage() {
         const tasksPerSet = levelInfo?.tasks_per_set || 40;
         const count = tasksPerSet * Math.max(1, setsToGenerate);
         
-        const clearExisting = confirm(`Generate ${count} new products for VIP Level ${filterLevel} (${setsToGenerate} set${setsToGenerate > 1 ? 's' : ''} × ${tasksPerSet} tasks)?\n\nClick OK to clear existing items for this level first, or Cancel to just add more.`);
-        
-        setLoading(true);
+        setConfirmModal({
+            show: true,
+            title: `Sync VIP ${filterLevel} Units?`,
+            message: `Generate ${count} new products for VIP Level ${filterLevel}? This will clear existing items for this specific level first.`,
+            onConfirm: async () => {
+                setLoading(true);
+                try {
+                    await fetch('/api/admin/bulk-tasks', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ action: 'purge_level', levelId: filterLevel })
+                    });
 
-        try {
-            if (clearExisting) {
-                await fetch('/api/admin/bulk-tasks', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ action: 'purge_level', levelId: filterLevel })
-                });
+                    const pool = productPool.length > 0 ? productPool : PROFESSIONAL_PHOTO_PATHS.map(p => ({ name: 'Premium Asset', cat: 'general', path: p }));
+                    let levelPool = [...pool].sort(() => Math.random() - 0.5);
+                    if (filterLevel === 1) levelPool = levelPool.filter(p => p.cat === 'electrical');
+                    else if (filterLevel === 2) levelPool = levelPool.filter(p => p.cat === 'furniture');
+                    else if (filterLevel === 3) levelPool = levelPool.filter(p => p.cat === 'gym' || p.cat === 'fashion');
+                    else if (filterLevel === 4) levelPool = levelPool.filter(p => p.cat === 'automotive' || p.cat === 'electrical');
+                    if (levelPool.length === 0) levelPool = pool.sort(() => Math.random() - 0.5);
+
+                    const descSeeds = [
+                        "Advanced cryptographic asset integration for premium task fulfillment.",
+                        "High authority and verified quality for decentralized marketplace optimization.",
+                        "Premium architectural grade asset curated for high-volume matrix distribution.",
+                        "Institutional-tech certified unit for optimized participant performance.",
+                        "Optimized for high-fidelity synchronization within the NodeFlow ecosystem."
+                    ];
+
+                    const newItems = Array.from({ length: count }).map((_, i) => {
+                        const product = levelPool[i % levelPool.length];
+                        const imgUrl = product.path;
+                        const seqId = (i + 1).toString().padStart(3, '0');
+                        const desc = descSeeds[Math.floor(Math.random() * descSeeds.length)];
+
+                        return {
+                            title: `T${filterLevel} - #${seqId} - ${product.name || 'Premium Unit'}`,
+                            description: `Industrial grade ${product.cat || 'matrix'} unit. ${desc}`,
+                            category: product.cat || 'general',
+                            level_id: filterLevel,
+                            image_url: imgUrl,
+                            is_active: true
+                        };
+                    });
+
+                    const res = await fetch('/api/admin/bulk-tasks', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ action: 'bulk_insert', items: newItems })
+                    });
+
+                    if (!res.ok) throw new Error('Bulk deployment failed');
+                    
+                    toast.success(`Successfully deployed ${count} units for VIP Level ${filterLevel}!`);
+                    await fetchItems();
+                } catch (err: any) {
+                    toast.error(err.message);
+                } finally {
+                    setLoading(false);
+                    setConfirmModal(null);
+                }
             }
-
-            const pool = productPool.length > 0 ? productPool : PROFESSIONAL_PHOTO_PATHS.map(p => ({ name: 'Premium Asset', cat: 'general', path: p }));
-            let levelPool = [...pool].sort(() => Math.random() - 0.5);
-            if (filterLevel === 1) levelPool = levelPool.filter(p => p.cat === 'electrical');
-            else if (filterLevel === 2) levelPool = levelPool.filter(p => p.cat === 'furniture');
-            else if (filterLevel === 3) levelPool = levelPool.filter(p => p.cat === 'gym' || p.cat === 'fashion');
-            else if (filterLevel === 4) levelPool = levelPool.filter(p => p.cat === 'automotive' || p.cat === 'electrical');
-            if (levelPool.length === 0) levelPool = pool.sort(() => Math.random() - 0.5);
-
-            const descSeeds = [
-                "Advanced cryptographic asset integration for premium task fulfillment.",
-                "High authority and verified quality for decentralized marketplace optimization.",
-                "Premium architectural grade asset curated for high-volume matrix distribution.",
-                "Institutional-tech certified unit for optimized participant performance.",
-                "Optimized for high-fidelity synchronization within the NodeFlow ecosystem."
-            ];
-
-            const newItems = Array.from({ length: count }).map((_, i) => {
-                const product = levelPool[i % levelPool.length];
-                const imgUrl = product.path;
-                const seqId = (i + 1).toString().padStart(3, '0');
-                const desc = descSeeds[Math.floor(Math.random() * descSeeds.length)];
-
-                return {
-                    title: `T${filterLevel} - #${seqId} - ${product.name || 'Premium Unit'}`,
-                    description: `Industrial grade ${product.cat || 'matrix'} unit. ${desc}`,
-                    category: product.cat || 'general',
-                    level_id: filterLevel,
-                    image_url: imgUrl,
-                    is_active: true
-                };
-            });
-
-            const res = await fetch('/api/admin/bulk-tasks', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action: 'bulk_insert', items: newItems })
-            });
-
-            if (!res.ok) throw new Error('Bulk deployment failed');
-            
-            toast.success(`Successfully deployed ${count} units for VIP Level ${filterLevel}!`);
-            await fetchItems();
-        } catch (err: any) {
-            toast.error(err.message);
-        } finally {
-            setLoading(false);
-        }
+        });
     };
 
     const filteredItems = items
@@ -655,6 +671,33 @@ export default function AdminTasksPage() {
                     ))
                 )}
             </div>
+            {/* Interaction Confirmation Matrix */}
+            {confirmModal && (
+                <div className="fixed inset-0 z-[200] flex items-center justify-center p-6 backdrop-blur-2xl bg-black/60 animate-in fade-in duration-300">
+                    <div className="bg-[#0f0f12] border border-[#3DD6C8]/20 rounded-[40px] w-full max-w-sm p-10 shadow-2xl relative overflow-hidden text-center scale-in-center">
+                        <div className="w-20 h-20 rounded-3xl bg-amber-500/10 flex items-center justify-center mx-auto mb-6">
+                            <AlertCircle size={32} className="text-amber-500" />
+                        </div>
+                        <h3 className="text-xl font-black text-white italic uppercase tracking-tighter mb-2">{confirmModal.title}</h3>
+                        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest leading-relaxed mb-8">{confirmModal.message}</p>
+                        <div className="flex flex-col gap-3">
+                            <button 
+                                onClick={confirmModal.onConfirm}
+                                disabled={loading}
+                                className="w-full py-4 bg-[#3DD6C8] text-[#0F0F23] rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-white transition-all shadow-xl active:scale-95 disabled:opacity-50"
+                            >
+                                {loading ? 'EXECUTING PROTOCOL...' : 'CONFIRM ACTION'}
+                            </button>
+                            <button 
+                                onClick={() => setConfirmModal(null)}
+                                className="w-full bg-white/5 text-slate-500 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:text-white transition-all"
+                            >
+                                ABORT SEQUENCE
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
