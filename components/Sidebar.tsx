@@ -70,8 +70,10 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
 
                 <div className="p-6 flex items-center justify-between gap-3">
                     <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center shadow-lg shadow-primary/20">
-                            <span className="text-white font-black text-xl">$</span>
+                        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-500 to-indigo-600 p-[1px] shadow-lg shadow-cyan-500/20 overflow-hidden">
+                            <div className="w-full h-full rounded-[7px] bg-slate-900 flex items-center justify-center p-1.5">
+                                <img src="/logo.png" alt="NodeFlow Logo" className="w-full h-full" />
+                            </div>
                         </div>
                         <h1 className="text-xl font-bold bg-gradient-to-r from-text-primary to-text-primary/60 bg-clip-text text-transparent">
                             NodeFlow.

@@ -100,8 +100,10 @@ export default function Header({ onMenuClick }: HeaderProps) {
 
                     {/* Branding (Mobile only, as Sidebar shows it on Desktop) */}
                     <div className="flex items-center gap-2 md:gap-3 whitespace-nowrap md:hidden">
-                        <div className="w-7 h-7 md:w-8 md:h-8 rounded-lg bg-primary flex items-center justify-center shadow-lg shadow-primary/20">
-                            <span className="text-white font-black text-base md:text-lg">$</span>
+                        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-500 to-indigo-600 p-[1px] shadow-lg shadow-cyan-500/20 overflow-hidden">
+                            <div className="w-full h-full rounded-[7px] bg-slate-900 flex items-center justify-center p-1.5">
+                                <img src="/logo.png" alt="NodeFlow Logo" className="w-full h-full" />
+                            </div>
                         </div>
                         <span className="text-sm md:text-xl font-bold text-text-primary dark:text-white tracking-tight">NodeFlow.</span>
                     </div>
