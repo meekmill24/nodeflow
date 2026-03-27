@@ -125,7 +125,7 @@ export default function Page() {
                   <div className="grid gap-2">
                     <div className="flex items-center justify-between ml-1">
                       <Label htmlFor="password" title="password" className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Password</Label>
-                      <Link href="#" className="text-[10px] font-black uppercase tracking-widest hover:underline" style={{color:'#E34304'}}>Reset</Link>
+                      <Link href="/auth/forgot-password" title="reset-password" className="text-[10px] font-black uppercase tracking-widest hover:underline transition-all" style={{color:'#E34304'}}>Reset</Link>
                     </div>
                     <div className="relative group">
                        <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4" style={{color:'rgba(61,214,200,0.5)'}} />
