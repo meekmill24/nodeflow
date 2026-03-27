@@ -63,9 +63,9 @@ export const WelcomeEmail = (username: string) => `
   </table>
 </body>
 </html>
-\`;
+`;
 
-export const PasswordResetEmail = (resetLink: string) => \`
+export const PasswordResetEmail = (resetLink: string) => `
 <!DOCTYPE html>
 <html>
 <head>
@@ -101,7 +101,7 @@ export const PasswordResetEmail = (resetLink: string) => \`
               <table border="0" cellspacing="0" cellpadding="0" style="margin: 0 auto;">
                 <tr>
                   <td align="center" style="border-radius: 16px; background-color: #E34304;">
-                    <a href="\${resetLink}" target="_blank" style="font-size: 14px; font-weight: 900; color: #FFFFFF; text-decoration: none; padding: 18px 40px; display: inline-block; text-transform: uppercase; letter-spacing: 1px;">
+                    <a href="${resetLink}" target="_blank" style="font-size: 14px; font-weight: 900; color: #FFFFFF; text-decoration: none; padding: 18px 40px; display: inline-block; text-transform: uppercase; letter-spacing: 1px;">
                       Reset Password
                     </a>
                   </td>
@@ -128,4 +128,4 @@ export const PasswordResetEmail = (resetLink: string) => \`
   </table>
 </body>
 </html>
-\`;
+`;
