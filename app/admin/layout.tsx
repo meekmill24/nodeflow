@@ -118,7 +118,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </div>
             <div>
               <h1 className="text-xl font-black" style={{color:'#3DD6C8', fontFamily:'Montserrat, sans-serif'}}>
-                SmartBugMedia<span style={{color:'#E34304'}}>.</span>
+                NodeFlow<span style={{color:'#E34304'}}>.</span>
               </h1>
               <p className="text-[9px] font-black uppercase tracking-widest" style={{color:'rgba(255,255,255,0.3)'}}>Command Center</p>
             </div>
@@ -175,7 +175,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <div className="w-9 h-9 rounded-xl bg-slate-900 border border-[#3DD6C8]/20 flex items-center justify-center p-1.5 overflow-hidden">
                <img src="/logo.png" alt="Logo" className="w-full h-full object-contain" />
             </div>
-            <div className="text-xl font-black" style={{color:'#3DD6C8', fontFamily:'Montserrat,sans-serif'}}>SmartBugMedia<span style={{color:'#E34304'}}>.</span></div>
+            <div className="text-xl font-black" style={{color:'#3DD6C8', fontFamily:'Montserrat,sans-serif'}}>NodeFlow<span style={{color:'#E34304'}}>.</span></div>
           </div>
           <div className="flex items-center gap-4">
             {totalPending > 0 && (
