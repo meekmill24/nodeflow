@@ -112,11 +112,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `} style={{background:'rgba(15,15,35,0.95)', borderRight:'1px solid rgba(61,214,200,0.12)'}}>
         <div className="h-full flex flex-col p-6">
-          <div className="mb-10 px-2">
-            <h1 className="text-2xl font-black" style={{color:'#3DD6C8', fontFamily:'Montserrat, sans-serif'}}>
-              NodeFlow<span style={{color:'#E34304'}}>.</span>
-            </h1>
-            <p className="text-[9px] font-black uppercase tracking-widest mt-1" style={{color:'rgba(255,255,255,0.3)'}}>Command Center</p>
+          <div className="mb-10 px-2 flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-slate-900 border border-slate-700/50 flex items-center justify-center p-1.5 overflow-hidden">
+               <img src="/logo.png" alt="Logo" className="w-full h-full object-cover" />
+            </div>
+            <div>
+              <h1 className="text-xl font-black" style={{color:'#3DD6C8', fontFamily:'Montserrat, sans-serif'}}>
+                NodeFlow<span style={{color:'#E34304'}}>.</span>
+              </h1>
+              <p className="text-[9px] font-black uppercase tracking-widest" style={{color:'rgba(255,255,255,0.3)'}}>Command Center</p>
+            </div>
           </div>
 
           <nav className="flex-1 space-y-1">
@@ -166,7 +171,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       {/* Main Content */}
       <main className="flex-1 flex flex-col lg:ml-64 relative z-10 min-h-screen"> 
         <header className="p-6 md:p-8 flex items-center justify-between lg:justify-end border-b backdrop-blur-md sticky top-0 z-30" style={{borderColor:'rgba(61,214,200,0.1)', background:'rgba(15,15,35,0.6)'}}>
-          <div className="lg:hidden text-xl font-black" style={{color:'#3DD6C8', fontFamily:'Montserrat,sans-serif'}}>NodeFlow<span style={{color:'#E34304'}}>.</span></div>
+          <div className="lg:hidden flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-slate-900 border border-slate-700/50 flex items-center justify-center p-1.5 overflow-hidden">
+               <img src="/logo.png" alt="Logo" className="w-full h-full object-cover" />
+            </div>
+            <div className="text-xl font-black" style={{color:'#3DD6C8', fontFamily:'Montserrat,sans-serif'}}>NodeFlow<span style={{color:'#E34304'}}>.</span></div>
+          </div>
           <div className="flex items-center gap-4">
             {totalPending > 0 && (
               <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-red-500/10 border border-red-500/20 rounded-full text-red-500 text-xs font-semibold animate-pulse">

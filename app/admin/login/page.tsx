@@ -62,8 +62,8 @@ export default function AdminLogin() {
             <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-purple-500/50 to-transparent" />
             
             <div className="flex flex-col items-center mb-10">
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center mb-6 shadow-lg shadow-purple-500/20 group-hover:scale-110 transition-transform duration-500">
-                    <Shield className="text-white w-8 h-8" />
+                <div className="w-16 h-16 rounded-2xl bg-slate-900 border border-slate-700/50 flex items-center justify-center mb-6 shadow-lg shadow-cyan-500/20 group-hover:scale-110 transition-transform duration-500 overflow-hidden p-2">
+                    <img src="/logo.png" alt="Logo" className="w-full h-full object-cover" />
                 </div>
                 <h1 className="text-3xl font-black tracking-tighter italic uppercase text-white mb-2">Terminal Access</h1>
                 <p className="text-slate-500 text-xs font-black uppercase tracking-[0.3em]">Restricted Node Authority</p>

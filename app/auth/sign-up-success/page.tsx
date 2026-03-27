@@ -14,7 +14,7 @@ export default function SignUpSuccess() {
 
       <div className='relative z-10 flex flex-col items-center justify-center px-6 text-center max-w-md'>
         <div className="mb-8 flex flex-col items-center gap-2">
-            <div className="w-12 h-12 premium-gradient rounded-xl flex items-center justify-center shadow-lg overflow-hidden">
+            <div className="w-12 h-12 rounded-xl flex items-center justify-center shadow-lg overflow-hidden border-2 border-slate-200/50" style={{background: '#0F172A'}}>
                <NextImage src="/logo.png" alt="Logo" width={48} height={48} className="object-cover" />
             </div>
             <h2 className="text-xl font-bold text-[#003d5c]">NodeFlow. </h2>

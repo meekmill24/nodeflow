@@ -89,8 +89,8 @@ export default function Page() {
         <div className="flex flex-col gap-8">
           {/* Logo Section */}
           <div className="flex flex-col items-center gap-2">
-            <div className="w-20 h-20 rounded-3xl flex items-center justify-center shadow-2xl mb-4" style={{background: 'rgba(61,214,200,0.15)', border: '2px solid rgba(61,214,200,0.4)', boxShadow: '0 0 32px rgba(61,214,200,0.2)'}}>
-               <span className="text-3xl font-black" style={{color: '#3DD6C8', fontFamily: 'Montserrat, sans-serif'}}>N</span>
+            <div className="w-20 h-20 rounded-3xl flex items-center justify-center shadow-2xl mb-4 overflow-hidden" style={{background: 'rgba(61,214,200,0.15)', border: '2px solid rgba(61,214,200,0.4)', boxShadow: '0 0 32px rgba(61,214,200,0.2)'}}>
+               <NextImage src="/logo.png" alt="NodeFlow Logo" width={80} height={80} className="object-cover transition-transform hover:scale-110" />
             </div>
              <h1 className="text-4xl font-black tracking-tighter text-white">NodeFlow<span style={{color:'#3DD6C8'}}>.</span></h1>
              <p className="text-[10px] font-black uppercase tracking-[0.4em]" style={{color:'rgba(61,214,200,0.6)'}}>Precision Optimization Platform</p>

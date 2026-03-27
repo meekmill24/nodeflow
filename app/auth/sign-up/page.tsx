@@ -125,7 +125,7 @@ export default function Page() {
         <div className="flex flex-col gap-8">
           {/* Logo Section */}
           <div className="flex flex-col items-center gap-2">
-            <div className="w-16 h-16 premium-gradient rounded-2xl flex items-center justify-center shadow-2xl shadow-blue-500/20 mb-2 overflow-hidden">
+            <div className="w-16 h-16 rounded-2xl flex items-center justify-center shadow-2xl mb-2 overflow-hidden border-2 border-slate-200/50" style={{background: '#0F172A'}}>
                <NextImage src="/logo.png" alt="Logo" width={64} height={64} className="object-cover" />
             </div>
             <h1 className="text-3xl font-extrabold tracking-tight text-[#003d5c]">NodeFlow.</h1>
