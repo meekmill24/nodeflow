@@ -4,7 +4,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
 import { useLanguage } from '@/context/LanguageContext';
 import { useCurrency } from '@/context/CurrencyContext';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase/index';
 import { ArrowLeft, Globe, Moon, Sun, Bell, Lock, Mail, ChevronRight, CheckCircle, AlertCircle, Loader2, X, DollarSign, LogOut } from 'lucide-react';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';

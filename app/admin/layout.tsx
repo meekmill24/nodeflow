@@ -2,7 +2,7 @@
 import { useAuth } from '@/context/AuthContext'; 
 import { useRouter } from 'next/navigation'; 
 import { useEffect, useState } from 'react'; 
-import { supabase } from '@/lib/supabase'; 
+import { supabase } from '@/lib/supabase/index'; 
 import Link from 'next/link'; 
 import { usePathname } from 'next/navigation'; 
 import { 

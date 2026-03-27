@@ -1,6 +1,6 @@
 'use client'; 
 import { useEffect, useState, useCallback } from 'react'; 
-import { supabase } from '@/lib/supabase'; 
+import { supabase } from '@/lib/supabase/index'; 
 import type { Profile } from '@/lib/types'; 
 import { Search, UserPlus, Edit2, Trash2, Save, X, Shield, ShieldAlert, Wallet, TrendingUp, Mail, Phone, Calendar, RefreshCcw, DollarSign, Lock, Eye, EyeOff, Zap, CheckCircle, Layers, Target } from 'lucide-react';
 import { toast } from 'sonner';

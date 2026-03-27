@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase/index';
 import { ArrowLeft, Wallet, Shield, CheckCircle, AlertCircle, Loader2, LogOut } from 'lucide-react';
 import Link from 'next/link';
 

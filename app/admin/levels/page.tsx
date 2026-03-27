@@ -1,6 +1,6 @@
 'use client'; 
 import { useEffect, useState } from 'react'; 
-import { supabase } from '@/lib/supabase'; 
+import { supabase } from '@/lib/supabase/index'; 
 import type { Level } from '@/lib/types'; 
 import { Plus, Edit2, Trash2, Save, X, Layers, Percent, CreditCard, ClipboardList, Palette } from 'lucide-react'; 
 import { toast } from 'sonner';

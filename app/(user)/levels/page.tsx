@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 
 
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase/index';
 import type { Level } from '@/lib/types';
 
 

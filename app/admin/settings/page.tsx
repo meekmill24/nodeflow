@@ -1,6 +1,6 @@
 'use client'; 
 import { useState, useEffect } from 'react'; 
-import { supabase } from '@/lib/supabase'; 
+import { supabase } from '@/lib/supabase/index'; 
 import { Settings, Globe, DollarSign, Palette, Save, Loader2, CheckCircle2, X, Plus, ShieldCheck, CreditCard, Layout, UserPlus, Wallet } from 'lucide-react'; 
 import { toast } from 'sonner';
 

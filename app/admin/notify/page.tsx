@@ -1,6 +1,6 @@
 'use client'; 
 import { useEffect, useState } from 'react'; 
-import { supabase } from '@/lib/supabase'; 
+import { supabase } from '@/lib/supabase/index'; 
 import { Send, Users, Bell, Info, CheckCircle, AlertTriangle, XCircle, Loader2, MessageSquare, Zap, History } from 'lucide-react'; 
 import { toast } from 'sonner';
 

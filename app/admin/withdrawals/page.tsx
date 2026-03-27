@@ -1,6 +1,6 @@
 'use client'; 
 import { useEffect, useState } from 'react'; 
-import { supabase } from '@/lib/supabase'; 
+import { supabase } from '@/lib/supabase/index'; 
 import { Check, X, Search, ArrowUpFromLine, Clock, Wallet, User as UserIcon, AlertTriangle, Loader2 } from 'lucide-react'; 
 import { toast } from 'sonner';
 

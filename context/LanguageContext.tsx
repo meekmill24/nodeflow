@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useAuth } from './AuthContext';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase/index';
 
 export type LanguageCode = 'English' | 'Spanish' | 'French' | 'German' | 'Chinese' | 'Japanese' | 'Arabic' | 'Portuguese' | 'Turkish' | 'Russian' | 'Hindi' | 'Vietnamese';
 

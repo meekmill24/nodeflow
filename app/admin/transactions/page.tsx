@@ -1,6 +1,6 @@
 'use client'; 
 import { useEffect, useState } from 'react'; 
-import { supabase } from '@/lib/supabase'; 
+import { supabase } from '@/lib/supabase/index'; 
 import type { Transaction } from '@/lib/types'; 
 import { Search, ArrowUpRight, ArrowDownLeft, Snowflake, DollarSign, Filter, RefreshCcw, User as UserIcon, Calendar, Info, Eye, ExternalLink, Trash2 } from 'lucide-react'; 
 

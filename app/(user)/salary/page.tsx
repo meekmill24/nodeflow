@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase/index';
 
 const salaryData = [
     { level: 1, name: 'Level 1 Collector', rewards: [100, 300, 1000, 1800, 5000], total: 8200 },
