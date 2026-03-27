@@ -167,10 +167,8 @@ export default function LandingPage() {
         <nav className="sticky top-0 z-50 px-6 py-4 lg:px-12 backdrop-blur-xl border-b border-white/5 bg-slate-950/60">
           <div className="max-w-7xl mx-auto flex items-center justify-between">
             <Link href="/" className="flex items-center gap-3 group">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-indigo-600 p-[1.5px] transition-transform group-hover:scale-110 group-hover:rotate-6">
-                <div className="w-full h-full rounded-[10px] bg-slate-900 flex items-center justify-center overflow-hidden">
+              <div className="w-10 h-10 rounded-full bg-slate-900 border border-white/10 flex items-center justify-center p-1.5 shadow-lg shadow-cyan-500/20 overflow-hidden transition-transform group-hover:scale-110">
                   <Image src="/logo.png" alt="NodeFlow Logo" width={24} height={24} />
-                </div>
               </div>
               <span className="text-2xl font-black tracking-tight text-white italic">NodeFlow<span className="text-cyan-500">.</span></span>
             </Link>

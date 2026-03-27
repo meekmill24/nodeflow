@@ -61,13 +61,11 @@ export default function AdminLogin() {
             {/* Top Glow */}
             <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-purple-500/50 to-transparent" />
             
-            <div className="flex flex-col items-center mb-10">
-                <div className="w-16 h-16 rounded-2xl bg-slate-900 border border-slate-700/50 flex items-center justify-center mb-6 shadow-lg shadow-cyan-500/20 group-hover:scale-110 transition-transform duration-500 overflow-hidden p-2">
+                <div className="w-16 h-16 rounded-full bg-slate-900 border border-slate-700/50 flex items-center justify-center mb-6 shadow-lg shadow-cyan-500/20 group-hover:scale-110 transition-transform duration-500 overflow-hidden p-2">
                     <img src="/logo.png" alt="Logo" className="w-full h-full object-cover" />
                 </div>
-                <h1 className="text-3xl font-black tracking-tighter italic uppercase text-white mb-2">Terminal Access</h1>
-                <p className="text-slate-500 text-xs font-black uppercase tracking-[0.3em]">Restricted Node Authority</p>
-            </div>
+                <h1 className="text-3xl font-black tracking-tighter italic uppercase text-white mb-2">NodeFlow Terminal</h1>
+                <p className="text-[#3DD6C8] text-[9px] font-black uppercase tracking-[0.4em] opacity-70">Secured Node Authority</p>
             
             {error && (
                 <div className="mb-8 p-4 bg-red-500/10 border border-red-500/20 rounded-2xl flex items-center gap-3 animate-shake">
@@ -126,7 +124,7 @@ export default function AdminLogin() {
             </form>
 
             <div className="mt-10 pt-8 border-t border-white/5 text-center">
-                <p className="text-[9px] font-black text-slate-700 uppercase tracking-[0.4em]">NodeFlow. Operating System v4.0</p>
+                <p className="text-[9px] font-black text-slate-700 uppercase tracking-[0.4em]">© 2026 NodeFlow. Global Matrix</p>
             </div>
         </div>
       </div>

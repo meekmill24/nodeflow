@@ -70,13 +70,11 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
 
                 <div className="p-6 flex items-center justify-between gap-3">
                     <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-500 to-indigo-600 p-[1px] shadow-lg shadow-cyan-500/20 overflow-hidden">
-                            <div className="w-full h-full rounded-[7px] bg-slate-900 flex items-center justify-center p-1.5">
-                                <img src="/logo.png" alt="NodeFlow Logo" className="w-full h-full" />
-                            </div>
+                        <div className="w-10 h-10 rounded-full bg-slate-900 border border-white/10 flex items-center justify-center p-1.5 shadow-lg shadow-cyan-500/20 overflow-hidden">
+                            <img src="/logo.png" alt="NodeFlow Logo" className="w-full h-full object-contain" />
                         </div>
-                        <h1 className="text-xl font-bold bg-gradient-to-r from-text-primary to-text-primary/60 bg-clip-text text-transparent">
-                            NodeFlow.
+                        <h1 className="text-xl font-bold bg-gradient-to-r from-white via-white/80 to-white/60 bg-clip-text text-transparent italic tracking-tight">
+                            NodeFlow<span className="text-primary-light">.</span>
                         </h1>
                     </div>
                     {/* Mobile Close Button */}
