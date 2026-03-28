@@ -32,6 +32,7 @@ import {
 import Link from 'next/link';
 import { useState, useRef } from 'react';
 import { supabase } from '@/lib/supabase/index';
+import { toast } from 'sonner';
 
 export default function ProfilePage() {
     const { profile, signOut } = useAuth();
@@ -98,7 +99,7 @@ export default function ProfilePage() {
                                 onClick={() => {
                                     if (profile?.referral_code) {
                                         navigator.clipboard.writeText(profile.referral_code);
-                                        alert('Protocol Token Copied to Clipboard');
+                                        toast.success('Protocol Token Copied to Clipboard');
                                     }
                                 }}
                                 className="flex flex-col cursor-pointer group/ref hover:scale-105 active:scale-95 transition-all bg-white/5 border border-white/5 hover:border-[#3DD6C8]/30 px-3 py-2 rounded-xl"
