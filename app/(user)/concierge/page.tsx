@@ -41,28 +41,32 @@ export default function ConciergeHubPage() {
             icon: Target,
             title: 'Operation Protocol',
             desc: 'Standardized workflow for network optimization tasks.',
-            color: 'text-primary'
+            color: 'text-primary',
+            href: '/rules'
         },
         {
             icon: ShieldCheck,
             title: 'Security Compliance',
             desc: 'End-to-end encryption and account protection measures.',
-            color: 'text-success'
+            color: 'text-success',
+            href: '/rules'
         },
         {
             icon: Zap,
             title: 'Priority Settlement',
             desc: 'Accelerated payout processing for VIP members.',
-            color: 'text-accent'
+            color: 'text-accent',
+            href: '/withdraw'
         },
         {
             icon: Cpu,
             title: 'Neural Engine',
             desc: 'Optimization logic and market analysis framework.',
-            color: 'text-[#3DD6C8]'
+            color: 'text-[#3DD6C8]',
+            href: '/start'
         }
     ];
- 
+
     return (
         <div className="space-y-8 pb-24">
             {/* Header */}
@@ -75,7 +79,7 @@ export default function ConciergeHubPage() {
                     <p className="text-[10px] font-black text-text-secondary uppercase tracking-[0.2em] opacity-60">Priority Protocol & Support</p>
                 </div>
             </div>
- 
+
             {/* Support Hero */}
             <div className="glass-card-strong p-8 relative overflow-hidden group animate-slide-up [animation-delay:0.1s]">
                 <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:scale-110 transition-transform duration-700">
@@ -96,7 +100,7 @@ export default function ConciergeHubPage() {
                             Our priority support team is active 24/7 to handle account inquiries, large settlements, and tier advancement consultations.
                         </p>
                     </div>
- 
+
                     <div className="flex flex-wrap gap-4">
                         <button 
                             onClick={() => {
@@ -110,7 +114,7 @@ export default function ConciergeHubPage() {
                         >
                             Live Chat <ArrowRight className="group-hover/btn:translate-x-1 transition-transform" />
                         </button>
- 
+
                         <a 
                             href={supportLinks.whatsapp} 
                             target="_blank"
@@ -118,7 +122,7 @@ export default function ConciergeHubPage() {
                         >
                             WhatsApp
                         </a>
- 
+
                         <a 
                             href={supportLinks.telegram} 
                             target="_blank"
@@ -126,7 +130,7 @@ export default function ConciergeHubPage() {
                         >
                             Telegram
                         </a>
- 
+
                         <a 
                             href="mailto:support@nodeflow.com"
                             className="bg-accent/20 border border-accent/30 text-accent-light px-8 py-3.5 rounded-2xl font-black uppercase tracking-widest text-xs flex items-center gap-3 hover:bg-accent/30 transition-all active:scale-95"
@@ -146,8 +150,9 @@ export default function ConciergeHubPage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {protocols.map((protocol, i) => (
-                        <div 
+                        <Link 
                             key={i} 
+                            href={protocol.href}
                             className="glass-card p-6 flex items-center gap-6 group hover:translate-y-[-4px] transition-all animate-slide-up"
                             style={{ animationDelay: `${0.3 + i * 0.1}s` }}
                         >
@@ -161,7 +166,7 @@ export default function ConciergeHubPage() {
                             <div className="text-text-secondary opacity-30 group-hover:opacity-100 group-hover:translate-x-1 transition-all">
                                 <ChevronRight size={20} />
                             </div>
-                        </div>
+                        </Link>
                     ))}
                 </div>
             </div>
