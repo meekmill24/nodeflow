@@ -24,6 +24,7 @@ import {
     Globe
 } from 'lucide-react';
 import { useCurrency, CurrencyCode } from '@/context/CurrencyContext';
+import { useLanguage } from '@/context/LanguageContext';
 import { useTheme } from '@/context/ThemeContext';
 
 interface HeaderProps {
@@ -34,6 +35,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
     const { profile, signOut } = useAuth();
     const { notifications, unreadCount, markAsRead, markAllRead, clearAll } = useNotifications();
     const { format, currency, setCurrency } = useCurrency();
+    const { t } = useLanguage();
     const router = useRouter();
     
     const [isNotifOpen, setIsNotifOpen] = useState(false);
