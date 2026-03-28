@@ -143,10 +143,10 @@ export default function LandingPage() {
   ];
 
   const tiers = [
-    { name: 'JUNIOR AGENT', price: '500', yield: '0.4%', tasks: '40', features: ['Institutional Entry', 'Standard Node Access', 'Daily Optimization Cycle'] },
-    { name: 'INTERMEDIATE AGENT', price: '1,500', yield: '0.6%', tasks: '45', features: ['Enhanced Yield Velocity', 'Priority Node Access', 'Extended Audit Logs'] },
-    { name: 'SENIOR AGENT', price: '5,000', yield: '0.8%', tasks: '50', features: ['Premium Distribution', 'Multi-Node Sharding', 'Institutional Vault Access'], popular: true },
-    { name: 'MASTER AGENT', price: '15,000', yield: '1.0%', tasks: '55', features: ['Global Matrix Governance', 'Unlimited Node Scaling', 'Quantum Settlement Security'] }
+    { name: 'JUNIOR AGENT', price: '100', yield: '0.4%', tasks: '40', features: ['Institutional Entry', 'Standard Node Access', 'Daily Optimization Cycle'] },
+    { name: 'INTERMEDIATE AGENT', price: '500', yield: '0.6%', tasks: '45', features: ['Enhanced Yield Velocity', 'Priority Node Access', 'Extended Audit Logs'] },
+    { name: 'SENIOR AGENT', price: '1,500', yield: '0.8%', tasks: '50', features: ['Premium Distribution', 'Multi-Node Sharding', 'Institutional Vault Access'], popular: true },
+    { name: 'MASTER AGENT', price: '5,000', yield: '1.0%', tasks: '55', features: ['Global Matrix Governance', 'Unlimited Node Scaling', 'Quantum Settlement Security'] }
   ];
 
   if (!mounted) return null;
