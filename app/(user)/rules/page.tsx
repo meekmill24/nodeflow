@@ -17,11 +17,10 @@ import Link from 'next/link';
 
 
 const VIP_LEVELS = [
-    { level: 'LV1', deposit: 100, tasks: 40, sets: 3, color: 'from-[#3DD6C8] to-[#1a1a2e]' },
-    { level: 'LV2', deposit: 500, tasks: 45, sets: 4, color: 'from-[#E34304] to-[#1a1a2e]' },
-    { level: 'LV3', deposit: 2000, tasks: 50, sets: 5, color: 'from-amber-400 to-orange-500' },
-    { level: 'LV4', deposit: 5000, tasks: 60, sets: 6, color: 'from-rose-500 to-red-600' },
-    { level: 'LV5', deposit: 10000, tasks: 80, sets: 7, color: 'from-emerald-500 to-teal-600' },
+    { level: 'Junior Agent', deposit: 500, tasks: 40, sets: 1, color: 'from-[#3DD6C8] to-[#1a1a2e]' },
+    { level: 'Intermediate Agent', deposit: 1500, tasks: 45, sets: 1, color: 'from-[#E34304] to-[#1a1a2e]' },
+    { level: 'Senior Agent', deposit: 5000, tasks: 50, sets: 1, color: 'from-amber-400 to-orange-500' },
+    { level: 'Master Agent', deposit: 15000, tasks: 55, sets: 1, color: 'from-rose-500 to-red-600' },
 ];
 
 const BONUS_CHIPS = [
@@ -140,6 +139,50 @@ export default function RulesPage() {
                     </div>
                 </div>
 
+            </div>
+
+            {/* Terms of Engagement Section */}
+            <div className="glass-card-strong p-10 md:p-14 border border-white/5 space-y-10 bg-slate-900/40 backdrop-blur-3xl overflow-hidden relative">
+                <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/5 blur-[120px] rounded-full pointer-events-none" />
+                
+                <div className="flex flex-col md:flex-row gap-10 items-start relative z-10">
+                    <div className="shrink-0 p-5 rounded-3xl bg-white/5 border border-white/10 text-white shadow-2xl">
+                        <FileText size={40} strokeWidth={1} />
+                    </div>
+                    <div className="space-y-8">
+                        <div>
+                            <h2 className="text-3xl font-black text-white uppercase italic tracking-tighter leading-none mb-3">Terms of Engagement</h2>
+                            <p className="text-[10px] font-black text-white/30 uppercase tracking-[0.4em]">NodeFlow. Institutional Protocol v4.2</p>
+                        </div>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 text-[11px] font-bold text-white/50 leading-relaxed uppercase tracking-widest text-justify">
+                            <div className="space-y-6">
+                                <p>
+                                    All agents engaging with the NodeFlow. matrix agree to the synchronized distribution protocols established within this governance document. By initializing a node, the agent acknowledges that task optimization requires high-fidelity verification and consistent nodal activity to maintain yield velocity.
+                                </p>
+                                <p>
+                                    NodeFlow. serves as the premier successor to the legacy <span className="text-primary-light">Captiv8</span> and <span className="text-amber-500">Simple Money</span> frameworks. All previous architectural shards have been migrated to ensure superior liquidity matching and enhanced layer-2 security settlements.
+                                </p>
+                            </div>
+                            <div className="space-y-6">
+                                <p>
+                                    Assets deployed within the wealth calibration section are subject to real-time institutional auditing. NodeFlow. reserves the right to suspend any node exhibiting non-standard latency or synchronized malicious patterns that threaten the total network integrity.
+                                </p>
+                                <p>
+                                    Settlement periods are optimized for daily extraction. However, larger wealth extraction requests may undergo multi-signature verification protocols to ensure the safety of the agent's digital vault and the broader ecosystem liquidity.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div className="pt-8 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-6">
+                            <div className="flex items-center gap-4">
+                                <ShieldCheck className="text-success" size={20} />
+                                <span className="text-[10px] font-black text-white uppercase tracking-[0.2em]">Compliance Verified by Neural Matrix</span>
+                            </div>
+                            <p className="text-[9px] font-black text-white/20 uppercase tracking-[0.3em]">Last Updated: March 2026 • Build ID: NF-889-SYNC</p>
+                        </div>
+                    </div>
+                </div>
             </div>
 
         </div>

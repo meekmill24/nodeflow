@@ -160,7 +160,7 @@ export default function CertificatePage() {
                                     <div className="space-y-8 flex-1 flex flex-col justify-center max-w-2xl mt-12">
                                         <div className="relative inline-block">
                                             <h3 className="text-4xl md:text-6xl font-black text-white uppercase tracking-[0.2em] px-8 py-2 font-serif">
-                                                SIMPLE MONEY
+                                                NODEFLOW. GLOBAL OPS
                                             </h3>
                                             <div className="absolute -bottom-2 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-amber-500 to-transparent opacity-80" />
                                         </div>

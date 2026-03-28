@@ -49,7 +49,7 @@ export default function HomePage() {
             try {
                 const [allRes, levelsResult] = await Promise.all([
                     supabase.from('user_tasks').select('*', { count: 'exact', head: true }).eq('user_id', profile.id),
-                    supabase.from('levels').select('*').order('price', { ascending: true }).limit(2)
+                    supabase.from('levels').select('*').order('price', { ascending: true }).limit(4)
                 ]);
                 setStats({
                     totalTasks: allRes.count || 0,
@@ -174,18 +174,20 @@ export default function HomePage() {
                         <h3 className="text-[10px] font-black text-white/50 uppercase tracking-[0.4em]">QUICK HUB SELECT</h3>
                     </div>
                     
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
                         {[
                             { icon: ArrowDownLeft, label: t('deposit'), href: '/deposit', color: 'text-[#3DD6C8]', bg: 'bg-[#3DD6C8]/5' },
                             { icon: ArrowUpRight, label: t('withdraw'), href: '/withdraw', color: 'text-amber-500', bg: 'bg-amber-500/5' },
                             { icon: Building2, label: t('company'), href: '/company', color: 'text-indigo-400', bg: 'bg-indigo-400/5' },
                             { icon: FileText, label: 'Certificate', href: '/certificate', color: 'text-pink-500', bg: 'bg-pink-500/5' },
+                            { icon: ShieldCheck, label: 'Terms & Strategy', href: '/rules', color: 'text-emerald-500', bg: 'bg-emerald-500/5' },
+                            { icon: Headset, label: 'Concierge', href: '/concierge', color: 'text-blue-500', bg: 'bg-blue-500/5' },
                         ].map((hub, i) => (
-                            <Link key={i} href={hub.href} className="group p-8 rounded-[36px] bg-[#0B0B1E] border border-white/5 flex flex-col items-center gap-5 hover:border-white/10 transition-all duration-500 hover:-translate-y-1">
-                                <div className={`w-14 h-14 rounded-3xl ${hub.bg} border border-white/5 flex items-center justify-center ${hub.color} group-hover:scale-110 transition-transform duration-700`}>
-                                    <hub.icon size={26} />
+                            <Link key={i} href={hub.href} className="group p-6 rounded-[36px] bg-[#0B0B1E] border border-white/5 flex flex-col items-center gap-4 hover:border-white/10 transition-all duration-500 hover:-translate-y-1">
+                                <div className={`w-12 h-12 rounded-2xl ${hub.bg} border border-white/5 flex items-center justify-center ${hub.color} group-hover:scale-110 transition-transform duration-700`}>
+                                    <hub.icon size={22} />
                                 </div>
-                                <span className="text-[10px] font-black text-white/60 uppercase tracking-[0.3em]">{hub.label}</span>
+                                <span className="text-[10px] font-black text-white/60 uppercase tracking-[0.3em] text-center">{hub.label}</span>
                             </Link>
                         ))}
                     </div>
