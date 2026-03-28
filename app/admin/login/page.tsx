@@ -32,7 +32,14 @@ export default function AdminLogin() {
           .eq('id', data.user.id)
           .single();
 
-        if (profileError || profile?.role !== 'admin') {
+        if (profileError) {
+          console.error("Profile Fetch Error:", profileError);
+          await supabase.auth.signOut();
+          throw new Error(`Profile access failed: ${profileError.message}`);
+        }
+
+        if (profile?.role !== 'admin' && !profile?.is_admin) {
+          console.warn("Unauthorized Access Attempt:", data.user.email, "Role:", profile?.role, "IsAdmin:", profile?.is_admin);
           await supabase.auth.signOut();
           throw new Error('Access Denied. Administrator privileges required.');
         }
@@ -41,7 +48,12 @@ export default function AdminLogin() {
         router.refresh();
       }
     } catch (err: any) {
-      setError(err.message || 'Authentication failed');
+      console.error("Admin Login Sequence Failure:", err);
+      if (err.message?.toLowerCase().includes('confirm')) {
+        setError('Security Protocol: Email confirmation required. Please check your inbox.');
+      } else {
+        setError(err.message || 'Authentication failed');
+      }
     } finally {
       setLoading(false);
     }
