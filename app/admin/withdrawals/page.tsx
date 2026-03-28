@@ -12,18 +12,17 @@ export default function AdminWithdrawalsPage() {
 
   const fetchWithdrawals = async () => { 
     setLoading(true);
-    let query = supabase
-      .from('transactions')
-      .select('*, profile:profiles(username, wallet_balance, withdrawal_wallet_address)')
-      .eq('type', 'withdrawal');
-
-    if (statusFilter !== 'all') {
-      query = query.eq('status', statusFilter);
+    try {
+        const res = await fetch(`/api/admin/transactions?type=withdrawal&status=${statusFilter}`);
+        if (!res.ok) throw new Error(`HTTP Error: ${res.status}`);
+        const data = await res.json();
+        setWithdrawals(data || []);
+    } catch (err) {
+        console.error(err);
+        toast.error('Directory Sync Loss: Withdrawal layer disconnected');
+    } finally {
+        setLoading(false);
     }
-    
-    const { data } = await query.order('created_at', { ascending: false }); 
-    if (data) setWithdrawals(data); 
-    setLoading(false); 
   }; 
 
   useEffect(() => { fetchWithdrawals(); }, [statusFilter]); 
@@ -31,13 +30,15 @@ export default function AdminWithdrawalsPage() {
   const handleAction = async (id: number, status: 'approved' | 'rejected', amount: number, userId: string) => { 
     setProcessingId(id);
     try {
-      const { data, error } = await supabase.rpc('handle_withdrawal_action', {
-        p_transaction_id: id,
-        p_status: status
+      const res = await fetch('/api/admin/transactions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, status, type: 'withdrawal' })
       });
 
-      if (error) throw error;
-      if (data && !data.success) throw new Error(data.message);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Identity Verification Failed');
+      if (data && !data.success) throw new Error(data.message || 'System Logic Rejected Action');
 
       if (status === 'rejected') { 
         toast.info(`Withdrawal for $${amount} rejected and refunded.`);

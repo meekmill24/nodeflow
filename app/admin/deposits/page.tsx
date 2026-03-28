@@ -12,18 +12,17 @@ export default function AdminDepositsPage() {
 
   const fetchDeposits = async () => { 
     setLoading(true);
-    let query = supabase
-      .from('transactions')
-      .select('*, profile:profiles(username, wallet_balance)')
-      .eq('type', 'deposit');
-    
-    if (statusFilter !== 'all') {
-      query = query.eq('status', statusFilter);
+    try {
+        const res = await fetch(`/api/admin/transactions?type=deposit&status=${statusFilter}`);
+        if (!res.ok) throw new Error(`HTTP Error: ${res.status}`);
+        const data = await res.json();
+        setDeposits(data || []);
+    } catch (err) {
+        console.error(err);
+        toast.error('Directory Sync Loss: Deposit layer disconnected');
+    } finally {
+        setLoading(false);
     }
-
-    const { data } = await query.order('created_at', { ascending: false }); 
-    if (data) setDeposits(data); 
-    setLoading(false); 
   }; 
 
   useEffect(() => { fetchDeposits(); }, [statusFilter]); 
@@ -31,13 +30,15 @@ export default function AdminDepositsPage() {
   const handleAction = async (id: number, status: 'approved' | 'rejected', amount: number, userId: string) => { 
     setProcessingId(id);
     try {
-      const { data, error } = await supabase.rpc('handle_deposit_action', {
-        p_transaction_id: id,
-        p_status: status
+      const res = await fetch('/api/admin/transactions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, status, type: 'deposit' })
       });
 
-      if (error) throw error;
-      if (data && !data.success) throw new Error(data.message);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Identity Verification Failed');
+      if (data && !data.success) throw new Error(data.message || 'System Logic Rejected Action');
 
       if (status === 'approved') { 
         toast.success(`Deposit of $${amount} approved.`);

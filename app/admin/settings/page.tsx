@@ -17,9 +17,17 @@ export default function AdminSettingsPage() {
 
   const fetchSettings = async () => { 
     setLoading(true); 
-    const { data } = await supabase.from('site_settings').select('*').order('key'); 
-    if (data) setSettings(data); 
-    setLoading(false); 
+    try {
+        const res = await fetch('/api/admin/site-settings');
+        if (!res.ok) throw new Error(`HTTP Error: ${res.status}`);
+        const data = await res.json();
+        setSettings(data || []);
+    } catch (err) {
+        console.error(err);
+        toast.error('Directory Sync Loss: Settings layer disconnected');
+    } finally {
+        setLoading(false); 
+    }
   }; 
 
   const handleUpdate = (key: string, value: any) => {
