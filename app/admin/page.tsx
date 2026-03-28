@@ -88,14 +88,30 @@ export default function AdminDashboard() {
       </div>
 
       {/* Main Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
         {statCards.map((stat, i) => (
-          <div key={i} className="bg-slate-900/40 border border-slate-800 p-6 rounded-3xl backdrop-blur-sm group hover:border-[#3DD6C8]/50 transition-all duration-300">
-            <div className={`p-3 rounded-2xl bg-${stat.color}-500/10 text-${stat.color}-400 w-fit mb-4 group-hover:scale-110 transition-transform duration-300`}>
-              <stat.icon size={24} />
+          <div key={i} className="bg-slate-950/40 border border-white/[0.05] p-8 rounded-[40px] backdrop-blur-xl group hover:border-[#3DD6C8]/40 transition-all duration-500 relative overflow-hidden shadow-2xl">
+            {/* Background Accent Glow */}
+            <div className={`absolute -top-12 -right-12 w-32 h-32 bg-${stat.color}-500 blur-[80px] opacity-10 group-hover:opacity-20 transition-opacity`} />
+            
+            <div className="relative z-10 flex flex-col h-full">
+                <div className={`w-14 h-14 rounded-3xl bg-${stat.color}-500/10 border border-${stat.color}-500/20 flex items-center justify-center text-${stat.color}-400 mb-8 group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 shadow-lg shadow-${stat.color}-500/5`}>
+                <stat.icon size={28} strokeWidth={2.5} />
+                </div>
+                
+                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 mb-2 group-hover:text-slate-300 transition-colors">{stat.label}</p>
+                <div className="flex items-baseline gap-2">
+                    <h3 className="text-4xl font-black text-white italic tracking-tighter transition-transform duration-500 group-hover:translate-x-1">{stat.value}</h3>
+                    {i === 1 && <span className="text-[10px] font-bold text-emerald-400 opacity-60">+12.5%</span>}
+                </div>
+                
+                {/* Micro Chart Hint */}
+                <div className="mt-6 flex items-end gap-1 h-3 opacity-20 group-hover:opacity-40 transition-opacity">
+                    {[0.3, 0.5, 0.4, 0.8, 0.6, 0.9, 0.7].map((h, j) => (
+                        <div key={j} className={`w-full bg-${stat.color}-400 rounded-full`} style={{ height: `${h * 100}%` }} />
+                    ))}
+                </div>
             </div>
-            <p className="text-slate-400 text-sm font-medium uppercase tracking-wider">{stat.label}</p>
-            <h3 className="text-2xl font-bold text-white mt-1">{stat.value}</h3>
           </div>
         ))}
       </div>

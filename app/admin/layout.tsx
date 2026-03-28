@@ -115,10 +115,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `} style={{background:'rgba(15,15,35,0.95)', borderRight:'1px solid rgba(61,214,200,0.12)'}}>
         <div className="h-full flex flex-col p-6">
-          <div className="mb-12 px-2 flex items-center gap-4 group cursor-default">
-            <div className="w-14 h-14 rounded-2xl bg-slate-950 border border-[#3DD6C8]/20 flex items-center justify-center p-2 relative shadow-[0_0_20px_rgba(61,214,200,0.05)] group-hover:shadow-[0_0_30px_rgba(61,214,200,0.15)] transition-all duration-500 overflow-hidden">
-               <div className="absolute inset-0 bg-gradient-to-br from-[#3DD6C8]/10 to-transparent opacity-50" />
-               <img src="/logo.png" alt="Logo" className="w-full h-full object-contain relative z-10 filter drop-shadow-[0_0_5px_rgba(61,214,200,0.5)]" />
+          <div className="mb-12 px-2 flex items-center gap-5 group cursor-default">
+            <div className="w-9 h-24 rounded-full bg-slate-950 border border-[#3DD6C8]/20 flex flex-col items-center justify-center relative shadow-[0_0_30px_rgba(61,214,200,0.05)] group-hover:shadow-[0_0_40px_rgba(61,214,200,0.15)] transition-all duration-700 overflow-hidden shrink-0">
+               <div className="absolute inset-0 bg-gradient-to-b from-[#3DD6C8]/10 via-[#3DD6C8]/5 to-transparent opacity-40 group-hover:opacity-60 transition-opacity" />
+               <div className="w-7 h-7 relative z-10 flex items-center justify-center translate-y-[-2px]">
+                  <img src="/logo.png" alt="Logo" className="w-full h-full object-contain filter drop-shadow-[0_0_8px_rgba(61,214,200,0.6)] group-hover:scale-110 transition-transform duration-500" />
+               </div>
+               {/* Visual pulse line */}
+               <div className="absolute bottom-4 left-1/2 -translate-x-1/2 w-0.5 h-6 bg-gradient-to-t from-[#3DD6C8]/40 to-transparent rounded-full opacity-20" />
             </div>
             <div className="flex flex-col">
               <h1 className="text-[20px] font-black leading-none tracking-tight flex items-baseline" style={{color:'#3DD6C8', fontFamily:'Montserrat, sans-serif'}}>
