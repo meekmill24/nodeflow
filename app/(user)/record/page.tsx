@@ -338,7 +338,7 @@ export default function RecordPage() {
             </div>
             {/* TOAST ALIGNED CENTER - SLIGHTLY UNDER FEED */}
             <Portal>
-                <div className="fixed top-28 left-1/2 -translate-x-1/2 z-[20000] flex justify-center pointer-events-none px-4 w-full md:w-auto">
+                <div className="fixed top-[110px] left-1/2 -translate-x-1/2 z-[20000] flex justify-center pointer-events-none px-4 w-full md:w-auto">
                     <div className="w-full max-w-sm flex flex-col gap-3">
                         {profitAdded !== null && (
                             <div className="glass-card-strong px-5 py-4 rounded-[20px] shadow-[0_25px_60px_rgba(0,0,0,0.8)] border border-success/30 flex items-center gap-4 animate-scale-in pointer-events-auto bg-surface/90">
