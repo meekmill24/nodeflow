@@ -115,15 +115,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `} style={{background:'rgba(15,15,35,0.95)', borderRight:'1px solid rgba(61,214,200,0.12)'}}>
         <div className="h-full flex flex-col p-6">
-          <div className="mb-10 px-2 flex items-center gap-3">
-            <div className="min-w-[40px] h-10 rounded-xl bg-slate-900 border border-[#3DD6C8]/20 flex items-center justify-center p-1.5 overflow-hidden shadow-[0_0_15px_rgba(61,214,200,0.1)]">
-               <img src="/logo.png" alt="Logo" className="w-full h-full object-contain" />
+          <div className="mb-12 px-2 flex items-center gap-4 group cursor-default">
+            <div className="w-14 h-14 rounded-2xl bg-slate-950 border border-[#3DD6C8]/20 flex items-center justify-center p-2 relative shadow-[0_0_20px_rgba(61,214,200,0.05)] group-hover:shadow-[0_0_30px_rgba(61,214,200,0.15)] transition-all duration-500 overflow-hidden">
+               <div className="absolute inset-0 bg-gradient-to-br from-[#3DD6C8]/10 to-transparent opacity-50" />
+               <img src="/logo.png" alt="Logo" className="w-full h-full object-contain relative z-10 filter drop-shadow-[0_0_5px_rgba(61,214,200,0.5)]" />
             </div>
-            <div>
-              <h1 className="text-xl font-black" style={{color:'#3DD6C8', fontFamily:'Montserrat, sans-serif'}}>
-                SmartBugMedia<span style={{color:'#E34304'}}>.</span>
+            <div className="flex flex-col">
+              <h1 className="text-[20px] font-black leading-none tracking-tight flex items-baseline" style={{color:'#3DD6C8', fontFamily:'Montserrat, sans-serif'}}>
+                SmartBugMedia<span className="text-[#E34304] scale-125 ml-0.5">.</span>
               </h1>
-              <p className="text-[9px] font-black uppercase tracking-widest" style={{color:'rgba(255,255,255,0.3)'}}>Command Center</p>
+              <p className="text-[10px] font-black uppercase tracking-[0.4em] mt-1.5 opacity-40 group-hover:opacity-60 transition-opacity" style={{color:'rgba(255,255,255,0.8)'}}>Command Center</p>
             </div>
           </div>
 
