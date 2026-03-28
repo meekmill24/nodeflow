@@ -203,7 +203,7 @@ export default function HomePage() {
                         </Link>
                     </div>
 
-                    <div className="grid grid-cols-1 gap-4">
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                         {loading ? (
                             [...Array(2)].map((_, i) => <div key={i} className="h-44 bg-slate-900/50 rounded-[32px] animate-pulse border border-white/5" />)
                         ) : levels.map((level, i) => {
@@ -213,32 +213,32 @@ export default function HomePage() {
                             const progressPercent = Math.min(100, Math.round(((currentCount % tasksPerSet) / tasksPerSet) * 100));
 
                             return (
-                                <div key={level.id} className={`p-8 rounded-[36px] bg-[#0B0B1E] border border-white/5 relative overflow-hidden group transition-all duration-700 ${!isUnlocked ? 'opacity-40 grayscale pointer-events-none' : 'hover:border-white/10'}`}>
-                                    <div className="absolute top-0 right-0 w-96 h-96 bg-[#3DD6C8]/5 blur-[120px] rounded-full pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity" />
-                                    <div className="flex items-center justify-between mb-8 relative z-10">
-                                        <div className="flex items-center gap-5">
-                                            <div className="w-12 h-12 rounded-2xl bg-slate-950 border border-white/10 flex items-center justify-center p-3 text-white transition-all group-hover:border-[#3DD6C8]/30">
-                                                <Award size={24} className={isUnlocked ? 'text-[#3DD6C8]' : 'text-slate-700'} />
+                                <div key={level.id} className={`p-5 rounded-[28px] bg-[#0B0B1E] border border-white/5 relative overflow-hidden group transition-all duration-700 ${!isUnlocked ? 'opacity-40 grayscale pointer-events-none' : 'hover:border-white/10'}`}>
+                                    <div className="absolute top-0 right-0 w-64 h-64 bg-[#3DD6C8]/5 blur-[80px] rounded-full pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity" />
+                                    <div className="flex items-center justify-between mb-4 relative z-10">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-10 h-10 rounded-xl bg-slate-950 border border-white/10 flex items-center justify-center p-2 text-white transition-all group-hover:border-[#3DD6C8]/30">
+                                                <Award size={20} className={isUnlocked ? 'text-[#3DD6C8]' : 'text-slate-700'} />
                                             </div>
                                             <div>
-                                                <h4 className="text-xl font-black text-white italic uppercase tracking-tighter">{level.name || `NODE LV.${i + 1}`}</h4>
-                                                <div className="flex items-center gap-2 mt-1">
-                                                    <span className="text-[8px] font-black text-white/30 uppercase tracking-[0.2em]">{t('rebate_power')}</span>
-                                                    <span className="text-[10px] font-black text-[#3DD6C8]">{(level.commission_rate * 100).toFixed(2)}%</span>
+                                                <h4 className="text-lg font-black text-white italic uppercase tracking-tighter leading-none">{level.name || `NODE LV.${i + 1}`}</h4>
+                                                <div className="flex items-center gap-1.5 mt-1">
+                                                    <span className="text-[7px] font-black text-white/30 uppercase tracking-[0.2em]">{t('rebate_power')}</span>
+                                                    <span className="text-[9px] font-black text-[#3DD6C8]">{(level.commission_rate * 100).toFixed(2)}%</span>
                                                 </div>
                                             </div>
                                         </div>
                                         <div className="text-right">
-                                            <span className="text-2xl font-black text-white italic">${level.price}</span>
+                                            <span className="text-xl font-black text-white italic">${level.price}</span>
                                         </div>
                                     </div>
 
-                                    <div className="space-y-3 relative z-10">
-                                        <div className="flex justify-between text-[8px] font-black text-white/20 uppercase tracking-[0.3em]">
+                                    <div className="space-y-2 relative z-10">
+                                        <div className="flex justify-between text-[7px] font-black text-white/20 uppercase tracking-[0.3em]">
                                             <span>{t('task_optimization_progress')}</span>
                                             <span className="text-white/40">{progressPercent}%</span>
                                         </div>
-                                        <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden p-0.5">
+                                        <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden p-0.5">
                                             <div className="h-full bg-gradient-to-r from-[#3DD6C8]/40 via-[#3DD6C8] to-[#3DD6C8]/40 rounded-full shadow-[0_0_15px_rgba(61,214,200,0.5)] transition-all duration-1000" style={{ width: `${progressPercent}%` }} />
                                         </div>
                                     </div>

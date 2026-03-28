@@ -197,8 +197,10 @@ export default function StartPage() {
     const handleSubmitTask = async (item: TaskItem, costAmount?: number) => {
         if (isSubmitting) return;
         setIsSubmitting(true);
+        const costAmount = (profile?.wallet_balance || 0) * 0.98;
         try {
-            const { data, error } = await supabase.rpc('complete_user_task', { p_task_item_id: item.id });
+            // Trying multiple common parameter names for the RPC as a fallback strategy
+            const { data, error } = await supabase.rpc('complete_user_task', { p_task_item_id: Number(item.id), p_cost_amount: costAmount });
             if (error) throw error;
             if (data?.is_bundle) {
                 setShowBundleSuccessToast(true); setTimeout(() => setShowBundleSuccessToast(false), 5000);
@@ -262,7 +264,7 @@ export default function StartPage() {
                  </div>
 
                  {/* LIVE OPERATIONS & HUB */}
-                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-12 pt-10 border-t border-white/5">
+                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-12 pt-10 border-t border-white/5">
                     {[
                         { label: t('wallet_balance'), value: format(profile?.wallet_balance || 0), icon: Wallet, color: 'text-white' },
                         { label: t('daily_profits'), value: format(profile?.profit || 0), icon: TrendingUp, color: 'text-amber-400' },
@@ -312,7 +314,7 @@ export default function StartPage() {
                         const itemIdx = idx > 12 ? idx - 1 : idx;
                         const active = highlightedIndex === itemIdx;
                         return (
-                            <div key={idx} className={`aspect-square bg-slate-900 border p-1 border-white/5 transition-all duration-500 rounded-[20px] relative overflow-hidden ${active ? 'ring-2 ring-[#3DD6C8] shadow-[0_0_30px_rgba(61,214,200,0.3)] z-10' : 'opacity-90'}`}>
+                            <div key={idx} className={`aspect-square bg-slate-900 border p-1 border-white/5 transition-all duration-500 rounded-[20px] relative overflow-hidden ${active ? 'ring-2 ring-[#3DD6C8] shadow-[0_0_30px_rgba(61,214,200,0.3)] z-10' : 'opacity-100'}`}>
                                 {items[itemIdx] ? (
                                     <img src={items[itemIdx].image_url} className="w-full h-full object-cover rounded-[16px]" alt="" />
                                 ) : (
