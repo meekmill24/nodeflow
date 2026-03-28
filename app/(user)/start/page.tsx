@@ -28,7 +28,8 @@ import {
     Target,
     Zap as ZapIcon,
     ArrowDownLeft,
-    ArrowUpRight
+    ArrowUpRight,
+    Lock
 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';

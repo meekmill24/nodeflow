@@ -110,34 +110,87 @@ export default function HomePage() {
 
             {/* FINANCIAL SNAPSHOT MATRIX */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {[
-                    { label: t('available_balance'), value: format(profile?.wallet_balance || 0), desc: t('tether_holdings'), icon: Wallet, color: 'text-[#3DD6C8]', bg: 'bg-[#3DD6C8]/10' },
-                    { label: t('today_profit'), value: format(profile?.profit || 0), desc: t('secured_rebates'), icon: Zap, color: 'text-amber-400', bg: 'bg-amber-400/10' },
-                    { label: t('referral_bonus'), value: format(profile?.referral_earned || 0), desc: t('network_yield'), icon: Network, color: 'text-indigo-400', bg: 'bg-indigo-400/10' },
-                ].map((stat, i) => (
-                    <div key={i} className="bg-[#0B0B1E] border border-white/5 p-8 rounded-[40px] shadow-2xl backdrop-blur-3xl relative overflow-hidden group hover:border-white/10 transition-all duration-700">
-                        <div className={`absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity`}>
-                            <stat.icon size={120} />
-                        </div>
-                        <div className="flex items-center gap-4 mb-6">
-                            <div className={`p-3 rounded-2xl ${stat.bg} ${stat.color} transition-all duration-500 group-hover:scale-110`}>
-                                <stat.icon size={20} />
-                            </div>
-                            <span className="text-[10px] font-black text-white/30 uppercase tracking-[0.4em]">{stat.label}</span>
-                        </div>
-                        <div className="space-y-1">
-                            <h2 className={`text-4xl md:text-5xl font-black ${i === 0 ? 'text-white' : stat.color} tracking-tighter italic uppercase`}>
-                                {stat.value}
-                            </h2>
-                            <p className="text-[9px] font-black text-white/30 uppercase tracking-[0.2em]">{stat.desc}</p>
-                        </div>
+                <div className="md:col-span-3 lg:col-span-1 bg-[#0B0B1E] border border-white/5 p-8 rounded-[40px] shadow-2xl backdrop-blur-3xl relative overflow-hidden group hover:border-white/10 transition-all duration-700">
+                    <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
+                        <Wallet size={120} />
                     </div>
-                ))}
+                    <div className="flex items-center gap-4 mb-6">
+                        <div className="p-3 rounded-2xl bg-[#3DD6C8]/10 text-[#3DD6C8] transition-all duration-500 group-hover:scale-110">
+                            <Wallet size={20} />
+                        </div>
+                        <span className="text-[10px] font-black text-white/30 uppercase tracking-[0.4em]">{t('available_balance')}</span>
+                    </div>
+                    <div className="space-y-1">
+                        <h2 className="text-4xl md:text-5xl font-black text-white tracking-tighter italic uppercase">
+                            {format(profile?.wallet_balance || 0)}
+                        </h2>
+                        <p className="text-[9px] font-black text-white/30 uppercase tracking-[0.2em]">{t('tether_holdings')}</p>
+                    </div>
+                </div>
+
+                <div className="bg-[#0B0B1E] border border-white/5 p-8 rounded-[40px] shadow-2xl backdrop-blur-3xl relative overflow-hidden group hover:border-white/10 transition-all duration-700">
+                    <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
+                        <Zap size={120} />
+                    </div>
+                    <div className="flex items-center gap-4 mb-6">
+                        <div className="p-3 rounded-2xl bg-amber-400/10 text-amber-400 transition-all duration-500 group-hover:scale-110">
+                            <Zap size={20} />
+                        </div>
+                        <span className="text-[10px] font-black text-white/30 uppercase tracking-[0.4em]">{t('today_profit')}</span>
+                    </div>
+                    <div className="space-y-1">
+                        <h2 className="text-4xl md:text-5xl font-black text-amber-400 tracking-tighter italic uppercase">
+                            {format(profile?.profit || 0)}
+                        </h2>
+                        <p className="text-[9px] font-black text-white/30 uppercase tracking-[0.2em]">{t('secured_rebates')}</p>
+                    </div>
+                </div>
+
+                <div className="bg-[#0B0B1E] border border-white/5 p-8 rounded-[40px] shadow-2xl backdrop-blur-3xl relative overflow-hidden group hover:border-white/10 transition-all duration-700">
+                    <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
+                        <Network size={120} />
+                    </div>
+                    <div className="flex items-center gap-4 mb-6">
+                        <div className="p-3 rounded-2xl bg-indigo-400/10 text-indigo-400 transition-all duration-500 group-hover:scale-110">
+                            <Network size={20} />
+                        </div>
+                        <span className="text-[10px] font-black text-white/30 uppercase tracking-[0.4em]">{t('referral_bonus')}</span>
+                    </div>
+                    <div className="space-y-1">
+                        <h2 className="text-4xl md:text-5xl font-black text-indigo-400 tracking-tighter italic uppercase">
+                            {format(profile?.referral_earned || 0)}
+                        </h2>
+                        <p className="text-[9px] font-black text-white/30 uppercase tracking-[0.2em]">{t('network_yield')}</p>
+                    </div>
+                </div>
             </div>
 
             {/* LIVE OPERATIONS & HUB */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-                
+                {/* System Hub & Actions */}
+                <div className="space-y-6">
+                    <div className="flex items-center gap-3 px-4">
+                        <div className="w-1.5 h-1.5 rounded-full bg-rose-500 shadow-[0_0_8px_rgba(239,68,68,0.8)]" />
+                        <h3 className="text-[10px] font-black text-white/50 uppercase tracking-[0.4em]">QUICK HUB SELECT</h3>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                        {[
+                            { icon: ArrowDownLeft, label: t('deposit'), href: '/deposit', color: 'text-[#3DD6C8]', bg: 'bg-[#3DD6C8]/5' },
+                            { icon: ArrowUpRight, label: t('withdraw'), href: '/withdraw', color: 'text-amber-500', bg: 'bg-amber-500/5' },
+                            { icon: Building2, label: t('company'), href: '/company', color: 'text-indigo-400', bg: 'bg-indigo-400/5' },
+                            { icon: FileText, label: 'Certificate', href: '/certificate', color: 'text-pink-500', bg: 'bg-pink-500/5' },
+                        ].map((hub, i) => (
+                            <Link key={i} href={hub.href} className="group p-8 rounded-[36px] bg-[#0B0B1E] border border-white/5 flex flex-col items-center gap-5 hover:border-white/10 transition-all duration-500 hover:-translate-y-1">
+                                <div className={`w-14 h-14 rounded-3xl ${hub.bg} border border-white/5 flex items-center justify-center ${hub.color} group-hover:scale-110 transition-transform duration-700`}>
+                                    <hub.icon size={26} />
+                                </div>
+                                <span className="text-[10px] font-black text-white/60 uppercase tracking-[0.3em]">{hub.label}</span>
+                            </Link>
+                        ))}
+                    </div>
+                </div>
+
                 {/* VIP Evolution Module */}
                 <div className="space-y-6">
                     <div className="flex items-center justify-between px-4">
@@ -192,30 +245,6 @@ export default function HomePage() {
                                 </div>
                             );
                         })}
-                    </div>
-                </div>
-
-                {/* System Hub & Actions */}
-                <div className="space-y-6">
-                    <div className="flex items-center gap-3 px-4">
-                        <div className="w-1.5 h-1.5 rounded-full bg-rose-500 shadow-[0_0_8px_rgba(239,68,68,0.8)]" />
-                        <h3 className="text-[10px] font-black text-white/50 uppercase tracking-[0.4em]">QUICK HUB SELECT</h3>
-                    </div>
-                    
-                    <div className="grid grid-cols-2 gap-4">
-                        {[
-                            { icon: ArrowDownLeft, label: t('deposit'), href: '/deposit', color: 'text-[#3DD6C8]', bg: 'bg-[#3DD6C8]/5' },
-                            { icon: ArrowUpRight, label: t('withdraw'), href: '/withdraw', color: 'text-amber-500', bg: 'bg-amber-500/5' },
-                            { icon: Building2, label: t('company'), href: '/company', color: 'text-indigo-400', bg: 'bg-indigo-400/5' },
-                            { icon: FileText, label: 'Certificate', href: '/certificate', color: 'text-pink-500', bg: 'bg-pink-500/5' },
-                        ].map((hub, i) => (
-                            <Link key={i} href={hub.href} className="group p-8 rounded-[36px] bg-[#0B0B1E] border border-white/5 flex flex-col items-center gap-5 hover:border-white/10 transition-all duration-500 hover:-translate-y-1">
-                                <div className={`w-14 h-14 rounded-3xl ${hub.bg} border border-white/5 flex items-center justify-center ${hub.color} group-hover:scale-110 transition-transform duration-700`}>
-                                    <hub.icon size={26} />
-                                </div>
-                                <span className="text-[10px] font-black text-white/60 uppercase tracking-[0.3em]">{hub.label}</span>
-                            </Link>
-                        ))}
                     </div>
                 </div>
             </div>
