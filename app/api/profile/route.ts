@@ -24,8 +24,14 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 400 })
     }
 
-    // 24h Reset Logic
+    // Referral & 24h Reset Logic
     if (profile) {
+      if (!profile.referral_code || profile.referral_code === '') {
+        const newRef = user.id.slice(0, 4).toUpperCase();
+        await supabase.from('profiles').update({ referral_code: newRef }).eq('id', user.id);
+        profile.referral_code = newRef;
+      }
+
       const lastReset = new Date(profile.last_reset_at || profile.created_at || new Date())
       const now = new Date()
       const diffMs = now.getTime() - lastReset.getTime()

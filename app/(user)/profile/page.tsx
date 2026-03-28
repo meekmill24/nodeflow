@@ -94,9 +94,20 @@ export default function ProfilePage() {
                         </div>
                         <h2 className="text-3xl md:text-5xl font-black text-white uppercase tracking-tighter italic leading-none mb-4">{profile?.username || 'Node User'}</h2>
                         <div className="flex items-center gap-4">
-                             <div className="flex flex-col">
-                                <span className="text-[7px] font-black text-white/30 uppercase tracking-[0.5em] mb-1 leading-none italic">SECURE ACCESS TOKEN</span>
-                                <span className="text-xs font-black text-white/60 tracking-widest leading-none">{profile?.referral_code || '--- --- ---'}</span>
+                             <div 
+                                onClick={() => {
+                                    if (profile?.referral_code) {
+                                        navigator.clipboard.writeText(profile.referral_code);
+                                        alert('Protocol Token Copied to Clipboard');
+                                    }
+                                }}
+                                className="flex flex-col cursor-pointer group/ref hover:scale-105 active:scale-95 transition-all bg-white/5 border border-white/5 hover:border-[#3DD6C8]/30 px-3 py-2 rounded-xl"
+                             >
+                                <span className="text-[7px] font-black text-white/30 uppercase tracking-[0.5em] mb-1 leading-none italic group-hover/ref:text-[#3DD6C8] transition-colors">SECURE ACCESS TOKEN</span>
+                                <div className="flex items-center gap-2">
+                                    <span className="text-xs font-black text-white/60 tracking-widest leading-none group-hover/ref:text-white transition-colors">{profile?.referral_code || '--- --- ---'}</span>
+                                    <Activity size={10} className="text-[#3DD6C8] opacity-0 group-hover/ref:opacity-100 transition-opacity" />
+                                </div>
                              </div>
                              <div className="h-6 w-[1px] bg-white/10" />
                              <div className="flex flex-col">
