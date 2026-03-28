@@ -307,7 +307,7 @@ export default function StartPage() {
             <div className="relative flex flex-col items-center justify-center py-10">
                 <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full md:w-[800px] h-[600px] bg-[#3DD6C8]/5 rounded-full blur-[160px] transition-opacity duration-1000 ${isSpinning ? 'opacity-100' : 'opacity-40'}`} />
 
-                <div className="w-full max-w-3xl mx-auto grid grid-cols-5 gap-4 z-10 px-4 relative">
+                <div className="w-full max-w-3xl mx-auto grid grid-cols-5 gap-1.5 md:gap-4 z-10 px-1.5 md:px-4 relative">
                     {Array.from({ length: 25 }).map((_, idx) => {
                         if (idx === 12) {
                             return (
