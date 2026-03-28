@@ -69,69 +69,42 @@ export default function HomePage() {
     return (
         <div className="space-y-12 animate-in fade-in duration-1000 pb-20">
             
-            {/* TACTICAL BRIEFING SPACE */}
-            <div className="relative group perspective-1000 overflow-hidden rounded-[48px] bg-slate-900 shadow-2xl border border-white/5 mx-2 md:mx-0">
-                <div className="absolute inset-x-0 bottom-0 h-[2px] bg-gradient-to-r from-transparent via-[#3DD6C8] to-transparent opacity-40 blur-sm" />
-                <div className="relative p-12 md:p-20 flex flex-col md:flex-row md:items-center justify-between gap-12">
-                    <div className="flex-1 space-y-8">
-                        <div className="flex items-center gap-6">
-                            <div className="w-20 h-20 rounded-[32px] bg-[#3DD6C8]/10 border border-[#3DD6C8]/30 flex items-center justify-center relative shadow-[0_0_40px_rgba(61,214,200,0.1)] overflow-hidden group-hover:scale-105 transition-transform duration-700">
+            {/* TERMINAL HEADER */}
+            <div className="relative group perspective-1000 overflow-hidden rounded-[48px] bg-slate-900 shadow-2xl border border-white/5">
+                <div className="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-transparent via-[#3DD6C8] to-transparent opacity-30 blur-sm" />
+                <div className="relative p-10 md:p-14 flex flex-col md:flex-row md:items-center justify-between gap-10">
+                    <div className="flex-1 space-y-6">
+                        <div className="flex items-center gap-4">
+                            <div className="w-16 h-16 rounded-3xl bg-[#3DD6C8]/10 border border-[#3DD6C8]/30 flex items-center justify-center relative shadow-[0_0_30px_rgba(61,214,200,0.15)] overflow-hidden group-hover:scale-105 transition-transform duration-700">
                                 <div className="absolute inset-0 bg-gradient-to-br from-[#3DD6C8]/20 to-transparent animate-pulse" />
-                                <Cpu className="text-[#3DD6C8] relative z-10" size={40} />
+                                <Cpu className="text-[#3DD6C8] relative z-10" size={32} />
                             </div>
-                            <div className="space-y-2">
-                                <div className="flex items-center gap-3">
-                                    <span className="text-[10px] font-black text-[#3DD6C8] uppercase tracking-[0.6em] italic animate-pulse">TACTICAL BRIEFING</span>
-                                    <div className="h-[1px] w-12 bg-white/10" />
-                                </div>
-                                <h1 className="text-4xl md:text-7xl font-black text-white italic uppercase tracking-tighter leading-[0.8] flex items-baseline gap-2">
+                            <div>
+                                <h1 className="text-3xl md:text-5xl font-black text-white italic uppercase tracking-tighter leading-none flex items-baseline gap-2">
                                     {t('welcome_back')}, <span className="bg-gradient-to-r from-white via-white to-white/40 bg-clip-text text-transparent">{profile?.username || 'Node'}</span>
+                                    <span className="text-[#E34304] scale-150 ml-0.5">.</span>
                                 </h1>
-                                <div className="flex items-center gap-4 pt-2">
-                                    <div className="flex items-center gap-2 px-4 py-1.5 bg-emerald-500/10 border border-emerald-500/20 rounded-full">
+                                <div className="flex items-center gap-3 mt-4">
+                                    <div className="flex items-center gap-2 px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-full">
                                         <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.8)]" />
-                                        <span className="text-[10px] font-black text-emerald-400 uppercase tracking-[0.3em] italic">{t('neural_active')}</span>
+                                        <span className="text-[9px] font-black text-emerald-400 uppercase tracking-[0.2em]">{t('neural_active')}</span>
                                     </div>
-                                    <span className="text-[10px] font-black text-white/20 uppercase tracking-[0.4em] italic leading-none">Authorization Shard Ready</span>
+                                    <span className="text-[9px] font-black text-white/30 uppercase tracking-[0.4em] italic">Identity Shard Verified</span>
                                 </div>
                             </div>
                         </div>
                     </div>
                     
-                    <div className="flex items-center gap-10 md:border-l border-white/10 md:pl-12">
+                    <div className="flex items-center gap-8 md:border-l border-white/10 md:pl-10">
                          <div className="flex flex-col text-right">
-                             <span className="text-[9px] font-black text-white/30 uppercase tracking-[0.5em] mb-2 italic">SYSTEM UPTIME</span>
-                             <span className="text-3xl font-mono font-black text-white tracking-widest drop-shadow-[0_0_10px_rgba(255,255,255,0.2)]">99.98%</span>
+                             <span className="text-[10px] font-black text-white/40 uppercase tracking-[0.4em] mb-1">NETWORK LATENCY</span>
+                             <span className="text-xl font-mono font-black text-[#3DD6C8]">1.24ms</span>
                          </div>
-                         <div className="w-16 h-16 rounded-[24px] border border-white/10 flex items-center justify-center p-2 relative overflow-hidden group/logo bg-black/40">
+                         <div className="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center p-1 relative overflow-hidden group/logo">
                             <div className="absolute inset-0 bg-[#3DD6C8]/5 opacity-0 group-hover/logo:opacity-100 transition-opacity" />
-                            <img src="/logo.png" alt="Logo" className="w-full h-full object-contain filter grayscale group-hover:grayscale-0 transition-all duration-700 brightness-150" />
+                            <img src="/logo.png" alt="Logo" className="w-full h-full object-contain filter grayscale group-hover:grayscale-0 transition-all duration-700" />
                          </div>
                     </div>
-                </div>
-            </div>
-
-            {/* STRATEGIC BRIEFING DIRECTIVE */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 px-2 md:px-0">
-                <div className="md:col-span-3 bg-slate-900/40 border border-white/5 p-8 rounded-[32px] flex items-center gap-6 relative overflow-hidden group">
-                    <div className="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-500">
-                        <ShieldCheck size={24} />
-                    </div>
-                    <div className="space-y-1">
-                        <span className="text-[10px] font-black text-amber-500 uppercase tracking-[0.4em] italic">ACTIVE DIRECTIVE</span>
-                        <p className="text-sm font-bold text-white/60 tracking-tight leading-snug">
-                            Your Node connection is currently optimized at <span className="text-white">99.9% efficiency</span>. Ensure your wallet balance remains above <span className="text-[#3DD6C8]">$65</span> to maintain uninterrupted neural yield processing.
-                        </p>
-                    </div>
-                    <div className="absolute inset-0 bg-gradient-to-r from-amber-500/5 to-transparent pointer-events-none" />
-                </div>
-                <div className="bg-[#3DD6C8] rounded-[32px] p-8 flex flex-col justify-between group cursor-pointer hover:shadow-[0_0_40px_rgba(61,214,200,0.3)] transition-all overflow-hidden relative">
-                    <div className="relative z-10">
-                        <span className="text-[9px] font-black text-[#0B0B1E] uppercase tracking-[0.4em] opacity-60">HUB STATUS</span>
-                        <h4 className="text-2xl font-black text-[#0B0B1E] italic leading-none mt-2">SECURE</h4>
-                    </div>
-                    <Activity className="text-[#0B0B1E] opacity-20 relative z-10 self-end" size={24} />
-                    <div className="absolute inset-x-0 bottom-0 h-1 bg-black/10" />
                 </div>
             </div>
 
