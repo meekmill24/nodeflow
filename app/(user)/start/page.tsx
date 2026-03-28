@@ -70,7 +70,8 @@ export default function StartPage() {
     const [commissionRate, setCommissionRate] = useState(0.0045);
     const [isLoadingData, setIsLoadingData] = useState(true);
     
-    const completedCount = profile?.completed_count || 0;
+    const [dbCompletedCount, setDbCompletedCount] = useState(0);
+    const completedCount = dbCompletedCount || profile?.completed_count || 0;
     const currentSet = profile?.current_set || 1;
     const isProfileIncomplete = !profile?.phone || profile?.phone === '';
 
@@ -94,6 +95,7 @@ export default function StartPage() {
 
                 if (pastTasksRes.data) {
                     setHasPendingTask((pastTasksRes.data as any[]).some(t => t.status === 'pending'));
+                    setDbCompletedCount((pastTasksRes.data as any[]).filter(t => t.status === 'completed').length);
                 }
                 if (levelsRes.data) {
                     const currentLevel = levelsRes.data.find(l => l.id === profile.level_id);
