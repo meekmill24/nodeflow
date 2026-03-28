@@ -735,7 +735,109 @@ export default function AdminTasksPage() {
                         </div>
                     ))
                 )}
+                {!loading && finalItems.length === 0 && (
+                    <div className="col-span-full py-40 text-center flex flex-col items-center justify-center p-10 bg-slate-900/10 border border-dashed border-white/5 rounded-[48px]">
+                        <div className="w-20 h-20 rounded-[32px] bg-slate-800/50 flex items-center justify-center text-slate-700 mb-6 border border-white/5 shadow-inner">
+                            <LayersIcon size={40} />
+                        </div>
+                        <h3 className="text-xl font-black text-white italic tracking-tighter uppercase mb-2">Node Isolation Detected</h3>
+                        <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.5em] italic">No active products match the selected criteria</p>
+                    </div>
+                )}
             </div>
+            {/* Modify Identity (Edit) Overlay */}
+            {editingId && (
+                <div className="fixed inset-0 z-[150] flex items-center justify-center p-6 backdrop-blur-3xl bg-black/60 animate-in fade-in duration-300">
+                    <div className="bg-slate-900/60 border border-[#3DD6C8]/20 p-10 rounded-[48px] backdrop-blur-3xl w-full max-w-5xl relative overflow-hidden group shadow-[0_50px_150px_rgba(0,0,0,0.8)]">
+                        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#3DD6C8]/50 to-transparent" />
+                        
+                        <div className="flex items-center justify-between mb-10">
+                            <div className="space-y-1">
+                                <h3 className="text-2xl font-black text-white italic tracking-tighter uppercase leading-none">Modify Identity</h3>
+                                <p className="text-[10px] font-black text-[#3DD6C8] uppercase tracking-widest">Recalibrating Node ID: {editingId}</p>
+                            </div>
+                            <button onClick={() => setEditingId(null)} className="w-12 h-12 rounded-2xl bg-slate-950 border border-white/5 text-slate-500 hover:text-white hover:border-white/20 transition-all flex items-center justify-center active:scale-95">
+                                <X size={20} />
+                            </button>
+                        </div>
+
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                            <div className="space-y-6">
+                                <div className="space-y-2">
+                                    <label className="text-[11px] font-black text-slate-500 uppercase tracking-widest ml-1">Asset Identity</label>
+                                    <input 
+                                        className="w-full bg-slate-950 border border-white/10 rounded-2xl px-6 py-4 text-white focus:outline-none focus:ring-2 focus:ring-[#3DD6C8]/20 focus:border-[#3DD6C8] transition-all font-bold" 
+                                        value={editData.title}
+                                        onChange={e => setEditData({ ...editData, title: e.target.value })}
+                                    />
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-6">
+                                    <div className="space-y-2">
+                                        <label className="text-[11px] font-black text-slate-500 uppercase tracking-widest ml-1">Classification</label>
+                                        <div className="relative">
+                                            <select className="w-full bg-slate-950 border border-white/10 rounded-2xl px-6 py-4 text-white hover:border-[#3DD6C8]/30 transition-all cursor-pointer font-bold appearance-none" value={editData.category} onChange={e => setEditData({ ...editData, category: e.target.value })}>
+                                                {['electrical', 'furniture', 'gym', 'fashion', 'automotive', 'general'].map(c => <option key={c} value={c}>{c.toUpperCase()}</option>)}
+                                            </select>
+                                            <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none" size={16} />
+                                        </div>
+                                    </div>
+                                    <div className="space-y-2 relative">
+                                        <label className="text-[11px] font-black text-slate-500 uppercase tracking-widest ml-1">VIP Tier</label>
+                                        <div className="relative">
+                                            <select className="w-full bg-slate-950 border border-white/10 rounded-2xl px-6 py-4 text-white hover:border-[#3DD6C8]/30 transition-all cursor-pointer font-bold appearance-none" value={editData.level_id} onChange={e => setEditData({ ...editData, level_id: parseInt(e.target.value) })}>
+                                                {levels.map(l => <option key={l.id} value={l.id}>VIP LEVEL {l.id} - ${l.price}</option>)}
+                                            </select>
+                                            <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none" size={16} />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="space-y-2">
+                                    <label className="text-[11px] font-black text-slate-500 uppercase tracking-widest ml-1">Asset Description</label>
+                                    <textarea 
+                                        className="w-full bg-slate-950 border border-white/10 rounded-2xl px-6 py-4 text-white focus:outline-none focus:ring-2 focus:ring-[#3DD6C8]/20 focus:border-[#3DD6C8] transition-all h-32 resize-none" 
+                                        value={editData.description}
+                                        onChange={e => setEditData({ ...editData, description: e.target.value })}
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="space-y-6">
+                                <div className="space-y-2">
+                                    <label className="text-[11px] font-black text-slate-500 uppercase tracking-widest ml-1">Image URL</label>
+                                    <div className="flex gap-2">
+                                        <input 
+                                            className="flex-1 bg-slate-950 border border-white/10 rounded-2xl px-6 py-4 text-white font-mono" 
+                                            value={editData.image_url}
+                                            onChange={e => setEditData({ ...editData, image_url: e.target.value })}
+                                        />
+                                        <button 
+                                            type="button"
+                                            onClick={() => setEditData({ ...editData, image_url: generateFallbackUrl(editData.title || `item-${editingId}`) })}
+                                            className="w-[60px] h-[60px] rounded-2xl bg-white/5 border border-white/10 text-white flex items-center justify-center hover:bg-white/10 transition-all"
+                                        >
+                                            <RefreshCw size={20} />
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <ImagePreview url={editData.image_url || ''} alt={editData.title || ''} size="lg" />
+
+                                <div className="flex gap-4">
+                                    <button onClick={() => setEditingId(null)} className="flex-1 h-16 bg-slate-800 text-white rounded-2xl font-black uppercase tracking-widest hover:bg-slate-700 transition-all">
+                                        Abort
+                                    </button>
+                                    <button onClick={handleSave} disabled={saving} className="flex-[2] h-16 bg-[#3DD6C8] text-[#0F0F23] rounded-2xl font-black uppercase tracking-widest shadow-xl shadow-[#3DD6C8]/20 hover:scale-[1.02] active:scale-95 transition-all">
+                                        Commit Changes
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {/* Interaction Confirmation Matrix */}
             {confirmModal && (
                 <div className="fixed inset-0 z-[200] flex items-center justify-center p-6 backdrop-blur-2xl bg-black/60 animate-in fade-in duration-300">

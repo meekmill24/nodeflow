@@ -4,74 +4,34 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --background: #F8FAFC;
-  --foreground: #0F172A;
-  --card: #FFFFFF;
-  --card-foreground: #0F172A;
-  --popover: #FFFFFF;
-  --popover-foreground: #0F172A;
-  --primary: #10B981; /* Bug Green */
-  --primary-foreground: #FFFFFF;
-  --secondary: #F1F5F9;
-  --secondary-foreground: #1E293B;
-  --muted: #F1F5F9;
-  --muted-foreground: #64748B;
-  --accent: #0284C7; /* Sky Blue */
-  --accent-foreground: #0F172A;
-  --destructive: #EF4444;
-  --destructive-foreground: #FFFFFF;
-  --border: #E2E8F0;
-  --input: #E2E8F0;
-  --ring: #10B981;
-  --radius: 1.25rem;
+  --background: #0B0B1E;
+  --foreground: #FFFFFF;
+  --primary: #3DD6C8;
+  --primary-glow: rgba(61, 214, 200, 0.3);
+  --secondary: #0F172A;
+  --accent: #E34304;
+  --surface: rgba(15, 23, 42, 0.6);
+  --border: rgba(255, 255, 255, 0.08);
+  --radius: 2rem;
 }
 
 .dark {
-  --background: #0F172A; /* Deep Slate */
-  --foreground: #F8FAFC;
-  --card: #1E293B;
-  --card-foreground: #F8FAFC;
-  --popover: #1E293B;
-  --popover-foreground: #F8FAFC;
-  --primary: #10B981; /* Bug Green */
-  --primary-foreground: #0F172A;
-  --secondary: #334155;
-  --secondary-foreground: #F8FAFC;
-  --muted: #334155;
-  --muted-foreground: #94A3B8;
-  --accent: #22D3EE; /* Cyan */
-  --accent-foreground: #0F172A;
-  --destructive: #7F1D1D;
-  --destructive-foreground: #F8FAFC;
-  --border: #334155;
-  --input: #334155;
-  --ring: #10B981;
+  --background: #0B0B1E;
+  --foreground: #FFFFFF;
 }
 
 @theme inline {
-  --font-sans: 'Inter', 'Geist', 'Geist Fallback', system-ui, sans-serif;
+  --font-sans: 'Montserrat', 'Inter', system-ui, sans-serif;
   --color-primary: var(--primary);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --color-popover: var(--popover);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-primary-foreground: var(--primary-foreground);
   --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
   --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-destructive: var(--destructive);
-  --color-destructive-foreground: var(--destructive-foreground);
+  --color-surface: var(--surface);
   --color-border: var(--border);
-  --color-input: var(--input);
-  --color-ring: var(--ring);
-  --radius-lg: var(--radius);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-sm: calc(var(--radius) - 4px);
+  --radius-3xl: 2rem;
+  --radius-2xl: 1.5rem;
+  --radius-xl: 1rem;
 }
 
 html {

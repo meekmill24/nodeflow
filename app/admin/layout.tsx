@@ -126,10 +126,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 w-0.5 h-6 bg-gradient-to-t from-[#3DD6C8]/40 to-transparent rounded-full opacity-20" />
             </div>
             <div className="flex flex-col">
-              <h1 className="text-lg font-black leading-none tracking-tight flex items-baseline" style={{color:'#3DD6C8', fontFamily:'Montserrat, sans-serif'}}>
+              <h1 className="text-sm font-black leading-none tracking-tight flex items-baseline" style={{color:'#3DD6C8', fontFamily:'Montserrat, sans-serif'}}>
                 SmartBugMedia<span className="text-[#E34304] scale-125 ml-0.5">.</span>
               </h1>
-              <p className="text-[10px] font-black uppercase tracking-[0.4em] mt-1.5 opacity-40 group-hover:opacity-60 transition-opacity" style={{color:'rgba(255,255,255,0.8)'}}>Command Center</p>
+              <p className="text-[9px] font-black uppercase tracking-[0.4em] mt-1.5 opacity-40 group-hover:opacity-60 transition-opacity" style={{color:'rgba(255,255,255,0.8)'}}>Command Center</p>
             </div>
           </div>
 
@@ -149,8 +149,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   style={isActive ? {background:'rgba(61,214,200,0.2)', border:'1px solid rgba(61,214,200,0.3)'} : {}}
                 >
                   <div className="flex items-center gap-3">
-                    <item.icon size={20} style={isActive ? {color:'#3DD6C8'} : {}} className={isActive ? '' : 'text-slate-500 group-hover:text-white'} />
-                    <span className="font-medium">{item.label}</span>
+                    <item.icon size={18} style={isActive ? {color:'#3DD6C8'} : {}} className={isActive ? '' : 'text-slate-500 group-hover:text-white'} />
+                    <span className="text-[13px] font-bold uppercase tracking-tight">{item.label}</span>
                   </div>
                 {item.label === 'Deposits' && pendingCounts.deposits > 0 && (
                   <span className="flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
@@ -181,10 +181,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <main className="flex-1 flex flex-col lg:ml-64 relative z-10 min-h-screen"> 
         <header className="p-6 md:p-8 flex items-center justify-between lg:justify-end border-b backdrop-blur-md sticky top-0 z-30" style={{borderColor:'rgba(61,214,200,0.1)', background:'rgba(15,15,35,0.6)'}}>
           <div className="lg:hidden flex items-center gap-2">
-            <div className="w-9 h-9 rounded-xl bg-slate-900 border border-[#3DD6C8]/20 flex items-center justify-center p-1.5 overflow-hidden">
+            <div className="w-8 h-8 rounded-xl bg-slate-900 border border-[#3DD6C8]/20 flex items-center justify-center p-1.5 overflow-hidden">
                <img src="/logo.png" alt="Logo" className="w-full h-full object-contain" />
             </div>
-            <div className="text-xl font-black" style={{color:'#3DD6C8', fontFamily:'Montserrat,sans-serif'}}>SmartBugMedia<span style={{color:'#E34304'}}>.</span></div>
+            <div className="text-sm font-black uppercase tracking-tighter" style={{color:'#3DD6C8', fontFamily:'Montserrat,sans-serif'}}>SmartBugMedia<span style={{color:'#E34304'}}>.</span></div>
           </div>
           <div className="flex items-center gap-4">
             {totalPending > 0 && (

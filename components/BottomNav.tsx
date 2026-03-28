@@ -18,11 +18,11 @@ export default function BottomNav() {
     const { t } = useLanguage();
 
     return (
-        <nav className="fixed bottom-0 left-0 right-0 z-[100] md:hidden pb-safe transition-all duration-300">
-            {/* GLASS BACKGROUND WITH BLUR */}
-            <div className="absolute inset-0 bg-surface/80 backdrop-blur-2xl border-t border-white/5 shadow-[0_-10px_40px_rgba(0,0,0,0.4)]" />
+        <nav className="fixed bottom-0 left-0 right-0 z-[100] md:hidden pb-safe">
+            {/* ULTRA GLASS DOCKSIDE */}
+            <div className="absolute inset-0 bg-[#0B0B1E]/90 backdrop-blur-3xl border-t border-white/5 shadow-[0_-20px_60px_rgba(0,0,0,0.8)]" />
             
-            <div className="relative grid grid-cols-5 w-full h-16 items-center">
+            <div className="relative grid grid-cols-5 w-full h-20 items-center px-2">
                 {tabs.map((item) => {
                     const { icon: Icon, label, href, isCenter } = item;
                     const isActive = pathname === href;
@@ -33,29 +33,28 @@ export default function BottomNav() {
                             <div key={href} className="flex flex-col items-center justify-center h-full relative">
                                 <Link
                                     href={href}
-                                    className="flex flex-col items-center group -mt-8"
+                                    className="flex flex-col items-center group -mt-10"
                                 >
                                     <div className="relative">
-                                        {/* RADIANT GLOW BEHIND CENTER BUTTON */}
-                                        <div className={`absolute inset-0 rounded-full blur-xl transition-all duration-500 opacity-0 group-hover:opacity-60 ${isActive ? 'bg-primary/50 opacity-60 scale-125' : 'bg-primary/30'}`} />
+                                        <div className={`absolute inset-0 rounded-[28px] blur-2xl transition-all duration-700 ${isActive ? 'bg-[#3DD6C8]/60 opacity-100 scale-125' : 'bg-[#3DD6C8]/20 opacity-0 group-hover:opacity-40'}`} />
                                         
                                         <div
-                                            className={`w-14 h-14 rounded-[22px] flex items-center justify-center transition-all duration-500 relative z-10 
+                                            className={`w-16 h-16 rounded-[24px] flex items-center justify-center transition-all duration-500 relative z-10 border
                                                 ${isActive
-                                                    ? 'bg-gradient-to-br from-primary via-primary-light to-accent shadow-[0_8px_30px_rgba(59,130,246,0.6)] scale-110 rotate-[5deg]'
-                                                    : 'bg-gradient-to-br from-surface-light via-surface-lighter to-surface border border-white/10 shadow-2xl hover:scale-105 active:scale-95'
+                                                    ? 'bg-[#3DD6C8] border-[#3DD6C8] shadow-[0_10px_40px_rgba(61,214,200,0.5)] rotate-[5deg] scale-110'
+                                                    : 'bg-slate-900 border-white/10 shadow-2xl hover:scale-105 active:scale-95'
                                                 }`}
                                         >
                                             <Icon 
-                                                size={28} 
-                                                className={`transition-all duration-500 ${isActive ? 'text-white' : 'text-primary/70 group-hover:text-primary'} ${isActive ? 'animate-pulse' : ''}`} 
+                                                size={32} 
+                                                className={`transition-all duration-500 ${isActive ? 'text-[#0B0B1E]' : 'text-[#3DD6C8] group-hover:scale-110'}`} 
                                                 fill={isActive ? "currentColor" : "none"}
                                             />
                                         </div>
                                     </div>
                                     <span
-                                        className={`text-[8px] mt-2.5 font-black transition-all duration-300 uppercase tracking-[0.2em] italic 
-                                            ${isActive ? 'text-primary drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]' : 'text-text-secondary opacity-40'}`}
+                                        className={`text-[8px] mt-2 font-black transition-all duration-500 uppercase tracking-[0.2em] italic 
+                                            ${isActive ? 'text-[#3DD6C8]' : 'text-white/20'}`}
                                     >
                                         {translatedLabel}
                                     </span>
@@ -65,19 +64,19 @@ export default function BottomNav() {
                     }
 
                     const Content = (
-                        <div className="flex flex-col items-center justify-center gap-1 group">
+                        <div className="flex flex-col items-center justify-center gap-1.5 group">
                             <div className="relative">
                                 <Icon
-                                    size={20}
-                                    className={`transition-all duration-300 group-active:scale-90 ${isActive ? 'text-primary' : 'text-text-secondary opacity-50'}`}
+                                    size={22}
+                                    className={`transition-all duration-500 group-active:scale-90 ${isActive ? 'text-[#3DD6C8]' : 'text-white/20 group-hover:text-white'}`}
                                 />
                                 {isActive && (
-                                    <div className="absolute -top-1 -right-1 w-1.5 h-1.5 bg-primary rounded-full animate-pulse shadow-[0_0_10px_var(--color-primary)]" />
+                                    <div className="absolute -top-1.5 -right-1.5 w-1.5 h-1.5 bg-[#3DD6C8] rounded-full animate-pulse shadow-[0_0_10px_rgba(61,214,200,1)]" />
                                 )}
                             </div>
                             <span
-                                className={`text-[9px] font-black transition-all duration-300 uppercase tracking-widest 
-                                    ${isActive ? 'text-primary scale-105' : 'text-text-secondary opacity-40'}`}
+                                className={`text-[8px] font-black transition-all duration-500 uppercase tracking-widest 
+                                    ${isActive ? 'text-[#3DD6C8]' : 'text-white/20'}`}
                             >
                                 {translatedLabel}
                             </span>

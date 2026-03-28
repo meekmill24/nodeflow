@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react'; 
 import { supabase } from '@/lib/supabase/index'; 
 import type { Transaction } from '@/lib/types'; 
-import { Search, ArrowUpRight, ArrowDownLeft, Snowflake, DollarSign, Filter, RefreshCcw, User as UserIcon, Calendar, Info, Eye, ExternalLink, Trash2 } from 'lucide-react'; 
+import { Search, ArrowUpRight, ArrowDownLeft, Snowflake, DollarSign, Filter, RefreshCcw, User as UserIcon, Calendar, Info, Eye, ExternalLink, Trash2, TrendingUp, Share2, ChevronDown } from 'lucide-react'; 
 import { toast } from 'sonner';
 
 export default function AdminTransactionsPage() { 
@@ -34,49 +34,92 @@ export default function AdminTransactionsPage() {
     fetchTransactions(); 
   }; 
 
-  const filtered = transactions.filter(t => 
-    (typeFilter === 'all' || t.type === typeFilter) && 
-    (t.description?.toLowerCase().includes(search.toLowerCase()) || 
-     t.profile?.username?.toLowerCase().includes(search.toLowerCase()))
-  );
+  const filtered = transactions.filter(t => {
+    const matchesSearch = (t.description?.toLowerCase().includes(search.toLowerCase()) || 
+                          t.profile?.username?.toLowerCase().includes(search.toLowerCase()));
+    
+    if (typeFilter === 'all') return matchesSearch;
+    if (typeFilter === 'referral') return matchesSearch && t.description?.toLowerCase().includes('referral');
+    if (typeFilter === 'task') return matchesSearch && (t.description?.toLowerCase().includes('level') || t.description?.toLowerCase().includes('task'));
+    return matchesSearch && t.type === typeFilter;
+  });
 
+  // Calculate Matrix
+  const stats = {
+    turnover: transactions.reduce((sum, t) => sum + t.amount, 0),
+    liquidity: transactions.reduce((sum, t) => {
+        if (t.type === 'deposit') return sum + t.amount;
+        if (t.type === 'withdrawal') return sum - t.amount;
+        return sum;
+    }, 0),
+    referrals: transactions.filter(t => t.description?.toLowerCase().includes('referral')).reduce((sum, t) => sum + t.amount, 0),
+    peak: Math.max(...transactions.map(t => t.amount), 0)
+  };
 
   return ( 
-    <div className="space-y-8 animate-in fade-in duration-500"> 
-       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4"> 
+    <div className="space-y-8 animate-in fade-in duration-500 pb-20"> 
+       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6"> 
         <div>
-          <h1 className="text-3xl font-black text-white tracking-tight italic uppercase">Financial Ledger</h1> 
-          <p className="text-slate-400 mt-1">Audit log of all platform financial movements.</p>
+          <h1 className="text-4xl font-black text-white tracking-tighter italic uppercase bg-gradient-to-r from-white to-white/40 bg-clip-text text-transparent">Financial Ledger</h1> 
+          <p className="text-slate-500 text-[10px] font-black uppercase tracking-[0.4em] mt-1">Audit log of all platform financial movements.</p>
         </div>
-        <button onClick={fetchTransactions} className="p-3 bg-slate-900/50 border border-slate-800 text-slate-400 rounded-2xl hover:text-[#3DD6C8] transition-all">
-          <RefreshCcw size={20} className={loading ? 'animate-spin' : ''} />
-        </button>
+        <div className="flex items-center gap-3">
+            <button onClick={fetchTransactions} className="h-14 px-6 bg-slate-900 border border-slate-800 text-slate-400 rounded-2xl hover:text-[#3DD6C8] hover:border-[#3DD6C8]/30 transition-all flex items-center gap-3 group">
+              <RefreshCcw size={20} className={loading ? 'animate-spin' : 'group-hover:rotate-180 transition-transform duration-700'} />
+              <span className="text-[10px] font-black uppercase tracking-widest">{loading ? 'SYNCING...' : 'REFRESH'}</span>
+            </button>
+        </div>
       </div> 
 
-      <div className="flex flex-col md:flex-row gap-4"> 
+      {/* Stats Matrix */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {[
+          { icon: DollarSign, label: 'TOTAL TURNOVER', value: `$${stats.turnover.toLocaleString()}`, color: 'text-indigo-400', glow: 'bg-indigo-500/10' },
+          { icon: TrendingUp, label: 'NET LIQUIDITY', value: `$${stats.liquidity.toLocaleString()}`, color: stats.liquidity >= 0 ? 'text-emerald-400' : 'text-rose-400', glow: stats.liquidity >= 0 ? 'bg-emerald-500/10' : 'bg-rose-500/10' },
+          { icon: Share2, label: 'REFERRAL YIELD', value: `$${stats.referrals.toLocaleString()}`, color: 'text-amber-400', glow: 'bg-amber-500/10' },
+          { icon: ArrowUpRight, label: 'PEAK TRANSACTION', value: `$${stats.peak.toLocaleString()}`, color: 'text-[#3DD6C8]', glow: 'bg-[#3DD6C8]/10' },
+        ].map((s, i) => (
+          <div key={i} className="bg-slate-900/40 border border-slate-800 p-8 rounded-[40px] backdrop-blur-md relative overflow-hidden group">
+             <div className="flex items-center gap-4 mb-4">
+                <div className={`w-10 h-10 rounded-2xl ${s.glow} flex items-center justify-center ${s.color}`}>
+                   <s.icon size={20} />
+                </div>
+                <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{s.label}</span>
+             </div>
+             <div className={`text-3xl font-black italic tracking-tighter ${s.color}`}>
+                {s.value}
+             </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="flex flex-col xl:flex-row gap-4"> 
         <div className="relative flex-1 group">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-[#3DD6C8] transition-colors" size={18} />
+          <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-700 group-focus-within:text-[#3DD6C8] transition-colors" size={20} />
           <input 
             type="text" 
             placeholder="Search by user or description..." 
             value={search} 
             onChange={e => setSearch(e.target.value)} 
-            className="w-full pl-12 pr-4 py-3 bg-slate-900/50 border border-slate-800 rounded-2xl text-white focus:outline-none focus:ring-2 focus:ring-[#3DD6C8]/20 transition-all" 
+            className="w-full pl-16 pr-6 py-5 bg-slate-900/30 border border-slate-800 rounded-[28px] text-white focus:outline-none focus:ring-4 focus:ring-[#3DD6C8]/10 focus:border-[#3DD6C8]/50 transition-all font-bold placeholder:text-slate-800 text-sm uppercase tracking-wide" 
           /> 
         </div>
         <div className="relative">
-          <Filter className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" size={18} />
+          <Filter className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-500" size={18} />
           <select 
             value={typeFilter} 
             onChange={e => setTypeFilter(e.target.value)} 
-            className="pl-12 pr-10 py-3 bg-slate-900/50 border border-slate-800 rounded-2xl text-white appearance-none focus:outline-none focus:ring-2 focus:ring-[#3DD6C8]/20 transition-all font-bold uppercase tracking-widest text-xs"
+            className="pl-16 pr-12 h-16 bg-slate-900/50 border border-slate-800 rounded-[28px] text-white appearance-none focus:outline-none focus:ring-2 focus:ring-[#3DD6C8]/20 transition-all font-black uppercase tracking-widest text-[10px] min-w-[240px]"
           > 
             <option value="all">Global Ledger</option> 
             <option value="deposit">Deposits Only</option> 
             <option value="withdrawal">Withdrawals Only</option> 
-            <option value="commission">Commissions</option> 
+            <option value="referral">Referral Commissions</option> 
+            <option value="task">Task Commissions</option> 
+            <option value="commission">Other Commissions</option> 
             <option value="freeze">Hold / Freeze</option> 
           </select> 
+          <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none" size={16} />
         </div>
       </div> 
 
