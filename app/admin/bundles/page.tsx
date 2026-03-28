@@ -124,43 +124,53 @@ export default function AdminBundlesPage() {
 
     const fetchUsers = useCallback(async () => {
         try {
+            console.log("Syncing Node Registry...");
             const [profilesRes, tasksRes] = await Promise.all([
                 fetch('/api/admin/users'),
                 fetch('/api/admin/user-tasks')
             ]);
             
-            if (profilesRes.ok && tasksRes.ok) {
-                const profiles = await profilesRes.json();
-                const pendingTasks = await tasksRes.json();
-                
-                if (profiles) {
-                    const usersWithPending = (profiles as any[]).map(u => {
-                        const pt = (pendingTasks || []).find((t: any) => t.user_id === u.id);
-                        return {
-                            ...u,
-                            has_pending_task: !!pt,
-                            has_pending_bundle_task: pt?.is_bundle || false,
-                            pending_cost_amount: pt?.cost_amount || 0,
-                            pending_earned_amount: pt?.earned_amount || 0
-                        };
-                    });
-                    setUsers(usersWithPending as any[]);
-                }
+            if (!profilesRes.ok || !tasksRes.ok) {
+                console.error("Sync Failure:", profilesRes.status, tasksRes.status);
+                toast.error(`Directory Sync Failure (${profilesRes.status})`);
+                return;
+            }
+
+            const profiles = await profilesRes.json();
+            const pendingTasks = await tasksRes.json();
+            
+            console.log(`Sync Success: ${profiles?.length || 0} nodes retrieved.`);
+            
+            if (profiles && Array.isArray(profiles)) {
+                const usersWithPending = profiles.map(u => {
+                    const pt = (pendingTasks || []).find((t: any) => t.user_id === u.id);
+                    return {
+                        ...u,
+                        has_pending_task: !!pt,
+                        has_pending_bundle_task: pt?.is_bundle || false,
+                        pending_cost_amount: pt?.cost_amount || 0,
+                        pending_earned_amount: pt?.earned_amount || 0
+                    };
+                });
+                setUsers(usersWithPending as any[]);
             }
         } catch (err) {
-            console.error("Fetch Users/Tasks Error:", err);
+            console.error("Critical Sync Loss:", err);
+            toast.error("Critical system connection loss");
         }
     }, []);
 
     const fetchTaskItems = useCallback(async () => {
         try {
             const res = await fetch('/api/admin/task-items');
-            if (res.ok) {
-                const data = await res.json();
-                setTaskItems(data as TaskItem[]);
+            if (!res.ok) {
+                console.error("Catalog Fetch Failure:", res.status);
+                return;
             }
+            const data = await res.json();
+            setTaskItems(data as TaskItem[]);
         } catch (err) {
-            console.error("Fetch Task Items Error:", err);
+            console.error("Catalog Connection Error:", err);
         }
     }, []);
 
@@ -366,7 +376,11 @@ export default function AdminBundlesPage() {
                         Queue high-profit bundle orders for specific users
                     </p>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex gap-2 items-center">
+                    {/* Debug Monitor */}
+                    <div className="border border-red-500/30 bg-red-500/10 px-3 py-1 rounded-lg text-[10px] text-red-400 font-black uppercase">
+                        State: {users.length} Nodes | Filtered: {filteredUsers.length}
+                    </div>
                     <button onClick={() => { fetchBundles(); fetchUsers(); fetchTaskItems(); }} className="p-3 rounded-2xl bg-slate-900 border border-slate-800 text-slate-400 hover:text-white transition-all">
                         <RefreshCcw size={18} className={loading ? 'animate-spin' : ''} />
                     </button>
