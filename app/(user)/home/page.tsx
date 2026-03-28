@@ -26,7 +26,8 @@ import {
     Activity,
     Cpu,
     Zap,
-    Network
+    Network,
+    Wallet
 } from 'lucide-react';
 
 export default function HomePage() {
