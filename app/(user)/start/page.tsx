@@ -75,7 +75,7 @@ export default function StartPage() {
     const currentSet = profile?.current_set || 1;
     const isProfileIncomplete = !profile?.phone || profile?.phone === '';
 
-    const tasksInCurrentSet = Math.max(0, Math.min(completedCount - taskBaseOffset - ((currentSet - 1) * tasksPerSet), tasksPerSet));
+    const tasksInCurrentSet = (completedCount % tasksPerSet === 0 && completedCount > 0) ? tasksPerSet : (completedCount % tasksPerSet);
     const isLocked = tasksInCurrentSet >= tasksPerSet;
     const isAllSetsDone = currentSet >= setsPerDay && isLocked;
     const totalTasks = tasksPerSet;
