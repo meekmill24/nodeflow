@@ -29,6 +29,8 @@
   --color-accent: var(--accent);
   --color-surface: var(--surface);
   --color-border: var(--border);
+  --color-muted: var(--border);
+  --color-muted-foreground: #94A3B8;
   --radius-3xl: 2rem;
   --radius-2xl: 1.5rem;
   --radius-xl: 1rem;
@@ -124,9 +126,9 @@ html {
 }
 
 ::-webkit-scrollbar-track {
-  @apply bg-muted;
+  @apply bg-transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-muted-foreground/20 rounded-full hover:bg-muted-foreground/40 transition-colors;
+  @apply bg-white/10 rounded-full hover:bg-white/20 transition-colors;
 }
