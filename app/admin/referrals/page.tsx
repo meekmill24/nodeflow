@@ -11,12 +11,18 @@ export default function AdminReferralsPage() {
 
   const fetchReferrals = async () => { 
     setLoading(true);
-    const { data } = await supabase
-      .from('profiles')
-      .select('id, username, phone, referral_code, referred_users_count, referral_earned')
-      .order('referred_users_count', { ascending: false }); 
-    if (data) setReferrals(data); 
-    setLoading(false); 
+    try {
+        const res = await fetch('/api/admin/users');
+        if (!res.ok) throw new Error('Affiliate directory sync failure');
+        const data = await res.json();
+        // Filter out people with no referrals if you want, or show all
+        if (data) setReferrals(data); 
+    } catch (err) {
+        console.error(err);
+        toast.error('System Node Collision: Affiliate registry unreachable');
+    } finally {
+        setLoading(false); 
+    }
   }; 
 
   useEffect(() => { fetchReferrals(); }, []); 

@@ -125,7 +125,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 w-0.5 h-6 bg-gradient-to-t from-[#3DD6C8]/40 to-transparent rounded-full opacity-20" />
             </div>
             <div className="flex flex-col">
-              <h1 className="text-[20px] font-black leading-none tracking-tight flex items-baseline" style={{color:'#3DD6C8', fontFamily:'Montserrat, sans-serif'}}>
+              <h1 className="text-lg font-black leading-none tracking-tight flex items-baseline" style={{color:'#3DD6C8', fontFamily:'Montserrat, sans-serif'}}>
                 SmartBugMedia<span className="text-[#E34304] scale-125 ml-0.5">.</span>
               </h1>
               <p className="text-[10px] font-black uppercase tracking-[0.4em] mt-1.5 opacity-40 group-hover:opacity-60 transition-opacity" style={{color:'rgba(255,255,255,0.8)'}}>Command Center</p>
