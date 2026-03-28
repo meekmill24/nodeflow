@@ -1,6 +1,8 @@
 'use client';
-
+ 
 import { useLanguage } from '@/context/LanguageContext';
+import { useSiteSettings } from '@/context/SettingsContext';
+import { useMemo } from 'react';
 import { 
     Headset, 
     ShieldCheck, 
@@ -11,13 +13,29 @@ import {
     Sparkles, 
     Gem,
     Cpu,
-    Target
+    Target,
+    Send
 } from 'lucide-react';
 import Link from 'next/link';
-
+ 
 export default function ConciergeHubPage() {
     const { t } = useLanguage();
-
+    const settings = useSiteSettings() as any;
+ 
+    const supportLinks = useMemo(() => {
+        const whatsappValue = settings?.whatsapp_url || '1234567890';
+        const whatsappAction = whatsappValue.startsWith('http') 
+            ? whatsappValue 
+            : `https://wa.me/${whatsappValue}?text=${encodeURIComponent('Hello, I need help with my NodeFlow. account.')}`;
+ 
+        const telegramAction = settings?.telegram_url || 'https://t.me/nodeflow_ops';
+ 
+        return {
+            whatsapp: whatsappAction,
+            telegram: telegramAction
+        };
+    }, [settings]);
+ 
     const protocols = [
         {
             icon: Target,
@@ -44,7 +62,7 @@ export default function ConciergeHubPage() {
             color: 'text-[#3DD6C8]'
         }
     ];
-
+ 
     return (
         <div className="space-y-8 pb-24">
             {/* Header */}
@@ -57,7 +75,7 @@ export default function ConciergeHubPage() {
                     <p className="text-[10px] font-black text-text-secondary uppercase tracking-[0.2em] opacity-60">Priority Protocol & Support</p>
                 </div>
             </div>
-
+ 
             {/* Support Hero */}
             <div className="glass-card-strong p-8 relative overflow-hidden group animate-slide-up [animation-delay:0.1s]">
                 <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:scale-110 transition-transform duration-700">
@@ -78,7 +96,7 @@ export default function ConciergeHubPage() {
                             Our priority support team is active 24/7 to handle account inquiries, large settlements, and tier advancement consultations.
                         </p>
                     </div>
-
+ 
                     <div className="flex flex-wrap gap-4">
                         <button 
                             onClick={() => {
@@ -92,15 +110,23 @@ export default function ConciergeHubPage() {
                         >
                             Live Chat <ArrowRight className="group-hover/btn:translate-x-1 transition-transform" />
                         </button>
-
+ 
                         <a 
-                            href="https://wa.me/1234567890" 
+                            href={supportLinks.whatsapp} 
                             target="_blank"
-                            className="bg-[#25D366]/20 border border-[#25D366]/30 text-[#25D366] px-8 py-3.5 rounded-2xl font-black uppercase tracking-widest text-xs flex items-center gap-3 hover:bg-[#25D366]/30 transition-all active:scale-95"
+                            className="bg-emerald-500 hover:bg-emerald-600 text-white px-8 py-3.5 rounded-2xl font-black uppercase tracking-widest text-xs flex items-center gap-3 transition-all active:scale-95 shadow-lg shadow-emerald-500/20"
                         >
                             WhatsApp
                         </a>
-
+ 
+                        <a 
+                            href={supportLinks.telegram} 
+                            target="_blank"
+                            className="bg-sky-500 hover:bg-sky-600 text-white px-8 py-3.5 rounded-2xl font-black uppercase tracking-widest text-xs flex items-center gap-3 transition-all active:scale-95 shadow-lg shadow-sky-500/20"
+                        >
+                            Telegram
+                        </a>
+ 
                         <a 
                             href="mailto:support@nodeflow.com"
                             className="bg-accent/20 border border-accent/30 text-accent-light px-8 py-3.5 rounded-2xl font-black uppercase tracking-widest text-xs flex items-center gap-3 hover:bg-accent/30 transition-all active:scale-95"
