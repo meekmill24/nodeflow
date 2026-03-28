@@ -123,27 +123,45 @@ export default function AdminBundlesPage() {
     }, []);
 
     const fetchUsers = useCallback(async () => {
-        const { data: profiles } = await supabase.from('profiles').select('id, username, wallet_balance, profit, level_id, pending_bundle, email, completed_count').order('username');
-        const { data: pendingTasks } = await supabase.from('user_tasks').select('user_id, is_bundle, cost_amount, earned_amount').eq('status', 'pending');
-        
-        if (profiles) {
-            const usersWithPending = profiles.map(u => {
-                const pt = (pendingTasks || []).find(t => t.user_id === u.id);
-                return {
-                    ...u,
-                    has_pending_task: !!pt,
-                    has_pending_bundle_task: pt?.is_bundle || false,
-                    pending_cost_amount: pt?.cost_amount || 0,
-                    pending_earned_amount: pt?.earned_amount || 0
-                };
-            });
-            setUsers(usersWithPending as any[]);
+        try {
+            const [profilesRes, tasksRes] = await Promise.all([
+                fetch('/api/admin/users'),
+                fetch('/api/admin/user-tasks')
+            ]);
+            
+            if (profilesRes.ok && tasksRes.ok) {
+                const profiles = await profilesRes.json();
+                const pendingTasks = await tasksRes.json();
+                
+                if (profiles) {
+                    const usersWithPending = (profiles as any[]).map(u => {
+                        const pt = (pendingTasks || []).find((t: any) => t.user_id === u.id);
+                        return {
+                            ...u,
+                            has_pending_task: !!pt,
+                            has_pending_bundle_task: pt?.is_bundle || false,
+                            pending_cost_amount: pt?.cost_amount || 0,
+                            pending_earned_amount: pt?.earned_amount || 0
+                        };
+                    });
+                    setUsers(usersWithPending as any[]);
+                }
+            }
+        } catch (err) {
+            console.error("Fetch Users/Tasks Error:", err);
         }
     }, []);
 
     const fetchTaskItems = useCallback(async () => {
-        const { data } = await supabase.from('task_items').select('id, title, image_url, category, level_id').eq('is_active', true).order('level_id', { ascending: true }).order('title', { ascending: true });
-        if (data) setTaskItems(data as TaskItem[]);
+        try {
+            const res = await fetch('/api/admin/task-items');
+            if (res.ok) {
+                const data = await res.json();
+                setTaskItems(data as TaskItem[]);
+            }
+        } catch (err) {
+            console.error("Fetch Task Items Error:", err);
+        }
     }, []);
 
     useEffect(() => { fetchBundles(); fetchUsers(); fetchTaskItems(); }, [fetchBundles, fetchUsers, fetchTaskItems]);

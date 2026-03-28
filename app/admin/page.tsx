@@ -50,58 +50,22 @@ export default function AdminDashboard() {
 
   useEffect(() => { 
     const fetchAll = async () => { 
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      const todayISO = today.toISOString();
+      try {
+          const res = await fetch('/api/admin/stats');
+          if (!res.ok) throw new Error('Metric matrix synchronization failure');
+          const data = await res.json();
+          
+          if (data) {
+            setStats(data);
+          }
 
-      const [ 
-        users, levels, tasks, referrals, bundles, 
-        deposits, withdrawals, commissions, 
-        pendingDeps, pendingWiths, recent,
-        allProfiles
-      ] = await Promise.all([ 
-        supabase.from('profiles').select('*', { count: 'exact', head: true }), 
-        supabase.from('levels').select('*', { count: 'exact', head: true }), 
-        supabase.from('task_items').select('*', { count: 'exact', head: true }), 
-        supabase.from('referral_codes').select('*', { count: 'exact', head: true }), 
-        supabase.from('bundle_packages').select('*', { count: 'exact', head: true }), 
-        supabase.from('transactions').select('amount').eq('type', 'deposit').eq('status', 'approved'), 
-        supabase.from('transactions').select('amount').eq('type', 'withdrawal').eq('status', 'approved'), 
-        supabase.from('transactions').select('amount').eq('type', 'commission'), 
-        supabase.from('transactions').select('*', { count: 'exact', head: true }).eq('type', 'deposit').eq('status', 'pending'), 
-        supabase.from('transactions').select('*', { count: 'exact', head: true }).eq('type', 'withdrawal').eq('status', 'pending'), 
-        supabase.from('transactions').select('id, type, amount, status, created_at, profile:profiles(username)').order('created_at', { ascending: false }).limit(8), 
-        supabase.from('profiles').select('profit, completed_tasks_count'),
-      ]); 
-
-      const [todayTx] = await Promise.all([
-        supabase.from('transactions').select('amount').gte('created_at', todayISO).eq('status', 'approved')
-      ]);
-
-      const sumAmounts = (data: { amount: number }[] | null) => (data || []).reduce((sum, t) => sum + (t.amount || 0), 0); 
-
-      const todayProfit = (allProfiles.data || []).reduce((sum, p) => sum + (p.profit || 0), 0);
-      const todayTasksCount = (allProfiles.data || []).reduce((sum, p) => sum + (p.completed_tasks_count || 0), 0);
-      const todayVolume = sumAmounts(todayTx.data);
-
-      setStats({ 
-        totalUsers: users.count || 0, 
-        totalLevels: levels.count || 0, 
-        totalTasks: tasks.count || 0, 
-        totalReferrals: referrals.count || 0, 
-        totalBundles: bundles.count || 0, 
-        totalDepositsAmount: sumAmounts(deposits.data), 
-        totalWithdrawalsAmount: sumAmounts(withdrawals.data), 
-        totalCommissions: sumAmounts(commissions.data), 
-        pendingDeposits: pendingDeps.count || 0, 
-        pendingWithdrawals: pendingWiths.count || 0, 
-        todayProfit,
-        todayTasks: todayTasksCount,
-        todayVolume,
-      }); 
-
-      if (recent.data) setRecentTx(recent.data as any); 
-      setLoading(false); 
+          const { data: recent } = await supabase.from('transactions').select('id, type, amount, status, created_at, profile:profiles(username)').order('created_at', { ascending: false }).limit(8); 
+          if (recent) setRecentTx(recent as any); 
+      } catch (err: any) {
+          console.error("Dashboard Sync Loss:", err);
+      } finally {
+          setLoading(false); 
+      }
     }; 
     fetchAll(); 
   }, []); 
