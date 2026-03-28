@@ -26,26 +26,23 @@ export default function AdminLogin() {
       if (signInError) throw signInError;
 
       if (data?.user) {
-        const { data: profile, error: profileError } = await supabase
-          .from('profiles')
-          .select('role, is_admin')
-          .eq('id', data.user.id)
-          .maybeSingle();
+        // Use the Server-Side API to bypass RLS for admin verification
+        const res = await fetch('/api/auth/admin-check', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId: data.user.id })
+        });
+        
+        const checkData = await res.json();
 
-        if (profileError) {
-          console.error("Profile Fetch Error State:", profileError);
+        if (!res.ok) {
+          console.error("Matrix Access Denied:", checkData.error);
           await supabase.auth.signOut();
-          throw new Error(`Platform synchronization failed: ${profileError.message} (Code: ${profileError.code})`);
+          throw new Error(`Platform synchronization failed: ${checkData.error}`);
         }
 
-        if (!profile) {
-          console.error("Identity Exists but Node Missing:", data.user.id);
-          await supabase.auth.signOut();
-          throw new Error('Identity verification successful, but your admin profile node was not found in the matrix.');
-        }
-
-        if (profile?.role !== 'admin' && !profile?.is_admin) {
-          console.warn("Unauthorized Access Attempt:", data.user.email, "Role:", profile?.role, "IsAdmin:", profile?.is_admin);
+        if (!checkData.isAdmin) {
+          console.warn("Unauthorized Access Attempt:", data.user.email, "Protocol Role:", checkData.role);
           await supabase.auth.signOut();
           throw new Error('Access Denied. Administrator privileges required.');
         }
