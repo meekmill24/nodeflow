@@ -28,14 +28,20 @@ export default function AdminLogin() {
       if (data?.user) {
         const { data: profile, error: profileError } = await supabase
           .from('profiles')
-          .select('role')
+          .select('role, is_admin')
           .eq('id', data.user.id)
-          .single();
+          .maybeSingle();
 
         if (profileError) {
-          console.error("Profile Fetch Error:", profileError);
+          console.error("Profile Fetch Error State:", profileError);
           await supabase.auth.signOut();
-          throw new Error(`Profile access failed: ${profileError.message}`);
+          throw new Error(`Platform synchronization failed: ${profileError.message} (Code: ${profileError.code})`);
+        }
+
+        if (!profile) {
+          console.error("Identity Exists but Node Missing:", data.user.id);
+          await supabase.auth.signOut();
+          throw new Error('Identity verification successful, but your admin profile node was not found in the matrix.');
         }
 
         if (profile?.role !== 'admin' && !profile?.is_admin) {

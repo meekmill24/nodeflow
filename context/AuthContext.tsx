@@ -39,10 +39,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 .from('profiles')
                 .select('*, level:levels(*)')
                 .eq('id', userId)
-                .single();
+                .maybeSingle();
 
             if (error) {
                 console.error(`DB Error (${error.code}):`, error.message, "| Details:", error.details);
+                setProfile(null);
+            } else if (!data) {
+                console.warn(`Profile Not Found for User: ${userId}`);
                 setProfile(null);
             } else {
                 console.log("Profile data fetched successfully:", data);
