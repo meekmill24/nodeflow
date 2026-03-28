@@ -131,8 +131,9 @@ export default function AdminBundlesPage() {
             ]);
             
             if (!profilesRes.ok || !tasksRes.ok) {
-                console.error("Sync Failure:", profilesRes.status, tasksRes.status);
-                toast.error(`Directory Sync Failure (${profilesRes.status})`);
+                const failCause = !profilesRes.ok ? `Profiles:${profilesRes.status}` : `Tasks:${tasksRes.status}`;
+                console.error("Sync Failure:", failCause);
+                toast.error(`Directory Sync Failure (${failCause})`);
                 return;
             }
 
