@@ -16,25 +16,10 @@ export default function AdminNotifyPage() {
   const fetchHistory = async () => {
     setLoadingHistory(true);
     try {
-      // Fetch notifications, grouped by title/message conceptually by selecting unique combinations
-      const { data } = await supabase
-        .from('notifications')
-        .select('title, message, created_at, type')
-        .order('created_at', { ascending: false })
-        .limit(200);
-
-      if (data) {
-        // Simple grouping by title + message
-        const grouped = data.reduce((acc: any[], current) => {
-          const existing = acc.find(item => item.title === current.title && item.message === current.message);
-          if (!existing) {
-            acc.push({ ...current, count: 1 });
-          } else {
-            existing.count++;
-          }
-          return acc;
-        }, []);
-        setHistory(grouped);
+      const resp = await fetch('/api/admin/notify');
+      const data = await resp.json();
+      if (data.success) {
+        setHistory(data.history || []);
       }
     } catch (err) {
       console.error(err);
@@ -54,13 +39,14 @@ export default function AdminNotifyPage() {
   const handleDelete = async (title: string, message: string) => {
     if (!confirm("Decomission this broadcast protocol?")) return;
     try {
-        const { error } = await supabase
-            .from('notifications')
-            .delete()
-            .eq('title', title)
-            .eq('message', message);
+        const res = await fetch('/api/admin/notify', {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ title, message })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "De-index failure");
         
-        if (error) throw error;
         toast.success("Protocol de-indexed.");
         fetchHistory();
     } catch (err: any) {
@@ -74,22 +60,21 @@ export default function AdminNotifyPage() {
     
     setSending(true); 
     try {
-      const records = users.map(u => ({ 
-        user_id: u.id, 
-        title, 
-        message, 
-        type: 'info',
-        is_read: false
-      })); 
-      
-      const { error } = await supabase.from('notifications').insert(records); 
-      if (error) throw error;
+      const userIds = users.map(u => u.id);
+      const res = await fetch('/api/admin/notify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title, message, userIds })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Transmission failure');
 
       toast.success(`Broadcasting to ${users.length} users completed.`);
       setTitle(''); 
       setMessage(''); 
       fetchHistory();
     } catch (err: any) {
+        console.error('Send failed:', err);
       toast.error(err.message || 'Transmission failure');
     } finally {
       setSending(true); // Artificial delay for UX feel

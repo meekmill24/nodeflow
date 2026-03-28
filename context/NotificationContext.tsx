@@ -5,7 +5,7 @@ import { supabase } from '@/lib/supabase/index';
 import { useAuth } from '@/context/AuthContext';
 
 export interface Notification {
-    id: number;
+    id: string;
     title: string;
     message: string;
     type: 'info' | 'success' | 'warning' | 'danger';
@@ -17,7 +17,7 @@ interface NotificationContextType {
     notifications: Notification[];
     unreadCount: number;
     toast: Notification | null;
-    markAsRead: (id: number) => Promise<void>;
+    markAsRead: (id: string) => Promise<void>;
     markAllRead: () => Promise<void>;
     clearAll: () => Promise<void>;
     refresh: () => Promise<void>;
@@ -96,7 +96,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
         }
     }, [toast]);
 
-    const markAsRead = async (id: number) => {
+    const markAsRead = async (id: string) => {
         const notif = notifications.find(n => n.id === id);
         if (!notif || notif.is_read) return;
 

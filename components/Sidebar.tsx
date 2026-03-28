@@ -71,10 +71,10 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                 <div className="p-6 flex items-center justify-between gap-3">
                     <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-full bg-slate-900 border border-white/10 flex items-center justify-center p-1.5 shadow-lg shadow-cyan-500/20 overflow-hidden">
-                            <img src="/logo.png" alt="NodeFlow Logo" className="w-full h-full object-contain" />
+                            <img src="/logo.png" alt="SmartBugMedia Logo" className="w-full h-full object-contain" />
                         </div>
                         <h1 className="text-xl font-bold bg-gradient-to-r from-white via-white/80 to-white/60 bg-clip-text text-transparent italic tracking-tight">
-                            NodeFlow<span className="text-primary-light">.</span>
+                            SmartBugMedia<span className="text-primary-light">.</span>
                         </h1>
                     </div>
                     {/* Mobile Close Button */}
