@@ -14,27 +14,29 @@ export async function GET() {
 
         const supabaseAdmin = createClient(url, key, { db: { schema: 'public' } });
 
-        // FULL scan of all rows to verify data integrity
-        const [profiles, settings, levels, authUsers] = await Promise.all([
+        // DEEP TRACE across all core tables
+        const results = await Promise.allSettled([
             supabaseAdmin.from('profiles').select('*', { count: 'exact' }),
-            supabaseAdmin.from('site_settings').select('*', { count: 'exact' }),
-            supabaseAdmin.from('levels').select('*', { count: 'exact' }),
+            supabaseAdmin.from('user_tasks').select('*', { count: 'exact' }),
+            supabaseAdmin.from('bundle_packages').select('*', { count: 'exact' }),
             supabaseAdmin.auth.admin.listUsers()
         ]);
 
-        return NextResponse.json({
-            status: 'Audit Logged',
-            snapshot: {
-                directory_count: profiles.count || 0,
-                directory_rows: profiles.data || [],
-                auth_count: authUsers.data?.users?.length || 0,
-                auth_emails: authUsers.data?.users?.map(u => ({ email: u.email, id: u.id })) || []
-            },
-            diagnostics: {
-                error_p: profiles.error || null,
-                error_a: authUsers.error || null,
-                target_url: url.substring(0, 20) + '...'
+        const formatResult = (r: any) => {
+            if (r.status === 'fulfilled') {
+                return { 
+                    count: r.value.count ?? (r.value.data?.users ? r.value.data.users.length : (r.value.data?.length ?? 0)), 
+                    error: r.value.error?.message || null 
+                };
             }
+            return { status: 'rejected', error: r.reason?.message || r.reason };
+        };
+
+        return NextResponse.json({
+            profiles: formatResult(results[0]),
+            user_tasks: formatResult(results[1]),
+            bundle_packages: formatResult(results[2]),
+            auth: formatResult(results[3])
         });
     } catch (err: any) {
         return NextResponse.json({ error: err.message }, { status: 500 });
