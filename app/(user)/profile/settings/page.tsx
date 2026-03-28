@@ -191,20 +191,6 @@ export default function SettingsPage() {
                 </div>
 
                 <button 
-                    onClick={() => setActiveModal('language')}
-                    className="w-full flex items-center justify-between p-4 hover:bg-black/[0.02] transition-colors group text-left"
-                >
-                    <div className="flex items-center gap-3">
-                        <Globe size={18} className="text-text-secondary group-hover:text-primary transition-colors" />
-                        <span className="text-sm font-medium text-text-primary">{t('language')}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <span className="text-sm font-bold text-text-secondary group-hover:text-primary transition-colors">{language}</span>
-                        <ChevronRight size={16} className="text-text-secondary group-hover:translate-x-1 group-hover:text-primary transition-all" />
-                    </div>
-                </button>
-
-                <button 
                     onClick={() => setActiveModal('currency')}
                     className="w-full flex items-center justify-between p-4 hover:bg-black/[0.02] transition-colors group text-left"
                 >
