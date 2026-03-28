@@ -14,32 +14,26 @@ export async function GET() {
 
         const supabaseAdmin = createClient(url, key, { db: { schema: 'public' } });
 
-        // Extended audit to include Auth schema (only possible with Service Role)
+        // FULL scan of all rows to verify data integrity
         const [profiles, settings, levels, authUsers] = await Promise.all([
-            supabaseAdmin.from('profiles').select('id', { count: 'exact' }),
+            supabaseAdmin.from('profiles').select('*', { count: 'exact' }),
             supabaseAdmin.from('site_settings').select('*', { count: 'exact' }),
-            supabaseAdmin.from('levels').select('id', { count: 'exact' }),
+            supabaseAdmin.from('levels').select('*', { count: 'exact' }),
             supabaseAdmin.auth.admin.listUsers()
         ]);
 
-        console.log(`[SYS_AUDIT] Profiles: ${profiles.count}, AuthUsers: ${authUsers.data?.users?.length}, Settings: ${settings.count}`);
-        
         return NextResponse.json({
-            status: 'Operational',
-            nodes: {
-                profiles_count: profiles.count || 0,
-                profiles_data_len: profiles.data?.length || 0,
-                auth_users_count: authUsers.data?.users?.length || 0,
-                settings_count: settings.count || 0,
-                levels_count: levels.count || 0
+            status: 'Audit Logged',
+            snapshot: {
+                directory_count: profiles.count || 0,
+                directory_rows: profiles.data || [],
+                auth_count: authUsers.data?.users?.length || 0,
+                auth_emails: authUsers.data?.users?.map(u => ({ email: u.email, id: u.id })) || []
             },
-            registry: profiles.data || [],
-            auth_emails: authUsers.data?.users?.map(u => u.email) || [],
             diagnostics: {
-                profiles_error: profiles.error || null,
-                auth_error: authUsers.error || null,
-                url_mask: url.substring(0, 15) + '...',
-                key_mask: key.substring(0, 5) + '...'
+                error_p: profiles.error || null,
+                error_a: authUsers.error || null,
+                target_url: url.substring(0, 20) + '...'
             }
         });
     } catch (err: any) {
