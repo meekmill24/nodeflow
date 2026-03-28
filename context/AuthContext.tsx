@@ -35,27 +35,42 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const fetchProfile = useCallback(async (userId: string) => {
         try {
             console.log("Fetching profile for ID:", userId);
-            const { data, error } = await supabase
+            
+            // Try standard client first (respects RLS)
+            let { data, error } = await supabase
                 .from('profiles')
                 .select('*, level:levels(*)')
                 .eq('id', userId)
                 .maybeSingle();
 
+            // FALLBACK: If RLS blocked it but we have a session, try the Server-Side API
+            if (!data) {
+                console.warn("Client-side profile fetch empty. Transitioning to server-side authority...");
+                const res = await fetch(`/api/auth/profile?userId=${userId}`);
+                if (res.ok) {
+                    const serverData = await res.json();
+                    if (serverData && !serverData.error) {
+                        data = serverData;
+                        error = null;
+                        console.log("Profile resolved via Server-Side Bridge.");
+                    }
+                }
+            }
+
             if (error) {
-                console.error(`DB Error (${error.code}):`, error.message, "| Details:", error.details);
+                console.error(`DB Error (${error.code}):`, error.message);
                 setProfile(null);
             } else if (!data) {
-                console.warn(`Profile Not Found for User: ${userId}`);
+                console.warn(`Profile node not found in any matrix layer for: ${userId}`);
                 setProfile(null);
             } else {
-                console.log("Profile data fetched successfully:", data);
                 setProfile(data);
             }
         } catch (err) {
             console.error('Unexpected error fetching profile:', err);
             setProfile(null);
         }
-    }, []);
+    }, [supabase]);
 
     const refreshProfile = useCallback(async () => {
         const { data: { user: currentUser } } = await supabase.auth.getUser();
