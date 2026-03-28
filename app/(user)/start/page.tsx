@@ -199,8 +199,10 @@ export default function StartPage() {
         setIsSubmitting(true);
         const costAmount = providedCost || (profile?.wallet_balance || 0) * 0.98;
         try {
-            // Trying multiple common parameter names for the RPC as a fallback strategy
-            const { data, error } = await supabase.rpc('complete_user_task', { p_task_item_id: Number(item.id), p_cost_amount: costAmount });
+            // Matching the single-parameter signature verified in the Record page
+            const { data, error } = await supabase.rpc('complete_user_task', { 
+                p_task_item_id: Number(item.id)
+            });
             if (error) throw error;
             if (data?.is_bundle) {
                 setShowBundleSuccessToast(true); setTimeout(() => setShowBundleSuccessToast(false), 5000);
