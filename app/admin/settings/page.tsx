@@ -296,8 +296,12 @@ export default function AdminSettingsPage() {
                             <input className="w-full bg-black/40 border border-white/5 rounded-2xl px-6 py-4 text-white font-black uppercase tracking-widest text-sm" value={settings.find(s => s.key === 'site_name')?.value || ''} onChange={(e) => handleUpdate('site_name', e.target.value)} />
                         </div>
                         <div className="space-y-2">
-                            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-600 ml-1">Support Endpoint</label>
-                            <input className="w-full bg-black/40 border border-white/5 rounded-2xl px-6 py-4 text-blue-400 font-bold" value={settings.find(s => s.key === 'support_link')?.value || ''} onChange={(e) => handleUpdate('support_link', e.target.value)} />
+                            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-600 ml-1">WhatsApp Endpoint (Number or Link)</label>
+                            <input className="w-full bg-black/40 border border-white/5 rounded-2xl px-6 py-4 text-emerald-400 font-bold" value={settings.find(s => s.key === 'whatsapp_url')?.value || ''} onChange={(e) => handleUpdate('whatsapp_url', e.target.value)} placeholder="e.g. 1234567890" />
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-600 ml-1">Telegram Pathway</label>
+                            <input className="w-full bg-black/40 border border-white/5 rounded-2xl px-6 py-4 text-sky-400 font-bold" value={settings.find(s => s.key === 'telegram_url')?.value || ''} onChange={(e) => handleUpdate('telegram_url', e.target.value)} placeholder="e.g. https://t.me/nodeflow_ops" />
                         </div>
                     </div>
                 </div>

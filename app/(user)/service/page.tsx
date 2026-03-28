@@ -1,49 +1,70 @@
 'use client';
-
-import { HeadphonesIcon, ChevronLeft, MessageSquare, Mail, Phone, Clock, ChevronRight, Zap, Target, Activity, ShieldCheck } from 'lucide-react';
+ 
+import { HeadphonesIcon, MessageSquare, Mail, Phone, Clock, ChevronRight, Zap, Target, Activity, ShieldCheck, Send } from 'lucide-react';
 import Link from 'next/link';
-
-const WHATSAPP_NUMBER = '1234567890';
-const WHATSAPP_MESSAGE = 'Hello, I need help with my NodeFlow. account.';
+import { useSiteSettings } from '@/context/SettingsContext';
+import { useMemo } from 'react';
+ 
 const TAWK_TO_LINK = '#tawk';
-
-const channels = [
-    {
-        icon: MessageSquare,
-        title: 'Neural Chat Support',
-        subtitle: 'Avg. latency: 45ms (Live Node)',
-        color: 'bg-primary/20 text-primary-light',
-        badge: 'Online Now',
-        badgeColor: 'bg-success/20 text-success',
-        action: TAWK_TO_LINK,
-        target: '_blank',
-        description: 'Instant verification for account-level queries and transactional support.'
-    },
-    {
-        icon: Phone,
-        title: 'Priority WhatsApp',
-        subtitle: 'Direct encrypted channel',
-        color: 'bg-success/20 text-success',
-        badge: 'Secure',
-        badgeColor: 'bg-success/20 text-success',
-        action: `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(WHATSAPP_MESSAGE)}`,
-        target: '_blank',
-        description: 'Fast-track communication for VIP tier members and wallet synchronization.'
-    },
-    {
-        icon: Mail,
-        title: 'Governance Email',
-        subtitle: 'support@nodeflow.com',
-        color: 'bg-accent/20 text-accent-light',
-        badge: '24h SLA',
-        badgeColor: 'bg-accent/20 text-accent-light',
-        action: 'mailto:support@nodeflow.com',
-        target: '_self',
-        description: 'In-depth inquiries regarding institutional partnership and legal compliance.'
-    },
-];
-
+ 
 export default function CustomerServicePage() {
+    const settings = useSiteSettings() as any;
+ 
+    const channels = useMemo(() => {
+        const whatsappValue = settings?.whatsapp_url || '1234567890';
+        const whatsappAction = whatsappValue.startsWith('http') 
+            ? whatsappValue 
+            : `https://wa.me/${whatsappValue}?text=${encodeURIComponent('Hello, I need help with my NodeFlow. account.')}`;
+ 
+        const telegramAction = settings?.telegram_url || 'https://t.me/nodeflow_ops';
+ 
+        return [
+            {
+                icon: MessageSquare,
+                title: 'Neural Chat Support',
+                subtitle: 'Avg. latency: 45ms (Live Node)',
+                color: 'bg-primary/20 text-primary-light',
+                badge: 'Online Now',
+                badgeColor: 'bg-success/20 text-success',
+                action: TAWK_TO_LINK,
+                target: '_blank',
+                description: 'Instant verification for account-level queries and transactional support.'
+            },
+            {
+                icon: Phone,
+                title: 'Priority WhatsApp',
+                subtitle: 'Direct encrypted channel',
+                color: 'bg-emerald-500/20 text-emerald-400',
+                badge: 'Secure',
+                badgeColor: 'bg-emerald-500/10 text-emerald-400',
+                action: whatsappAction,
+                target: '_blank',
+                description: 'Fast-track communication for VIP tier members and wallet synchronization.'
+            },
+            {
+                icon: Send,
+                title: 'Telegram Pathway',
+                subtitle: '@nodeflow_governance',
+                color: 'bg-sky-500/20 text-sky-400',
+                badge: 'Active Node',
+                badgeColor: 'bg-sky-500/10 text-sky-400',
+                action: telegramAction,
+                target: '_blank',
+                description: 'Announcement protocol and peer-to-peer verification hub.'
+            },
+            {
+                icon: Mail,
+                title: 'Governance Email',
+                subtitle: 'support@nodeflow.com',
+                color: 'bg-accent/20 text-accent-light',
+                badge: '24h SLA',
+                badgeColor: 'bg-accent/20 text-accent-light',
+                action: 'mailto:support@nodeflow.com',
+                target: '_self',
+                description: 'In-depth inquiries regarding institutional partnership and legal compliance.'
+            },
+        ];
+    }, [settings]);
     return (
         <div className="max-w-4xl mx-auto pb-20 animate-fade-in space-y-10">
 
