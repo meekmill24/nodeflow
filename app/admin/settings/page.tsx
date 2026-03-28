@@ -15,7 +15,8 @@ import {
   Share2,
   ArrowUpRight,
   ArrowDownLeft,
-  Wallet
+  Wallet,
+  Target
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
