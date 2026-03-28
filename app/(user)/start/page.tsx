@@ -261,7 +261,7 @@ export default function StartPage() {
                         </div>
                         <div>
                             <h1 className="text-3xl md:text-5xl font-black text-white italic uppercase tracking-tighter leading-none mb-3">
-                                {t('optimization_hub')}
+                                OPTIMIZATION COMMAND CENTER
                             </h1>
                             <div className="flex items-center gap-3">
                                 <span className="px-3 py-1 bg-white/5 rounded-full text-[9px] font-black text-white/40 uppercase tracking-[0.2em] border border-white/10 italic">Module: Start.exe</span>
