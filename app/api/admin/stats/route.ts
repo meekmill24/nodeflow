@@ -3,10 +3,14 @@ import { NextResponse } from 'next/server';
 
 export async function GET() {
     try {
-        const supabaseAdmin = createClient(
-            process.env.NEXT_PUBLIC_SUPABASE_URL || '',
-            process.env.SUPABASE_SERVICE_ROLE_KEY || ''
-        );
+        const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+        const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+        if (!url || !key) {
+            return NextResponse.json({ error: 'Stats Sync Failure: Supabase credentials missing (Vercel ENV).' }, { status: 500 });
+        }
+
+        const supabaseAdmin = createClient(url, key);
 
         const today = new Date();
         today.setHours(0, 0, 0, 0);
