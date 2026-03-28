@@ -52,14 +52,17 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   useEffect(() => {
     const fetchPending = async () => {
-      const [deps, withs] = await Promise.all([
-        supabase.from('transactions').select('*', { count: 'exact', head: true }).eq('type', 'deposit').eq('status', 'pending'),
-        supabase.from('transactions').select('*', { count: 'exact', head: true }).eq('type', 'withdrawal').eq('status', 'pending'),
-      ]);
-      setPendingCounts({
-        deposits: deps.count || 0,
-        withdrawals: withs.count || 0,
-      });
+      try {
+          const res = await fetch('/api/admin/stats');
+          if (!res.ok) return;
+          const stats = await res.json();
+          setPendingCounts({
+            deposits: stats.pendingDeposits || 0,
+            withdrawals: stats.pendingWithdrawals || 0,
+          });
+      } catch (err) {
+          console.error("Dashboard Status Sync Failure:", err);
+      }
     };
     if (user && (profile?.role === 'admin' || profile?.is_admin) && pathname !== '/admin/login') fetchPending();
   }, [user, profile, pathname]);

@@ -29,10 +29,21 @@ export default function AdminNotifyPage() {
   };
 
   useEffect(() => {
-    supabase.from('profiles').select('id, username').then(({ data }) => {
-      if (data) setUsers(data);
-      setLoading(false);
-    });
+    const fetchUsers = async () => {
+        try {
+            const res = await fetch('/api/admin/users');
+            if (!res.ok) throw new Error(`HTTP Error: ${res.status}`);
+            const data = await res.json();
+            if (data && Array.isArray(data)) {
+                setUsers(data.map(u => ({ id: u.id, username: u.username || u.email?.split('@')[0] })));
+            }
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setLoading(false);
+        }
+    }
+    fetchUsers();
     fetchHistory();
   }, []);
 
