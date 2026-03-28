@@ -56,12 +56,8 @@ export default function CertificatePage() {
                 <div className="relative glass-card-strong p-1 rounded-[48px] overflow-hidden border border-white/10 shadow-2xl shadow-primary/20">
                     <div className="relative rounded-[46px] overflow-hidden aspect-[1/1.4] md:aspect-[1.4/1] min-h-[600px] flex items-center justify-center p-8 md:p-16">
                         {/* High-fidelity Background */}
-                        <div className="absolute inset-0">
-                            <img 
-                                src={view === 'personal' ? "/certificate-bg.png" : "/company-license.png"} 
-                                alt="Certificate Background" 
-                                className="w-full h-full object-cover opacity-90 dark:opacity-100 contrast-[1.1] brightness-[0.9]"
-                            />
+                        <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900">
+                            <div className="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]" />
                             {/* Overlay gradients for readability */}
                             <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/60 marker:pointer-events-none" />
                         </div>
@@ -133,7 +129,7 @@ export default function CertificatePage() {
                                             <div className="flex flex-col items-center">
                                                 <span className="text-[9px] font-black text-white/40 uppercase tracking-widest leading-none mb-2">Authentication ID</span>
                                                 <span className="text-[10px] font-bold text-white font-mono opacity-80 uppercase tracking-tighter">
-                                                    {profile?.id?.slice(0, 18).toUpperCase() || 'OPT-NODE-PROTOCOL'}
+                                                    {profile?.id?.slice(0, 18).toUpperCase() || 'OPT-SBM-PROTOCOL'}
                                                 </span>
                                             </div>
                                         </div>
@@ -160,7 +156,7 @@ export default function CertificatePage() {
                                     <div className="space-y-8 flex-1 flex flex-col justify-center max-w-2xl mt-12">
                                         <div className="relative inline-block">
                                             <h3 className="text-4xl md:text-6xl font-black text-white uppercase tracking-[0.2em] px-8 py-2 font-serif">
-                                                NODEFLOW. GLOBAL OPS
+                                                SmartBugMedia. GLOBAL OPS
                                             </h3>
                                             <div className="absolute -bottom-2 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-amber-500 to-transparent opacity-80" />
                                         </div>
@@ -171,7 +167,7 @@ export default function CertificatePage() {
                                         <div className="grid grid-cols-2 gap-12 mt-8">
                                             <div className="text-left space-y-2">
                                                 <span className="text-[9px] font-black text-white/40 uppercase tracking-widest">Registration No.</span>
-                                                <p className="text-lg font-black text-white tracking-widest font-mono">NF-GLOBAL-99B2-2026</p>
+                                                <p className="text-lg font-black text-white tracking-widest font-mono">SBM-GLOBAL-99B2-2026</p>
                                             </div>
                                             <div className="text-right space-y-2">
                                                 <span className="text-[9px] font-black text-white/40 uppercase tracking-widest">Jurisdiction</span>
