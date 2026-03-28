@@ -19,9 +19,11 @@ import {
     Moon,
     Wallet,
     Cpu,
-    Target
+    Target,
+    ChevronDown,
+    Globe
 } from 'lucide-react';
-import { useCurrency } from '@/context/CurrencyContext';
+import { useCurrency, CurrencyCode } from '@/context/CurrencyContext';
 import { useTheme } from '@/context/ThemeContext';
 
 interface HeaderProps {
@@ -31,11 +33,12 @@ interface HeaderProps {
 export default function Header({ onMenuClick }: HeaderProps) {
     const { profile, signOut } = useAuth();
     const { notifications, unreadCount, markAsRead, markAllRead, clearAll } = useNotifications();
-    const { format } = useCurrency();
+    const { format, currency, setCurrency } = useCurrency();
     const router = useRouter();
     
     const [isNotifOpen, setIsNotifOpen] = useState(false);
     const [isProfileOpen, setIsProfileOpen] = useState(false);
+    const [isCurrencyOpen, setIsCurrencyOpen] = useState(false);
     const { theme, toggleTheme } = useTheme();
     
     const notifRef = useRef<HTMLDivElement>(null);
