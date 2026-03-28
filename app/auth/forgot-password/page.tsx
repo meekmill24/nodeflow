@@ -35,7 +35,7 @@ export default function ForgotPasswordPage() {
             // Note: If you want to use RESEND for this exact email, 
             // you would typically capture the event in a Supabase Hook or 
             // handle it via a custom API if you have a way to generate the token.
-            // For now, we'll assume standard flow but with NodeFlow branding.
+            // For now, we'll assume standard flow but with SmartBugMedia branding.
 
             setMessage('Identity verification sequence initiated. Please check your inbox for override instructions.');
         } catch (err: any) {
@@ -57,7 +57,7 @@ export default function ForgotPasswordPage() {
                         <div className="w-20 h-20 rounded-3xl flex items-center justify-center shadow-2xl mb-4 overflow-hidden border border-white/10 bg-slate-900/50 backdrop-blur-xl">
                             <NextImage src="/logo.png" alt="Logo" width={80} height={80} className="object-cover" />
                         </div>
-                        <h1 className="text-4xl font-black tracking-tighter text-white">NodeFlow<span className="text-[#3DD6C8]">.</span></h1>
+                        <h1 className="text-4xl font-black tracking-tighter text-white">SmartBugMedia<span className="text-[#3DD6C8]">.</span></h1>
                         <p className="text-[10px] font-black uppercase tracking-[0.4em] text-red-500/60">Recovery Protocol Activated</p>
                     </div>
 
@@ -91,7 +91,7 @@ export default function ForgotPasswordPage() {
                                                 <Input 
                                                     id="email" 
                                                     type="email" 
-                                                    placeholder="agent@nodeflow.io" 
+                                                    placeholder="agent@smartbugmedia.io" 
                                                     required 
                                                     className="pl-12 h-14 rounded-2xl bg-white/5 border-white/10 text-white font-bold placeholder:text-slate-700 focus:border-[#3DD6C8]/50 transition-all"
                                                     value={email}

@@ -26,9 +26,9 @@ export default function ConciergeHubPage() {
         const whatsappValue = settings?.whatsapp_url || '1234567890';
         const whatsappAction = whatsappValue.startsWith('http') 
             ? whatsappValue 
-            : `https://wa.me/${whatsappValue}?text=${encodeURIComponent('Hello, I need help with my NodeFlow. account.')}`;
+            : `https://wa.me/${whatsappValue}?text=${encodeURIComponent('Hello, I need help with my SmartBugMedia. account.')}`;
  
-        const telegramAction = settings?.telegram_url || 'https://t.me/nodeflow_ops';
+        const telegramAction = settings?.telegram_url || 'https://t.me/smartbugmedia_ops';
  
         return {
             whatsapp: whatsappAction,
@@ -132,7 +132,7 @@ export default function ConciergeHubPage() {
                         </a>
 
                         <a 
-                            href="mailto:support@nodeflow.com"
+                            href="mailto:support@smartbugmedia.com"
                             className="bg-accent/20 border border-accent/30 text-accent-light px-8 py-3.5 rounded-2xl font-black uppercase tracking-widest text-xs flex items-center gap-3 hover:bg-accent/30 transition-all active:scale-95"
                         >
                             Email Support

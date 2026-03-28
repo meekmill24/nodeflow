@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useMemo } from 'react';
 import { supabase } from '@/lib/supabase/index';
 import { useAuth } from '@/context/AuthContext';
+import { useSiteSettings } from '@/context/SettingsContext';
 import { 
     ChevronLeft, 
     Copy, 
@@ -36,9 +37,14 @@ export default function DepositPage() {
     const [proofPreview, setProofPreview] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    const depositAddress = network === 'BTC' 
-        ? '1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa' // Example BTC Genesis address as placeholder
-        : 'TRx9mK2pQbN7cVh3dJwXeGfLkAoYsUP5rI8';
+    const settings = useSiteSettings() as any;
+    
+    const depositAddress = useMemo(() => {
+        if (network === 'BTC') return settings?.wallet_btc || '1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa';
+        if (network === 'ERC20') return settings?.wallet_erc20 || '0x0000000000000000000000000000000000000000';
+        if (network === 'BEP20') return settings?.wallet_bep20 || '0x0000000000000000000000000000000000000000';
+        return settings?.wallet_trc20 || 'TRx9mK2pQbN7cVh3dJwXeGfLkAoYsUP5rI8';
+    }, [network, settings]);
 
     const finalAmount = customAmount || amount;
 

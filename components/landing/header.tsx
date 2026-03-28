@@ -39,7 +39,7 @@ export function Header() {
               <DollarSign className="h-5 w-5 text-primary-foreground" />
             </div>
             <span className="font-bold text-xl text-foreground">
-              NodeFlow.
+              SmartBugMedia.
             </span>
           </Link>
 

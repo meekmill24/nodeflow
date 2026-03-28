@@ -59,7 +59,7 @@ export default function ResetPasswordPage() {
                         <div className="w-20 h-20 rounded-3xl flex items-center justify-center shadow-2xl mb-4 overflow-hidden border border-white/10 bg-slate-900/50 backdrop-blur-xl">
                             <NextImage src="/logo.png" alt="Logo" width={80} height={80} className="object-cover" />
                         </div>
-                        <h1 className="text-4xl font-black tracking-tighter text-white">NodeFlow<span className="text-[#3DD6C8]">.</span></h1>
+                        <h1 className="text-4xl font-black tracking-tighter text-white">SmartBugMedia<span className="text-[#3DD6C8]">.</span></h1>
                         <p className="text-[10px] font-black uppercase tracking-[0.4em] text-[#3DD6C8]/60">Identity Override Matrix</p>
                     </div>
 

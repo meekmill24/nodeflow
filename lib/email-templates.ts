@@ -1,5 +1,5 @@
 /**
- * NodeFlow Institutional Email Templates
+ * SmartBugMedia Institutional Email Templates
  * Uses inline CSS for maximum compatibility with Resend and top email clients.
  */
 
@@ -39,7 +39,7 @@ export const WelcomeEmail = (username: string) => `
               <table border="0" cellspacing="0" cellpadding="0" style="margin: 0 auto;">
                 <tr>
                   <td align="center" style="border-radius: 16px; background-color: #3DD6C8;">
-                    <a href="https://nodeflow-xi.vercel.app/home" target="_blank" style="font-size: 14px; font-weight: 900; color: #0F172A; text-decoration: none; padding: 18px 40px; display: inline-block; text-transform: uppercase; letter-spacing: 1px;">
+                    <a href="https://smartbugmedia-xi.vercel.app/home" target="_blank" style="font-size: 14px; font-weight: 900; color: #0F172A; text-decoration: none; padding: 18px 40px; display: inline-block; text-transform: uppercase; letter-spacing: 1px;">
                       Initialize Dashboard
                     </a>
                   </td>

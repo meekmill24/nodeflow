@@ -1,120 +1,162 @@
 'use client';
 
-import { HelpCircle, ChevronLeft, ChevronDown, Search, MessageSquare, Zap, ShieldCheck, Globe } from 'lucide-react';
-import Link from 'next/link';
+import { 
+    Plus, 
+    Minus, 
+    HelpCircle, 
+    CreditCard, 
+    Smartphone, 
+    Mail, 
+    ShieldCheck, 
+    Clock, 
+    TrendingUp,
+    ShieldAlert
+} from 'lucide-react';
 import { useState } from 'react';
 
 const FAQS = [
     {
-        category: "Platform Architecture",
-        icon: Globe,
-        q: "What is NodeFlow.?",
-        a: "NodeFlow. is an AI collaboration platform that bridges the gap between neural network models and human verification. We provide structured data verify by global contributors to ensure the accuracy and safety of modern AI systems."
+        category: 'Payments & Accounts',
+        icon: CreditCard,
+        qas: [
+            {
+                q: "What payment methods does SmartBugMedia support?",
+                a: "SmartBugMedia currently supports Cryptocurrency (USDT / USDC), Bank Wire Transfer, and Bank Check. Transactions below 10,000 USDT are typically processed using cryptocurrency. Above 10,000 USDT, bank options become available."
+            },
+            {
+                q: "How are bank checks issued and delivered?",
+                a: "Bank checks may be issued through institutions like Chase, Citibank, Barclays, or BNP Paribas. Above 50,000 USDT: FedEx Overnight Delivery. 10,000 – 30,000 USDT: USPS Priority Mail. Next business day delivery is standard for high-volume transactions."
+            },
+            {
+                q: "How long do bank transfers take?",
+                a: "Bank wire transfers typically follow a 4–6 business day processing timeline, depending on local bank holidays, international banking compliance checks, and country-specific regulations."
+            }
+        ]
     },
     {
-        category: "Financial Settlements",
-        icon: Zap,
-        q: "How do I withdraw my earnings?",
-        a: "Earnings are settled daily via the USDT-TRC20 protocol. Once a task set is finalized, you can request a withdrawal to your personal digital wallet. Most transfers are completed within 5-15 minutes after network confirmation."
+        category: 'Operations & Tasks',
+        icon: TrendingUp,
+        qas: [
+            {
+                q: "What are the platform operating hours?",
+                a: "The SmartBugMedia platform operates daily from 09:00 AM – 09:00 PM for product maintenance tasks, withdrawal processing, and customer support."
+            },
+            {
+                q: "How are promotional gift packages assigned?",
+                a: "Gift packages are randomly allocated by the system based on account activity and task progress. Allocation ensures equal opportunity across the network, but negative balances must be cleared first."
+            },
+            {
+                q: "How are user levels determined?",
+                a: "User levels (Junior, Mid-Level, Senior, Mentor) are determined by the initial deposit amount and task volume. Each level offers progressive return rates and base salaries (up to 400 USDT for Mentor level)."
+            }
+        ]
     },
     {
-        category: "Security & Escrow",
+        category: 'Security & Compliance',
         icon: ShieldCheck,
-        q: "What are Frozen Amounts?",
-        a: "Frozen amounts indicate assets currently undergoing multi-node verification or special bundle processing. These funds are held in a secure escrow smart-contract until the optimization sequence is fully validated by our compliance engine."
-    },
-    {
-        category: "Growth & Rewards",
-        icon: MessageSquare,
-        q: "Can I earn without investing?",
-        a: "Every new node receives a $25 starter credit. While base-level participation is automated, upgrading your VIP Tier unlocks higher commission tiers, specialized asset batches, and priority settlement slots."
+        qas: [
+            {
+                q: "How does account security work?",
+                a: "SmartBugMedia mandates separate login and withdrawal passwords. Entering the wrong password three times will result in temporary suspension to prevent unauthorized access."
+            },
+            {
+                q: "What are the tax reporting requirements?",
+                a: "Users are responsible for domestic tax compliance. In the US, cash payments exceeding $10,000 may require IRS Form 8300 reporting. SmartBugMedia provides transaction records to assist users in fulfilling these obligations."
+            },
+            {
+                q: "Are international wire transfers secure?",
+                a: "Yes. All transfers pass through regulated financial institutions and are monitored by the U.S. Treasury (OFAC) to ensure security and prevent fraudulent activities."
+            }
+        ]
     }
 ];
 
 export default function FAQPage() {
-    const [openIndex, setOpenIndex] = useState<number | null>(null);
+    const [openIdx, setOpenIdx] = useState<string | null>("cat-0-qa-0");
+
+    const toggle = (id: string) => {
+        setOpenIdx(openIdx === id ? null : id);
+    };
 
     return (
-        <div className="max-w-4xl mx-auto pb-20 animate-fade-in space-y-10">
+        <div className="max-w-4xl mx-auto pb-20 animate-fade-in space-y-12">
             
             {/* Header */}
-            <div className="flex items-center justify-between">
-                <div>
-                    <h1 className="text-2xl font-black text-white uppercase tracking-tight">Knowledge Base</h1>
-                    <p className="text-text-secondary text-xs mt-1 font-bold uppercase tracking-widest font-mono opacity-60">System FAQ & Support Hub</p>
+            <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+                <div className="space-y-2 text-center md:text-left">
+                    <h1 className="text-4xl font-black text-white uppercase italic tracking-tighter">Support <span className="text-primary-light">Matrix</span></h1>
+                    <p className="text-[10px] font-black text-white/30 uppercase tracking-[0.4em]">Integrated Intelligence & Frequently Asked Questions</p>
                 </div>
-                <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary" size={16} />
-                    <input 
-                        type="text" 
-                        placeholder="Search protocols..." 
-                        className="bg-white/5 border border-white/10 rounded-xl pl-10 pr-4 py-2 text-xs font-bold text-white uppercase tracking-widest focus:outline-none focus:border-primary/50 transition-colors w-[200px]"
-                    />
+                <div className="p-4 bg-primary/10 border border-primary/20 rounded-2xl flex items-center gap-4">
+                    <ShieldCheck size={24} className="text-primary-light" />
+                    <div>
+                        <p className="text-[9px] font-black text-white uppercase tracking-widest leading-none mb-1">Status: Operational</p>
+                        <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest leading-none">Security Protocols Active</p>
+                    </div>
                 </div>
             </div>
 
-            {/* Support Hero */}
-            <div className="glass-card p-8 flex items-center gap-6 border-primary/20 bg-primary/[0.03]">
-                <div className="w-12 h-12 rounded-2xl bg-primary/20 flex items-center justify-center shrink-0">
-                    <HelpCircle size={24} className="text-primary-light" />
-                </div>
-                <div className="space-y-1">
-                    <h3 className="text-sm font-black text-white uppercase tracking-widest">Need live assistance?</h3>
-                    <p className="text-[10px] font-bold text-text-secondary uppercase tracking-[0.15em] opacity-60">
-                        Our technical support nodes are available 24/7 for account-specific queries.
-                    </p>
-                </div>
-                <Link href="/service" className="ml-auto px-6 py-2.5 bg-primary text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-primary/20 hover:brightness-110 shrink-0">
-                    Contact Support
-                </Link>
-            </div>
-
-            {/* FAQ Accordion List */}
-            <div className="space-y-4">
-                {FAQS.map((faq, idx) => {
-                    const Icon = faq.icon;
-                    const isOpen = openIndex === idx;
-
-                    return (
-                        <div key={idx} className={`group glass-card overflow-hidden transition-all duration-500 ${isOpen ? 'border-primary/30 ring-1 ring-primary/20' : 'border-white/5 hover:border-white/10'}`}>
-                            <button
-                                onClick={() => setOpenIndex(isOpen ? null : idx)}
-                                className="w-full flex items-start gap-5 p-6 text-left"
-                            >
-                                <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-colors ${isOpen ? 'bg-primary text-white' : 'bg-white/5 text-text-secondary'}`}>
-                                    <Icon size={18} />
-                                </div>
-                                <div className="flex-1 pt-1">
-                                    <span className="text-[9px] font-black text-text-secondary uppercase tracking-[0.3em] block mb-1 opacity-50">{faq.category}</span>
-                                    <span className="text-sm font-black text-white uppercase tracking-tight leading-tight">{faq.q}</span>
-                                </div>
-                                <div className={`w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center mt-1 transition-transform duration-500 ${isOpen ? 'rotate-180 bg-primary/10' : ''}`}>
-                                    <ChevronDown size={14} className={isOpen ? 'text-primary-light' : 'text-text-secondary'} />
-                                </div>
-                            </button>
-
-                            <div className={`transition-all duration-500 ease-in-out ${isOpen ? 'max-h-[300px] opacity-100' : 'max-h-0 opacity-0'}`}>
-                                <div className="px-6 pb-8 pl-[76px] space-y-4">
-                                    <div className="h-[1px] w-full bg-white/5" />
-                                    <p className="text-[11px] font-bold text-text-secondary leading-relaxed uppercase tracking-wider opacity-80 max-w-2xl">
-                                        {faq.a}
-                                    </p>
-                                    <div className="flex gap-2">
-                                        <div className="w-1.5 h-1.5 rounded-full bg-success" />
-                                        <span className="text-[9px] font-black text-success uppercase tracking-widest">Verified Solution</span>
-                                    </div>
-                                </div>
+            {/* Categories */}
+            <div className="space-y-10">
+                {FAQS.map((cat, ci) => (
+                    <div key={ci} className="space-y-6">
+                        <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center">
+                                <cat.icon size={20} className="text-white/60" />
                             </div>
+                            <h2 className="text-lg font-black text-white uppercase tracking-tight italic">{cat.category}</h2>
                         </div>
-                    );
-                })}
+
+                        <div className="grid grid-cols-1 gap-4">
+                            {cat.qas.map((qa, qi) => {
+                                const id = `cat-${ci}-qa-${qi}`;
+                                const isOpen = openIdx === id;
+                                return (
+                                    <div 
+                                        key={qi} 
+                                        className={`glass-card transition-all duration-300 ${isOpen ? 'border-primary/40 bg-white/[0.03]' : 'border-white/5 hover:border-white/10'}`}
+                                    >
+                                        <button 
+                                            onClick={() => toggle(id)}
+                                            className="w-full p-6 flex items-center justify-between text-left"
+                                        >
+                                            <span className="text-xs font-black text-white uppercase tracking-widest leading-relaxed pr-8">{qa.q}</span>
+                                            <div className={`shrink-0 w-8 h-8 rounded-lg flex items-center justify-center transition-all ${isOpen ? 'bg-primary text-white' : 'bg-white/5 text-white/40'}`}>
+                                                {isOpen ? <Minus size={14} /> : <Plus size={14} />}
+                                            </div>
+                                        </button>
+                                        <div className={`overflow-hidden transition-all duration-300 ${isOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
+                                            <div className="p-6 pt-0 border-t border-white/5">
+                                                <p className="text-[11px] font-bold text-white/40 leading-relaxed uppercase tracking-widest">
+                                                    {qa.a}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                ))}
             </div>
 
-            {/* Footer Notice */}
-            <div className="text-center pt-8 border-t border-white/5">
-                <p className="text-[10px] font-black text-text-secondary uppercase tracking-[0.4em] opacity-40">
-                    Document Version: 2.1.0-Release-SG
+            {/* Bottom Support Callout */}
+            <div className="glass-card-strong p-10 border-white/5 text-center space-y-6">
+                <div className="w-16 h-16 rounded-full bg-accent/20 flex items-center justify-center mx-auto mb-4">
+                    <Smartphone size={32} className="text-accent-light" />
+                </div>
+                <h3 className="text-xl font-black text-white uppercase tracking-tight">Need Neural Assistance?</h3>
+                <p className="text-xs font-bold text-white/40 uppercase tracking-widest leading-relaxed max-w-sm mx-auto">
+                    Our technical support agents are available 12 hours a day to assist with nodal activations and wealth extraction.
                 </p>
+                <div className="flex flex-wrap justify-center gap-4 pt-4">
+                    <button className="px-8 py-3.5 bg-accent text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-accent/20 hover:brightness-110">
+                        Live Web Support
+                    </button>
+                    <button className="px-8 py-3.5 bg-white/5 border border-white/10 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-white/10">
+                        Telegram Matrix
+                    </button>
+                </div>
             </div>
 
         </div>

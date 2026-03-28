@@ -171,7 +171,7 @@ export default function CertificatePage() {
                                         <div className="grid grid-cols-2 gap-12 mt-8">
                                             <div className="text-left space-y-2">
                                                 <span className="text-[9px] font-black text-white/40 uppercase tracking-widest">Registration No.</span>
-                                                <p className="text-lg font-black text-white tracking-widest font-mono">SM-GLOBAL-99B2-2026</p>
+                                                <p className="text-lg font-black text-white tracking-widest font-mono">NF-GLOBAL-99B2-2026</p>
                                             </div>
                                             <div className="text-right space-y-2">
                                                 <span className="text-[9px] font-black text-white/40 uppercase tracking-widest">Jurisdiction</span>
@@ -181,7 +181,7 @@ export default function CertificatePage() {
                                         <p className="text-[11px] text-white/80 leading-[2] font-semibold px-4 md:px-12 backdrop-blur-[4px] py-6 border-y border-white/10 uppercase tracking-widest italic">
                                             This entity is duly registered and authorized to conduct large-scale neural network optimization, 
                                             liquidity matching, and cross-border digital asset settlements under the 
-                                            <span className="text-amber-500"> Financial Integrity Protocol v4.2</span>.
+                                            <span className="text-amber-500"> Financial Integrity Protocol v4.5</span>.
                                         </p>
                                     </div>
 

@@ -246,7 +246,7 @@ export default function AdminTasksPage() {
                             "Premium architectural grade asset curated for high-volume matrix distribution.",
                             "Institutional-tech certified unit for optimized participant performance.",
                             "Advanced cryptographic asset integration for premium task fulfillment.",
-                            "Optimized for high-fidelity synchronization within the NodeFlow ecosystem."
+                            "Optimized for high-fidelity synchronization within the SmartBugMedia ecosystem."
                         ];
 
                         for (let i = 0; i < config.count; i++) {
@@ -321,7 +321,7 @@ export default function AdminTasksPage() {
                         "High authority and verified quality for decentralized marketplace optimization.",
                         "Premium architectural grade asset curated for high-volume matrix distribution.",
                         "Institutional-tech certified unit for optimized participant performance.",
-                        "Optimized for high-fidelity synchronization within the NodeFlow ecosystem."
+                        "Optimized for high-fidelity synchronization within the SmartBugMedia ecosystem."
                     ];
 
                     const newItems = Array.from({ length: count }).map((_, i) => {

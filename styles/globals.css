@@ -4,12 +4,12 @@
 @custom-variant dark (&:is(.dark *));
 
 /* ================================================================
-   NodeFlow. Design System
+   SmartBugMedia. Design System
    Inspired by SmartBugMedia — Teal, Orange, Deep Navy
    ================================================================ */
 
 :root {
-  /* NodeFlow Brand Colors */
+  /* SmartBugMedia Brand Colors */
   --nf-teal: #3DD6C8;
   --nf-orange: #E34304;
   --nf-navy: #0F0F23;
@@ -132,7 +132,7 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
-/* NodeFlow Utility Classes */
+/* SmartBugMedia Utility Classes */
 .nf-gradient {
   background: linear-gradient(135deg, #0F0F23 0%, #1A1A2E 50%, #16213E 100%);
 }

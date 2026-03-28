@@ -13,6 +13,7 @@ import { LanguageProvider } from '@/context/LanguageContext'
 import { ThemeProvider } from '@/context/ThemeContext'
 import { NotificationProvider } from '@/context/NotificationContext'
 import { Toaster } from 'sonner'
+import TawkMessenger from '@/components/TawkMessenger'
 
 export const metadata: Metadata = {
   title: 'SmartBugMedia. | Precision Optimization & Amplified Returns',
@@ -38,23 +39,7 @@ export default function RootLayout({
                     <Toaster position="top-center" richColors containerStyle={{ left: '50%', transform: 'translateX(-50%)' }} toastOptions={{ style: { marginTop: '36px', borderRadius: '24px', border: '1px solid rgba(255,255,255,0.1)' }, className: 'md:!left-[57.5%] !left-1/2' }} />
                     <Analytics />
                     
-                    {/* TAWK.TO LIVE CHAT PROTOCOL */}
-                    <Script id="tawk-to" strategy="lazyOnload">
-                      {`
-                        var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
-                        Tawk_API.onLoad = function() {
-                          Tawk_API.hideWidget();
-                        };
-                        (function(){
-                        var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
-                        s1.async=true;
-                        s1.src='https://embed.tawk.to/69c441ae5b8e4d1c398bb6e2/1jkja14p1';
-                        s1.charset='UTF-8';
-                        s1.setAttribute('crossorigin','*');
-                        s0.parentNode.insertBefore(s1,s0);
-                        })();
-                      `}
-                    </Script>
+                    <TawkMessenger />
                   </NotificationProvider>
                 </ThemeProvider>
               </LanguageProvider>

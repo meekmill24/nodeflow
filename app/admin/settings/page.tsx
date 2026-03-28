@@ -301,7 +301,15 @@ export default function AdminSettingsPage() {
                         </div>
                         <div className="space-y-2">
                             <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-600 ml-1">Telegram Pathway</label>
-                            <input className="w-full bg-black/40 border border-white/5 rounded-2xl px-6 py-4 text-sky-400 font-bold" value={settings.find(s => s.key === 'telegram_url')?.value || ''} onChange={(e) => handleUpdate('telegram_url', e.target.value)} placeholder="e.g. https://t.me/nodeflow_ops" />
+                            <input className="w-full bg-black/40 border border-white/5 rounded-2xl px-6 py-4 text-sky-400 font-bold" value={settings.find(s => s.key === 'telegram_url')?.value || ''} onChange={(e) => handleUpdate('telegram_url', e.target.value)} placeholder="e.g. https://t.me/smartbugmedia_ops" />
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-600 ml-1">Tawk.to Property ID</label>
+                            <input className="w-full bg-black/40 border border-white/5 rounded-2xl px-6 py-4 text-pink-400 font-bold font-mono text-[11px]" value={settings.find(s => s.key === 'tawkto_property_id')?.value || ''} onChange={(e) => handleUpdate('tawkto_property_id', e.target.value)} placeholder="Property ID" />
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-600 ml-1">Tawk.to Widget ID</label>
+                            <input className="w-full bg-black/40 border border-white/5 rounded-2xl px-6 py-4 text-pink-400 font-bold font-mono text-[11px]" value={settings.find(s => s.key === 'tawkto_widget_id')?.value || ''} onChange={(e) => handleUpdate('tawkto_widget_id', e.target.value)} placeholder="Widget ID" />
                         </div>
                     </div>
                 </div>

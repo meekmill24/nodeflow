@@ -12,7 +12,7 @@ export async function POST(req: Request) {
 
     const { success, data, error } = await sendEmail({
       to: email,
-      subject: 'NodeFlow: Protocol Activation Confirmed',
+      subject: 'SmartBugMedia: Protocol Activation Confirmed',
       html: WelcomeEmail(username || email),
     });
 

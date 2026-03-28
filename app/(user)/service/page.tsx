@@ -14,9 +14,9 @@ export default function CustomerServicePage() {
         const whatsappValue = settings?.whatsapp_url || '1234567890';
         const whatsappAction = whatsappValue.startsWith('http') 
             ? whatsappValue 
-            : `https://wa.me/${whatsappValue}?text=${encodeURIComponent('Hello, I need help with my NodeFlow. account.')}`;
+            : `https://wa.me/${whatsappValue}?text=${encodeURIComponent('Hello, I need help with my SmartBugMedia. account.')}`;
  
-        const telegramAction = settings?.telegram_url || 'https://t.me/nodeflow_ops';
+        const telegramAction = settings?.telegram_url || 'https://t.me/smartbugmedia_ops';
  
         return [
             {
@@ -44,7 +44,7 @@ export default function CustomerServicePage() {
             {
                 icon: Send,
                 title: 'Telegram Pathway',
-                subtitle: '@nodeflow_governance',
+                subtitle: '@smartbugmedia_governance',
                 color: 'bg-sky-500/20 text-sky-400',
                 badge: 'Active Node',
                 badgeColor: 'bg-sky-500/10 text-sky-400',
@@ -55,11 +55,11 @@ export default function CustomerServicePage() {
             {
                 icon: Mail,
                 title: 'Governance Email',
-                subtitle: 'support@nodeflow.com',
+                subtitle: 'support@smartbugmedia.com',
                 color: 'bg-accent/20 text-accent-light',
                 badge: '24h SLA',
                 badgeColor: 'bg-accent/20 text-accent-light',
-                action: 'mailto:support@nodeflow.com',
+                action: 'mailto:support@smartbugmedia.com',
                 target: '_self',
                 description: 'In-depth inquiries regarding institutional partnership and legal compliance.'
             },
@@ -94,7 +94,7 @@ export default function CustomerServicePage() {
                         <div className="space-y-2">
                             <h2 className="text-3xl font-black text-white uppercase tracking-tighter leading-none">How can we assist your node today?</h2>
                             <p className="text-text-secondary text-xs uppercase font-bold tracking-[0.15em] opacity-60">
-                                NodeFlow. technicians are monitoring system processes in real-time. Choose a dedicated channel below.
+                                SmartBugMedia. technicians are monitoring system processes in real-time. Choose a dedicated channel below.
                             </p>
                         </div>
                     </div>

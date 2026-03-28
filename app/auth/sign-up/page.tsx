@@ -34,14 +34,14 @@ function SignUpForm() {
     const [error, setError] = useState<string | null>(null)
     const [isLoading, setIsLoading] = useState(false)
     const router = useRouter()
-
+ 
     useEffect(() => {
         const refLink = searchParams.get('ref') || searchParams.get('code')
         if (refLink) {
             setReferral(refLink.toUpperCase())
         }
     }, [searchParams])
-
+ 
     const handleNextStep = (e: React.FormEvent) => {
         e.preventDefault()
         if (password !== repeatPassword) {
@@ -50,10 +50,6 @@ function SignUpForm() {
         }
         if (password.length < 6) {
             setError('Password must be at least 6 characters')
-            return
-        }
-        if (!referral || referral.length < 4) {
-            setError('An active invitation code is required for recruitment.')
             return
         }
         setError(null)
@@ -138,7 +134,7 @@ function SignUpForm() {
                         <div className="w-16 h-16 rounded-2xl flex items-center justify-center shadow-2xl mb-2 overflow-hidden border-2 border-slate-200/50" style={{background: '#0F172A'}}>
                             <NextImage src="/logo.png" alt="Logo" width={64} height={64} className="object-cover" />
                         </div>
-                        <h1 className="text-3xl font-extrabold tracking-tight text-[#0f172a]">NodeFlow<span className="text-[#3DD6C8]">.</span></h1>
+                        <h1 className="text-3xl font-extrabold tracking-tight text-[#0f172a]">SmartBugMedia<span className="text-[#3DD6C8]">.</span></h1>
                         <p className="text-muted-foreground text-sm font-medium tracking-wide">Institutional Distribution Protocol</p>
                     </div>
 
@@ -203,13 +199,12 @@ function SignUpForm() {
                                         </div>
 
                                         <div className="grid gap-2">
-                                            <Label htmlFor="referral" className="text-xs font-bold uppercase tracking-wider text-slate-500 ml-1">Invitation Code (Required)</Label>
+                                            <Label htmlFor="referral" className="text-xs font-bold uppercase tracking-wider text-slate-500 ml-1">Invitation Code (Optional)</Label>
                                             <div className="relative">
                                                 <Share2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                                                 <Input
                                                     id="referral"
                                                     type="text"
-                                                    required
                                                     placeholder="4-digit protocol"
                                                     maxLength={4}
                                                     value={referral}
@@ -292,7 +287,7 @@ function SignUpForm() {
                     </Card>
                     
                     <div className="text-center pt-4">
-                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em]">© 2026 NodeFlow. Platform</p>
+                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em]">© 2026 SmartBugMedia. Platform</p>
                     </div>
                 </div>
             </div>
