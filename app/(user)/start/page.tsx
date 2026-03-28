@@ -33,6 +33,8 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { motion, AnimatePresence } from 'framer-motion';
+import { toast } from 'sonner';
 import confetti from 'canvas-confetti';
 
 export default function StartPage() {
@@ -208,7 +210,12 @@ export default function StartPage() {
             if (data?.is_bundle) {
                 setShowBundleSuccessToast(true); setTimeout(() => setShowBundleSuccessToast(false), 5000);
             } else {
-                setModalOpen(false); setProfitAdded(Number(data?.earned_amount) || 0); setTimeout(() => setProfitAdded(null), 3000);
+                setModalOpen(false); 
+                const profit = Number(data?.earned_amount) || 0;
+                setProfitAdded(profit); 
+                toast.success(`Optimization Synchronized! Cloud Yield: ${format(profit)} credited to node.`);
+                confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+                setTimeout(() => setProfitAdded(null), 3000);
                 setIsRefreshing(true);
                 setTimeout(() => {
                     const pool = (window as any)._allPoolItems || [];
@@ -292,7 +299,13 @@ export default function StartPage() {
                     {Array.from({ length: 25 }).map((_, idx) => {
                         if (idx === 12) {
                             return (
-                                <div key="center" className="aspect-square flex items-center justify-center">
+                                <motion.div 
+                                    key="center" 
+                                    initial={{ scale: 0, opacity: 0 }}
+                                    animate={{ scale: 1, opacity: 1 }}
+                                    transition={{ type: 'spring', damping: 15, delay: 0.3 }}
+                                    className="aspect-square flex items-center justify-center"
+                                >
                                     <button
                                         onClick={handleStart}
                                         disabled={isSpinning || isLocked || hasPendingTask}
@@ -311,20 +324,26 @@ export default function StartPage() {
                                         </div>
                                         <div className="absolute inset-0 bg-gradient-to-t from-white/20 to-transparent group-hover:opacity-100 opacity-0 transition-opacity" />
                                     </button>
-                                </div>
+                                </motion.div>
                             );
                         }
                         const itemIdx = idx > 12 ? idx - 1 : idx;
                         const active = highlightedIndex === itemIdx;
                         return (
-                            <div key={idx} className={`aspect-square bg-slate-900 border p-1 border-white/5 transition-all duration-500 rounded-[20px] relative overflow-hidden ${active ? 'ring-2 ring-[#3DD6C8] shadow-[0_0_30px_rgba(61,214,200,0.3)] z-10' : 'opacity-100'}`}>
+                            <motion.div 
+                                key={idx} 
+                                initial={{ opacity: 0, y: 10, scale: 0.9 }}
+                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                transition={{ delay: idx * 0.02, duration: 0.5 }}
+                                className={`aspect-square bg-slate-900 border p-1 border-white/5 transition-all duration-500 rounded-[20px] relative overflow-hidden ${active ? 'ring-2 ring-[#3DD6C8] shadow-[0_0_30px_rgba(61,214,200,0.3)] z-10' : 'opacity-100'}`}
+                            >
                                 {items[itemIdx] ? (
                                     <img src={items[itemIdx].image_url} className="w-full h-full object-cover rounded-[16px]" alt="" />
                                 ) : (
                                     <div className="w-full h-full bg-white/5 animate-pulse rounded-[16px]" />
                                 )}
                                 {active && <div className="absolute inset-0 bg-[#3DD6C8]/10 animate-pulse" />}
-                            </div>
+                            </motion.div>
                         );
                     })}
                 </div>
