@@ -35,7 +35,7 @@ export default function RootLayout({
                 <ThemeProvider>
                   <NotificationProvider>
                     {children}
-                    <Toaster position="top-right" richColors toastOptions={{ style: { marginTop: '80px', marginRight: '20px', borderRadius: '24px', border: '1px solid rgba(255,255,255,0.1)' } }} />
+                    <Toaster position="top-right" richColors toastOptions={{ style: { marginTop: '80px', marginRight: '5px', borderRadius: '24px', border: '1px solid rgba(255,255,255,0.1)' } }} />
                     <Analytics />
                     
                     {/* TAWK.TO LIVE CHAT PROTOCOL */}
