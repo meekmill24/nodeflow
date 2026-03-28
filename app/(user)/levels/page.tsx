@@ -88,13 +88,13 @@ export default function LevelsPage() {
             </div>
 
             {/* LEVEL GRID */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {loading ? (
-                    Array(6).fill(0).map((_, i) => <div key={i} className="h-96 bg-slate-900/50 rounded-[40px] animate-pulse border border-white/5" />)
+                    Array(4).fill(0).map((_, i) => <div key={i} className="h-96 bg-slate-900/50 rounded-[40px] animate-pulse border border-white/5" />)
                 ) : (
-                    levels.map((level, idx) => {
-                        const Icon = levelIcons[idx % levelIcons.length];
-                        const colorClass = levelColors[idx % levelColors.length];
+                    levels.slice(0, 4).map((level, idx) => {
+                        const Icon = levelIcons[idx] || Zap;
+                        const colorClass = levelColors[idx] || levelColors[0];
                         const isCurrentLevel = currentLevelId === level.id;
                         const isLocked = level.id > currentLevelId;
                         const isCompleted = level.id < currentLevelId;
