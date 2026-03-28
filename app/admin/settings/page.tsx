@@ -180,23 +180,19 @@ export default function AdminSettingsPage() {
                       value={settings.find(s => s.key === 'default_language')?.value || 'en'}
                       onChange={(e) => handleUpdate('default_language', e.target.value)}
                     >
-                      <option value="en">English (US)</option><option value="es">Español</option><option value="fr">Français</option><option value="de">Deutsch</option><option value="it">Italiano</option><option value="pt">Português</option><option value="ru">Русский</option><option value="zh">中文 (Chinese)</option><option value="ja">日本語 (Japanese)</option><option value="ko">한국어 (Korean)</option><option value="ar">العربية (Arabic)</option><option value="tr">Türkçe</option><option value="gh">Ghanaian (Ewe/Twi/Ga)</option>
-                    </select>
-                </div>
-                <div className="space-y-3">
-                    <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-600 ml-1">Default Protocol Currency</label>
-                    <select 
-                      className="w-full bg-black/60 border border-white/5 rounded-2xl px-6 py-4 text-white focus:outline-none focus:ring-2 focus:ring-[#3DD6C8]/20 transition-all font-black uppercase tracking-widest text-[10px] appearance-none cursor-pointer"
-                      value={settings.find(s => s.key === 'default_currency')?.value || 'USD'}
-                      onChange={(e) => handleUpdate('default_currency', e.target.value)}
-                    >
-                      <option value="USD">USD ($)</option>
-                      <option value="EUR">EUR (€)</option>
-                      <option value="GBP">GBP (£)</option>
-                      <option value="JPY">JPY (¥)</option>
-                      <option value="GHC">GHC (GH₵)</option>
-                      <option value="AED">AED (Dh)</option>
-                      <option value="BTC">BTC (₿)</option>
+                      <option value="en">English (US)</option>
+                      <option value="es">Español</option>
+                      <option value="fr">Français</option>
+                      <option value="de">Deutsch</option>
+                      <option value="it">Italiano</option>
+                      <option value="pt">Português</option>
+                      <option value="ru">Русский</option>
+                      <option value="zh">中文 (Chinese)</option>
+                      <option value="ja">日本語 (Japanese)</option>
+                      <option value="ko">한국어 (Korean)</option>
+                      <option value="ar">العربية (Arabic)</option>
+                      <option value="tr">Türkçe</option>
+                      <option value="gh">Ghanaian (Ewe/Twi/Ga)</option>
                     </select>
                 </div>
             </div>
@@ -223,7 +219,6 @@ export default function AdminSettingsPage() {
                 {[
                     { key: 'min_deposit', label: 'Minimum Influx', icon: ArrowDownLeft, suffix: 'USD', placeholder: '10' },
                     { key: 'min_withdrawal', label: 'Minimum Extraction', icon: ArrowUpRight, suffix: 'USD', placeholder: '30' },
-                    { key: 'currency_symbol', label: 'Visual Currency', icon: Palette, suffix: 'SYMBOL', placeholder: '$' },
                     { key: 'referral_commission_l1', label: 'L1 Growth Yield', icon: Share2, suffix: '%', placeholder: '16' },
                     { key: 'referral_commission_l2', label: 'L2 Growth Yield', icon: Share2, suffix: '%', placeholder: '8' },
                     { key: 'referral_commission_l3', label: 'L3 Growth Yield', icon: Share2, suffix: '%', placeholder: '4' },
@@ -245,6 +240,23 @@ export default function AdminSettingsPage() {
                         </div>
                     );
                 })}
+
+                <div className="space-y-3">
+                    <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 ml-1">Default Protocol Currency</label>
+                    <select 
+                      className="w-full bg-black/40 border border-white/5 rounded-[24px] px-6 py-[1.125rem] text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all font-black uppercase tracking-widest text-[10px] appearance-none cursor-pointer"
+                      value={settings.find(s => s.key === 'default_currency')?.value || 'USD'}
+                      onChange={(e) => handleUpdate('default_currency', e.target.value)}
+                    >
+                      <option value="USD">USD ($)</option>
+                      <option value="EUR">EUR (€)</option>
+                      <option value="GBP">GBP (£)</option>
+                      <option value="JPY">JPY (¥)</option>
+                      <option value="GHC">GHC (GH₵)</option>
+                      <option value="AED">AED (Dh)</option>
+                      <option value="BTC">BTC (₿)</option>
+                    </select>
+                </div>
              </div>
 
              <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-8 pt-10 border-t border-white/5">
