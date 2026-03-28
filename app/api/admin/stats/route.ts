@@ -48,16 +48,16 @@ export async function GET() {
         const todayVolume = sumAmounts(todayTx);
 
         return NextResponse.json({
-            totalUsers: users.count || 0,
-            totalLevels: levels.count || 0,
-            totalTasks: tasks.count || 0,
-            totalReferrals: referrals.count || 0,
-            totalBundles: bundles.count || 0,
+            totalUsers: users.count ?? 0,
+            totalLevels: levels.count ?? 0,
+            totalTasks: tasks.count ?? 0,
+            totalReferrals: referrals.count ?? 0,
+            totalBundles: bundles.count ?? 0,
             totalDepositsAmount: sumAmounts(deposits.data),
             totalWithdrawalsAmount: sumAmounts(withdrawals.data),
             totalCommissions: sumAmounts(commissions.data),
-            pendingDeposits: pendingDeps.count || 0,
-            pendingWithdrawals: pendingWiths.count || 0,
+            pendingDeposits: pendingDeps.count ?? 0,
+            pendingWithdrawals: pendingWiths.count ?? 0,
             todayProfit: totalProfit,
             todayTasks: totalTasksCount,
             todayVolume: todayVolume,

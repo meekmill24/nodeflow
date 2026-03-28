@@ -7,26 +7,30 @@ export async function GET() {
         const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
         if (!url || !key) {
-            console.error("Supabase API: Connection constants missing.");
-            return NextResponse.json({ error: 'System Configuration Fault: Supabase credentials missing on the host server.' }, { status: 500 });
+            return NextResponse.json({ 
+                error: 'Circuit Fault: Credentials Missing on Host',
+                urlProvided: !!url,
+                keyProvided: !!key
+            }, { status: 500 });
         }
 
         const supabaseAdmin = createClient(url, key);
 
-        const { data: users, error } = await supabaseAdmin
+        // Debugging verification
+        const { data: users, error, count } = await supabaseAdmin
             .from('profiles')
-            .select('*')
+            .select('*', { count: 'exact' })
             .order('created_at', { ascending: false });
 
+        console.log(`[DIRECTORY_SYNC] Found ${users?.length || 0} nodes. Count: ${count}. Error: ${error?.message || 'None'}`);
+
         if (error) {
-            console.error("Supabase API: Directory retrieval error:", error.message);
             return NextResponse.json({ error: `Directory Sync Collision: ${error.message}` }, { status: 500 });
         }
 
-        console.log(`Supabase API: Retrieved ${users?.length || 0} nodes.`);
-        return NextResponse.json(users);
+        return NextResponse.json(users || []);
     } catch (err: any) {
-        console.error("Supabase API: Critical failure:", err.message);
+        console.error("[DIRECTORY_FATAL] Access Violation:", err.message);
         return NextResponse.json({ error: `Critical System Failure: ${err.message}` }, { status: 500 });
     }
 }
