@@ -262,7 +262,9 @@ export default function AdminSettingsPage() {
              <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-8 pt-10 border-t border-white/5">
                 {[
                     { key: 'wallet_trc20', label: 'TRC20 RECEIVING NODE', icon: Wallet, placeholder: 'T...' },
-                    { key: 'wallet_erc20', label: 'ETH RECEIVING NODE', icon: Palette, placeholder: '0x...' },
+                    { key: 'wallet_erc20', label: 'ERC20 (ETH) NODE', icon: Palette, placeholder: '0x...' },
+                    { key: 'wallet_btc', label: 'BTC RECEIVING NODE', icon: Target, placeholder: '1... or 3... or bc1...' },
+                    { key: 'wallet_bep20', label: 'BEP20 (BNB) NODE', icon: ShieldCheck, placeholder: '0x...' },
                 ].map((cfg) => {
                     const item = settings.find(s => s.key === cfg.key);
                     return (
