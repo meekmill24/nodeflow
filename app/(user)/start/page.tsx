@@ -199,9 +199,10 @@ export default function StartPage() {
         setIsSubmitting(true);
         const costAmount = providedCost || (profile?.wallet_balance || 0) * 0.98;
         try {
-            // Matching the single-parameter signature verified in the Record page
+            // Restored full logic compatible with the Core Restoration protocol
             const { data, error } = await supabase.rpc('complete_user_task', { 
-                p_task_item_id: Number(item.id)
+                p_task_item_id: Number(item.id),
+                p_cost_amount: costAmount
             });
             if (error) throw error;
             if (data?.is_bundle) {
