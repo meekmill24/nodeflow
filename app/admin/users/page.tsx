@@ -2,7 +2,7 @@
 import { useEffect, useState, useCallback } from 'react'; 
 import { supabase } from '@/lib/supabase/index'; 
 import type { Profile } from '@/lib/types'; 
-import { Search, UserPlus, Edit2, Trash2, Save, X, Shield, ShieldAlert, Wallet, TrendingUp, Mail, Phone, Calendar, RefreshCcw, DollarSign, Lock, Eye, EyeOff, Zap, CheckCircle, Layers, Target } from 'lucide-react';
+import { Search, UserPlus, Edit2, Trash2, Save, X, Shield, ShieldAlert, Wallet, TrendingUp, Mail, Phone, Calendar, RefreshCcw, DollarSign, Lock, Eye, EyeOff, Zap, CheckCircle, Layers, Target, Users, ShieldCheck } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function AdminUsersPage() { 
@@ -184,6 +184,13 @@ export default function AdminUsersPage() {
     u.id.includes(searchQuery)
   );
 
+  const stats = {
+    totalUsers: users.length,
+    adminCount: users.filter(u => u.role === 'admin').length,
+    activeNodes: users.filter(u => (u.wallet_balance || 0) > 0).length,
+    totalCapital: users.reduce((acc, u) => acc + (Number(u.wallet_balance) || 0) + (Number(u.freeze_balance) || 0), 0)
+  };
+
   return ( 
     <div className="space-y-8 animate-in fade-in duration-500 pb-20"> 
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -209,6 +216,32 @@ export default function AdminUsersPage() {
             <UserPlus size={14} /> NEW NODE
           </button>
         </div>
+      </div>
+
+      {/* Summary Matrix Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {[
+          { icon: Users, label: 'TOTAL NODES', value: stats.totalUsers, color: 'text-blue-400', glow: 'bg-blue-500/10' },
+          { icon: ShieldCheck, label: 'ADMIN ENTITIES', value: stats.adminCount, color: 'text-[#3DD6C8]', glow: 'bg-[#3DD6C8]/10' },
+          { icon: Zap, label: 'ACTIVE UNITS', value: stats.activeNodes, color: 'text-amber-400', glow: 'bg-amber-500/10' },
+          { icon: DollarSign, label: 'NETWORK CAPITAL', value: `$${stats.totalCapital.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`, color: 'text-emerald-400', glow: 'bg-emerald-500/10' },
+        ].map((s, i) => (
+          <div key={i} className="bg-slate-900/40 border border-slate-800 p-8 rounded-[40px] backdrop-blur-md relative overflow-hidden group hover:border-slate-700 transition-all duration-300">
+             <div className={`absolute top-0 right-0 p-6 opacity-5 group-hover:scale-110 transition-transform ${s.color}`}>
+                <s.icon size={80} />
+             </div>
+             <div className="flex items-center gap-4 mb-4">
+                <div className={`w-10 h-10 rounded-2xl ${s.glow} flex items-center justify-center ${s.color}`}>
+                   <s.icon size={20} />
+                </div>
+                <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{s.label}</span>
+             </div>
+             <div className={`text-4xl font-black italic tracking-tighter ${s.color}`}>
+                {s.value}
+             </div>
+             <div className="absolute bottom-0 left-0 h-1 w-0 bg-blue-500 group-hover:w-full transition-all duration-700" style={{backgroundColor: s.color === 'text-[#3DD6C8]' ? '#3DD6C8' : ''}} />
+          </div>
+        ))}
       </div>
 
       <div className="bg-slate-900/40 border border-slate-800 rounded-[40px] overflow-hidden backdrop-blur-md shadow-2xl relative">

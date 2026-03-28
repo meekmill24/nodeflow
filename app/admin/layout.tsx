@@ -113,6 +113,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <aside className={`
         fixed inset-y-0 left-0 z-40 w-64 backdrop-blur-xl transform transition-transform duration-300 ease-in-out
         ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+        overflow-y-auto scrollbar-thin scrollbar-thumb-slate-800
       `} style={{background:'rgba(15,15,35,0.95)', borderRight:'1px solid rgba(61,214,200,0.12)'}}>
         <div className="h-full flex flex-col p-6">
           <div className="mb-12 px-2 flex items-center gap-5 group cursor-default">

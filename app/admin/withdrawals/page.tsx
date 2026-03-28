@@ -57,25 +57,47 @@ export default function AdminWithdrawalsPage() {
 
   return ( 
     <div className="space-y-8 animate-in fade-in duration-500"> 
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
         <div>
-          <h2 className="text-3xl font-bold text-white tracking-tight italic uppercase">Withdrawal Requests</h2>
-          <p className="text-slate-400 mt-1">Review and process fund disbursement requests to external wallets.</p>
+          <h2 className="text-4xl font-black text-white tracking-tighter italic uppercase bg-gradient-to-r from-white to-white/40 bg-clip-text text-transparent">Withdrawal Requests</h2>
+          <p className="text-slate-500 text-[10px] font-black uppercase tracking-[0.4em] mt-1">Review and process fund disbursement requests.</p>
         </div>
-        <div className="flex bg-slate-900 border border-slate-800 p-1 rounded-2xl gap-1">
+        <div className="flex bg-slate-900 border border-slate-800 p-1.5 rounded-2xl gap-1 h-fit">
           {['all', 'pending', 'approved', 'rejected'].map((s) => (
             <button
               key={s}
               onClick={() => setStatusFilter(s as any)}
               className={`
                 px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all
-                ${statusFilter === s ? 'bg-rose-600 text-white shadow-lg' : 'text-slate-500 hover:text-slate-300'}
+                ${statusFilter === s ? 'bg-rose-600 text-white shadow-lg shadow-rose-500/20' : 'text-slate-500 hover:text-slate-300'}
               `}
             >
               {s}
             </button>
           ))}
         </div>
+      </div>
+
+      {/* Stats Matrix */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {[
+          { icon: Clock, label: 'PENDING PAYOUTS', value: withdrawals.filter(w => w.status === 'pending').length, color: 'text-blue-400', glow: 'bg-blue-500/10' },
+          { icon: Check, label: 'SUCCESS DISBURSED', value: withdrawals.filter(w => w.status === 'approved').length, color: 'text-[#3DD6C8]', glow: 'bg-[#3DD6C8]/10' },
+          { icon: ArrowUpFromLine, label: 'CAPITAL OUTFLOW', value: `$${withdrawals.filter(w => w.status === 'approved').reduce((acc, w) => acc + w.amount, 0).toLocaleString()}`, color: 'text-rose-400', glow: 'bg-rose-500/10' },
+          { icon: Wallet, label: 'AVG REQUEST', value: `$${withdrawals.length ? Math.round(withdrawals.reduce((acc, w) => acc + w.amount, 0) / withdrawals.length).toLocaleString() : 0}`, color: 'text-indigo-400', glow: 'bg-indigo-500/10' },
+        ].map((s, i) => (
+          <div key={i} className="bg-slate-900/40 border border-slate-800 p-8 rounded-[40px] backdrop-blur-md relative overflow-hidden group">
+             <div className="flex items-center gap-4 mb-4">
+                <div className={`w-10 h-10 rounded-2xl ${s.glow} flex items-center justify-center ${s.color}`}>
+                   <s.icon size={20} />
+                </div>
+                <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{s.label}</span>
+             </div>
+             <div className={`text-3xl font-black italic tracking-tighter ${s.color}`}>
+                {s.value}
+             </div>
+          </div>
+        ))}
       </div>
 
       <div className="bg-slate-900/40 border border-slate-800 rounded-[32px] overflow-hidden backdrop-blur-md">

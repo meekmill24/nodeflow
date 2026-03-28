@@ -57,25 +57,47 @@ export default function AdminDepositsPage() {
 
   return ( 
     <div className="space-y-8 animate-in fade-in duration-500"> 
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
         <div>
           <h2 className="text-4xl font-black text-white tracking-tighter italic uppercase bg-gradient-to-r from-white to-white/40 bg-clip-text text-transparent">Deposit Requests</h2>
           <p className="text-slate-500 text-[10px] font-black uppercase tracking-[0.4em] mt-1">Review and approve incoming funds to user wallets.</p>
         </div>
-        <div className="flex bg-slate-900 border border-slate-800 p-1 rounded-2xl gap-1">
+        <div className="flex bg-slate-900 border border-slate-800 p-1.5 rounded-2xl gap-1 h-fit">
           {['all', 'pending', 'approved', 'rejected'].map((s) => (
             <button
               key={s}
               onClick={() => setStatusFilter(s as any)}
               className={`
                 px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all
-                ${statusFilter === s ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-500 hover:text-slate-300'}
+                ${statusFilter === s ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20' : 'text-slate-500 hover:text-slate-300'}
               `}
             >
               {s}
             </button>
           ))}
         </div>
+      </div>
+
+      {/* Stats Matrix */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {[
+          { icon: Clock, label: 'PENDING REQUESTS', value: deposits.filter(d => d.status === 'pending').length, color: 'text-blue-400', glow: 'bg-blue-500/10' },
+          { icon: Check, label: 'TOTAL APPROVED', value: deposits.filter(d => d.status === 'approved').length, color: 'text-emerald-400', glow: 'bg-emerald-500/10' },
+          { icon: ArrowDownToLine, label: 'TOTAL VOLUME', value: `$${deposits.filter(d => d.status === 'approved').reduce((acc, d) => acc + d.amount, 0).toLocaleString()}`, color: 'text-indigo-400', glow: 'bg-indigo-500/10' },
+          { icon: AlertCircle, label: 'REJECTION RATE', value: `${deposits.length ? Math.round((deposits.filter(d => d.status === 'rejected').length / deposits.length) * 100) : 0}%`, color: 'text-rose-400', glow: 'bg-rose-500/10' },
+        ].map((s, i) => (
+          <div key={i} className="bg-slate-900/40 border border-slate-800 p-8 rounded-[40px] backdrop-blur-md relative overflow-hidden group">
+             <div className="flex items-center gap-4 mb-4">
+                <div className={`w-10 h-10 rounded-2xl ${s.glow} flex items-center justify-center ${s.color}`}>
+                   <s.icon size={20} />
+                </div>
+                <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{s.label}</span>
+             </div>
+             <div className={`text-3xl font-black italic tracking-tighter ${s.color}`}>
+                {s.value}
+             </div>
+          </div>
+        ))}
       </div>
 
       <div className="bg-slate-900/40 border border-slate-800 rounded-[40px] overflow-hidden backdrop-blur-md shadow-2xl relative">
