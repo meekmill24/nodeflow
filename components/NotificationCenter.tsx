@@ -243,7 +243,7 @@ export default function NotificationCenter() {
             {/* View All Utility */}
             <div className="p-4 bg-white/[0.04] border-t border-white/5">
                 <Link 
-                  href="/app/notifications" 
+                  href={window.location.pathname.startsWith('/admin') ? "/admin/transactions" : "/app/notifications"} 
                   onClick={() => setIsOpen(false)}
                   className="group flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 hover:border-white/10 transition-all font-black text-[10px] uppercase tracking-widest text-zinc-400 hover:text-white"
                 >

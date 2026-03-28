@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase/index'; 
 import type { Transaction } from '@/lib/types'; 
 import { Search, ArrowUpRight, ArrowDownLeft, Snowflake, DollarSign, Filter, RefreshCcw, User as UserIcon, Calendar, Info, Eye, ExternalLink, Trash2 } from 'lucide-react'; 
+import { toast } from 'sonner';
 
 export default function AdminTransactionsPage() { 
   const [transactions, setTransactions] = useState<(Transaction & { profile?: { username: string } })[]>([]); 
@@ -12,13 +13,17 @@ export default function AdminTransactionsPage() {
 
   const fetchTransactions = async () => { 
     setLoading(true);
-    const { data } = await supabase
-      .from('transactions')
-      .select('*, profile:profiles(username)')
-      .order('created_at', { ascending: false })
-      .limit(200); 
-    if (data) setTransactions(data as any); 
-    setLoading(false); 
+    try {
+        const res = await fetch('/api/admin/transactions?type=all');
+        if (!res.ok) throw new Error(`HTTP Error: ${res.status}`);
+        const data = await res.json();
+        setTransactions(data || []);
+    } catch (err) {
+        console.error(err);
+        toast.error('Directory Sync Loss: Ledger registry disconnected');
+    } finally {
+        setLoading(false);
+    }
   }; 
 
   useEffect(() => { fetchTransactions(); }, []); 
