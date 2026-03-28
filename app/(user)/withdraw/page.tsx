@@ -87,7 +87,7 @@ export default function WithdrawPage() {
                 .from('profiles')
                 .update({ 
                     wallet_balance: balance - amt, 
-                    frozen_amount: (profile?.frozen_amount || 0) + amt 
+                    freeze_balance: (profile?.freeze_balance || 0) + amt 
                 })
                 .eq('id', profile!.id);
 
