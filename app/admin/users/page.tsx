@@ -23,9 +23,20 @@ export default function AdminUsersPage() {
 
   const fetchUsers = useCallback(async () => { 
     setLoading(true);
-    const { data } = await supabase.from('profiles').select('*').order('created_at', { ascending: false }); 
-    if (data) setUsers(data as Profile[]); 
-    setLoading(false);
+    try {
+        const res = await fetch('/api/admin/users');
+        if (!res.ok) {
+            const err = await res.json();
+            throw new Error(err.error || 'Identity list retrieval failed');
+        }
+        const data = await res.json();
+        if (data) setUsers(data as Profile[]); 
+    } catch (err: any) {
+        toast.error(`Matrix Calibration Error: ${err.message}`);
+        console.error("Users Fetch Sync Loss:", err);
+    } finally {
+        setLoading(false);
+    }
   }, []); 
 
   useEffect(() => { fetchUsers(); }, [fetchUsers]); 
