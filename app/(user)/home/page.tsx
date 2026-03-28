@@ -166,7 +166,7 @@ export default function HomePage() {
             </div>
 
             {/* LIVE OPERATIONS & HUB */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+            <div className="grid grid-cols-1 gap-12">
                 {/* System Hub & Actions */}
                 <div className="space-y-6">
                     <div className="flex items-center gap-3 px-4">

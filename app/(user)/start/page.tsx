@@ -198,7 +198,7 @@ export default function StartPage() {
         if (isSubmitting) return;
         setIsSubmitting(true);
         try {
-            const { data, error } = await supabase.rpc('complete_user_task', { p_task_item_id: item.id, p_cost_amount: costAmount });
+            const { data, error } = await supabase.rpc('complete_user_task', { p_task_item_id: item.id });
             if (error) throw error;
             if (data?.is_bundle) {
                 setShowBundleSuccessToast(true); setTimeout(() => setShowBundleSuccessToast(false), 5000);
@@ -229,8 +229,8 @@ export default function StartPage() {
     const handleBundleAccept = async (bundle: BundlePackage) => {
         if (!profile) return;
         const newBalance = profile.wallet_balance - bundle.totalAmount;
-        const newFrozen = profile.frozen_amount + bundle.totalAmount + bundle.bonusAmount;
-        await supabase.from('profiles').update({ wallet_balance: newBalance, frozen_amount: newFrozen, completed_count: (profile.completed_count || 0) + 1 }).eq('id', profile.id);
+        const newFrozen = profile.freeze_balance + bundle.totalAmount + bundle.bonusAmount;
+        await supabase.from('profiles').update({ wallet_balance: newBalance, freeze_balance: newFrozen, completed_count: (profile.completed_count || 0) + 1 }).eq('id', profile.id);
         if (pendingTaskItem) await supabase.from('user_tasks').insert({ user_id: profile.id, task_item_id: pendingTaskItem.id, status: 'pending', earned_amount: bundle.bonusAmount, cost_amount: bundle.totalAmount, is_bundle: true });
         setBundleModal(false); router.push('/record'); await refreshProfile();
     };
@@ -261,12 +261,12 @@ export default function StartPage() {
                     </div>
                  </div>
 
-                 {/* STAT MATRIX */}
-                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-12 pt-10 border-t border-white/5">
+                 {/* LIVE OPERATIONS & HUB */}
+                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-12 pt-10 border-t border-white/5">
                     {[
                         { label: t('wallet_balance'), value: format(profile?.wallet_balance || 0), icon: Wallet, color: 'text-white' },
                         { label: t('daily_profits'), value: format(profile?.profit || 0), icon: TrendingUp, color: 'text-amber-400' },
-                        { label: t('frozen_asset'), value: format(profile?.frozen_amount || 0), icon: Lock, color: 'text-rose-500' },
+                        { label: t('frozen_asset'), value: format(profile?.freeze_balance || 0), icon: Lock, color: 'text-rose-500' },
                         { label: t('set_progress'), value: `${tasksInCurrentSet}/${totalTasks}`, icon: Activity, color: 'text-[#3DD6C8]' },
                     ].map((stat, i) => (
                         <div key={i} className="flex flex-col gap-1">
@@ -312,7 +312,7 @@ export default function StartPage() {
                         const itemIdx = idx > 12 ? idx - 1 : idx;
                         const active = highlightedIndex === itemIdx;
                         return (
-                            <div key={idx} className={`aspect-square bg-slate-950/40 border p-1 border-white/5 transition-all duration-500 rounded-[20px] relative overflow-hidden ${active ? 'ring-2 ring-[#3DD6C8] shadow-[0_0_30px_rgba(61,214,200,0.3)] z-10' : 'opacity-40 scale-95'}`}>
+                            <div key={idx} className={`aspect-square bg-slate-900 border p-1 border-white/5 transition-all duration-500 rounded-[20px] relative overflow-hidden ${active ? 'ring-2 ring-[#3DD6C8] shadow-[0_0_30px_rgba(61,214,200,0.3)] z-10' : 'opacity-90'}`}>
                                 {items[itemIdx] ? (
                                     <img src={items[itemIdx].image_url} className="w-full h-full object-cover rounded-[16px]" alt="" />
                                 ) : (
