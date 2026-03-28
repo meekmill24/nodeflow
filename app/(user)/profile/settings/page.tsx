@@ -5,7 +5,7 @@ import { useTheme } from '@/context/ThemeContext';
 import { useLanguage } from '@/context/LanguageContext';
 import { useCurrency } from '@/context/CurrencyContext';
 import { supabase } from '@/lib/supabase/index';
-import { ArrowLeft, Globe, Moon, Sun, Bell, Lock, Mail, ChevronRight, CheckCircle, AlertCircle, Loader2, X, DollarSign, LogOut } from 'lucide-react';
+import { ArrowLeft, Globe, Moon, Sun, Bell, Lock, Mail, ChevronRight, CheckCircle, AlertCircle, Loader2, X, DollarSign, LogOut, CreditCard } from 'lucide-react';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 
@@ -28,12 +28,14 @@ export default function SettingsPage() {
     // Selection states
     const [language, setLanguage] = useState(profile?.language || 'English');
     const [currency, setCurrency] = useState(profile?.currency || 'USD');
+    const [walletAddress, setWalletAddress] = useState(profile?.wallet_address || '');
 
     useEffect(() => {
         if (profile) {
             setLanguage(profile.language || 'English');
             setCurrency(profile.currency || 'USD');
             setNotifications(profile.notifications_enabled !== false);
+            setWalletAddress(profile.wallet_address || '');
         }
     }, [profile]);
 
