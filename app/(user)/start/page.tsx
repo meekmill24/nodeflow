@@ -266,7 +266,7 @@ export default function StartPage() {
                             <h1 className="text-3xl md:text-5xl font-black text-white italic uppercase tracking-tighter leading-none mb-3">
                                 OPTIMIZATION COMMAND CENTER
                             </h1>
-                            <div className="flex items-center gap-3">
+                            <div className="flex flex-wrap items-center gap-3">
                                 <span className="px-3 py-1 bg-white/5 rounded-full text-[9px] font-black text-white/40 uppercase tracking-[0.2em] border border-white/10 italic">Module: Start.exe</span>
                                 <div className="flex items-center gap-2 px-3 py-1 bg-white/5 border border-white/10 rounded-full group/ref cursor-pointer hover:bg-white/10 transition-all" onClick={() => {
                                     navigator.clipboard.writeText(profile?.referral_code || '');

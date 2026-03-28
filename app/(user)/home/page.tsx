@@ -88,7 +88,7 @@ export default function HomePage() {
                                     {t('welcome_back')}, <span className="bg-gradient-to-r from-white via-white to-white/40 bg-clip-text text-transparent">{profile?.username || 'Node'}</span>
                                     <span className="text-[#E34304] scale-150 ml-0.5">.</span>
                                 </h1>
-                                <div className="flex items-center gap-3 mt-4">
+                                <div className="flex flex-wrap items-center gap-3 mt-4">
                                     <div className="flex items-center gap-2 px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-full">
                                         <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.8)]" />
                                         <span className="text-[9px] font-black text-emerald-400 uppercase tracking-[0.2em]">{t('neural_active')}</span>
