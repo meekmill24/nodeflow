@@ -29,8 +29,10 @@ import {
     Network,
     Wallet,
     HelpCircle,
-    ShieldAlert
+    ShieldAlert,
+    Copy 
 } from 'lucide-react';
+import { toast } from 'sonner';
 
 export default function HomePage() {
     const { profile, signOut } = useAuth();
@@ -92,6 +94,14 @@ export default function HomePage() {
                                         <span className="text-[9px] font-black text-emerald-400 uppercase tracking-[0.2em]">{t('neural_active')}</span>
                                     </div>
                                     <span className="text-[9px] font-black text-white/30 uppercase tracking-[0.4em] italic">Identity Shard Verified</span>
+                                    <div className="flex items-center gap-2 px-3 py-1 bg-white/5 border border-white/10 rounded-full group/ref cursor-pointer hover:bg-white/10 transition-all" onClick={() => {
+                                        navigator.clipboard.writeText(profile?.referral_code || '');
+                                        toast.success('Referral Protocol Copied');
+                                    }}>
+                                        <span className="text-[9px] font-black text-white/40 uppercase tracking-[0.2em]">Node ID:</span>
+                                        <span className="text-[9px] font-black text-[#3DD6C8] uppercase tracking-widest">{profile?.referral_code || '---'}</span>
+                                        <Copy size={10} className="text-white/20 group-hover/ref:text-[#3DD6C8] transition-colors" />
+                                    </div>
                                 </div>
                             </div>
                         </div>
