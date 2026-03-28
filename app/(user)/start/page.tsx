@@ -215,6 +215,7 @@ export default function StartPage() {
                 setProfitAdded(profit); 
                 toast.success(`Optimization Synchronized! Cloud Yield: ${format(profit)} credited to node.`);
                 confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+                await refreshProfile();
                 setTimeout(() => setProfitAdded(null), 3000);
                 setIsRefreshing(true);
                 setTimeout(() => {
@@ -244,7 +245,7 @@ export default function StartPage() {
         const newFrozen = profile.freeze_balance + bundle.totalAmount + bundle.bonusAmount;
         await supabase.from('profiles').update({ wallet_balance: newBalance, freeze_balance: newFrozen, completed_count: (profile.completed_count || 0) + 1 }).eq('id', profile.id);
         if (pendingTaskItem) await supabase.from('user_tasks').insert({ user_id: profile.id, task_item_id: pendingTaskItem.id, status: 'pending', earned_amount: bundle.bonusAmount, cost_amount: bundle.totalAmount, is_bundle: true });
-        setBundleModal(false); router.push('/record'); await refreshProfile();
+        setBundleModal(false); await refreshProfile(); router.push('/record');
     };
 
     return (
