@@ -194,10 +194,10 @@ export default function StartPage() {
         setSelectedItem({ ...item }); setModalOpen(true);
     };
 
-    const handleSubmitTask = async (item: TaskItem, costAmount?: number) => {
+    const handleSubmitTask = async (item: TaskItem, providedCost?: number) => {
         if (isSubmitting) return;
         setIsSubmitting(true);
-        const costAmount = (profile?.wallet_balance || 0) * 0.98;
+        const costAmount = providedCost || (profile?.wallet_balance || 0) * 0.98;
         try {
             // Trying multiple common parameter names for the RPC as a fallback strategy
             const { data, error } = await supabase.rpc('complete_user_task', { p_task_item_id: Number(item.id), p_cost_amount: costAmount });

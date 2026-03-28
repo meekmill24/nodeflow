@@ -44,6 +44,10 @@ export default function Page() {
         setError('Password must be at least 6 characters')
         return
     }
+    if (!referral || referral.length < 4) {
+      setError('An active invitation code is required for recruitment.')
+      return
+    }
     setError(null)
     setStep(2)
   }
@@ -207,17 +211,18 @@ export default function Page() {
                     </div>
 
                     <div className="grid gap-2">
-                        <Label htmlFor="referral" className="text-xs font-bold uppercase tracking-wider text-slate-500 ml-1">Referral Code</Label>
+                        <Label htmlFor="referral" className="text-xs font-bold uppercase tracking-wider text-slate-500 ml-1">Invitation Code (Required)</Label>
                         <div className="relative">
                         <Share2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                         <Input
                             id="referral"
                             type="text"
-                            placeholder="4-digit code"
+                            required
+                            placeholder="4-digit protocol"
                             maxLength={4}
                             value={referral}
-                            onChange={(e) => setReferral(e.target.value)}
-                            className="pl-10 h-11 bg-white/50 border-white/50 focus:border-[#007CBA] transition-all rounded-xl text-slate-900 placeholder:text-slate-400"
+                            onChange={(e) => setReferral(e.target.value.toUpperCase())}
+                            className="pl-10 h-11 bg-white/50 border-white/50 focus:border-[#007CBA] transition-all rounded-xl text-slate-900 placeholder:text-slate-400 font-mono"
                         />
                         </div>
                     </div>

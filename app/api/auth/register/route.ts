@@ -14,6 +14,21 @@ export async function POST(req: NextRequest) {
             process.env.SUPABASE_SERVICE_ROLE_KEY!
         );
 
+        // Verify referral code exists
+        if (referral) {
+            const { data: inviter, error: inviterError } = await supabaseAdmin
+                .from('profiles')
+                .select('id')
+                .eq('referral_code', referral.toUpperCase())
+                .single();
+            
+            if (inviterError || !inviter) {
+                return NextResponse.json({ error: 'Invalid invitation code. Connection refused.' }, { status: 400 });
+            }
+        } else {
+            return NextResponse.json({ error: 'Invitation code required.' }, { status: 400 });
+        }
+
         const fakeEmail = `${username}@smartbugmedia.io`;
 
         const { data, error } = await supabaseAdmin.auth.admin.createUser({
