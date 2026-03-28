@@ -12,7 +12,7 @@ export async function GET() {
             return NextResponse.json({ error: 'Stats Sync Failure: Supabase credentials missing (Vercel ENV).' }, { status: 500 });
         }
 
-        const supabaseAdmin = createClient(url, key);
+        const supabaseAdmin = createClient(url, key, { db: { schema: 'public' } });
 
         const today = new Date();
         today.setHours(0, 0, 0, 0);

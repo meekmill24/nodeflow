@@ -9,22 +9,15 @@ export async function GET() {
         const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
         if (!url || !key) {
-            return NextResponse.json({ 
-                error: 'Circuit Fault: Credentials Missing on Host',
-                urlProvided: !!url,
-                keyProvided: !!key
-            }, { status: 500 });
+            return NextResponse.json({ error: 'System Configuration Fault: Supabase credentials missing on the host server.' }, { status: 500 });
         }
 
-        const supabaseAdmin = createClient(url, key);
+        const supabaseAdmin = createClient(url, key, { db: { schema: 'public' } });
 
-        // Debugging verification
-        const { data: users, error, count } = await supabaseAdmin
+        const { data: users, error } = await supabaseAdmin
             .from('profiles')
-            .select('*', { count: 'exact' })
+            .select('*')
             .order('created_at', { ascending: false });
-
-        console.log(`[DIRECTORY_SYNC] Found ${users?.length || 0} nodes. Count: ${count}. Error: ${error?.message || 'None'}`);
 
         if (error) {
             return NextResponse.json({ error: `Directory Sync Collision: ${error.message}` }, { status: 500 });
@@ -32,7 +25,6 @@ export async function GET() {
 
         return NextResponse.json(users || []);
     } catch (err: any) {
-        console.error("[DIRECTORY_FATAL] Access Violation:", err.message);
         return NextResponse.json({ error: `Critical System Failure: ${err.message}` }, { status: 500 });
     }
 }
