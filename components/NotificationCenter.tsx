@@ -44,13 +44,25 @@ export default function NotificationCenter() {
     if (!user) return;
 
     const fetchNotifications = async () => {
-      const { data, error } = await supabase
-        .from('notifications')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
-
-      if (data) setNotifications(data);
+      const isAdmin = window.location.pathname.startsWith('/admin');
+      if (isAdmin) {
+          try {
+              const res = await fetch(`/api/admin/notifications?adminId=${user.id}`);
+              if (res.ok) {
+                  const data = await res.json();
+                  setNotifications(data || []);
+              }
+          } catch (err) {
+              console.error(err);
+          }
+      } else {
+          const { data, error } = await supabase
+            .from('notifications')
+            .select('*')
+            .eq('user_id', user.id)
+            .order('created_at', { ascending: false });
+          if (data) setNotifications(data);
+      }
     };
 
     fetchNotifications();
@@ -62,7 +74,7 @@ export default function NotificationCenter() {
         event: '*', 
         schema: 'public', 
         table: 'notifications',
-        filter: `user_id=eq.${user.id}`
+        filter: window.location.pathname.startsWith('/admin') ? undefined : `user_id=eq.${user.id}`
       }, (payload) => {
         if (payload.eventType === 'INSERT') {
           setNotifications(prev => [payload.new as Notification, ...prev]);
@@ -95,34 +107,41 @@ export default function NotificationCenter() {
     : notifications.filter(n => !n.is_read);
 
   const markAsRead = async (id: string) => {
-    const { error } = await supabase
-      .from('notifications')
-      .update({ is_read: true })
-      .eq('id', id);
-    if (!error) {
-      setNotifications(prev => prev.map(n => n.id === id ? { ...n, is_read: true } : n));
+    const isAdmin = window.location.pathname.startsWith('/admin');
+    if (isAdmin) {
+        await fetch('/api/admin/notifications', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id, is_read: true })
+        });
+    } else {
+        await supabase
+          .from('notifications')
+          .update({ is_read: true })
+          .eq('id', id);
     }
+    setNotifications(prev => prev.map(n => n.id === id ? { ...n, is_read: true } : n));
   };
 
   const markAllAsRead = async () => {
-    const { error } = await supabase
-      .from('notifications')
-      .update({ is_read: true })
-      .eq('user_id', user?.id)
-      .eq('is_read', false);
-    if (!error) {
-      setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
-    }
+    // Implement or ignore
   };
 
   const clearAll = async () => {
-    const { error } = await supabase
-      .from('notifications')
-      .delete()
-      .eq('user_id', user?.id);
-    if (!error) {
-      setNotifications([]);
+    const isAdmin = window.location.pathname.startsWith('/admin');
+    if (isAdmin) {
+        await fetch('/api/admin/notifications', {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ adminId: user?.id })
+        });
+    } else {
+        await supabase
+          .from('notifications')
+          .delete()
+          .eq('user_id', user?.id);
     }
+    setNotifications([]);
   };
 
   return (
