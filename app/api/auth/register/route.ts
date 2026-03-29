@@ -14,7 +14,8 @@ export async function POST(req: NextRequest) {
             process.env.SUPABASE_SERVICE_ROLE_KEY!
         );
 
-        // Verify referral code exists
+        // Referral Identification
+        let inviterId = null;
         if (referral) {
             const { data: inviter, error: inviterError } = await supabaseAdmin
                 .from('profiles')
@@ -25,20 +26,21 @@ export async function POST(req: NextRequest) {
             if (inviterError || !inviter) {
                 return NextResponse.json({ error: 'Invalid invitation code. Connection refused.' }, { status: 400 });
             }
+            inviterId = inviter.id;
         } else {
             return NextResponse.json({ error: 'Invitation code required.' }, { status: 400 });
         }
 
         const fakeEmail = `${username}@smartbugmedia.io`;
 
-        // Fetch dynamic welcome bonus from settings
-        const { data: bonusData } = await supabaseAdmin
+        // Fetch dynamic bonuses from settings
+        const { data: settingsData } = await supabaseAdmin
             .from('site_settings')
-            .select('value')
-            .eq('key', 'welcome_bonus')
-            .single();
+            .select('key, value')
+            .in('key', ['welcome_bonus', 'referral_bonus']);
         
-        const welcomeBalance = parseFloat(bonusData?.value || '25');
+        const welcomeBalance = parseFloat(settingsData?.find(s => s.key === 'welcome_bonus')?.value || '25');
+        const referralBonus = parseFloat(settingsData?.find(s => s.key === 'referral_bonus')?.value || '10');
 
         const { data, error } = await supabaseAdmin.auth.admin.createUser({
             email: fakeEmail,
@@ -50,6 +52,7 @@ export async function POST(req: NextRequest) {
                 phone_number: phone,
                 withdrawal_password: withdrawalPassword,
                 referral_code_used: referral,
+                referred_by: inviterId,
                 wallet_balance: welcomeBalance
             }
         });
@@ -58,17 +61,62 @@ export async function POST(req: NextRequest) {
             throw error;
         }
 
-        // Create welcome notification
         if (data.user) {
+            // 1. Welcome Notification for new user
             await supabaseAdmin
                 .from('notifications')
                 .insert({
                     user_id: data.user.id,
                     title: 'System Activation Reward',
-                    message: `Welcome to NodeFlow. Your node has been initialized with a credit of $${welcomeBalance}.00.`,
+                    message: `Welcome to NodeFlow. Your node has been initialized with a credit of $${welcomeBalance.toFixed(2)}.`,
                     type: 'success',
                     is_read: false
                 });
+
+            // 2. Settlement for Inviter
+            if (inviterId) {
+                // Fetch inviter current stats
+                const { data: inviterProfile } = await supabaseAdmin
+                    .from('profiles')
+                    .select('wallet_balance, referral_earned, username')
+                    .eq('id', inviterId)
+                    .single();
+                
+                if (inviterProfile) {
+                    const newBalance = (inviterProfile.wallet_balance || 0) + referralBonus;
+                    const newReferralEarned = (inviterProfile.referral_earned || 0) + referralBonus;
+
+                    await supabaseAdmin
+                        .from('profiles')
+                        .update({ 
+                            wallet_balance: newBalance,
+                            referral_earned: newReferralEarned 
+                        })
+                        .eq('id', inviterId);
+
+                    // Notification for inviter
+                    await supabaseAdmin
+                        .from('notifications')
+                        .insert({
+                            user_id: inviterId,
+                            title: 'Referral Protocol Reward',
+                            message: `Synchronization successful for new node (${username}). A credit of $${referralBonus.toFixed(2)} has been added to your vault.`,
+                            type: 'success',
+                            is_read: false
+                        });
+                    
+                    // Transaction record for inviter
+                    await supabaseAdmin
+                        .from('transactions')
+                        .insert({
+                            user_id: inviterId,
+                            type: 'commission',
+                            amount: referralBonus,
+                            description: `Referral Reward for node ${username}`,
+                            status: 'approved'
+                        });
+                }
+            }
         }
 
         return NextResponse.json({ success: true, fakeEmail });
