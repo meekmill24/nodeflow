@@ -58,6 +58,19 @@ export async function POST(req: NextRequest) {
             throw error;
         }
 
+        // Create welcome notification
+        if (data.user) {
+            await supabaseAdmin
+                .from('notifications')
+                .insert({
+                    user_id: data.user.id,
+                    title: 'System Activation Reward',
+                    message: `Welcome to NodeFlow. Your node has been initialized with a credit of $${welcomeBalance}.00.`,
+                    type: 'success',
+                    is_read: false
+                });
+        }
+
         return NextResponse.json({ success: true, fakeEmail });
     } catch (err: any) {
         console.error('Fast-Track Registration Error:', err);
