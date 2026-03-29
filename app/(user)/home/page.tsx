@@ -133,7 +133,7 @@ export default function HomePage() {
                         <span className="text-[10px] font-black text-white/30 uppercase tracking-[0.4em]">{t('available_balance')}</span>
                     </div>
                     <div className="space-y-1">
-                        <h2 className="text-4xl md:text-5xl font-black text-white tracking-tighter italic uppercase">
+                        <h2 className="text-5xl md:text-6xl font-black text-white tracking-tighter italic uppercase drop-shadow-[0_0_15px_rgba(255,255,255,0.1)]">
                             {format(profile?.wallet_balance || 0)}
                         </h2>
                         <p className="text-[9px] font-black text-white/30 uppercase tracking-[0.2em]">{t('tether_holdings')}</p>
@@ -151,7 +151,7 @@ export default function HomePage() {
                         <span className="text-[10px] font-black text-white/30 uppercase tracking-[0.4em]">{t('today_profit')}</span>
                     </div>
                     <div className="space-y-1">
-                        <h2 className="text-4xl md:text-5xl font-black text-amber-400 tracking-tighter italic uppercase">
+                        <h2 className="text-5xl md:text-6xl font-black text-amber-400 tracking-tighter italic uppercase drop-shadow-[0_0_15px_rgba(251,191,36,0.2)]">
                             {format(profile?.profit || 0)}
                         </h2>
                         <p className="text-[9px] font-black text-white/30 uppercase tracking-[0.2em]">{t('secured_rebates')}</p>
@@ -169,7 +169,7 @@ export default function HomePage() {
                         <span className="text-[10px] font-black text-white/30 uppercase tracking-[0.4em]">{t('referral_bonus')}</span>
                     </div>
                     <div className="space-y-1">
-                        <h2 className="text-4xl md:text-5xl font-black text-indigo-400 tracking-tighter italic uppercase">
+                        <h2 className="text-5xl md:text-6xl font-black text-indigo-400 tracking-tighter italic uppercase drop-shadow-[0_0_15px_rgba(129,140,248,0.2)]">
                             {format(profile?.referral_earned || 0)}
                         </h2>
                         <p className="text-[9px] font-black text-white/30 uppercase tracking-[0.2em]">{t('network_yield')}</p>

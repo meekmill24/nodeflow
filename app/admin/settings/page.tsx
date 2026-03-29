@@ -56,13 +56,13 @@ export default function AdminSettingsPage() {
     setSuccess(false);
   };
 
-  const handleSave = async () => {
+  const handleSave = async (updatedSettings = settings) => {
     setSaving(true);
     try {
       const res = await fetch('/api/admin/site-settings', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ settings })
+        body: JSON.stringify({ settings: updatedSettings })
       });
       
       const data = await res.json();
@@ -98,7 +98,7 @@ export default function AdminSettingsPage() {
         </div>
         <div className="flex items-center gap-4">
             <button 
-              onClick={handleSave} 
+              onClick={() => handleSave()} 
               disabled={saving} 
               className={`
                 flex items-center gap-4 px-10 py-5 rounded-[24px] font-black uppercase tracking-[0.2em] text-[11px] transition-all duration-500
@@ -179,7 +179,12 @@ export default function AdminSettingsPage() {
                     <select 
                       className="w-full bg-black/60 border border-white/5 rounded-2xl px-6 py-4 text-white focus:outline-none focus:ring-2 focus:ring-[#3DD6C8]/20 transition-all font-black uppercase tracking-widest text-[10px] appearance-none cursor-pointer"
                       value={settings.find(s => s.key === 'default_language')?.value || 'en'}
-                      onChange={(e) => handleUpdate('default_language', e.target.value)}
+                      onChange={(e) => {
+                        const newValue = e.target.value;
+                        const updated = settings.map(s => s.key === 'default_language' ? { ...s, value: newValue } : s);
+                        setSettings(updated);
+                        handleSave(updated);
+                      }}
                     >
                       <option value="en">English (US)</option>
                       <option value="es">Español</option>
@@ -224,6 +229,7 @@ export default function AdminSettingsPage() {
                     { key: 'referral_commission_l2', label: 'L2 Growth Yield', icon: Share2, suffix: '%', placeholder: '8' },
                     { key: 'referral_commission_l3', label: 'L3 Growth Yield', icon: Share2, suffix: '%', placeholder: '4' },
                     { key: 'signup_bonus', label: 'Referral Signup Bonus', icon: UserPlus, suffix: 'USD', placeholder: '2' },
+                    { key: 'welcome_bonus', label: 'Initial Node Capital', icon: Wallet, suffix: 'USD', placeholder: '25' },
                 ].map((cfg) => {
                     const item = settings.find(s => s.key === cfg.key);
                     return (
@@ -247,14 +253,39 @@ export default function AdminSettingsPage() {
                     <select 
                       className="w-full bg-black/40 border border-white/5 rounded-[24px] px-6 py-[1.125rem] text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all font-black uppercase tracking-widest text-[10px] appearance-none cursor-pointer"
                       value={settings.find(s => s.key === 'default_currency')?.value || 'USD'}
-                      onChange={(e) => handleUpdate('default_currency', e.target.value)}
+                      onChange={(e) => {
+                        const newValue = e.target.value;
+                        const updated = settings.map(s => s.key === 'default_currency' ? { ...s, value: newValue } : s);
+                        setSettings(updated);
+                        handleSave(updated);
+                      }}
                     >
                       <option value="USD">USD ($)</option>
                       <option value="EUR">EUR (€)</option>
                       <option value="GBP">GBP (£)</option>
                       <option value="JPY">JPY (¥)</option>
-                      <option value="GHC">GHC (GH₵)</option>
+                      <option value="CAD">CAD ($)</option>
+                      <option value="CHF">CHF (Fr)</option>
+                      <option value="AUD">AUD (A$)</option>
+                      <option value="SGD">SGD (S$)</option>
                       <option value="AED">AED (Dh)</option>
+                      <option value="ZAR">ZAR (R)</option>
+                      <option value="BRL">BRL (R$)</option>
+                      <option value="GHC">GHC (GH₵)</option>
+                      <option value="INR">INR (₹)</option>
+                      <option value="CNY">CNY (¥)</option>
+                      <option value="KRW">KRW (₩)</option>
+                      <option value="HKD">HKD (HK$)</option>
+                      <option value="NZD">NZD (NZ$)</option>
+                      <option value="MXN">MXN ($)</option>
+                      <option value="RUB">RUB (₽)</option>
+                      <option value="SAR">SAR (SR)</option>
+                      <option value="TRY">TRY (₺)</option>
+                      <option value="IDR">IDR (Rp)</option>
+                      <option value="MYR">MYR (RM)</option>
+                      <option value="THB">THB (฿)</option>
+                      <option value="PHP">PHP (₱)</option>
+                      <option value="VND">VND (₫)</option>
                       <option value="BTC">BTC (₿)</option>
                     </select>
                 </div>

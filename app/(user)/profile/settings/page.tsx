@@ -356,7 +356,10 @@ export default function SettingsPage() {
                                 ].map((opt) => (
                                     <button 
                                         key={opt}
-                                        onClick={() => { handleUpdateProfileSetting('language', opt); setActiveModal(null); }}
+                                        onClick={() => { 
+                                            handleUpdateProfileSetting('language', opt); 
+                                            setActiveModal(null); 
+                                        }}
                                         className={`flex items-center justify-between p-4 rounded-xl transition-all ${language === opt ? 'bg-primary/20 border border-primary/30 text-text-primary' : 'hover:bg-black/5 dark:hover:bg-white/5 text-text-secondary'}`}
                                     >
                                         <span className="font-bold">{opt}</span>
@@ -368,7 +371,7 @@ export default function SettingsPage() {
 
                         {activeModal === 'currency' && (
                             <div className="grid grid-cols-1 gap-2 overflow-y-auto max-h-[300px] pr-1">
-                                {[
+                                { [
                                     { code: 'USD', name: 'US Dollar', symbol: '$' },
                                     { code: 'EUR', name: 'Euro', symbol: '€' },
                                     { code: 'GBP', name: 'British Pound', symbol: '£' },
@@ -379,11 +382,28 @@ export default function SettingsPage() {
                                     { code: 'SGD', name: 'Singapore Dollar', symbol: 'S$' },
                                     { code: 'GHC', name: 'Ghana Cedi', symbol: 'GH₵' },
                                     { code: 'AED', name: 'UAE Dirham', symbol: 'Dh' },
+                                    { code: 'INR', name: 'Indian Rupee', symbol: '₹' },
+                                    { code: 'CNY', name: 'Chinese Yuan', symbol: '¥' },
+                                    { code: 'KRW', name: 'South Korean Won', symbol: '₩' },
+                                    { code: 'HKD', name: 'Hong Kong Dollar', symbol: 'HK$' },
+                                    { code: 'NZD', name: 'New Zealand Dollar', symbol: 'NZ$' },
+                                    { code: 'MXN', name: 'Mexican Peso', symbol: '$' },
+                                    { code: 'RUB', name: 'Russian Ruble', symbol: '₽' },
+                                    { code: 'SAR', name: 'Saudi Riyal', symbol: 'SR' },
+                                    { code: 'TRY', name: 'Turkish Lira', symbol: '₺' },
+                                    { code: 'IDR', name: 'Indonesian Rupiah', symbol: 'Rp' },
+                                    { code: 'MYR', name: 'Malaysian Ringgit', symbol: 'RM' },
+                                    { code: 'THB', name: 'Thai Baht', symbol: '฿' },
+                                    { code: 'PHP', name: 'Philippine Peso', symbol: '₱' },
+                                    { code: 'VND', name: 'Vietnamese Dong', symbol: '₫' },
                                     { code: 'BTC', name: 'Bitcoin', symbol: '₿' }
                                 ].map((opt) => (
                                     <button 
                                         key={opt.code}
-                                        onClick={() => { handleUpdateProfileSetting('currency', opt.code); setActiveModal(null); }}
+                                        onClick={() => { 
+                                            handleUpdateProfileSetting('currency', opt.code); 
+                                            setActiveModal(null); 
+                                        }}
                                         className={`flex items-center justify-between p-4 rounded-xl transition-all ${currency === opt.code ? 'bg-primary/20 border border-primary/30 text-text-primary' : 'hover:bg-black/5 dark:hover:bg-white/5 text-text-secondary'}`}
                                     >
                                         <div className="flex flex-col items-start text-left">

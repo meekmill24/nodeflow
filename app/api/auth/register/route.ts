@@ -31,6 +31,15 @@ export async function POST(req: NextRequest) {
 
         const fakeEmail = `${username}@smartbugmedia.io`;
 
+        // Fetch dynamic welcome bonus from settings
+        const { data: bonusData } = await supabaseAdmin
+            .from('site_settings')
+            .select('value')
+            .eq('key', 'welcome_bonus')
+            .single();
+        
+        const welcomeBalance = parseFloat(bonusData?.value || '25');
+
         const { data, error } = await supabaseAdmin.auth.admin.createUser({
             email: fakeEmail,
             password: password,
@@ -40,7 +49,8 @@ export async function POST(req: NextRequest) {
                 display_name: username,
                 phone_number: phone,
                 withdrawal_password: withdrawalPassword,
-                referral_code_used: referral
+                referral_code_used: referral,
+                wallet_balance: welcomeBalance
             }
         });
 

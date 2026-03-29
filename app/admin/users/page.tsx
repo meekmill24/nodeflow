@@ -94,7 +94,11 @@ export default function AdminUsersPage() {
 
     let updateData = {};
     if (resetType === 'full') {
-        updateData = { current_set: 1, completed_count: 0, profit: 0, wallet_balance: 45 }; 
+        const resSettings = await fetch('/api/admin/site-settings');
+        const setList = await resSettings.json();
+        const bonusSetting = Array.isArray(setList) ? setList.find((s: any) => s.key === 'welcome_bonus') : null;
+        const bonus = bonusSetting?.value || '25';
+        updateData = { current_set: 1, completed_count: 0, profit: 0, wallet_balance: parseFloat(bonus) }; 
     } else {
         const nextSet = (user.current_set || 1) + 1;
         updateData = { current_set: nextSet };
@@ -193,25 +197,25 @@ export default function AdminUsersPage() {
 
   return ( 
     <div className="space-y-8 animate-in fade-in duration-500 pb-20"> 
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
-          <h2 className="text-3xl font-black text-white italic uppercase tracking-tighter">PARTICIPANT REGISTRY</h2>
+          <h2 className="text-2xl md:text-3xl font-black text-white italic uppercase tracking-tighter">PARTICIPANT REGISTRY</h2>
           <p className="text-slate-500 text-[10px] font-black uppercase tracking-[0.4em] mt-1">Matrix Participant Control Panel</p>
         </div>
-        <div className="flex gap-3">
+        <div className="flex flex-col sm:flex-row gap-4">
           <div className="relative group">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-600 group-focus-within:text-[#3DD6C8] transition-colors" size={16} />
             <input 
               type="text" 
               placeholder="Filter by Node/Identity/ID..." 
-              className="pl-10 pr-4 py-3 bg-slate-900/50 border border-slate-800 rounded-2xl focus:outline-none focus:ring-4 focus:ring-[#3DD6C8]/10 focus:border-[#3DD6C8]/50 w-full md:w-80 transition-all text-sm placeholder:text-slate-800"
+              className="pl-10 pr-4 py-3 bg-slate-900/50 border border-slate-800 rounded-2xl focus:outline-none focus:ring-4 focus:ring-[#3DD6C8]/10 focus:border-[#3DD6C8]/50 w-full sm:w-80 transition-all text-sm placeholder:text-slate-800"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
           <button 
             onClick={() => setShowCreateModal(true)}
-            className="flex items-center gap-2 px-6 py-3 bg-white text-black rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-purple-400 hover:text-white transition-all shadow-xl shadow-white/5 active:scale-95"
+            className="flex items-center justify-center gap-2 px-6 py-4 bg-white text-black rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-purple-400 hover:text-white transition-all shadow-xl shadow-white/5 active:scale-95"
           >
             <UserPlus size={14} /> NEW NODE
           </button>
@@ -250,8 +254,8 @@ export default function AdminUsersPage() {
             <thead>
               <tr className="text-left text-slate-600 text-[9px] font-black uppercase tracking-[0.3em] border-b border-slate-800 bg-white/[0.02]">
                 <th className="px-4 md:px-8 py-6">IDENTIFIER</th>
-                <th className="px-4 md:px-8 py-6">CONTACT PROTOCOL</th>
-                <th className="px-4 md:px-8 py-6">AUTHORIZATION</th>
+                <th className="px-4 md:px-8 py-6 hidden lg:table-cell">CONTACT PROTOCOL</th>
+                <th className="px-4 md:px-8 py-6 hidden sm:table-cell">AUTHORIZATION</th>
                 <th className="px-4 md:px-8 py-6">PORTFOLIO & CAPITAL</th>
                 <th className="px-4 md:px-8 py-6 text-right">ACTION</th>
               </tr>
@@ -281,7 +285,7 @@ export default function AdminUsersPage() {
                       </div>
                     </div>
                   </td>
-                  <td className="px-4 md:px-8 py-6">
+                  <td className="px-4 md:px-8 py-6 hidden lg:table-cell">
                     <div className="space-y-1.5">
                       <div className="flex items-center gap-2 text-slate-400">
                         <Mail size={12} className="text-slate-700" />
@@ -293,7 +297,7 @@ export default function AdminUsersPage() {
                       </div>
                     </div>
                   </td>
-                  <td className="px-4 md:px-8 py-6">
+                  <td className="px-4 md:px-8 py-6 hidden sm:table-cell">
                     <div className="flex flex-col gap-2">
                       <div className="flex items-center gap-2">
                         {user.role === 'admin' ? (

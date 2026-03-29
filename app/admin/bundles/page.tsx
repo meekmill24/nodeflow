@@ -621,11 +621,11 @@ export default function AdminBundlesPage() {
                             <table className="w-full text-sm">
                                 <thead>
                                     <tr className="text-[9px] font-black text-slate-500 uppercase tracking-widest border-b border-slate-800">
-                                        <th className="px-8 py-5 text-left">Agent</th>
-                                        <th className="px-8 py-5 text-center">Hit Index</th>
-                                        <th className="px-8 py-5 text-center">Value</th>
-                                        <th className="px-8 py-5 text-center">Reward</th>
-                                        <th className="px-8 py-5 text-right">Control</th>
+                                        <th className="px-4 md:px-8 py-5 text-left">Agent</th>
+                                        <th className="px-4 md:px-8 py-5 text-center hidden sm:table-cell">Hit Index</th>
+                                        <th className="px-4 md:px-8 py-5 text-center">Value</th>
+                                        <th className="px-4 md:px-8 py-5 text-center">Reward</th>
+                                        <th className="px-4 md:px-8 py-5 text-right">Control</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-slate-800/10">
@@ -639,19 +639,19 @@ export default function AdminBundlesPage() {
                                                 "hover:bg-slate-800/20 transition-colors",
                                                 isAccepted && "bg-indigo-500/5"
                                             )}>
-                                                <td className="px-8 py-5">
-                                                    <span className="font-bold text-white tracking-widest uppercase italic">{u.username}</span>
+                                                <td className="px-4 md:px-8 py-5">
+                                                    <span className="font-bold text-white tracking-widest uppercase italic text-xs md:text-sm">{u.username}</span>
                                                     <div className="flex flex-col gap-0.5 mt-1 border-l border-blue-500/30 pl-2">
-                                                        <div className="text-[9px] text-slate-500 uppercase font-black opacity-60">VIP {u.level_id} PROTOCOL</div>
+                                                        <div className="text-[8px] md:text-[9px] text-slate-500 uppercase font-black opacity-60">VIP {u.level_id}</div>
                                                         <div className={cn(
-                                                            "text-[8px] font-black uppercase tracking-widest",
+                                                            "text-[7px] md:text-[8px] font-black uppercase tracking-widest",
                                                             u.has_pending_task ? "text-green-400" : "text-blue-400"
                                                         )}>
-                                                            {currentProgressNum}/40 {u.has_pending_task ? "IN PROGRESS" : "SYNCED"}
+                                                            {currentProgressNum}/40
                                                         </div>
                                                     </div>
                                                 </td>
-                                                <td className="px-8 py-5 text-center">
+                                                <td className="px-4 md:px-8 py-5 text-center hidden sm:table-cell">
                                                     {isAccepted ? (
                                                         <span className="px-3 py-1 bg-green-500/10 text-green-500 rounded-full text-[9px] font-black italic border border-green-500/20 animate-pulse">
                                                             ACCEPTED
@@ -662,27 +662,27 @@ export default function AdminBundlesPage() {
                                                         </span>
                                                     )}
                                                 </td>
-                                                <td className="px-8 py-5 text-center font-bold text-slate-300">
+                                                <td className="px-4 md:px-8 py-5 text-center font-bold text-slate-300 text-xs md:text-sm">
                                                     ${Number(isAccepted ? u.pending_cost_amount : (b?.totalAmount || 0)).toLocaleString()}
                                                 </td>
-                                                <td className="px-8 py-5 text-center font-black text-green-500 italic">
+                                                <td className="px-4 md:px-8 py-5 text-center font-black text-green-500 italic text-xs md:text-sm">
                                                     +${Number(isAccepted ? u.pending_earned_amount : (b?.bonusAmount || 0)).toLocaleString()}
                                                 </td>
-                                                <td className="px-8 py-5 text-right">
-                                                    <div className="flex justify-end gap-2">
+                                                <td className="px-4 md:px-8 py-5 text-right">
+                                                    <div className="flex justify-end gap-1 md:gap-2">
                                                         {!isAccepted && (
                                                             <button 
                                                                 onClick={() => { setEditingQueueUser(u); setIsEditingQueue(true); }}
-                                                                className="p-2 text-slate-600 hover:text-white transition-colors"
+                                                                className="p-1.5 md:p-2 text-slate-600 hover:text-white transition-colors"
                                                             >
-                                                                <Pencil size={16} />
+                                                                <Pencil size={14} />
                                                             </button>
                                                         )}
                                                         <button 
                                                             onClick={() => handleClearBundle(u.id)}
-                                                            className="p-2 text-slate-600 hover:text-red-400 transition-colors"
+                                                            className="p-1.5 md:p-2 text-slate-600 hover:text-red-400 transition-colors"
                                                         >
-                                                            <Trash2 size={16} />
+                                                            <Trash2 size={14} />
                                                         </button>
                                                     </div>
                                                 </td>

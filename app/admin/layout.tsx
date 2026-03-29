@@ -36,15 +36,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     if (!loading) {
       // Check if user is already on the login page
       if (pathname === '/admin/login') {
-        // If they are already authenticated as an admin, redirect them out of the login page
-        if (user && (profile?.role === 'admin' || profile?.is_admin)) {
+        if (user && profile?.role === 'admin') {
           router.replace('/admin');
         }
         return;
       }
 
       // Normal protection for /admin/* pages:
-      if (!user || !profile || (profile.role !== 'admin' && !profile.is_admin)) {
+      if (!user || !profile || profile.role !== 'admin') {
         router.push('/admin/login');
       }
     }
@@ -64,7 +63,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           console.error("Dashboard Status Sync Failure:", err);
       }
     };
-    if (user && (profile?.role === 'admin' || profile?.is_admin) && pathname !== '/admin/login') fetchPending();
+    if (user && profile?.role === 'admin' && pathname !== '/admin/login') fetchPending();
   }, [user, profile, pathname]);
 
   // Do not render layout shell on the login page
@@ -86,7 +85,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     );
   }
   
-  if (!user || !profile || (profile.role !== 'admin' && !profile.is_admin)) return null; 
+  if (!user || !profile || profile.role !== 'admin') return null; 
 
   const totalPending = pendingCounts.deposits + pendingCounts.withdrawals;
 
@@ -95,7 +94,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       {/* Mobile Menu Toggle */}
       <button 
         onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-        className="lg:hidden fixed top-[76px] left-6 z-50 p-3 backdrop-blur-md rounded-2xl shadow-2xl border transition-all duration-300 hover:scale-110 active:scale-95 text-white"
+        className="lg:hidden fixed top-6 left-6 z-[60] p-3 backdrop-blur-md rounded-2xl shadow-2xl border transition-all duration-300 hover:scale-110 active:scale-95 text-white"
         style={{background:'rgba(61,214,200,0.9)', border:'1px solid rgba(61,214,200,0.3)'}}
       >
         {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
@@ -178,9 +177,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col lg:ml-64 relative z-10 min-h-screen"> 
-        <header className="p-6 md:p-8 flex items-center justify-between lg:justify-end border-b backdrop-blur-md sticky top-0 z-30" style={{borderColor:'rgba(61,214,200,0.1)', background:'rgba(15,15,35,0.6)'}}>
-          <div className="lg:hidden flex items-center gap-2">
+      <main className="flex-1 flex flex-col lg:ml-64 relative z-10 min-w-0 min-h-screen"> 
+        <header className="p-4 md:p-8 flex items-center justify-between lg:justify-end border-b backdrop-blur-md sticky top-0 z-30" style={{borderColor:'rgba(61,214,200,0.1)', background:'rgba(15,15,35,0.6)'}}>
+          <div className="lg:hidden flex items-center gap-2 pl-14">
             <div className="w-8 h-8 rounded-xl bg-slate-900 border border-[#3DD6C8]/20 flex items-center justify-center p-1.5 overflow-hidden">
                <img src="/logo.png" alt="Logo" className="w-full h-full object-contain" />
             </div>
@@ -205,8 +204,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </div>
         </header>
 
-        <div className="p-6 md:p-8 flex-1 overflow-auto" style={{background:'radial-gradient(circle at top right, rgba(61,214,200,0.04), transparent)'}}> 
-          <div className="max-w-[1600px] mx-auto"> 
+        <div className="p-4 md:p-8 flex-1 overflow-x-hidden" style={{background:'radial-gradient(circle at top right, rgba(61,214,200,0.04), transparent)'}}> 
+          <div className="max-w-[1600px] mx-auto w-full"> 
             <AnimatePage key={pathname}>{children}</AnimatePage> 
           </div> 
         </div> 

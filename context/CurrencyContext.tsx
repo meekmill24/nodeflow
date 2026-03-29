@@ -5,7 +5,7 @@ import { useAuth } from './AuthContext';
 import { useSiteSettings } from './SettingsContext';
 import { supabase } from '@/lib/supabase/index';
 
-export type CurrencyCode = 'USD' | 'EUR' | 'GBP' | 'JPY' | 'CAD' | 'CHF' | 'AUD' | 'SGD' | 'AED' | 'ZAR' | 'BRL' | 'GHC' | 'BTC';
+export type CurrencyCode = 'USD' | 'EUR' | 'GBP' | 'JPY' | 'CAD' | 'CHF' | 'AUD' | 'SGD' | 'AED' | 'ZAR' | 'BRL' | 'GHC' | 'BTC' | 'INR' | 'CNY' | 'KRW' | 'HKD' | 'NZD' | 'MXN' | 'RUB' | 'SAR' | 'TRY' | 'IDR' | 'MYR' | 'THB' | 'PHP' | 'VND';
 
 interface Currency {
     code: CurrencyCode;
@@ -26,7 +26,21 @@ const currencies: Record<CurrencyCode, Currency> = {
     ZAR: { code: 'ZAR', symbol: 'R', rate: 19.05 },
     BRL: { code: 'BRL', symbol: 'R$', rate: 4.97 },
     GHC: { code: 'GHC', symbol: 'GH₵', rate: 12.85 },
-    BTC: { code: 'BTC', symbol: '₿', rate: 0.000015 }, // Example rate
+    BTC: { code: 'BTC', symbol: '₿', rate: 0.000015 },
+    INR: { code: 'INR', symbol: '₹', rate: 82.95 },
+    CNY: { code: 'CNY', symbol: '¥', rate: 7.19 },
+    KRW: { code: 'KRW', symbol: '₩', rate: 1335.5 },
+    HKD: { code: 'HKD', symbol: 'HK$', rate: 7.82 },
+    NZD: { code: 'NZD', symbol: 'NZ$', rate: 1.62 },
+    MXN: { code: 'MXN', symbol: '$', rate: 17.05 },
+    RUB: { code: 'RUB', symbol: '₽', rate: 92.5 },
+    SAR: { code: 'SAR', symbol: 'SR', rate: 3.75 },
+    TRY: { code: 'TRY', symbol: '₺', rate: 31.05 },
+    IDR: { code: 'IDR', symbol: 'Rp', rate: 15650 },
+    MYR: { code: 'MYR', symbol: 'RM', rate: 4.75 },
+    THB: { code: 'THB', symbol: '฿', rate: 35.85 },
+    PHP: { code: 'PHP', symbol: '₱', rate: 56.05 },
+    VND: { code: 'VND', symbol: '₫', rate: 24650 },
 };
 
 interface CurrencyContextType {

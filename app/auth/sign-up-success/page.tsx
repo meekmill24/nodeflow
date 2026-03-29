@@ -5,7 +5,25 @@ import NextImage from 'next/image'
 import { CheckCircle2, ArrowRight } from 'lucide-react'
 import Link from 'next/link'
 
+import { useRouter } from 'next/navigation'
+import { useState, useEffect } from 'react'
+
 export default function SignUpSuccess() {
+  const [welcomeBonus, setWelcomeBonus] = useState<string | null>(null)
+
+  useEffect(() => {
+    // Fetch welcome bonus for display
+    fetch('/api/admin/site-settings')
+        .then(res => res.json())
+        .then(data => {
+            if (Array.isArray(data)) {
+                const bonus = data.find((s: any) => s.key === 'welcome_bonus')?.value;
+                if (bonus) setWelcomeBonus(bonus);
+            }
+        })
+        .catch(() => {});
+  }, [])
+
   return (
     <div className="relative min-h-screen w-full flex items-center justify-center overflow-hidden bg-[#fafafa]">
       {/* Background patterns */}
@@ -28,8 +46,13 @@ export default function SignUpSuccess() {
           Ready to Start?
         </h1>
         
-        <p className='mb-10 text-lg text-slate-500 font-medium leading-relaxed'>
+        <p className='mb-10 text-lg text-slate-500 font-medium leading-relaxed italic'>
           Your account is verified. Welcome to the elite community of asset growth and protocol optimization.
+          {welcomeBonus && (
+            <span className="block mt-4 text-[#3DD6C8] font-black uppercase tracking-widest text-sm drop-shadow-sm">
+              Node Initialized: ${welcomeBonus} Welcome Balance Credited
+            </span>
+          )}
         </p>
         
         <Link href='/auth/login' className='w-full'>
