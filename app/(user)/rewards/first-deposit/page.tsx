@@ -6,7 +6,12 @@ import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/context/LanguageContext';
 import { useCurrency } from '@/context/CurrencyContext';
 
-const REWARDS = [
+import { useState, useEffect } from 'react';
+import { supabase } from '@/lib/supabase/index';
+import { useAuth } from '@/context/AuthContext';
+import { toast } from 'sonner';
+
+const DEFAULT_REWARDS = [
     { amount: 100, receive: 10 },
     { amount: 500, receive: 50 },
     { amount: 1000, receive: 120 },
@@ -17,8 +22,64 @@ const REWARDS = [
 
 export default function FirstDepositRewardPage() {
     const router = useRouter();
-    const { t } = useLanguage();
+    const { profile } = useAuth();
     const { format } = useCurrency();
+    const [rewards, setRewards] = useState(DEFAULT_REWARDS);
+    const [isClaiming, setIsClaiming] = useState(false);
+
+    useEffect(() => {
+        const fetchSettings = async () => {
+            const { data } = await supabase.from('site_settings').select('key, value');
+            if (data) {
+                const dynamicRewards = [];
+                for (let i = 1; i <= 6; i++) {
+                    const setting = data.find(s => s.key === `reward_tier_${i}`);
+                    if (setting?.value && setting.value.includes('/')) {
+                        const [amount, receive] = setting.value.split('/').map(v => parseFloat(v));
+                        if (!isNaN(amount) && !isNaN(receive)) {
+                            dynamicRewards.push({ amount, receive });
+                        }
+                    }
+                }
+                if (dynamicRewards.length > 0) setRewards(dynamicRewards);
+            }
+        };
+        fetchSettings();
+    }, []);
+
+    const handleClaim = async (tier: any) => {
+        if (!profile?.id) {
+            toast.error('Authentication required to ping concierge.');
+            return;
+        }
+        setIsClaiming(true);
+        try {
+            // Fetch admins for notification
+            const { data: admins } = await supabase.from('profiles').select('id').eq('role', 'admin');
+            
+            if (admins && admins.length > 0) {
+                const notifications = admins.map(admin => ({
+                    user_id: admin.id,
+                    title: 'Reward Settlement Required',
+                    message: `User ${profile.username} (ID: ${profile.id.substring(0,6)}) is requesting manual verification for Tier Reward ($${tier.receive}).`,
+                    type: 'warning',
+                    is_read: false
+                }));
+
+                const { error } = await supabase.from('notifications').insert(notifications);
+                if (error) throw error;
+                
+                toast.success('Pinging Concierge Desk... Verification in progress.');
+            } else {
+                toast.error('No administrative nodes active. Use Live Chat.');
+            }
+        } catch (err) {
+            console.error('Claim Error:', err);
+            toast.error('Sync failed. Please use Live Chat.');
+        } finally {
+            setIsClaiming(false);
+        }
+    };
 
     return (
         <div className="max-w-4xl mx-auto pb-20 animate-slide-up">
@@ -63,8 +124,8 @@ export default function FirstDepositRewardPage() {
                 </div>
 
                 <div className="divide-y divide-white/5">
-                    {REWARDS.map((reward, idx) => (
-                        <div key={idx} className="grid grid-cols-3 px-8 py-6 items-center hover:bg-white/[0.02] transition-colors">
+                    {rewards.map((reward, idx) => (
+                        <div key={idx} className="grid grid-cols-3 px-8 py-6 items-center hover:bg-white/[0.02] transition-colors group/row">
                             <div className="flex items-center gap-3">
                                 <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
                                     <Zap size={14} className="text-primary-light" />
@@ -80,9 +141,13 @@ export default function FirstDepositRewardPage() {
                                 <div className="text-lg font-black text-success-light flex items-center gap-1.5 drop-shadow-glow-success">
                                     +${format(reward.receive)}
                                 </div>
-                                <div className="text-[9px] font-black text-success uppercase tracking-widest opacity-60">
-                                    Instant Credit
-                                </div>
+                                <button 
+                                    onClick={() => handleClaim(reward)}
+                                    disabled={isClaiming}
+                                    className="mt-2 px-3 py-1 rounded-full bg-[#3DD6C8]/10 border border-[#3DD6C8]/20 text-[8px] font-black text-[#3DD6C8] uppercase tracking-widest opacity-0 group-hover/row:opacity-100 hover:bg-[#3DD6C8] hover:text-[#0F172A] transition-all disabled:opacity-30"
+                                >
+                                    {isClaiming ? 'Pinging...' : 'Claim Now'}
+                                </button>
                             </div>
                         </div>
                     ))}

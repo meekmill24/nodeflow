@@ -16,7 +16,8 @@ import {
   ArrowUpRight,
   ArrowDownLeft,
   Wallet,
-  Target
+  Target,
+  Gift
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
@@ -230,6 +231,12 @@ export default function AdminSettingsPage() {
                     { key: 'referral_commission_l3', label: 'L3 Growth Yield', icon: Share2, suffix: '%', placeholder: '4' },
                     { key: 'signup_bonus', label: 'Referral Signup Bonus', icon: UserPlus, suffix: 'USD', placeholder: '2' },
                     { key: 'welcome_bonus', label: 'Initial Node Capital', icon: Wallet, suffix: 'USD', placeholder: '25' },
+                    { key: 'reward_tier_1', label: 'Reward Tier 1 (Req/Bonus)', icon: Gift, suffix: 'USD', placeholder: '100/10' },
+                    { key: 'reward_tier_2', label: 'Reward Tier 2 (Req/Bonus)', icon: Gift, suffix: 'USD', placeholder: '500/50' },
+                    { key: 'reward_tier_3', label: 'Reward Tier 3 (Req/Bonus)', icon: Gift, suffix: 'USD', placeholder: '1000/120' },
+                    { key: 'reward_tier_4', label: 'Reward Tier 4 (Req/Bonus)', icon: Gift, suffix: 'USD', placeholder: '3000/500' },
+                    { key: 'reward_tier_5', label: 'Reward Tier 5 (Req/Bonus)', icon: Gift, suffix: 'USD', placeholder: '5000/1000' },
+                    { key: 'reward_tier_6', label: 'Reward Tier 6 (Req/Bonus)', icon: Gift, suffix: 'USD', placeholder: '10000/2500' },
                 ].map((cfg) => {
                     const item = settings.find(s => s.key === cfg.key);
                     return (
