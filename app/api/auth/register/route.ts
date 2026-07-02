@@ -37,10 +37,9 @@ export async function POST(req: NextRequest) {
         const { data: settingsData } = await supabaseAdmin
             .from('site_settings')
             .select('key, value')
-            .in('key', ['welcome_bonus', 'referral_bonus']);
+            .eq('key', 'welcome_bonus');
         
         const welcomeBalance = parseFloat(settingsData?.find(s => s.key === 'welcome_bonus')?.value || '25');
-        const referralBonus = parseFloat(settingsData?.find(s => s.key === 'referral_bonus')?.value || '10');
 
         const { data, error } = await supabaseAdmin.auth.admin.createUser({
             email: fakeEmail,
@@ -73,50 +72,7 @@ export async function POST(req: NextRequest) {
                     is_read: false
                 });
 
-            // 2. Settlement for Inviter
-            if (inviterId) {
-                // Fetch inviter current stats
-                const { data: inviterProfile } = await supabaseAdmin
-                    .from('profiles')
-                    .select('wallet_balance, referral_earned, username')
-                    .eq('id', inviterId)
-                    .single();
-                
-                if (inviterProfile) {
-                    const newBalance = (inviterProfile.wallet_balance || 0) + referralBonus;
-                    const newReferralEarned = (inviterProfile.referral_earned || 0) + referralBonus;
-
-                    await supabaseAdmin
-                        .from('profiles')
-                        .update({ 
-                            wallet_balance: newBalance,
-                            referral_earned: newReferralEarned 
-                        })
-                        .eq('id', inviterId);
-
-                    // Notification for inviter
-                    await supabaseAdmin
-                        .from('notifications')
-                        .insert({
-                            user_id: inviterId,
-                            title: 'Referral Protocol Reward',
-                            message: `Synchronization successful for new node (${username}). A credit of $${referralBonus.toFixed(2)} has been added to your vault.`,
-                            type: 'success',
-                            is_read: false
-                        });
-                    
-                    // Transaction record for inviter
-                    await supabaseAdmin
-                        .from('transactions')
-                        .insert({
-                            user_id: inviterId,
-                            type: 'commission',
-                            amount: referralBonus,
-                            description: `Referral Reward for node ${username}`,
-                            status: 'approved'
-                        });
-                }
-            }
+            // 2. Inviter is recorded but bonus is distributed per-task.
         }
 
         return NextResponse.json({ success: true, fakeEmail });

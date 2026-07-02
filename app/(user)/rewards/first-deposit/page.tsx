@@ -35,7 +35,7 @@ export default function FirstDepositRewardPage() {
                 for (let i = 1; i <= 6; i++) {
                     const setting = data.find(s => s.key === `reward_tier_${i}`);
                     if (setting?.value && setting.value.includes('/')) {
-                        const [amount, receive] = setting.value.split('/').map(v => parseFloat(v));
+                        const [amount, receive] = setting.value.split('/').map((v: string) => parseFloat(v));
                         if (!isNaN(amount) && !isNaN(receive)) {
                             dynamicRewards.push({ amount, receive });
                         }

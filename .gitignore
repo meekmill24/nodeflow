@@ -27,3 +27,6 @@ node_modules/
 *.zip
 simple-money-unzipped/
 simple-money-temp-*/
+# Scratch
+scratch/
+

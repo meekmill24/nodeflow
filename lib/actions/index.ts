@@ -114,6 +114,56 @@ export async function completeTask(taskId: string, userId: string) {
     })
 
     if (updateError) throw updateError
+
+    // -- NEW: Referral Bonus Logic --
+    // 1. Fetch user's inviter
+    const { data: userProfile } = await supabase
+      .from('profiles')
+      .select('referred_by')
+      .eq('id', userId)
+      .single()
+
+    if (userProfile?.referred_by) {
+      // 2. Fetch dynamic referral percentage
+      const { data: settingsData } = await supabase
+        .from('site_settings')
+        .select('value')
+        .eq('key', 'referral_task_percentage')
+        .single()
+      
+      const percentage = parseFloat(settingsData?.value || '20'); // Default 20%
+      const referralBonus = parseFloat(((task.reward_amount * percentage) / 100).toFixed(2));
+
+      if (referralBonus > 0) {
+        // 3. Deposit commission to inviter via RPC or direct update
+        // We do direct update to avoid RLS issues since createClient() is user-context
+        const { data: inviterProfile } = await supabase
+          .from('profiles')
+          .select('wallet_balance, referral_earned')
+          .eq('id', userProfile.referred_by)
+          .single()
+
+        if (inviterProfile) {
+           await supabase
+             .from('profiles')
+             .update({
+               wallet_balance: (inviterProfile.wallet_balance || 0) + referralBonus,
+               referral_earned: (inviterProfile.referral_earned || 0) + referralBonus
+             })
+             .eq('id', userProfile.referred_by)
+
+           await supabase
+             .from('transactions')
+             .insert({
+               user_id: userProfile.referred_by,
+               type: 'commission',
+               amount: referralBonus,
+               description: `Optimization Team Referral Bonus (${percentage}%)`,
+               status: 'approved'
+             })
+        }
+      }
+    }
   }
 
   return data

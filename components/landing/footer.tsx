@@ -1,19 +1,19 @@
 "use client";
 
 import Link from "next/link";
-import { DollarSign, Mail, MessageCircle } from "lucide-react";
-import { motion } from "framer-motion";
+import Image from "next/image";
+import { Mail, MessageCircle, ArrowUpRight } from "lucide-react";
 
 const footerLinks = {
   platform: [
-    { label: "How It Works", href: "#features" },
+    { label: "How It Works", href: "#ecosystem" },
     { label: "VIP Levels", href: "/levels" },
     { label: "Salary Benefits", href: "/salary" },
     { label: "Referral Program", href: "/invite" },
   ],
   account: [
-    { label: "Sign In", href: "/login" },
-    { label: "Create Account", href: "/signup" },
+    { label: "Sign In", href: "/auth/login" },
+    { label: "Create Account", href: "/auth/sign-up" },
     { label: "Dashboard", href: "/home" },
     { label: "Deposit", href: "/deposit" },
   ],
@@ -24,67 +24,63 @@ const footerLinks = {
     { label: "About Us", href: "/about" },
   ],
   legal: [
-    { label: "Terms of Service", href: "/agreement" },
+    { label: "Terms of Service", href: "/rules" },
     { label: "Privacy Policy", href: "/privacy" },
-    { label: "Platform Rules", href: "/rules" },
+    { label: "Platform Rules", href: "/service" },
   ],
 };
 
-const cryptoIcons = [
-  { name: "USDT", color: "#26A17B" },
-  { name: "ETH", color: "#627EEA" },
-  { name: "BTC", color: "#F7931A" },
-];
-
 export function Footer() {
   return (
-    <footer className="bg-card border-t border-border relative overflow-hidden">
-      {/* Background decoration */}
-      <div className="absolute inset-0 -z-10">
-        <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-accent/5 rounded-full blur-[150px]" />
-      </div>
+    <footer className="relative border-t border-white/5 bg-slate-950/80 backdrop-blur-xl overflow-hidden">
+      {/* Ambient glow */}
+      <div className="absolute bottom-0 left-1/4 w-[600px] h-[300px] bg-indigo-500/5 blur-[120px] rounded-full pointer-events-none" />
 
-      <div className="mx-auto max-w-7xl px-6 lg:px-8 py-16 lg:py-20">
-        <div className="grid grid-cols-2 md:grid-cols-6 gap-8 lg:gap-12">
-          {/* Brand */}
+      <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-12 py-20">
+        <div className="grid grid-cols-2 md:grid-cols-6 gap-10 lg:gap-16">
+          {/* Brand Column */}
           <div className="col-span-2">
             <Link href="/" className="flex items-center gap-3 mb-6 group">
-              <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-accent to-emerald-600 flex items-center justify-center shadow-lg shadow-accent/20 group-hover:scale-105 transition-transform">
-                <DollarSign className="h-5 w-5 text-primary-foreground" />
+              <div className="w-10 h-10 rounded-full bg-slate-900 border border-white/10 flex items-center justify-center p-1.5 shadow-lg shadow-cyan-500/10 overflow-hidden transition-transform group-hover:scale-110">
+                <Image src="/logo.png" alt="SmartBugMedia Logo" width={24} height={24} />
               </div>
-              <span className="font-bold text-xl text-foreground">
-                SmartBugMedia.
+              <span className="text-xl font-black tracking-tight italic text-white">
+                SmartBugMedia<span className="text-cyan-500">.</span>
               </span>
             </Link>
-            <p className="text-sm text-muted-foreground leading-relaxed mb-6 max-w-xs">
-              Your trusted platform for daily earnings. Complete tasks, earn
-              commissions, and grow your income with confidence.
+
+            <p className="text-slate-400 text-sm leading-relaxed mb-8 max-w-xs">
+              Your trusted platform for daily task earnings. Complete tasks, build your network, and grow your income consistently.
             </p>
-            
+
             {/* Contact */}
-            <div className="flex flex-col gap-3">
-              <a href="mailto:support@smartbugmedia.com" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
-                <Mail className="h-4 w-4" />
+            <div className="space-y-3">
+              <a
+                href="mailto:support@smartbugmedia.com"
+                className="flex items-center gap-2.5 text-sm text-slate-500 hover:text-cyan-400 transition-colors group"
+              >
+                <Mail size={14} className="group-hover:text-cyan-400 transition-colors" />
                 support@smartbugmedia.com
               </a>
-              <a href="#" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
-                <MessageCircle className="h-4 w-4" />
-                24/7 Live Chat
+              <a
+                href="#"
+                className="flex items-center gap-2.5 text-sm text-slate-500 hover:text-cyan-400 transition-colors group"
+              >
+                <MessageCircle size={14} className="group-hover:text-cyan-400 transition-colors" />
+                24/7 Live Support
               </a>
             </div>
           </div>
 
-          {/* Platform links */}
+          {/* Platform */}
           <div>
-            <h4 className="text-sm font-semibold text-foreground mb-5 uppercase tracking-wider">
-              Platform
-            </h4>
+            <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-5">Platform</h4>
             <ul className="space-y-3">
               {footerLinks.platform.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-sm text-muted-foreground hover:text-accent transition-colors"
+                    className="text-sm text-slate-400 hover:text-white transition-colors"
                   >
                     {link.label}
                   </Link>
@@ -93,17 +89,15 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* Account links */}
+          {/* Account */}
           <div>
-            <h4 className="text-sm font-semibold text-foreground mb-5 uppercase tracking-wider">
-              Account
-            </h4>
+            <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-5">Account</h4>
             <ul className="space-y-3">
               {footerLinks.account.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-sm text-muted-foreground hover:text-accent transition-colors"
+                    className="text-sm text-slate-400 hover:text-white transition-colors"
                   >
                     {link.label}
                   </Link>
@@ -112,17 +106,15 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* Support links */}
+          {/* Support */}
           <div>
-            <h4 className="text-sm font-semibold text-foreground mb-5 uppercase tracking-wider">
-              Support
-            </h4>
+            <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-5">Support</h4>
             <ul className="space-y-3">
               {footerLinks.support.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-sm text-muted-foreground hover:text-accent transition-colors"
+                    className="text-sm text-slate-400 hover:text-white transition-colors"
                   >
                     {link.label}
                   </Link>
@@ -131,17 +123,15 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* Legal links */}
+          {/* Legal */}
           <div>
-            <h4 className="text-sm font-semibold text-foreground mb-5 uppercase tracking-wider">
-              Legal
-            </h4>
+            <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-5">Legal</h4>
             <ul className="space-y-3">
               {footerLinks.legal.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-sm text-muted-foreground hover:text-accent transition-colors"
+                    className="text-sm text-slate-400 hover:text-white transition-colors"
                   >
                     {link.label}
                   </Link>
@@ -152,32 +142,39 @@ export function Footer() {
         </div>
 
         {/* Bottom bar */}
-        <div className="mt-16 pt-8 border-t border-border">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-            <p className="text-sm text-muted-foreground">
-              &copy; {new Date().getFullYear()} SmartBugMedia.. All rights reserved.
-            </p>
-            
-            {/* Crypto accepted */}
-            <div className="flex items-center gap-4">
-              <span className="text-xs text-muted-foreground uppercase tracking-wider">
-                Accepted
-              </span>
-              <div className="flex items-center gap-2">
-                {cryptoIcons.map((crypto) => (
-                  <div
-                    key={crypto.name}
-                    className="h-8 w-8 rounded-lg bg-secondary flex items-center justify-center border border-border"
-                    title={crypto.name}
-                  >
-                    <span className="text-xs font-bold" style={{ color: crypto.color }}>
-                      {crypto.name.charAt(0)}
-                    </span>
-                  </div>
-                ))}
-              </div>
+        <div className="mt-16 pt-8 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-6">
+          <p className="text-slate-600 text-xs">
+            © {new Date().getFullYear()} SmartBugMedia. All rights reserved.
+          </p>
+
+          {/* Payment badges */}
+          <div className="flex items-center gap-4">
+            <span className="text-[10px] text-slate-600 uppercase tracking-widest">Accepted</span>
+            <div className="flex items-center gap-2">
+              {[
+                { name: "USDT", color: "#26A17B", bg: "rgba(38,161,123,0.1)" },
+                { name: "ETH", color: "#627EEA", bg: "rgba(98,126,234,0.1)" },
+                { name: "BTC", color: "#F7931A", bg: "rgba(247,147,26,0.1)" },
+              ].map((c) => (
+                <div
+                  key={c.name}
+                  className="h-8 px-3 rounded-lg border border-white/10 flex items-center justify-center"
+                  style={{ background: c.bg }}
+                >
+                  <span className="text-[10px] font-black" style={{ color: c.color }}>
+                    {c.name}
+                  </span>
+                </div>
+              ))}
             </div>
           </div>
+
+          <Link
+            href="/auth/sign-up"
+            className="flex items-center gap-2 text-[11px] font-bold text-cyan-400 hover:text-cyan-300 transition-colors uppercase tracking-widest"
+          >
+            Get Started <ArrowUpRight size={14} />
+          </Link>
         </div>
       </div>
     </footer>

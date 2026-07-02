@@ -46,7 +46,7 @@ export function StatCard({
           <p className='text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 italic'>{label}</p>
           <p className='text-3xl font-black text-white italic tracking-tighter'>{value}</p>
         </div>
-        <div className={`w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center border border-white/5 group-hover:border-white/10 transition-all ${iconColors[variant]}`}>
+        <div className={`w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center border border-white/5 group-hover:border-white/10 transition-all ${textColors[variant]}`}>
           <Icon className='w-7 h-7' />
         </div>
       </div>

@@ -785,7 +785,7 @@ export default function AdminTasksPage() {
                                     <div className="space-y-2 relative">
                                         <label className="text-[11px] font-black text-slate-500 uppercase tracking-widest ml-1">VIP Tier</label>
                                         <div className="relative">
-                                            <select className="w-full bg-slate-950 border border-white/10 rounded-2xl px-6 py-4 text-white hover:border-[#3DD6C8]/30 transition-all cursor-pointer font-bold appearance-none" value={editData.level_id} onChange={e => setEditData({ ...editData, level_id: parseInt(e.target.value) })}>
+                                            <select className="w-full bg-slate-950 border border-white/10 rounded-2xl px-6 py-4 text-white hover:border-[#3DD6C8]/30 transition-all cursor-pointer font-bold appearance-none" value={editData.level_id ?? ''} onChange={e => setEditData({ ...editData, level_id: parseInt(e.target.value) })}>
                                                 {levels.map(l => <option key={l.id} value={l.id}>VIP LEVEL {l.id} - ${l.price}</option>)}
                                             </select>
                                             <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none" size={16} />
