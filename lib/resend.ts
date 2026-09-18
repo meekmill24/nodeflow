@@ -5,7 +5,10 @@ export const resend = new Resend(process.env.RESEND_API_KEY);
 export const sendEmail = async ({ to, subject, html }: { to: string | string[], subject: string, html: string }) => {
   try {
     const { data, error } = await resend.emails.send({
-      from: 'SmartBugMedia <notifications@smartbugmedia.io>', // You'll need to verify your domain on Resend
+      // NOTE: smartbugmedia.io domain not yet verified on Resend.
+      // Once verified at https://resend.com/domains, change to:
+      // 'SmartBugMedia <notifications@smartbugmedia.io>'
+      from: 'SmartBugMedia <onboarding@resend.dev>',
       to,
       subject,
       html,

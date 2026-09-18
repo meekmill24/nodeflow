@@ -15,7 +15,9 @@ import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useState, useEffect, Suspense } from 'react'
 import NextImage from 'next/image'
-import { ArrowRight, Sparkles, User, Mail, Lock, UserCheck, ShieldCheck, Share2, Phone, AtSign } from 'lucide-react'
+import { ArrowRight, Sparkles, User, Mail, Lock, UserCheck, ShieldCheck, Share2, Phone, AtSign, AlertCircle } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { cn } from '@/lib/utils'
 
 function SignUpForm() {
     const searchParams = useSearchParams()
@@ -42,8 +44,9 @@ function SignUpForm() {
         }
     }, [searchParams])
  
-    const handleNextStep = (e: React.FormEvent) => {
+    const handleNextStep = async (e: React.FormEvent) => {
         e.preventDefault()
+        setError(null)
         if (password !== repeatPassword) {
             setError('Passwords do not match')
             return
@@ -52,6 +55,40 @@ function SignUpForm() {
             setError('Password must be at least 6 characters')
             return
         }
+
+        // If email is empty (fast-track username sign up), referral code is mandatory
+        if (!email.trim()) {
+            if (!referral.trim()) {
+                setError('Invitation code is required for username-based fast-track registration.')
+                return
+            }
+        }
+
+        // Validate invitation code against profiles table if entered
+        if (referral.trim()) {
+            setIsLoading(true)
+            try {
+                const supabase = createClient()
+                const { data: inviter, error: inviterError } = await supabase
+                    .from('profiles')
+                    .select('id')
+                    .eq('referral_code', referral.trim().toUpperCase())
+                    .maybeSingle()
+
+                if (inviterError) {
+                    console.error('Error verifying referral code:', inviterError)
+                } else if (!inviter) {
+                    setError('Invalid invitation code. Connection refused.')
+                    setIsLoading(false)
+                    return
+                }
+            } catch (err) {
+                console.error('Referral check error:', err)
+            } finally {
+                setIsLoading(false)
+            }
+        }
+
         setError(null)
         setStep(2)
     }
@@ -61,6 +98,32 @@ function SignUpForm() {
         const supabase = createClient()
         setIsLoading(true)
         setError(null)
+
+        if (!username.trim()) {
+            setError('Username is required')
+            setIsLoading(false)
+            return
+        }
+        if (!phone.trim()) {
+            setError('Phone number is required')
+            setIsLoading(false)
+            return
+        }
+        if (!withdrawalPassword) {
+            setError('Withdrawal PIN is required')
+            setIsLoading(false)
+            return
+        }
+        if (withdrawalPassword.length !== 6 || !/^\d+$/.test(withdrawalPassword)) {
+            setError('Withdrawal PIN must be exactly 6 digits')
+            setIsLoading(false)
+            return
+        }
+        if (withdrawalPassword !== confirmWithdrawalPassword) {
+            setError('Withdrawal PINs do not match')
+            setIsLoading(false)
+            return
+        }
 
         try {
             if (!email) {
@@ -151,134 +214,244 @@ function SignUpForm() {
                                 {step === 1 ? 'Configure your access credentials' : 'Tell us a bit about yourself'}
                             </CardDescription>
                         </CardHeader>
-                        <CardContent className="pb-8">
-                            {step === 1 ? (
-                                <form onSubmit={handleNextStep} className="space-y-5">
-                                    <div className="space-y-4">
-                                        <Label htmlFor="email" className="text-xs font-bold uppercase tracking-wider text-slate-500 ml-1">Email Address (Optional)</Label>
-                                        <div className="relative">
-                                            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                                            <Input
-                                                id="email"
-                                                type="email"
-                                                placeholder="your@email.com"
-                                                value={email}
-                                                onChange={(e) => setEmail(e.target.value)}
-                                                className="pl-10 h-11 bg-white/50 border-white/50 focus:border-[#007CBA] transition-all rounded-xl text-slate-900 placeholder:text-slate-400"
-                                            />
-                                        </div>
-                                    
-                                        <div className="grid gap-2">
-                                            <Label htmlFor="password" title="password-label" className="text-xs font-bold uppercase tracking-wider text-slate-500 ml-1">Password</Label>
-                                            <div className="relative">
-                                                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                                                <Input
-                                                    id="password"
-                                                    type="password"
-                                                    required
-                                                    value={password}
-                                                    onChange={(e) => setPassword(e.target.value)}
-                                                    className="pl-10 h-11 bg-white/50 border-white/50 focus:border-[#007CBA] transition-all rounded-xl text-slate-900"
-                                                />
-                                            </div>
-                                        </div>
-
-                                        <div className="grid gap-2">
-                                            <Label htmlFor="repeat-password" title="repeat-password-label" className="text-xs font-bold uppercase tracking-wider text-slate-500 ml-1">Confirm Password</Label>
-                                            <div className="relative">
-                                                <ShieldCheck className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                                                <Input
-                                                    id="repeat-password"
-                                                    type="password"
-                                                    required
-                                                    value={repeatPassword}
-                                                    onChange={(e) => setRepeatPassword(e.target.value)}
-                                                    className="pl-10 h-11 bg-white/50 border-white/50 focus:border-[#007CBA] transition-all rounded-xl"
-                                                />
-                                            </div>
-                                        </div>
-
-                                        <div className="grid gap-2">
-                                            <Label htmlFor="referral" className="text-xs font-bold uppercase tracking-wider text-slate-500 ml-1">Invitation Code (Optional)</Label>
-                                            <div className="relative">
-                                                <Share2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                                                <Input
-                                                    id="referral"
-                                                    type="text"
-                                                    placeholder="4-digit protocol"
-                                                    maxLength={4}
-                                                    value={referral}
-                                                    onChange={(e) => setReferral(e.target.value.toUpperCase())}
-                                                    className="pl-10 h-11 bg-white/50 border-white/50 focus:border-[#007CBA] transition-all rounded-xl text-slate-900 placeholder:text-slate-400 font-mono"
-                                                />
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {error && (
-                                        <div className="bg-red-50 text-red-600 p-3 rounded-xl text-xs font-medium border border-red-100 animate-in fade-in slide-in-from-top-1">
-                                            {error}
-                                        </div>
-                                    )}
-
-                                    <Button type="submit" className="w-full h-11 premium-gradient text-white rounded-xl font-bold shadow-lg shadow-blue-500/30 hover:shadow-xl hover:scale-[1.02] transition-all active:scale-[0.98] mt-2">
-                                        Continue to Profile <ArrowRight className="w-4 h-4 ml-2" />
-                                    </Button>
-                                </form>
-                            ) : (
-                                <form onSubmit={handleSignUp} className="space-y-5">
-                                    <div className="space-y-4">
-                                        <div className="grid grid-cols-2 gap-4">
-                                            <div className="grid gap-2">
-                                                <Label htmlFor="username" className="text-xs font-bold uppercase tracking-wider text-slate-500 ml-1">Username</Label>
-                                                <div className="relative">
-                                                    <AtSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                                                    <Input id="username" type="text" placeholder="johndoe" required value={username} onChange={(e) => setUsername(e.target.value)} className="pl-10 h-11 bg-white/50 border-white/50 focus:border-[#007CBA] transition-all rounded-xl text-slate-900" />
+                        <CardContent className="pb-8 overflow-hidden relative">
+                            <AnimatePresence mode="wait">
+                                {step === 1 ? (
+                                    <motion.div
+                                        key="step1"
+                                        initial={{ opacity: 0, x: -30 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        exit={{ opacity: 0, x: 30 }}
+                                        transition={{ duration: 0.25 }}
+                                    >
+                                        <form onSubmit={handleNextStep} className="space-y-5">
+                                            <div className="space-y-4">
+                                                <div>
+                                                    <Label htmlFor="email" className="text-xs font-bold uppercase tracking-wider text-slate-500 ml-1">Email Address (Optional)</Label>
+                                                    <div className="relative mt-1.5">
+                                                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                                        <Input
+                                                            id="email"
+                                                            type="email"
+                                                            placeholder="your@email.com"
+                                                            value={email}
+                                                            onChange={(e) => {
+                                                                setEmail(e.target.value);
+                                                                if (error) setError(null);
+                                                            }}
+                                                            className={cn(
+                                                                "pl-10 h-11 bg-white/50 border-white/50 focus:border-[#007CBA] transition-all rounded-xl text-slate-900 placeholder:text-slate-400",
+                                                                email.trim() && (email.includes('@') && email.length >= 5 ? "border-emerald-500/50 focus:border-emerald-500 focus:ring-emerald-500/20" : "border-rose-500/50 focus:border-rose-500 focus:ring-rose-500/20")
+                                                            )}
+                                                        />
+                                                    </div>
+                                                </div>
+                                            
+                                                <div className="grid gap-2">
+                                                    <Label htmlFor="password" title="password-label" className="text-xs font-bold uppercase tracking-wider text-slate-500 ml-1">Password</Label>
+                                                    <div className="relative">
+                                                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                                        <Input
+                                                            id="password"
+                                                            type="password"
+                                                            required
+                                                            value={password}
+                                                            onChange={(e) => {
+                                                                setPassword(e.target.value);
+                                                                if (error) setError(null);
+                                                            }}
+                                                            className={cn(
+                                                                "pl-10 h-11 bg-white/50 border-white/50 focus:border-[#007CBA] transition-all rounded-xl text-slate-900",
+                                                                password.trim() && (password.length >= 6 ? "border-emerald-500/50 focus:border-emerald-500 focus:ring-emerald-500/20" : "border-rose-500/50 focus:border-rose-500 focus:ring-rose-500/20")
+                                                            )}
+                                                        />
+                                                    </div>
+                                                </div>
+ 
+                                                <div className="grid gap-2">
+                                                    <Label htmlFor="repeat-password" title="repeat-password-label" className="text-xs font-bold uppercase tracking-wider text-slate-500 ml-1">Confirm Password</Label>
+                                                    <div className="relative">
+                                                        <ShieldCheck className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                                        <Input
+                                                            id="repeat-password"
+                                                            type="password"
+                                                            required
+                                                            value={repeatPassword}
+                                                            onChange={(e) => {
+                                                                setRepeatPassword(e.target.value);
+                                                                if (error) setError(null);
+                                                            }}
+                                                            className={cn(
+                                                                "pl-10 h-11 bg-white/50 border-white/50 focus:border-[#007CBA] transition-all rounded-xl text-slate-900",
+                                                                repeatPassword.trim() && (repeatPassword === password ? "border-emerald-500/50 focus:border-emerald-500 focus:ring-emerald-500/20" : "border-rose-500/50 focus:border-rose-500 focus:ring-rose-500/20")
+                                                            )}
+                                                        />
+                                                    </div>
+                                                </div>
+ 
+                                                <div className="grid gap-2">
+                                                    <Label htmlFor="referral" className="text-xs font-bold uppercase tracking-wider text-slate-500 ml-1">Invitation Code {!email.trim() && <span className="text-rose-500 font-bold">(Required)</span>}</Label>
+                                                    <div className="relative">
+                                                        <Share2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                                        <Input
+                                                            id="referral"
+                                                            type="text"
+                                                            placeholder="4-digit protocol"
+                                                            maxLength={4}
+                                                            value={referral}
+                                                            onChange={(e) => {
+                                                                setReferral(e.target.value.toUpperCase());
+                                                                if (error) setError(null);
+                                                            }}
+                                                            className={cn(
+                                                                "pl-10 h-11 bg-white/50 border-white/50 focus:border-[#007CBA] transition-all rounded-xl text-slate-900 placeholder:text-slate-400 font-mono",
+                                                                referral.trim() ? "border-emerald-500/50 focus:border-emerald-500 focus:ring-emerald-500/20" : (!email.trim() ? "border-rose-300/60 focus:border-rose-500" : "")
+                                                            )}
+                                                        />
+                                                    </div>
                                                 </div>
                                             </div>
-                                            <div className="grid gap-2">
-                                                <Label htmlFor="phone" className="text-xs font-bold uppercase tracking-wider text-slate-500 ml-1">Phone</Label>
-                                                <div className="relative">
-                                                    <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                                                    <Input id="phone" type="tel" placeholder="+1..." required value={phone} onChange={(e) => setPhone(e.target.value)} className="pl-10 h-11 bg-white/50 border-white/50 focus:border-[#007CBA] transition-all rounded-xl text-slate-900" />
+ 
+                                            {error && (
+                                                <motion.div
+                                                    initial={{ opacity: 0, y: -8 }}
+                                                    animate={{ opacity: 1, y: 0 }}
+                                                    className="bg-red-50 text-red-600 p-3 rounded-xl text-xs font-medium border border-red-100 flex items-center gap-2"
+                                                >
+                                                    <AlertCircle className="w-4 h-4 shrink-0" />
+                                                    <span>{error}</span>
+                                                </motion.div>
+                                            )}
+ 
+                                            <Button type="submit" className="w-full h-11 premium-gradient text-white rounded-xl font-bold shadow-lg shadow-blue-500/30 hover:shadow-xl hover:scale-[1.02] transition-all active:scale-[0.98] mt-2" disabled={isLoading}>
+                                                {isLoading ? <div className="flex items-center gap-2"><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />Verifying invitation...</div> : <div className="flex items-center justify-center gap-2">Continue to Profile <ArrowRight className="w-4 h-4 ml-2" /></div>}
+                                            </Button>
+                                        </form>
+                                    </motion.div>
+                                ) : (
+                                    <motion.div
+                                        key="step2"
+                                        initial={{ opacity: 0, x: 30 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        exit={{ opacity: 0, x: -30 }}
+                                        transition={{ duration: 0.25 }}
+                                    >
+                                        <form onSubmit={handleSignUp} className="space-y-5">
+                                            <div className="space-y-4">
+                                                <div className="grid grid-cols-2 gap-4">
+                                                    <div className="grid gap-2">
+                                                        <Label htmlFor="username" className="text-xs font-bold uppercase tracking-wider text-slate-500 ml-1">Username</Label>
+                                                        <div className="relative">
+                                                            <AtSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                                            <Input
+                                                                id="username"
+                                                                type="text"
+                                                                placeholder="johndoe"
+                                                                required
+                                                                value={username}
+                                                                onChange={(e) => {
+                                                                    setUsername(e.target.value);
+                                                                    if (error) setError(null);
+                                                                }}
+                                                                className={cn(
+                                                                    "pl-10 h-11 bg-white/50 border-white/50 focus:border-[#007CBA] transition-all rounded-xl text-slate-900",
+                                                                    username.trim() && (username.length >= 3 ? "border-emerald-500/50 focus:border-emerald-500" : "border-rose-500/50 focus:border-rose-500")
+                                                                )}
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                    <div className="grid gap-2">
+                                                        <Label htmlFor="phone" className="text-xs font-bold uppercase tracking-wider text-slate-500 ml-1">Phone</Label>
+                                                        <div className="relative">
+                                                            <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                                            <Input
+                                                                id="phone"
+                                                                type="tel"
+                                                                placeholder="+1..."
+                                                                required
+                                                                value={phone}
+                                                                onChange={(e) => {
+                                                                    setPhone(e.target.value);
+                                                                    if (error) setError(null);
+                                                                }}
+                                                                className={cn(
+                                                                    "pl-10 h-11 bg-white/50 border-white/50 focus:border-[#007CBA] transition-all rounded-xl text-slate-900",
+                                                                    phone.trim() && (phone.length >= 6 ? "border-emerald-500/50 focus:border-emerald-500" : "border-rose-500/50 focus:border-rose-500")
+                                                                )}
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div className="grid grid-cols-2 gap-4">
+                                                    <div className="grid gap-2">
+                                                        <Label htmlFor="withdrawal-password" title="withdrawal-password-label" className="text-[10px] font-black uppercase tracking-wider text-slate-500 ml-1">Withdrawal PIN (6-digit)</Label>
+                                                        <div className="relative">
+                                                            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                                            <Input
+                                                                id="withdrawal-password"
+                                                                type="password"
+                                                                required
+                                                                placeholder="6-digit"
+                                                                maxLength={6}
+                                                                value={withdrawalPassword}
+                                                                onChange={(e) => {
+                                                                    setWithdrawalPassword(e.target.value);
+                                                                    if (error) setError(null);
+                                                                }}
+                                                                className={cn(
+                                                                    "pl-10 h-11 bg-white/50 border-white/50 focus:border-[#007CBA] transition-all rounded-xl text-slate-900",
+                                                                    withdrawalPassword.trim() && (withdrawalPassword.length === 6 && /^\d+$/.test(withdrawalPassword) ? "border-emerald-500/50 focus:border-emerald-500" : "border-rose-500/50 focus:border-rose-500")
+                                                                )}
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                    <div className="grid gap-2">
+                                                        <Label htmlFor="confirm-withdrawal" title="confirm-withdrawal-label" className="text-[10px] font-black uppercase tracking-wider text-slate-500 ml-1">Confirm PIN</Label>
+                                                        <div className="relative">
+                                                            <ShieldCheck className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                                            <Input
+                                                                id="confirm-withdrawal"
+                                                                type="password"
+                                                                required
+                                                                value={confirmWithdrawalPassword}
+                                                                onChange={(e) => {
+                                                                    setConfirmWithdrawalPassword(e.target.value);
+                                                                    if (error) setError(null);
+                                                                }}
+                                                                className={cn(
+                                                                    "pl-10 h-11 bg-white/50 border-white/50 focus:border-[#007CBA] transition-all rounded-xl text-slate-900",
+                                                                    confirmWithdrawalPassword.trim() && (confirmWithdrawalPassword === withdrawalPassword ? "border-emerald-500/50 focus:border-emerald-500" : "border-rose-500/50 focus:border-rose-500")
+                                                                )}
+                                                            />
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                        
-                                        <div className="grid grid-cols-2 gap-4">
-                                            <div className="grid gap-2">
-                                                <Label htmlFor="withdrawal-password" title="withdrawal-password-label" className="text-[10px] font-black uppercase tracking-wider text-slate-500 ml-1">Withdrawal Pin</Label>
-                                                <div className="relative">
-                                                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                                                    <Input id="withdrawal-password" type="password" required placeholder="6-digit" value={withdrawalPassword} onChange={(e) => setWithdrawalPassword(e.target.value)} className="pl-10 h-11 bg-white/50 border-white/50 focus:border-[#007CBA] transition-all rounded-xl text-slate-900" />
-                                                </div>
+ 
+                                            {error && (
+                                                <motion.div
+                                                    initial={{ opacity: 0, y: -8 }}
+                                                    animate={{ opacity: 1, y: 0 }}
+                                                    className="bg-red-50 text-red-600 p-3 rounded-xl text-xs font-medium border border-red-100 flex items-center gap-2"
+                                                >
+                                                    <AlertCircle className="w-4 h-4 shrink-0" />
+                                                    <span>{error}</span>
+                                                </motion.div>
+                                            )}
+ 
+                                            <div className="flex gap-3">
+                                                <Button type="button" variant="outline" onClick={() => setStep(1)} className="flex-1 h-11 rounded-xl font-bold border-slate-200" disabled={isLoading}>
+                                                    Back
+                                                </Button>
+                                                <Button type="submit" title="signup-button" className="flex-[2] h-11 premium-gradient text-white rounded-xl font-bold shadow-lg shadow-blue-500/30 hover:shadow-xl hover:scale-[1.02] transition-all active:scale-[0.98]" disabled={isLoading}>
+                                                    {isLoading ? <div className="flex items-center gap-2"><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />Finalizing...</div> : <div className="flex items-center justify-center gap-2">Complete Setup <UserCheck className="w-4 h-4" /></div>}
+                                                </Button>
                                             </div>
-                                            <div className="grid gap-2">
-                                                <Label htmlFor="confirm-withdrawal" title="confirm-withdrawal-label" className="text-[10px] font-black uppercase tracking-wider text-slate-500 ml-1">Confirm Pin</Label>
-                                                <div className="relative">
-                                                    <ShieldCheck className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                                                    <Input id="confirm-withdrawal" type="password" required value={confirmWithdrawalPassword} onChange={(e) => setConfirmWithdrawalPassword(e.target.value)} className="pl-10 h-11 bg-white/50 border-white/50 focus:border-[#007CBA] transition-all rounded-xl text-slate-900" />
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {error && (
-                                        <div className="bg-red-50 text-red-600 p-3 rounded-xl text-xs font-medium border border-red-100 animate-in fade-in slide-in-from-top-1">
-                                            {error}
-                                        </div>
-                                    )}
-
-                                    <div className="flex gap-3">
-                                        <Button type="button" variant="outline" onClick={() => setStep(1)} className="flex-1 h-11 rounded-xl font-bold border-slate-200">
-                                            Back
-                                        </Button>
-                                        <Button type="submit" title="signup-button" className="flex-[2] h-11 premium-gradient text-white rounded-xl font-bold shadow-lg shadow-blue-500/30 hover:shadow-xl hover:scale-[1.02] transition-all active:scale-[0.98]" disabled={isLoading}>
-                                            {isLoading ? <div className="flex items-center gap-2"><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />Finalizing...</div> : <div className="flex items-center justify-center gap-2">Complete Setup <UserCheck className="w-4 h-4" /></div>}
-                                        </Button>
-                                    </div>
-                                </form>
-                            )}
+                                        </form>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
                             
                             <div className="mt-8 text-center">
                                 <p className="text-sm text-slate-500 font-medium">Already have an account? <Link href="/auth/login" className="text-[#007CBA] font-bold hover:underline">Log in here</Link></p>

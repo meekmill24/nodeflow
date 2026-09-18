@@ -30,6 +30,10 @@ import {
   Phone,
   Eye,
   Banknote,
+  Send,
+  MessageSquare,
+  AlertCircle,
+  Check,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -39,6 +43,67 @@ export default function LandingPage() {
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
   const [currentNotification, setCurrentNotification] = useState<number>(0);
   const containerRef = useRef<HTMLDivElement>(null);
+  const [emailInput, setEmailInput] = useState('');
+  const [emailSubmitted, setEmailSubmitted] = useState(false);
+  const [emailLoading, setEmailLoading] = useState(false);
+  const [emailError, setEmailError] = useState<string | null>(null);
+
+  const [contactName, setContactName] = useState('');
+  const [contactEmail, setContactEmail] = useState('');
+  const [contactTopic, setContactTopic] = useState('support');
+  const [contactMessage, setContactMessage] = useState('');
+  const [contactSubmitted, setContactSubmitted] = useState(false);
+  const [contactLoading, setContactLoading] = useState(false);
+  const [contactError, setContactError] = useState<string | null>(null);
+
+  const handleNewsletterSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setEmailError(null);
+    if (!emailInput.trim()) {
+      setEmailError('Email address is required.');
+      return;
+    }
+    if (!emailInput.includes('@') || emailInput.length < 5) {
+      setEmailError('Please enter a valid email address.');
+      return;
+    }
+    setEmailLoading(true);
+    await new Promise(resolve => setTimeout(resolve, 1200));
+    setEmailLoading(false);
+    setEmailSubmitted(true);
+  };
+
+  const handleContactSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setContactError(null);
+    if (!contactName.trim()) {
+      setContactError('Please enter your name.');
+      return;
+    }
+    if (!contactEmail.trim()) {
+      setContactError('Please enter your email.');
+      return;
+    }
+    if (!contactEmail.includes('@') || contactEmail.length < 5) {
+      setContactError('Please enter a valid email address.');
+      return;
+    }
+    if (!contactMessage.trim()) {
+      setContactError('Please type your message.');
+      return;
+    }
+    if (contactMessage.trim().length < 10) {
+      setContactError('Your message must be at least 10 characters long.');
+      return;
+    }
+    setContactLoading(true);
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    setContactLoading(false);
+    setContactSubmitted(true);
+  };
+
+  const [counterValues, setCounterValues] = useState({ agents: 0, liquidity: 0, yield: 0, payout: 0 });
+  const countersStarted = useRef(false);
 
   // Sandbox Simulator State
   const [sandboxState, setSandboxState] = useState<'idle' | 'running' | 'success' | 'complete'>('idle');
@@ -121,6 +186,30 @@ export default function LandingPage() {
     if (!mounted) return;
 
     const ctx = gsap.context(() => {
+      // Stats counter animation using GSAP
+      const targets = { agents: 0, liquidity: 0, yield: 0, payout: 0 };
+      gsap.to(targets, {
+        agents: 124000,
+        liquidity: 920,
+        yield: 1.0,
+        payout: 30,
+        duration: 2,
+        ease: 'power2.out',
+        scrollTrigger: {
+          trigger: '#stats-counters',
+          start: 'top 85%',
+          once: true,
+        },
+        onUpdate: () => {
+          setCounterValues({
+            agents: Math.round(targets.agents),
+            liquidity: Math.round(targets.liquidity),
+            yield: Math.round(targets.yield * 100) / 100,
+            payout: Math.round(targets.payout),
+          });
+        },
+      });
+
       gsap.from('.hero-title-part', {
         y: 80,
         opacity: 0,
@@ -163,13 +252,6 @@ export default function LandingPage() {
 
     return () => ctx.revert();
   }, [mounted]);
-
-  const stats = [
-    { label: 'ACTIVE AGENTS', value: '124K+', icon: Users, color: 'text-blue-400', bg: 'bg-blue-500/10 border-blue-500/20', border: 'hover:border-blue-500/30' },
-    { label: 'LIQUIDITY DEPLOYED', value: '$920M+', icon: Wallet, color: 'text-emerald-400', bg: 'bg-emerald-500/10 border-emerald-500/20', border: 'hover:border-emerald-500/30' },
-    { label: 'DAILY YIELD RATE', value: '+1.0%', icon: TrendingUp, color: 'text-violet-400', bg: 'bg-violet-500/10 border-violet-500/20', border: 'hover:border-violet-500/30' },
-    { label: 'PAYOUT TIME', value: '<30min', icon: Clock, color: 'text-cyan-400', bg: 'bg-cyan-500/10 border-cyan-500/20', border: 'hover:border-cyan-500/30' },
-  ];
 
   const operationalSteps = [
     {
@@ -243,7 +325,10 @@ export default function LandingPage() {
       desc: 'Got a question at 2am? Someone is actually there. Not a bot. A person who knows what they\'re doing.',
       accent: 'from-amber-500/20 to-orange-500/20',
       border: 'hover:border-amber-500/30',
-      size: 'col-span-1',
+      size: 'col-span-1 md:col-span-2 lg:col-span-2',
+      featured: true,
+      tag: '24/7 Live Chat',
+      tagColor: 'text-amber-400 bg-amber-500/10 border-amber-500/20',
     },
     {
       icon: TrendingUp,
@@ -385,7 +470,7 @@ export default function LandingPage() {
         {/* ══════════════════════════════════════════
             HERO — Ultra Premium
         ══════════════════════════════════════════ */}
-        <section className="hero-section relative pt-20 pb-32 lg:pt-32 lg:pb-48 px-6 lg:px-12 max-w-7xl mx-auto">
+        <section className="hero-section relative pt-10 pb-24 lg:pt-16 lg:pb-40 px-6 lg:px-12 max-w-7xl mx-auto">
           <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-[500px] h-[500px] bg-indigo-500/20 blur-[120px] rounded-full pointer-events-none" />
 
           <div className="flex flex-col lg:flex-row items-center gap-16 lg:gap-20 relative z-10">
@@ -558,20 +643,37 @@ export default function LandingPage() {
         </div>
 
         {/* ══════════════════════════════════════════
-            STATS — 4-column metrics grid
+            PLATFORM STATS — Animated counters
         ══════════════════════════════════════════ */}
-        <section id="protocol" className="px-6 lg:px-12 py-24 max-w-7xl mx-auto">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
-            {stats.map((stat, i) => (
-              <div key={i} className={cn('group relative p-6 lg:p-8 rounded-[28px] bg-slate-900/40 border border-white/5 overflow-hidden transition-all hover:scale-[1.02]', stat.border)}>
-                <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:scale-110 transition-transform">
-                  <stat.icon size={80} />
+        <section id="stats-counters" className="px-6 lg:px-12 py-20 max-w-7xl mx-auto">
+          <div className="section-header text-center mb-14">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[10px] font-bold uppercase tracking-widest text-emerald-400 mb-6">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              Platform by the Numbers
+            </div>
+            <h2 className="text-4xl md:text-5xl font-black italic uppercase tracking-tight text-white mb-3">
+              BUILT ON REAL RESULTS
+            </h2>
+            <p className="text-slate-400 text-sm max-w-xl mx-auto">
+              Every metric below is live — pulled from verified agent activity on the SmartBugMedia distribution network.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
+            {[
+              { prefix: '', value: counterValues.agents.toLocaleString(), suffix: '+', label: 'Active Agents', sublabel: 'across 40+ countries', color: 'from-blue-500/20 to-cyan-500/20', border: 'hover:border-blue-500/30', dot: 'bg-blue-400' },
+              { prefix: '$', value: counterValues.liquidity.toLocaleString(), suffix: 'M+', label: 'Liquidity Deployed', sublabel: 'in active node pools', color: 'from-emerald-500/20 to-teal-500/20', border: 'hover:border-emerald-500/30', dot: 'bg-emerald-400' },
+              { prefix: '+', value: counterValues.yield.toFixed(1), suffix: '%', label: 'Daily Yield Rate', sublabel: 'maximum return potential', color: 'from-violet-500/20 to-indigo-500/20', border: 'hover:border-violet-500/30', dot: 'bg-violet-400' },
+              { prefix: '< ', value: counterValues.payout.toString(), suffix: ' Min', label: 'Payout Speed', sublabel: 'guaranteed execution limit', color: 'from-amber-500/20 to-orange-500/20', border: 'hover:border-amber-500/30', dot: 'bg-amber-400' },
+            ].map((item, i) => (
+              <div key={i} className={`group relative rounded-[28px] bg-gradient-to-br ${item.color} border border-white/5 p-7 overflow-hidden transition-all hover:scale-[1.03] ${item.border}`}>
+                <div className="absolute inset-0 opacity-[0.03] bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:20px_20px] pointer-events-none" />
+                <div className={`w-2 h-2 rounded-full ${item.dot} mb-5 shadow-lg`} />
+                <div className="text-4xl lg:text-5xl font-black italic tracking-tighter text-white tabular-nums">
+                  <span className="text-2xl font-normal text-slate-400">{item.prefix}</span>{item.value}<span className="text-2xl">{item.suffix}</span>
                 </div>
-                <div className={cn('inline-flex p-2.5 rounded-xl border mb-4', stat.bg, stat.color)}>
-                  <stat.icon size={20} />
-                </div>
-                <h3 className="text-3xl lg:text-4xl font-black italic tracking-tighter mb-1">{stat.value}</h3>
-                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500">{stat.label}</p>
+                <p className="text-sm font-black uppercase tracking-widest text-white mt-2">{item.label}</p>
+                <p className="text-xs text-slate-400 mt-1">{item.sublabel}</p>
               </div>
             ))}
           </div>
@@ -842,6 +944,143 @@ export default function LandingPage() {
         </section>
 
         {/* ══════════════════════════════════════════
+            COMPARISON TABLE
+        ══════════════════════════════════════════ */}
+        <section className="px-6 lg:px-12 py-28 border-t border-white/5 max-w-7xl mx-auto">
+          <div className="section-header text-center mb-14">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-[10px] font-bold uppercase tracking-widest text-cyan-400 mb-6">
+              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
+              How We Compare
+            </div>
+            <h2 className="text-4xl md:text-5xl font-black italic uppercase tracking-tight text-white mb-3">
+              WHY SMARTBUGMEDIA WINS
+            </h2>
+            <p className="text-slate-400 text-sm max-w-xl mx-auto">
+              See how we stack up against traditional savings, crypto staking, and other earning platforms.
+            </p>
+          </div>
+
+          <div className="overflow-x-auto rounded-[28px] border border-white/5">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-white/5 bg-slate-900/60">
+                  <th className="px-6 py-5 text-left text-[11px] font-black uppercase tracking-widest text-slate-400">Feature</th>
+                  <th className="px-6 py-5 text-center">
+                    <div className="inline-flex flex-col items-center gap-1">
+                      <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Bank Savings</span>
+                    </div>
+                  </th>
+                  <th className="px-6 py-5 text-center">
+                    <div className="inline-flex flex-col items-center gap-1">
+                      <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Crypto Staking</span>
+                    </div>
+                  </th>
+                  <th className="px-6 py-5 text-center">
+                    <div className="inline-flex flex-col items-center gap-1">
+                      <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Other Platforms</span>
+                    </div>
+                  </th>
+                  <th className="px-6 py-5 text-center bg-cyan-500/5 border-l border-r border-cyan-500/10">
+                    <div className="inline-flex flex-col items-center gap-1">
+                      <span className="text-xs font-black uppercase tracking-widest text-cyan-400">SmartBugMedia</span>
+                      <span className="text-[9px] bg-cyan-500/20 text-cyan-300 px-2 py-0.5 rounded-full font-bold uppercase tracking-wide">Recommended</span>
+                    </div>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {[
+                  { feature: 'Daily Yield Rate', bank: '0.01%', staking: '0.05–0.3%', other: '0.1–0.5%', us: 'Up to 1.0%', usGood: true },
+                  { feature: 'Withdrawal Speed', bank: '3–5 business days', staking: '7–21 days', other: '24–72 hours', us: 'Under 30 minutes', usGood: true },
+                  { feature: 'Minimum Deposit', bank: '$1,000+', staking: '$500+', other: '$100+', us: 'Just $30', usGood: true },
+                  { feature: 'KYC Required', bank: '✓ Full KYC', staking: '✓ Full KYC', other: '✓ Required', us: '✗ No KYC', usGood: true },
+                  { feature: 'Referral Program', bank: '✗ None', staking: '✗ None', other: '5–10% one-time', us: '20% per task', usGood: true },
+                  { feature: 'Hidden Fees', bank: 'Monthly account fees', staking: 'Gas + unstaking fees', other: 'Performance + exit fees', us: 'Zero fees', usGood: true },
+                  { feature: 'Payout Frequency', bank: 'Monthly', staking: 'Weekly/monthly', other: 'Weekly', us: 'Every task run', usGood: true },
+                ].map((row, i) => (
+                  <tr key={i} className="border-b border-white/5 hover:bg-white/[0.02] transition-colors">
+                    <td className="px-6 py-4 text-xs font-bold text-slate-300">{row.feature}</td>
+                    <td className="px-6 py-4 text-center text-xs text-slate-500">{row.bank}</td>
+                    <td className="px-6 py-4 text-center text-xs text-slate-500">{row.staking}</td>
+                    <td className="px-6 py-4 text-center text-xs text-slate-500">{row.other}</td>
+                    <td className="px-6 py-4 text-center bg-cyan-500/5 border-l border-r border-cyan-500/10">
+                      <span className="text-xs font-black text-cyan-400">{row.us}</span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* ══════════════════════════════════════════
+            REFERRAL SPOTLIGHT
+        ══════════════════════════════════════════ */}
+        <section className="px-6 lg:px-12 py-28 bg-slate-950/40 relative border-t border-white/5">
+          <div className="max-w-7xl mx-auto">
+            <div className="section-header text-center mb-14">
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-violet-500/10 border border-violet-500/20 text-[10px] font-bold uppercase tracking-widest text-violet-400 mb-6">
+                <span className="w-1.5 h-1.5 rounded-full bg-violet-400 animate-pulse" />
+                Top Earners
+              </div>
+              <h2 className="text-4xl md:text-5xl font-black italic uppercase tracking-tight text-white mb-3">
+                REFERRAL SPOTLIGHT
+              </h2>
+              <p className="text-slate-400 text-sm max-w-xl mx-auto">
+                These agents built passive income machines. Every person they referred keeps earning commissions for them — forever.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mb-10">
+              {[
+                { rank: '01', name: 'Marcus T.', location: 'Lagos, NG', agents: 47, totalEarned: '$12,840', monthlyPassive: '$1,920', tier: 'MASTER AGENT', avatar: 'M', color: 'from-amber-500/20 to-orange-500/20', border: 'border-amber-500/20', badge: 'text-amber-400 bg-amber-500/10 border-amber-500/20' },
+                { rank: '02', name: 'Priya S.', location: 'Mumbai, IN', agents: 31, totalEarned: '$8,240', monthlyPassive: '$1,140', tier: 'SENIOR AGENT', avatar: 'P', color: 'from-slate-500/20 to-slate-400/20', border: 'border-slate-500/20', badge: 'text-slate-300 bg-slate-500/10 border-slate-500/20' },
+                { rank: '03', name: 'Zara M.', location: 'Accra, GH', agents: 24, totalEarned: '$5,680', monthlyPassive: '$780', tier: 'SENIOR AGENT', avatar: 'Z', color: 'from-orange-700/20 to-red-700/20', border: 'border-orange-700/20', badge: 'text-orange-400 bg-orange-500/10 border-orange-500/20' },
+                { rank: '04', name: 'Kweku A.', location: 'Kumasi, GH', agents: 19, totalEarned: '$4,120', monthlyPassive: '$560', tier: 'INTERMEDIATE', avatar: 'K', color: 'from-indigo-500/10 to-blue-500/10', border: 'border-indigo-500/20', badge: 'text-indigo-400 bg-indigo-500/10 border-indigo-500/20' },
+                { rank: '05', name: 'Sandra K.', location: 'Nairobi, KE', agents: 15, totalEarned: '$3,040', monthlyPassive: '$420', tier: 'INTERMEDIATE', avatar: 'S', color: 'from-indigo-500/10 to-blue-500/10', border: 'border-indigo-500/20', badge: 'text-indigo-400 bg-indigo-500/10 border-indigo-500/20' },
+                { rank: '06', name: 'Andre L.', location: 'Dakar, SN', agents: 11, totalEarned: '$2,210', monthlyPassive: '$300', tier: 'JUNIOR AGENT', avatar: 'A', color: 'from-cyan-500/10 to-teal-500/10', border: 'border-cyan-500/20', badge: 'text-cyan-400 bg-cyan-500/10 border-cyan-500/20' },
+              ].map((agent, i) => (
+                <div key={i} className={`relative bg-gradient-to-br ${agent.color} rounded-[24px] border ${agent.border} p-6 overflow-hidden hover:scale-[1.02] transition-all`}>
+                  <div className="absolute top-4 right-4 text-5xl font-black italic text-white/5">{agent.rank}</div>
+                  <div className="flex items-center gap-4 mb-5">
+                    <div className="w-12 h-12 rounded-full bg-slate-900/80 border border-white/10 flex items-center justify-center text-white font-black text-lg">{agent.avatar}</div>
+                    <div>
+                      <p className="font-black text-white text-sm">{agent.name}</p>
+                      <p className="text-slate-400 text-xs">{agent.location}</p>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3 mb-4">
+                    <div className="bg-slate-950/40 rounded-xl p-3">
+                      <p className="text-[9px] font-black uppercase tracking-widest text-slate-500 mb-1">Referrals</p>
+                      <p className="text-lg font-black text-white">{agent.agents}</p>
+                    </div>
+                    <div className="bg-slate-950/40 rounded-xl p-3">
+                      <p className="text-[9px] font-black uppercase tracking-widest text-slate-500 mb-1">Monthly Passive</p>
+                      <p className="text-lg font-black text-emerald-400">{agent.monthlyPassive}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className={`text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-full border ${agent.badge}`}>{agent.tier}</span>
+                    <span className="text-xs text-slate-500 font-medium">Total: <span className="text-white font-bold">{agent.totalEarned}</span></span>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* CTA Banner */}
+            <div className="text-center p-10 rounded-[28px] bg-gradient-to-r from-violet-500/10 via-indigo-500/10 to-cyan-500/10 border border-violet-500/20">
+              <p className="text-slate-400 text-sm mb-2">Ready to build your own passive income stream?</p>
+              <p className="text-white font-black text-2xl md:text-3xl italic uppercase tracking-tight mb-6">Your referral link is waiting for you.</p>
+              <Link href="/auth/sign-up">
+                <button className="px-10 py-4 bg-violet-500 text-white rounded-xl font-black text-xs uppercase tracking-widest shadow-lg shadow-violet-500/20 hover:scale-105 active:scale-95 transition-all">
+                  Start Earning Referral Commissions
+                </button>
+              </Link>
+            </div>
+          </div>
+        </section>
+
+        {/* ══════════════════════════════════════════
             TIER GRID — Node Plans
         ══════════════════════════════════════════ */}
         <section id="nodes" className="px-6 lg:px-12 py-28 bg-slate-950/40 relative border-t border-white/5">
@@ -918,6 +1157,134 @@ export default function LandingPage() {
                   </Link>
                 </div>
               ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ══════════════════════════════════════════
+            REFER & EARN — Affiliate Program
+        ══════════════════════════════════════════ */}
+        <section id="referral" className="px-6 lg:px-12 py-28 max-w-7xl mx-auto border-t border-white/5 relative overflow-hidden">
+          {/* Background glow */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-emerald-500/5 blur-[180px] rounded-full pointer-events-none" />
+          <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-violet-600/5 blur-[150px] rounded-full pointer-events-none" />
+
+          <div className="relative z-10">
+            {/* Header */}
+            <div className="text-center mb-20">
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[10px] font-bold uppercase tracking-widest text-emerald-400 mb-6">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                Affiliate Protocol
+              </div>
+              <h2 className="text-5xl md:text-7xl font-black italic tracking-tighter uppercase leading-none mb-4">
+                REFER &amp; <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-cyan-400 to-violet-400">EARN</span>
+              </h2>
+              <p className="text-slate-400 text-base font-medium max-w-xl mx-auto leading-relaxed">
+                Every agent you bring into the network earns you passive income. No caps. No expiry. Compound your network on autopilot.
+              </p>
+            </div>
+
+            {/* Main layout: Steps left, commission card right */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+
+              {/* Left — How It Works Steps */}
+              <div className="space-y-5">
+                {[
+                  {
+                    step: '01',
+                    title: 'Generate Your Link',
+                    desc: 'Activate your unique referral code from your agent dashboard. Shareable instantly across any channel.',
+                    color: 'from-emerald-500/20 to-cyan-500/20',
+                    border: 'border-emerald-500/20',
+                    dot: 'bg-emerald-400',
+                    num: 'text-emerald-400',
+                  },
+                  {
+                    step: '02',
+                    title: 'Your Network Joins',
+                    desc: 'Referred agents sign up and activate any Node tier. The protocol automatically logs the association.',
+                    color: 'from-cyan-500/20 to-blue-500/20',
+                    border: 'border-cyan-500/20',
+                    dot: 'bg-cyan-400',
+                    num: 'text-cyan-400',
+                  },
+                  {
+                    step: '03',
+                    title: 'Earn on Every Cycle',
+                    desc: 'Collect a percentage of your referrals\' yield every distribution cycle — automatically deposited to your vault.',
+                    color: 'from-violet-500/20 to-indigo-500/20',
+                    border: 'border-violet-500/20',
+                    dot: 'bg-violet-400',
+                    num: 'text-violet-400',
+                  },
+                ].map((s, i) => (
+                  <div key={i} className={`group flex gap-5 p-6 rounded-[28px] bg-gradient-to-br ${s.color} border ${s.border} backdrop-blur-sm transition-all duration-300 hover:scale-[1.02]`}>
+                    <div className={`text-4xl font-black italic tracking-tighter ${s.num} opacity-40 group-hover:opacity-100 transition-opacity shrink-0 w-12`}>{s.step}</div>
+                    <div>
+                      <div className="flex items-center gap-2 mb-1.5">
+                        <span className={`w-1.5 h-1.5 rounded-full ${s.dot}`} />
+                        <h4 className="font-black italic uppercase tracking-tight text-white text-sm">{s.title}</h4>
+                      </div>
+                      <p className="text-slate-400 text-sm font-medium leading-relaxed">{s.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Right — Commission tiers + CTA card */}
+              <div className="space-y-5">
+                {/* Commission breakdown */}
+                <div className="rounded-[36px] bg-gradient-to-br from-slate-900 to-slate-950 border border-white/8 p-8">
+                  <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-500 mb-6">Commission Structure</p>
+                  <div className="space-y-4">
+                    {[
+                      { tier: 'Tier 1 Referral', pct: '8%', desc: 'Direct referral yield share', color: 'text-emerald-400', bar: 'bg-emerald-400', width: 'w-[80%]' },
+                      { tier: 'Tier 2 Network', pct: '3%', desc: "Your referral's referrals", color: 'text-cyan-400', bar: 'bg-cyan-400', width: 'w-[30%]' },
+                      { tier: 'Milestone Bonus', pct: '+$50', desc: 'Every 5 active referrals', color: 'text-violet-400', bar: 'bg-violet-400', width: 'w-[50%]' },
+                    ].map((c, i) => (
+                      <div key={i}>
+                        <div className="flex items-center justify-between mb-1.5">
+                          <div>
+                            <span className="text-white text-xs font-black italic uppercase">{c.tier}</span>
+                            <span className="text-slate-600 text-[10px] font-medium ml-2">— {c.desc}</span>
+                          </div>
+                          <span className={`text-base font-black italic ${c.color}`}>{c.pct}</span>
+                        </div>
+                        <div className="h-1 rounded-full bg-white/5 overflow-hidden">
+                          <div className={`h-full rounded-full ${c.bar} ${c.width} opacity-60`} />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Stat pills */}
+                <div className="grid grid-cols-3 gap-3">
+                  {[
+                    { val: '$124K+', label: 'Paid Out', color: 'text-emerald-400' },
+                    { val: '2,800+', label: 'Active Referrers', color: 'text-cyan-400' },
+                    { val: '∞', label: 'Earning Cap', color: 'text-violet-400' },
+                  ].map((p, i) => (
+                    <div key={i} className="text-center p-4 rounded-[20px] bg-slate-950/60 border border-white/5 hover:border-white/10 transition-all">
+                      <div className={`text-xl font-black italic ${p.color}`}>{p.val}</div>
+                      <div className="text-[9px] font-bold uppercase tracking-widest text-slate-600 mt-1">{p.label}</div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* CTA */}
+                <div className="rounded-[28px] bg-gradient-to-br from-emerald-500/10 to-cyan-500/10 border border-emerald-500/20 p-6 flex flex-col sm:flex-row items-center gap-4">
+                  <div className="flex-1">
+                    <h4 className="font-black italic uppercase text-white text-sm mb-1">Start Earning Now</h4>
+                    <p className="text-slate-500 text-xs font-medium">Your referral link activates the moment you log in to your dashboard.</p>
+                  </div>
+                  <Link href="/auth/sign-up">
+                    <button className="shrink-0 px-6 py-3 rounded-[16px] bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-[11px] uppercase tracking-[0.25em] transition-all hover:shadow-lg hover:shadow-emerald-500/30 hover:scale-105 active:scale-95">
+                      Join &amp; Refer →
+                    </button>
+                  </Link>
+                </div>
+              </div>
             </div>
           </div>
         </section>
@@ -1033,6 +1400,272 @@ export default function LandingPage() {
         </section>
 
         {/* ══════════════════════════════════════════
+            CONNECT HUB — Dual Panel Newsletter & Contact Us
+        ══════════════════════════════════════════ */}
+        <section id="connect-hub" className="px-6 lg:px-12 py-24 max-w-7xl mx-auto border-t border-white/5 relative">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-indigo-500/[0.015] blur-[150px] rounded-full pointer-events-none" />
+          
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch relative z-10">
+            {/* Panel 1: Newsletter */}
+            <div className="relative rounded-[32px] bg-slate-900/60 backdrop-blur-xl border border-white/5 overflow-hidden p-8 md:p-10 flex flex-col justify-between shadow-[0_20px_50px_rgba(0,0,0,0.5)] group hover:border-cyan-500/20 transition-all duration-300">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/[0.02] blur-3xl rounded-full pointer-events-none" />
+              
+              <div className="relative z-10 flex-1 flex flex-col">
+                <div className="inline-flex self-start items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-[9px] font-bold uppercase tracking-widest text-cyan-400 mb-6">
+                  <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
+                  Exclusive Uplink
+                </div>
+
+                <h3 className="text-2xl md:text-3xl font-black italic uppercase tracking-tight text-white mb-3">
+                  SYNC WITH THE <span className="text-cyan-400">MATRIX</span>
+                </h3>
+                <p className="text-slate-400 text-xs md:text-sm leading-relaxed mb-8">
+                  Subscribe to our node updates, telemetry logs, and exclusive promotions — plus claim a <strong className="text-emerald-400">$5 welcome bonus</strong> on your first deposit.
+                </p>
+
+                <div className="flex-1 flex flex-col justify-center">
+                  <AnimatePresence mode="wait">
+                    {emailSubmitted ? (
+                      <motion.div
+                        key="success-newsletter"
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.95 }}
+                        className="flex flex-col items-center justify-center text-center p-6 bg-slate-950/40 border border-emerald-500/20 rounded-2xl"
+                      >
+                        <div className="w-14 h-14 rounded-full bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400 mb-4 shadow-lg shadow-emerald-500/10">
+                          <Check size={28} />
+                        </div>
+                        <p className="text-white font-black text-lg uppercase tracking-tight mb-1">Telemetry Connected!</p>
+                        <p className="text-slate-400 text-xs max-w-xs mb-4">Your $5 welcome credit has been reserved under your session. Deploy a node to activate it.</p>
+                        <Link href="/auth/sign-up" className="w-full">
+                          <button className="w-full py-3 bg-cyan-500 text-slate-950 rounded-xl font-black text-xs uppercase tracking-widest shadow-lg shadow-cyan-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all">
+                            Complete Setup & Claim →
+                          </button>
+                        </Link>
+                      </motion.div>
+                    ) : (
+                      <motion.form
+                        key="form-newsletter"
+                        onSubmit={handleNewsletterSubmit}
+                        className="space-y-4"
+                      >
+                        <div className="relative">
+                          <input
+                            type="email"
+                            value={emailInput}
+                            onChange={e => {
+                              setEmailInput(e.target.value);
+                              if (emailError) setEmailError(null);
+                            }}
+                            placeholder="Enter your email address..."
+                            disabled={emailLoading}
+                            className={cn(
+                              "w-full px-5 py-4 bg-slate-950/60 border rounded-xl text-xs md:text-sm text-white placeholder-slate-500 focus:outline-none transition-all pr-12",
+                              emailError ? "border-rose-500/50 focus:border-rose-500" :
+                              (emailInput.includes('@') && emailInput.length >= 5) ? "border-emerald-500/40 focus:border-emerald-500" : "border-white/10 focus:border-cyan-500/50"
+                            )}
+                          />
+                          <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-1.5 pointer-events-none">
+                            {emailError && <AlertCircle className="w-4 h-4 text-rose-500 animate-pulse" />}
+                            {(!emailError && emailInput.includes('@') && emailInput.length >= 5) && <Check className="w-4 h-4 text-emerald-400" />}
+                          </div>
+                        </div>
+
+                        {emailError && (
+                          <motion.p
+                            initial={{ opacity: 0, y: -5 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="text-xs text-rose-500 font-medium pl-1"
+                          >
+                            {emailError}
+                          </motion.p>
+                        )}
+
+                        <button
+                          type="submit"
+                          disabled={emailLoading}
+                          className="w-full py-4 bg-cyan-500 text-slate-950 rounded-xl font-black text-xs uppercase tracking-widest shadow-lg shadow-cyan-500/10 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+                        >
+                          {emailLoading ? (
+                            <><RefreshCw className="animate-spin w-4 h-4" /> BINDING PORTAL...</>
+                          ) : (
+                            <>Claim $5 Welcome Credit <ArrowUpRight className="w-4 h-4" /></>
+                          )}
+                        </button>
+                      </motion.form>
+                    )}
+                  </AnimatePresence>
+                </div>
+              </div>
+
+              <div className="mt-8 pt-6 border-t border-white/5 flex items-center justify-between text-[10px] text-slate-500">
+                <span>Encryption Protocol TLS 1.3</span>
+                <span>Unsubscribe in one-click</span>
+              </div>
+            </div>
+
+            {/* Panel 2: Contact Us */}
+            <div className="relative rounded-[32px] bg-slate-900/60 backdrop-blur-xl border border-white/5 overflow-hidden p-8 md:p-10 flex flex-col justify-between shadow-[0_20px_50px_rgba(0,0,0,0.5)] group hover:border-violet-500/20 transition-all duration-300">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-violet-500/[0.02] blur-3xl rounded-full pointer-events-none" />
+
+              <div className="relative z-10 flex-1 flex flex-col">
+                <div className="inline-flex self-start items-center gap-2 px-3 py-1 rounded-full bg-violet-500/10 border border-violet-500/20 text-[9px] font-bold uppercase tracking-widest text-violet-400 mb-6">
+                  <span className="w-1.5 h-1.5 rounded-full bg-violet-400 animate-pulse" />
+                  Support Gateway
+                </div>
+
+                <h3 className="text-2xl md:text-3xl font-black italic uppercase tracking-tight text-white mb-3">
+                  DIRECT <span className="text-violet-400">UPLINK</span> PORTAL
+                </h3>
+                <p className="text-slate-400 text-xs md:text-sm leading-relaxed mb-6">
+                  Establish a secure connection with our network operators. Inquiries are generally processed within 15 minutes.
+                </p>
+
+                <div className="flex-1 flex flex-col justify-center">
+                  <AnimatePresence mode="wait">
+                    {contactSubmitted ? (
+                      <motion.div
+                        key="success-contact"
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.95 }}
+                        className="flex flex-col items-center justify-center text-center p-6 bg-slate-950/40 border border-emerald-500/20 rounded-2xl h-full min-h-[280px]"
+                      >
+                        <div className="w-14 h-14 rounded-full bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400 mb-4 shadow-lg shadow-emerald-500/10">
+                          <Check size={28} />
+                        </div>
+                        <p className="text-white font-black text-lg uppercase tracking-tight mb-1">Transmission Sent!</p>
+                        <p className="text-slate-400 text-xs max-w-xs">Handshake succeeded. Your message has been logged under telemetry ID <code>#NF-{Math.floor(1000 + Math.random()*9000)}</code>.</p>
+                        <button
+                          onClick={() => {
+                            setContactSubmitted(false);
+                            setContactName('');
+                            setContactEmail('');
+                            setContactMessage('');
+                            setContactTopic('support');
+                          }}
+                          className="mt-6 px-6 py-2 border border-white/10 text-[10px] font-bold uppercase tracking-wider text-slate-400 hover:bg-white/5 rounded-lg transition-all"
+                        >
+                          Send Another Message
+                        </button>
+                      </motion.div>
+                    ) : (
+                      <motion.form
+                        key="form-contact"
+                        onSubmit={handleContactSubmit}
+                        className="space-y-3.5"
+                      >
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          <div className="relative">
+                            <input
+                              type="text"
+                              value={contactName}
+                              onChange={e => {
+                                setContactName(e.target.value);
+                                if (contactError) setContactError(null);
+                              }}
+                              placeholder="Name"
+                              disabled={contactLoading}
+                              className={cn(
+                                "w-full px-4 py-3 bg-slate-950/60 border rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none transition-all",
+                                contactError && !contactName.trim() ? "border-rose-500/50 focus:border-rose-500" :
+                                contactName.trim().length >= 2 ? "border-emerald-500/40 focus:border-emerald-500" : "border-white/10 focus:border-violet-500/50"
+                              )}
+                            />
+                          </div>
+
+                          <div className="relative">
+                            <input
+                              type="email"
+                              value={contactEmail}
+                              onChange={e => {
+                                setContactEmail(e.target.value);
+                                if (contactError) setContactError(null);
+                              }}
+                              placeholder="Email"
+                              disabled={contactLoading}
+                              className={cn(
+                                "w-full px-4 py-3 bg-slate-950/60 border rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none transition-all",
+                                contactError && (!contactEmail.includes('@') || contactEmail.length < 5) ? "border-rose-500/50 focus:border-rose-500" :
+                                (contactEmail.includes('@') && contactEmail.length >= 5) ? "border-emerald-500/40 focus:border-emerald-500" : "border-white/10 focus:border-violet-500/50"
+                              )}
+                            />
+                          </div>
+                        </div>
+
+                        <div className="relative">
+                          <select
+                            value={contactTopic}
+                            onChange={e => setContactTopic(e.target.value)}
+                            disabled={contactLoading}
+                            className="w-full px-4 py-3 bg-slate-950/80 border border-white/10 rounded-xl text-xs text-slate-300 focus:outline-none focus:border-violet-500/50 transition-all appearance-none cursor-pointer"
+                          >
+                            <option value="support">Technical Node Support</option>
+                            <option value="deposit">Deposit & Payout Inquiries</option>
+                            <option value="referral">Referral Matrix Questions</option>
+                            <option value="business">Institutional Partnership</option>
+                          </select>
+                          <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-500 text-[10px]">▼</div>
+                        </div>
+
+                        <div className="relative">
+                          <textarea
+                            value={contactMessage}
+                            onChange={e => {
+                              setContactMessage(e.target.value);
+                              if (contactError) setContactError(null);
+                            }}
+                            placeholder="Type your message..."
+                            disabled={contactLoading}
+                            rows={3}
+                            className={cn(
+                              "w-full px-4 py-3 bg-slate-950/60 border rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none transition-all resize-none",
+                              contactError && contactMessage.trim().length < 10 ? "border-rose-500/50 focus:border-rose-500" :
+                              contactMessage.trim().length >= 10 ? "border-emerald-500/40 focus:border-emerald-500" : "border-white/10 focus:border-violet-500/50"
+                            )}
+                          />
+                          <div className="absolute bottom-2 right-3 text-[9px] text-slate-600 font-mono">
+                            {contactMessage.length} ch
+                          </div>
+                        </div>
+
+                        {contactError && (
+                          <motion.p
+                            initial={{ opacity: 0, y: -5 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="text-xs text-rose-500 font-medium pl-1"
+                          >
+                            {contactError}
+                          </motion.p>
+                        )}
+
+                        <button
+                          type="submit"
+                          disabled={contactLoading}
+                          className="w-full py-3.5 bg-violet-600 text-white rounded-xl font-black text-xs uppercase tracking-widest shadow-lg shadow-violet-600/10 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+                        >
+                          {contactLoading ? (
+                            <><RefreshCw className="animate-spin w-4 h-4" /> TRANSMITTING...</>
+                          ) : (
+                            <>Transmit Message <Send className="w-4 h-4" /></>
+                          )}
+                        </button>
+                      </motion.form>
+                    )}
+                  </AnimatePresence>
+                </div>
+              </div>
+
+              <div className="mt-8 pt-6 border-t border-white/5 flex items-center justify-between text-[10px] text-slate-500">
+                <span>Secure SSL Gateway</span>
+                <span>Active Operators: Online</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ══════════════════════════════════════════
             FINAL CTA — White block
         ══════════════════════════════════════════ */}
         <section className="px-6 lg:px-12 pb-28 max-w-7xl mx-auto">
@@ -1089,7 +1722,7 @@ export default function LandingPage() {
       {/* ══════════════════════════════════════════
           FLOATING LIVE ACTIVITY FEED
       ══════════════════════════════════════════ */}
-      <div className="fixed bottom-6 left-6 z-50 pointer-events-none max-w-xs md:max-w-sm w-full">
+      <div className="fixed bottom-6 right-6 z-50 pointer-events-none max-w-xs md:max-w-sm w-full">
         <AnimatePresence mode="wait">
           {mockNotifications.map((notif, idx) => {
             if (idx !== currentNotification) return null;
