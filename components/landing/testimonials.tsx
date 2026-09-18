@@ -59,15 +59,15 @@ const testimonials = [
   {
     name: "Marcus T.",
     role: "Warehouse Supervisor",
-    location: "Lagos, Nigeria",
+    location: "Houston, Texas, USA",
     avatar: "https://i.pravatar.cc/150?u=marcus-t",
-    content: "Honestly I was skeptical at first. Spent 2 weeks just watching before I even signed up. But when my first payout hit my account I nearly fell off my chair 😂 Now it's just part of my daily routine. Wake up, tasks done by 9am, go to work.",
+    content: "Honestly I was skeptical at first. Spent 2 weeks just watching before I even signed up. But when my first payout hit my PayPal I nearly fell off my chair 😂 Now it's just part of my daily routine. Wake up, tasks done by 9am, go to work.",
     earnings: "$6,240",
     joined: "7 months ago",
     tasks: 980,
     rating: 5,
     verified: true,
-    tag: "Daily user"
+    tag: "US Daily User"
   },
   {
     name: "Zara M.",
@@ -84,29 +84,29 @@ const testimonials = [
   },
   {
     name: "Sandra K.",
-    role: "Stay-at-home Mum",
-    location: "Nairobi, Kenya",
+    role: "Stay-at-home Mom",
+    location: "Phoenix, Arizona, USA",
     avatar: "https://i.pravatar.cc/150?u=sandra-k",
-    content: "My husband thought it was a scam until I showed him the bank transfer. Now he does it too lol. I do it during nap time and after the kids sleep. The tasks don't take long and the app never crashes on me.",
+    content: "My husband thought it was a scam until I showed him the PayPal transfer. Now he does it too lol. I do it during nap time and after the kids sleep. The tasks don't take long and the app never crashes on me.",
     earnings: "$9,400",
     joined: "9 months ago",
     tasks: 1240,
     rating: 5,
     verified: true,
-    tag: "Top earner"
+    tag: "Top US Earner"
   },
   {
     name: "Priya S.",
     role: "Freelance Designer",
-    location: "Mumbai, India",
+    location: "Seattle, Washington, USA",
     avatar: "https://i.pravatar.cc/150?u=priya-s",
-    content: "Client work can be so unpredictable — some months are great, some are dry. SmartBugMedia fills that gap. I do tasks between client projects and the referral earnings from my sister and two cousins I brought on is just a bonus 🙌",
+    content: "Client work can be so unpredictable — some months are great, some are dry. SmartBugMedia fills that gap. I do tasks between client projects and the referral earnings from my sister and two friends I brought on is just a bonus 🙌",
     earnings: "$4,810",
     joined: "5 months ago",
     tasks: 620,
     rating: 5,
     verified: true,
-    tag: "Referral earner"
+    tag: "Referral Earner"
   },
 ];
 
