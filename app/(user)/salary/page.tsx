@@ -21,10 +21,10 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase/index';
 
 const salaryData = [
-    { level: 1, name: 'Level 1 Collector', rewards: [100, 300, 1000, 1800, 5000], total: 8200 },
-    { level: 2, name: 'Level 2 Collector', rewards: [200, 600, 2000, 3600, 10000], total: 16400 },
-    { level: 3, name: 'Level 3 Collector', rewards: [300, 900, 3000, 5400, 15000], total: 24600 },
-    { level: 4, name: 'Level 4 Collector', rewards: [400, 1200, 4000, 7200, 20000], total: 32800 },
+    { level: 1, name: 'Junior', rewards: [100, 300, 800, 1500, 4000], total: 6700 },
+    { level: 2, name: 'Mid-Level', rewards: [200, 500, 1500, 3000, 6000], total: 11200 },
+    { level: 3, name: 'Senior', rewards: [300, 700, 2500, 5000, 10000], total: 18000 },
+    { level: 4, name: 'Expert', rewards: [400, 900, 3500, 6000, 12000], total: 22800 },
 ];
 
 const days = [2, 4, 7, 15, 30];
@@ -68,8 +68,12 @@ export default function SalaryPage() {
                         <p className="text-[10px] font-black text-text-secondary uppercase tracking-[0.2em] opacity-40">Monthly Compensation Model</p>
                     </div>
                 </div>
-                <div className="text-right">
-                    <div className="px-3 py-1.5 rounded-xl bg-primary/10 border border-primary/20 flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-3">
+                    <div className="px-3.5 py-1.5 rounded-xl bg-amber-400/10 border border-amber-400/25 flex items-center gap-2 shadow-sm">
+                        <Clock size={14} className="text-amber-400 animate-pulse" />
+                        <span className="text-xs font-black text-amber-300 uppercase tracking-widest">10:00 AM – 7:00 PM CT</span>
+                    </div>
+                    <div className="px-3.5 py-1.5 rounded-xl bg-primary/10 border border-primary/20 flex items-center gap-2">
                         <Calendar size={14} className="text-primary-light" />
                         <span className="text-xs font-black text-primary-light uppercase tracking-widest">{currentDays} Consecutive Days</span>
                     </div>
@@ -152,8 +156,8 @@ export default function SalaryPage() {
                                                 {row.level}
                                             </div>
                                             <div className="flex flex-col">
-                                                <span className="text-xs font-black text-white uppercase tracking-tight">{row.name.split(' ')[2]}</span>
-                                                <span className="text-[8px] font-bold text-text-secondary uppercase tracking-widest opacity-40">Collector</span>
+                                                <span className="text-xs font-black text-white uppercase tracking-tight">{row.name}</span>
+                                                <span className="text-[8px] font-bold text-text-secondary uppercase tracking-widest opacity-40">Tier {row.level}</span>
                                             </div>
                                         </div>
                                     </td>
@@ -189,10 +193,11 @@ export default function SalaryPage() {
                     </h3>
                     <ul className="space-y-4">
                         {[
-                            'Minimum salary is $8,200 for 30 consecutive days of work.',
+                            'Minimum salary is $6,700 for 30 consecutive days of work.',
                             'Salary increases with higher employee grades (VIP Levels).',
                             'Pay periods available every 2, 4, 7, 15, and 30 days.',
-                            'Working hours are from 09:00 a.m. to 09:00 p.m. (Eastern Time).',
+                            'Official working hours: US Central Time 10:00 AM – 7:00 PM (11:00 AM – 8:00 PM Eastern Time), Monday to Sunday.',
+                            'Daily operational commitment: ~30 to 60 minutes to complete designated task sets during working hours.',
                             'Missed or interrupted workdays will reset the daily cycle accrual.'
                         ].map((note, idx) => (
                             <li key={idx} className="flex gap-3 items-start group">
@@ -211,9 +216,18 @@ export default function SalaryPage() {
                     <div className="absolute bottom-0 right-0 w-32 h-32 bg-accent/5 rounded-tl-full" />
                     <h3 className="text-xs font-black text-white uppercase tracking-[0.3em] flex items-center gap-2">
                         <ShieldCheck size={16} className="text-success" />
-                        Compliance & Claims
+                        Compliance & Working Schedule
                     </h3>
                     <div className="space-y-4 relative z-10">
+                        <div className="p-4 rounded-xl bg-black/20 border border-white/5 space-y-1">
+                            <div className="flex items-center gap-2 text-amber-400">
+                                <Clock size={14} />
+                                <h4 className="text-[9px] font-black uppercase tracking-widest">Working Hours Window</h4>
+                            </div>
+                            <p className="text-[10px] text-text-secondary leading-relaxed font-bold uppercase tracking-widest opacity-70">
+                                10:00 AM – 7:00 PM CT (11:00 AM – 8:00 PM ET) • 7 Days a Week (Mon–Sun). Payouts and claims are validated in real-time by customer support.
+                            </p>
+                        </div>
                         <div className="p-4 rounded-xl bg-black/20 border border-white/5">
                             <h4 className="text-[9px] font-black text-primary-light uppercase tracking-widest mb-2">Claim Window</h4>
                             <p className="text-[10px] text-text-secondary leading-relaxed font-bold uppercase tracking-widest opacity-60">

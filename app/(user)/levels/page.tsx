@@ -76,7 +76,7 @@ export default function LevelsPage() {
                         </div>
                     </div>
                     <Link href="/salary" className="px-8 py-4 bg-white/5 border border-white/10 rounded-2xl text-[10px] font-black text-white uppercase tracking-[0.3em] hover:bg-white/10 hover:border-[#3DD6C8]/50 transition-all flex items-center gap-3">
-                        View All Nodes <ArrowRight size={14} className="text-[#3DD6C8]" />
+                        Salary Structure <ArrowRight size={14} className="text-[#3DD6C8]" />
                     </Link>
                  </div>
             </div>
@@ -142,11 +142,11 @@ export default function LevelsPage() {
                                 <div className="mt-8 relative z-10">
                                     {isCurrentLevel ? (
                                         <div className="w-full py-3.5 bg-gradient-to-r from-[#3DD6C8]/10 to-transparent border border-[#3DD6C8]/20 rounded-xl text-[9px] font-black text-[#3DD6C8] uppercase tracking-[0.3em] text-center shadow-lg shadow-[#3DD6C8]/5">
-                                            SECURE NODE ONLINE
+                                            ACTIVE LEVEL
                                         </div>
                                     ) : isLocked ? (
                                         <button className="w-full py-3.5 bg-white/5 border border-white/5 rounded-xl text-[9px] font-black text-white/30 uppercase tracking-[0.3em] hover:bg-white/10 hover:text-white transition-all group-hover:border-white/20">
-                                            PROTOCOL LOCKED
+                                            LOCKED
                                         </button>
                                     ) : (
                                         <div className="w-full py-3.5 bg-emerald-500/5 border border-emerald-500/10 rounded-xl text-[9px] font-black text-emerald-500/40 uppercase tracking-[0.3em] text-center">
@@ -160,6 +160,109 @@ export default function LevelsPage() {
                 )}
             </div>
             
+            {/* REWARD STRUCTURE SECTION - PLACED DIRECTLY BELOW VIP GRID */}
+            <div className="space-y-8 pt-6">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/5 pb-6">
+                    <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 shadow-[0_0_20px_rgba(245,158,11,0.15)]">
+                            <Sparkles size={24} />
+                        </div>
+                        <div>
+                            <div className="flex items-center gap-2">
+                                <span className="text-[10px] font-black text-amber-400 uppercase tracking-[0.3em]">Official Bonus Program</span>
+                            </div>
+                            <h2 className="text-2xl md:text-3xl font-black text-white uppercase italic tracking-tight leading-none">
+                                Reward Structure & Activation Bonuses
+                            </h2>
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                        <Link href="/rewards/first-deposit" className="px-5 py-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-300 text-[10px] font-black uppercase tracking-widest hover:bg-amber-500/20 transition-all">
+                            First Deposit Hub
+                        </Link>
+                        <Link href="/invite" className="px-5 py-2.5 rounded-xl bg-[#3DD6C8]/10 border border-[#3DD6C8]/20 text-[#3DD6C8] text-[10px] font-black uppercase tracking-widest hover:bg-[#3DD6C8]/20 transition-all flex items-center gap-2">
+                            Invite Friends <ArrowRight size={12} />
+                        </Link>
+                    </div>
+                </div>
+
+                {/* Deposit Tier Bonus Matrix */}
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3.5">
+                    {[
+                        { deposit: 500, bonus: 30, tag: 'Tier 1' },
+                        { deposit: 1000, bonus: 60, tag: 'Tier 2' },
+                        { deposit: 2000, bonus: 200, tag: 'Tier 3' },
+                        { deposit: 3000, bonus: 500, tag: 'Tier 4' },
+                        { deposit: 5000, bonus: 1000, tag: 'Tier 5' },
+                        { deposit: 10000, bonus: 2000, tag: 'Tier 6' },
+                    ].map((tier, idx) => (
+                        <div 
+                            key={idx}
+                            className="bg-[#0B0B1E] border border-white/5 hover:border-amber-400/30 p-5 rounded-[26px] text-center relative overflow-hidden group transition-all duration-500 hover:-translate-y-1 shadow-lg"
+                        >
+                            <div className="absolute inset-0 bg-gradient-to-b from-amber-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                            <span className="text-[9px] font-black text-amber-400/80 uppercase tracking-widest block mb-1.5">{tier.tag}</span>
+                            <span className="text-[10px] font-bold text-white/40 uppercase tracking-wider block mb-2">Deposit ${tier.deposit.toLocaleString()}</span>
+                            <div className="text-2xl font-black text-amber-400 tracking-tight leading-none mb-1">
+                                +${tier.bonus.toLocaleString()}
+                            </div>
+                            <span className="text-[8px] font-black text-white/40 uppercase tracking-widest">Bonus Credit</span>
+                        </div>
+                    ))}
+                </div>
+
+                {/* Referral & Team Commission Structure */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div className="bg-[#0B0B1E] border border-white/5 p-8 rounded-[36px] relative overflow-hidden group hover:border-[#3DD6C8]/30 transition-all duration-500">
+                        <div className="absolute top-0 right-0 w-48 h-48 bg-[#3DD6C8]/5 blur-3xl rounded-full pointer-events-none" />
+                        <div className="flex items-center justify-between mb-4">
+                            <span className="text-[10px] font-black text-[#3DD6C8] uppercase tracking-[0.25em]">Direct Tier 1</span>
+                            <span className="text-xs px-2.5 py-1 rounded-full bg-[#3DD6C8]/10 text-[#3DD6C8] font-bold">20% Yield</span>
+                        </div>
+                        <h3 className="text-xl font-black text-white uppercase italic tracking-tight mb-2">Direct Referrals</h3>
+                        <p className="text-xs font-bold text-white/50 leading-relaxed uppercase tracking-wider mb-6">
+                            Earn an instant 20% perpetual rebate commission from every task cycle completed by your direct invites.
+                        </p>
+                        <div className="pt-4 border-t border-white/5 flex items-center justify-between">
+                            <span className="text-[10px] font-black text-white/30 uppercase tracking-widest">Settlement</span>
+                            <span className="text-xs font-mono font-bold text-white">Instant Credit</span>
+                        </div>
+                    </div>
+
+                    <div className="bg-[#0B0B1E] border border-white/5 p-8 rounded-[36px] relative overflow-hidden group hover:border-indigo-500/30 transition-all duration-500">
+                        <div className="absolute top-0 right-0 w-48 h-48 bg-indigo-500/5 blur-3xl rounded-full pointer-events-none" />
+                        <div className="flex items-center justify-between mb-4">
+                            <span className="text-[10px] font-black text-indigo-400 uppercase tracking-[0.25em]">Team Tier 2</span>
+                            <span className="text-xs px-2.5 py-1 rounded-full bg-indigo-500/10 text-indigo-400 font-bold">10% Yield</span>
+                        </div>
+                        <h3 className="text-xl font-black text-white uppercase italic tracking-tight mb-2">Secondary Network</h3>
+                        <p className="text-xs font-bold text-white/50 leading-relaxed uppercase tracking-wider mb-6">
+                            Receive a secondary 10% reward tier from indirect participants invited by your direct team members.
+                        </p>
+                        <div className="pt-4 border-t border-white/5 flex items-center justify-between">
+                            <span className="text-[10px] font-black text-white/30 uppercase tracking-widest">Settlement</span>
+                            <span className="text-xs font-mono font-bold text-white">Automated</span>
+                        </div>
+                    </div>
+
+                    <div className="bg-[#0B0B1E] border border-white/5 p-8 rounded-[36px] relative overflow-hidden group hover:border-emerald-500/30 transition-all duration-500">
+                        <div className="absolute top-0 right-0 w-48 h-48 bg-emerald-500/5 blur-3xl rounded-full pointer-events-none" />
+                        <div className="flex items-center justify-between mb-4">
+                            <span className="text-[10px] font-black text-emerald-400 uppercase tracking-[0.25em]">Network Tier 3</span>
+                            <span className="text-xs px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 font-bold">5% Yield</span>
+                        </div>
+                        <h3 className="text-xl font-black text-white uppercase italic tracking-tight mb-2">Extended Community</h3>
+                        <p className="text-xs font-bold text-white/50 leading-relaxed uppercase tracking-wider mb-6">
+                            Scale your passive earnings with a 5% tertiary tier from third-level participant activity.
+                        </p>
+                        <div className="pt-4 border-t border-white/5 flex items-center justify-between">
+                            <span className="text-[10px] font-black text-white/30 uppercase tracking-widest">Settlement</span>
+                            <span className="text-xs font-mono font-bold text-white">Real-Time</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
             {/* OPTIMIZATION INSIGHTS */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-12">
                 <div className="bg-[#0B0B1E] border border-white/5 p-8 rounded-[32px] flex items-center gap-6">
@@ -167,9 +270,9 @@ export default function LevelsPage() {
                         <TrendingUp className="text-amber-500" size={24} />
                     </div>
                     <div>
-                        <h4 className="text-[10px] font-black text-white/20 uppercase tracking-[0.3em] mb-1">Network Yield Velocity</h4>
+                        <h4 className="text-[10px] font-black text-white/20 uppercase tracking-[0.3em] mb-1">Higher Level Benefits</h4>
                         <p className="text-[11px] font-black text-white/60 uppercase tracking-widest leading-relaxed">
-                            Master Agent nodes achieve the highest clearing priority on the decentralized matrix.
+                            Higher VIP levels unlock better commission rates and priority processing on all tasks.
                         </p>
                     </div>
                 </div>
@@ -178,9 +281,9 @@ export default function LevelsPage() {
                         <ShieldCheck className="text-indigo-500" size={24} />
                     </div>
                     <div>
-                        <h4 className="text-[10px] font-black text-white/20 uppercase tracking-[0.3em] mb-1">Asset Security Shard</h4>
+                        <h4 className="text-[10px] font-black text-white/20 uppercase tracking-[0.3em] mb-1">Your Funds Are Secure</h4>
                         <p className="text-[11px] font-black text-white/60 uppercase tracking-widest leading-relaxed">
-                            All tier transitions are verified via multi-signature consensus across the node infrastructure.
+                            All level upgrades and account transitions are verified by our customer support team.
                         </p>
                     </div>
                 </div>

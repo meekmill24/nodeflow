@@ -151,7 +151,7 @@ export default function BindWalletPage() {
                                         type="text"
                                         value={walletAddress}
                                         onChange={(e) => setWalletAddress(e.target.value)}
-                                        placeholder={network === 'PayPal' ? 'e.g. yourname@gmail.com' : `Enter ${network} address`}
+                                        placeholder={network === 'PAYPALUSD' ? '0x... PayPal USD (PYUSD) address' : `Enter ${network} address`}
                                         className="w-full bg-text-primary/5 border border-text-primary/10 rounded-xl py-4 pl-12 pr-4 text-text-primary placeholder-text-primary/30 focus:border-primary-light focus:bg-text-primary/10 transition-all outline-none font-mono text-sm"
                                     />
                                 </div>
@@ -171,7 +171,7 @@ export default function BindWalletPage() {
                                     network === 'BTC' ? 'from-orange-500 to-orange-600 shadow-orange-500/30' : 
                                     network === 'ETH' ? 'from-indigo-500 to-indigo-600 shadow-indigo-500/30' :
                                     network === 'BNB' ? 'from-amber-500 to-amber-600 shadow-amber-500/30' :
-                                    network === 'PayPal' ? 'from-sky-500 to-blue-600 shadow-sky-500/30' :
+                                    network === 'PAYPALUSD' ? 'from-sky-500 to-blue-600 shadow-sky-500/30' :
                                     ''
                                 }`}
                             >

@@ -218,7 +218,7 @@ export default function StartPage() {
                 setModalOpen(false); 
                 const profit = Number(data?.earned_amount) || 0;
                 setProfitAdded(profit); 
-                toast.success(`Optimization Synchronized! Cloud Yield: ${format(profit)} credited to node.`);
+                toast.success(`Optimization Synchronized! Cloud Yield: ${format(profit)} credited to your account.`);
                 confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
                 await refreshProfile();
                 setTimeout(() => setProfitAdded(null), 3000);
@@ -274,7 +274,7 @@ export default function StartPage() {
                                     navigator.clipboard.writeText(profile?.referral_code || '');
                                     toast.success('Referral Protocol Copied');
                                 }}>
-                                    <span className="text-[9px] font-black text-white/40 uppercase tracking-[0.2em]">Node ID:</span>
+                                    <span className="text-[9px] font-black text-white/40 uppercase tracking-[0.2em]">Referral Code:</span>
                                     <span className="text-[9px] font-black text-[#3DD6C8] uppercase tracking-widest">{profile?.referral_code || '---'}</span>
                                     <Copy size={10} className="text-white/20 group-hover/ref:text-[#3DD6C8] transition-colors" />
                                 </div>

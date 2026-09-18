@@ -35,18 +35,6 @@ const BONUS_CHIPS = [
 export default function RulesPage() {
     return (
         <div className="max-w-5xl mx-auto pb-20 animate-fade-in space-y-10">
-            
-
-            <div className="flex items-center justify-between">
-                <div>
-                    <h1 className="text-2xl font-black text-text-primary dark:text-white uppercase tracking-tight">System Protocols</h1>
-                    <p className="text-text-secondary text-xs mt-1 font-bold uppercase tracking-widest font-mono opacity-60">Governance & Reward Structure</p>
-                </div>
-                <div className="flex gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-success shadow-[0_0_5px_var(--color-success)]" />
-                    <span className="text-[10px] font-black text-text-secondary uppercase tracking-[0.2em]">Live Policy</span>
-                </div>
-            </div>
 
             {/* Salary Hub Section */}
             <div className="space-y-6">

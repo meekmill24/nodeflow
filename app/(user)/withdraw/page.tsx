@@ -18,14 +18,8 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 
-// Salary structure from the Simple Music table
-const SALARY_STRUCTURE: Record<number, { next: number; fourth: number; seventh: number; fifteenth: number; thirty: number; monthly: number }> = {
-    1: { next: 1000, fourth: 3000, seventh: 10000, fifteenth: 18000, thirty: 50000, monthly: 82000 },
-    2: { next: 2000, fourth: 6000, seventh: 20000, fifteenth: 36000, thirty: 100000, monthly: 164000 },
-    3: { next: 3000, fourth: 9000, seventh: 30000, fifteenth: 54000, thirty: 150000, monthly: 246000 },
-    4: { next: 4000, fourth: 12000, seventh: 40000, fifteenth: 72000, thirty: 200000, monthly: 328000 },
-    5: { next: 10000, fourth: 30000, seventh: 100000, fifteenth: 180000, thirty: 500000, monthly: 820000 },
-};
+// Default preset withdrawal tiers
+const QUICK_WITHDRAW_PRESETS = [100, 300, 500, 1000, 2000, 5000];
 
 export default function WithdrawPage() {
     const { profile, refreshProfile } = useAuth();
@@ -54,15 +48,13 @@ export default function WithdrawPage() {
                 setLevelName(data.name);
                 const lvNum = data.name.match(/\d+/)?.[0] ? parseInt(data.name.match(/\d+/)![0]) : 1;
                 setLevelIndex(lvNum);
-                const structMin = SALARY_STRUCTURE[lvNum]?.next || 100;
-                setMinWithdrawal(data.min_withdrawal || structMin);
+                setMinWithdrawal(data.min_withdrawal || 100);
             }
         };
         fetchLevel();
     }, [profile?.level_id]);
 
-    const salaryRow = SALARY_STRUCTURE[levelIndex] || SALARY_STRUCTURE[1];
-    const quickAmounts = [minWithdrawal, salaryRow.fourth, salaryRow.seventh].filter(v => v <= balance);
+    const quickAmounts = Array.from(new Set([minWithdrawal, ...QUICK_WITHDRAW_PRESETS])).filter(v => v <= balance && v >= minWithdrawal);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -78,7 +70,7 @@ export default function WithdrawPage() {
             return;
         }
         if (!walletAddress.trim()) {
-            setError(network === 'PAYPAL' ? 'Please enter your PayPal email or account ID.' : `Please enter your ${network} destination address.`);
+            setError(network === 'PAYPALUSD' ? 'Please enter your PayPal USD (PYUSD) destination address.' : `Please enter your ${network} destination address.`);
             return;
         }
 
@@ -142,33 +134,47 @@ export default function WithdrawPage() {
     return (
         <div className="max-w-4xl mx-auto space-y-8 animate-fade-in pb-12">
             
-            <div className="flex flex-col items-center justify-center mb-6 text-center">
-                <h2 className="text-2xl font-black text-text-primary dark:text-white uppercase tracking-tight">Withdrawal</h2>
+            <div className="flex flex-col items-center justify-center mb-4 text-center">
+                <h2 className="text-3xl font-black text-text-primary dark:text-white uppercase tracking-tight">Withdrawal</h2>
             </div>
 
-            {/* Available Funds Banner */}
-            <div className="glass-card-glow p-8 flex flex-col items-center justify-center relative overflow-hidden group border-primary/20">
-                <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
-                <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-primary/10 rounded-full blur-3xl opacity-50" />
-                <div className="absolute -top-10 -left-10 w-32 h-32 bg-accent/10 rounded-full blur-3xl opacity-50" />
+            {/* Available Funds Banner - Enhanced Premium Card */}
+            <div className="bg-gradient-to-b from-[#0e1428]/95 via-[#090d1c]/95 to-[#060812] border border-[#3DD6C8]/25 p-10 sm:p-14 md:p-16 rounded-[44px] shadow-[0_25px_80px_-15px_rgba(61,214,200,0.22)] flex flex-col items-center justify-center relative overflow-hidden group transition-all duration-700 hover:border-[#3DD6C8]/40">
+                {/* Glow & Highlight effects */}
+                <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-[#3DD6C8] to-transparent opacity-80" />
+                <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-[480px] h-[480px] bg-[#3DD6C8]/15 rounded-full blur-[110px] pointer-events-none" />
+                <div className="absolute -bottom-24 right-10 w-72 h-72 bg-indigo-500/10 rounded-full blur-[90px] pointer-events-none" />
+                <div className="absolute -bottom-24 left-10 w-72 h-72 bg-emerald-500/10 rounded-full blur-[90px] pointer-events-none" />
                 
                 {/* Status Badge in Banner */}
-                <div className="mb-4 px-3 py-1 rounded-full bg-success/20 border border-success/30 flex items-center gap-2">
-                    <ShieldCheck size={12} className="text-success" />
-                    <span className="text-[10px] font-black text-text-primary dark:text-white uppercase tracking-widest">{levelName} Verified Status</span>
+                <div className="mb-6 px-5 py-2 rounded-full bg-white/[0.04] border border-white/15 backdrop-blur-xl flex items-center gap-2.5 shadow-[0_4px_20px_rgba(0,0,0,0.35)] group-hover:border-[#3DD6C8]/40 transition-all">
+                    <ShieldCheck size={16} className="text-[#3DD6C8]" />
+                    <span className="text-[11px] sm:text-xs font-black text-white uppercase tracking-[0.25em]">
+                        {levelName} Verified Status
+                    </span>
                 </div>
 
-                <span className="text-[10px] font-black text-text-secondary uppercase tracking-[0.4em] mb-3 opacity-60">Available Funds for Payout</span>
-                <div className="flex items-baseline gap-2">
-                    <span className="text-4xl font-black text-text-primary dark:text-white leading-none">${balance.toFixed(2)}</span>
-                    <span className="text-xs font-black text-success uppercase tracking-widest">
-                        {network === 'ERC20' ? 'ETH' : network === 'BTC' ? 'BTC' : 'USDT'}
+                {/* Subtitle */}
+                <span className="text-xs sm:text-sm font-black text-white/50 uppercase tracking-[0.35em] mb-3">
+                    Available Funds for Payout
+                </span>
+
+                {/* Amount */}
+                <div className="flex flex-wrap items-baseline justify-center gap-3 my-2">
+                    <span className="text-6xl sm:text-7xl md:text-8xl font-black text-white tracking-tight leading-none drop-shadow-[0_10px_35px_rgba(61,214,200,0.25)]">
+                        ${balance.toFixed(2)}
+                    </span>
+                    <span className="text-sm sm:text-base font-black text-[#3DD6C8] uppercase tracking-widest px-3.5 py-1.5 rounded-2xl bg-[#3DD6C8]/10 border border-[#3DD6C8]/25 shadow-[0_0_15px_rgba(61,214,200,0.15)]">
+                        {network === 'ERC20' ? 'ETH' : network === 'BTC' ? 'BTC' : network === 'PAYPALUSD' ? 'PYUSD' : 'USDT'}
                     </span>
                 </div>
                 
-                <div className="mt-4 flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/5">
-                    <Zap size={12} className="text-warning animate-pulse" />
-                    <span className="text-[8px] font-black text-text-secondary uppercase tracking-[0.2em]">Escrow Control Active</span>
+                {/* Bottom Badge */}
+                <div className="mt-7 flex items-center gap-2.5 px-5 py-2 rounded-full bg-amber-400/[0.08] border border-amber-400/25 backdrop-blur-xl shadow-[0_0_20px_rgba(251,191,36,0.1)]">
+                    <Zap size={14} className="text-amber-400 animate-pulse" />
+                    <span className="text-[10px] sm:text-xs font-black text-amber-300 uppercase tracking-[0.22em]">
+                        Escrow Control Active
+                    </span>
                 </div>
             </div>
 
@@ -318,46 +324,6 @@ export default function WithdrawPage() {
                     </form>
                 </div>
 
-                {/* Salary Schedule: Premium Grid */}
-                <div className="w-full space-y-8">
-                    <div className="text-center space-y-2">
-                        <h3 className="text-sm font-black text-text-primary dark:text-white uppercase tracking-[0.3em] flex items-center justify-center gap-2">
-                            <Zap size={18} className="text-primary-light" />
-                            Performance Salary Hub
-                        </h3>
-                        <p className="text-[10px] font-bold text-text-secondary uppercase tracking-widest opacity-60">Verified benefit structure for {levelName}</p>
-                    </div>
-
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-                        {[
-                            { label: 'Next Day', value: salaryRow.next, icon: Clock },
-                            { label: '4th Day', value: salaryRow.fourth, icon: ShieldCheck },
-                            { label: '7th Day', value: salaryRow.seventh, icon: Zap },
-                            { label: '15th Day', value: salaryRow.fifteenth, icon: CreditCard },
-                            { label: '30 Days', value: salaryRow.thirty, icon: Wallet },
-                            { label: 'Monthly', value: salaryRow.monthly, icon: Info },
-                        ].map((row, idx) => (
-                            <div key={idx} className="glass-card p-6 flex flex-col items-center text-center space-y-3 border-white/5 hover:border-primary/20 hover:bg-white/5 transition-all group">
-                                <div className="p-3 rounded-2xl bg-white/5 group-hover:bg-primary/10 transition-colors">
-                                    <row.icon size={20} className="text-text-secondary group-hover:text-primary-light transition-colors" />
-                                </div>
-                                <div>
-                                    <span className="text-[9px] font-black text-text-secondary uppercase tracking-widest block mb-1">{row.label}</span>
-                                    <p className="text-lg font-black text-text-primary dark:text-white font-mono tracking-tighter">${row.value.toLocaleString()}</p>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-
-                    <div className="flex items-center justify-center gap-4 p-6 bg-white/[0.02] rounded-[30px] border border-white/5 max-w-2xl mx-auto">
-                        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                            <Info size={20} className="text-primary-light" />
-                        </div>
-                        <p className="text-[10px] font-bold text-text-secondary leading-relaxed uppercase tracking-wider italic">
-                            Withdrawal requests are verified and approved by customer service during official working hours (US Central Time 10:00 AM – 7:00 PM, Monday to Sunday).
-                        </p>
-                    </div>
-                </div>
             </div>
 
         </div>

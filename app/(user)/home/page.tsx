@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase/index';
 import { useAuth } from '@/context/AuthContext';
@@ -30,7 +30,12 @@ import {
     Wallet,
     HelpCircle,
     ShieldAlert,
-    Copy 
+    Copy,
+    Map,
+    ExternalLink,
+    Star,
+    Share2,
+    Check
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -43,6 +48,11 @@ export default function HomePage() {
         completedTasks: 0,
         pendingTasks: 0
     });
+    const [referralStats, setReferralStats] = useState({
+        totalReferrals: 0,
+        commissionEarned: 0
+    });
+    const [referralCopied, setReferralCopied] = useState(false);
     const [levels, setLevels] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -51,14 +61,19 @@ export default function HomePage() {
             if (!profile) return;
             setLoading(true);
             try {
-                const [allRes, levelsResult] = await Promise.all([
+                const [allRes, levelsResult, referralRes] = await Promise.all([
                     supabase.from('user_tasks').select('*', { count: 'exact', head: true }).eq('user_id', profile.id),
-                    supabase.from('levels').select('*').order('price', { ascending: true }).limit(4)
+                    supabase.from('levels').select('*').order('price', { ascending: true }).limit(4),
+                    supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('referred_by', profile.id)
                 ]);
                 setStats({
                     totalTasks: allRes.count || 0,
                     completedTasks: profile.completed_count || 0,
                     pendingTasks: Math.max(0, (allRes.count || 0) - (profile.completed_count || 0))
+                });
+                setReferralStats({
+                    totalReferrals: referralRes.count || 0,
+                    commissionEarned: profile.referral_earned || 0
                 });
                 if (levelsResult.data) setLevels(levelsResult.data);
             } catch (error) {
@@ -93,12 +108,12 @@ export default function HomePage() {
                                         <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.8)]" />
                                         <span className="text-[9px] font-black text-emerald-400 uppercase tracking-[0.2em]">{t('neural_active')}</span>
                                     </div>
-                                    <span className="text-[9px] font-black text-white/30 uppercase tracking-[0.4em] italic">Identity Shard Verified</span>
+                                    <span className="text-[9px] font-black text-white/30 uppercase tracking-[0.4em] italic">Verified Account</span>
                                     <div className="flex items-center gap-2 px-3 py-1 bg-white/5 border border-white/10 rounded-full group/ref cursor-pointer hover:bg-white/10 transition-all" onClick={() => {
                                         navigator.clipboard.writeText(profile?.referral_code || '');
                                         toast.success('Referral Protocol Copied');
                                     }}>
-                                        <span className="text-[9px] font-black text-white/40 uppercase tracking-[0.2em]">Node ID:</span>
+                                        <span className="text-[9px] font-black text-white/40 uppercase tracking-[0.2em]">Referral Code:</span>
                                         <span className="text-[9px] font-black text-[#3DD6C8] uppercase tracking-widest">{profile?.referral_code || '---'}</span>
                                         <Copy size={10} className="text-white/20 group-hover/ref:text-[#3DD6C8] transition-colors" />
                                     </div>
@@ -186,17 +201,18 @@ export default function HomePage() {
                         <h3 className="text-[10px] font-black text-white/50 uppercase tracking-[0.4em]">QUICK HUB SELECT</h3>
                     </div>
                     
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
                         {[
                             { icon: ArrowDownLeft, label: t('deposit'), href: '/deposit', color: 'text-[#3DD6C8]', bg: 'bg-[#3DD6C8]/5' },
                             { icon: ArrowUpRight, label: t('withdraw'), href: '/withdraw', color: 'text-amber-500', bg: 'bg-amber-500/5' },
-                            { icon: TrendingUp, label: 'Salary Structure', href: '/salary', color: 'text-cyan-400', bg: 'bg-cyan-400/5' },
                             { icon: Building2, label: t('company'), href: '/company', color: 'text-indigo-400', bg: 'bg-indigo-400/5' },
                             { icon: FileText, label: 'Certificate', href: '/certificate', color: 'text-pink-500', bg: 'bg-pink-500/5' },
                             { icon: ShieldCheck, label: 'Terms and Conditions', href: '/rules', color: 'text-emerald-500', bg: 'bg-emerald-500/5' },
                             { icon: HelpCircle, label: 'FAQ', href: '/faq', color: 'text-blue-500', bg: 'bg-blue-500/5' },
                             { icon: ShieldAlert, label: 'Privacy', href: '/privacy', color: 'text-orange-500', bg: 'bg-orange-500/5' },
                             { icon: Headset, label: 'Customer Support', href: '/concierge', color: 'text-rose-500', bg: 'bg-rose-500/5' },
+                            { icon: Map, label: 'VIP Map & Rewards', href: '/levels', color: 'text-violet-400', bg: 'bg-violet-400/5' },
+                            { icon: TrendingUp, label: 'Salary Structure', href: '/salary', color: 'text-cyan-400', bg: 'bg-cyan-400/5' },
                         ].map((hub, i) => (
                             <Link key={i} href={hub.href} className="group p-6 rounded-[36px] bg-[#0B0B1E] border border-white/5 flex flex-col items-center gap-4 hover:border-white/10 transition-all duration-500 hover:-translate-y-1">
                                 <div className={`w-12 h-12 rounded-2xl ${hub.bg} border border-white/5 flex items-center justify-center ${hub.color} group-hover:scale-110 transition-transform duration-700`}>
@@ -205,6 +221,13 @@ export default function HomePage() {
                                 <span className="text-[10px] font-black text-white/60 uppercase tracking-[0.25em] text-center">{hub.label}</span>
                             </Link>
                         ))}
+                        {/* WFP External Link */}
+                        <a href="https://www.wfp.org" target="_blank" rel="noopener noreferrer" className="group p-6 rounded-[36px] bg-[#0B0B1E] border border-white/5 flex flex-col items-center gap-4 hover:border-white/10 transition-all duration-500 hover:-translate-y-1">
+                            <div className="w-12 h-12 rounded-2xl bg-blue-600/10 border border-white/5 flex items-center justify-center group-hover:scale-110 transition-transform duration-700 p-2">
+                                <img src="/wfp-logo.svg" alt="World Food Programme" className="w-7 h-7 object-contain filter drop-shadow-[0_0_8px_rgba(82,137,195,0.5)]" />
+                            </div>
+                            <span className="text-[10px] font-black text-white/60 uppercase tracking-[0.25em] text-center">WFP</span>
+                        </a>
                     </div>
                 </div>
 
@@ -216,7 +239,7 @@ export default function HomePage() {
                             <h3 className="text-[10px] font-black text-white/50 uppercase tracking-[0.4em]">{t('vip_evolution')}</h3>
                         </div>
                         <Link href="/levels" className="text-[9px] font-black text-[#3DD6C8] uppercase tracking-[0.2em] hover:tracking-[0.3em] transition-all flex items-center gap-2 group">
-                             {t('view_all_nodes')} <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                             VIP Map & Rewards <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
                         </Link>
                     </div>
 
@@ -238,7 +261,7 @@ export default function HomePage() {
                                                 <Award size={20} className={isUnlocked ? 'text-[#3DD6C8]' : 'text-slate-700'} />
                                             </div>
                                             <div>
-                                                <h4 className="text-lg font-black text-white italic uppercase tracking-tighter leading-none">{level.name || `NODE LV.${i + 1}`}</h4>
+                                                <h4 className="text-lg font-black text-white italic uppercase tracking-tighter leading-none">{level.name || `Level ${i + 1}`}</h4>
                                                 <div className="flex items-center gap-1.5 mt-1">
                                                     <span className="text-[7px] font-black text-white/30 uppercase tracking-[0.2em]">{t('rebate_power')}</span>
                                                     <span className="text-[9px] font-black text-[#3DD6C8]">{(level.commission_rate * 100).toFixed(2)}%</span>
@@ -282,31 +305,131 @@ export default function HomePage() {
                             <span className="text-white/40 group-hover:text-white transition-all duration-700">Wealth Extraction.</span>
                         </h3>
                         <p className="text-[11px] font-bold text-white/30 uppercase tracking-[0.2em] leading-relaxed">
-                            Share your identity shard with friends. Each successful node established grants a perpetual 20% yield optimization on their daily productivity.
+                            Invite your friends and earn 20% commission from their daily task earnings.
                         </p>
                     </div>
                     
                     <Link href="/invite" className="flex items-center gap-6 px-12 py-7 bg-[#3DD6C8] text-[#0B0B1E] rounded-[24px] font-black uppercase tracking-[0.2em] text-sm hover:scale-105 active:scale-95 transition-all shadow-[0_0_50px_rgba(61,214,200,0.3)] group-hover:shadow-[0_0_70px_rgba(61,214,200,0.5)]">
-                        Establish Connection <ArrowRight size={20} />
+                        Invite Friends <ArrowRight size={20} />
                     </Link>
                 </div>
             </div>
 
-            {/* SYSTEM NODES GRID */}
+            {/* REFERRAL SPOTLIGHT */}
+            <div className="relative group overflow-hidden rounded-[48px] bg-[#0B0B1E] border border-white/5">
+                {/* Animated glow orbs */}
+                <div className="absolute -top-20 -left-20 w-64 h-64 bg-indigo-500/10 rounded-full blur-[80px] group-hover:bg-indigo-500/20 transition-all duration-1000 pointer-events-none" />
+                <div className="absolute -bottom-20 -right-20 w-80 h-80 bg-violet-500/10 rounded-full blur-[100px] group-hover:bg-violet-500/15 transition-all duration-1000 pointer-events-none" />
+                <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-indigo-400/40 to-transparent" />
+
+                <div className="relative p-10 md:p-14 space-y-10">
+                    {/* Section header */}
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                            <div className="w-12 h-12 rounded-3xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center shadow-[0_0_24px_rgba(99,102,241,0.2)]">
+                                <Star className="text-indigo-400" size={22} fill="rgba(99,102,241,0.3)" />
+                            </div>
+                            <div>
+                                <h3 className="text-lg font-black text-white italic uppercase tracking-tight leading-none">Referral Spotlight</h3>
+                                <p className="text-[9px] font-black text-white/30 uppercase tracking-[0.3em] mt-1">Your Network Performance</p>
+                            </div>
+                        </div>
+                        <Link href="/invite" className="text-[9px] font-black text-indigo-400 uppercase tracking-[0.2em] hover:tracking-[0.3em] transition-all flex items-center gap-2 group/lnk">
+                            View All <ArrowRight size={13} className="group-hover/lnk:translate-x-1 transition-transform" />
+                        </Link>
+                    </div>
+
+                    {/* Stats row */}
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                        {/* Total Referrals */}
+                        <div className="relative p-6 rounded-[32px] bg-white/[0.03] border border-white/5 overflow-hidden group/card hover:border-indigo-500/20 transition-all duration-500">
+                            <div className="absolute top-0 right-0 p-5 opacity-5">
+                                <Users size={64} />
+                            </div>
+                            <p className="text-[9px] font-black text-white/30 uppercase tracking-[0.3em] mb-3">Total Referrals</p>
+                            <p className="text-5xl font-black text-white italic tracking-tighter drop-shadow-[0_0_20px_rgba(99,102,241,0.3)]">
+                                {referralStats.totalReferrals}
+                            </p>
+                            <div className="flex items-center gap-2 mt-3">
+                                <div className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse shadow-[0_0_8px_rgba(99,102,241,0.8)]" />
+                                <span className="text-[8px] font-black text-indigo-400 uppercase tracking-widest">Active Members</span>
+                            </div>
+                        </div>
+
+                        {/* Commission Earned */}
+                        <div className="relative p-6 rounded-[32px] bg-white/[0.03] border border-white/5 overflow-hidden group/card hover:border-violet-500/20 transition-all duration-500">
+                            <div className="absolute top-0 right-0 p-5 opacity-5">
+                                <TrendingUp size={64} />
+                            </div>
+                            <p className="text-[9px] font-black text-white/30 uppercase tracking-[0.3em] mb-3">Commission Earned</p>
+                            <p className="text-5xl font-black text-violet-400 italic tracking-tighter drop-shadow-[0_0_20px_rgba(167,139,250,0.3)]">
+                                {format(referralStats.commissionEarned)}
+                            </p>
+                            <div className="flex items-center gap-2 mt-3">
+                                <div className="w-1.5 h-1.5 rounded-full bg-violet-400 animate-pulse shadow-[0_0_8px_rgba(167,139,250,0.8)]" />
+                                <span className="text-[8px] font-black text-violet-400 uppercase tracking-widest">20% Yield Rate</span>
+                            </div>
+                        </div>
+
+                        {/* Referral Code */}
+                        <div className="relative p-6 rounded-[32px] bg-white/[0.03] border border-white/5 overflow-hidden group/card hover:border-[#3DD6C8]/20 transition-all duration-500">
+                            <div className="absolute top-0 right-0 p-5 opacity-5">
+                                <Share2 size={64} />
+                            </div>
+                            <p className="text-[9px] font-black text-white/30 uppercase tracking-[0.3em] mb-3">Your Referral Code</p>
+                            <div
+                                onClick={() => {
+                                    navigator.clipboard.writeText(profile?.referral_code || '');
+                                    setReferralCopied(true);
+                                    setTimeout(() => setReferralCopied(false), 2000);
+                                }}
+                                className="flex items-center gap-3 cursor-pointer group/code"
+                            >
+                                <p className="text-5xl font-black text-[#3DD6C8] italic tracking-tighter drop-shadow-[0_0_20px_rgba(61,214,200,0.3)]">
+                                    {profile?.referral_code || '---'}
+                                </p>
+                                <div className="w-8 h-8 rounded-xl bg-[#3DD6C8]/10 border border-[#3DD6C8]/20 flex items-center justify-center shrink-0 group-hover/code:scale-110 transition-transform">
+                                    {referralCopied ? <Check size={14} className="text-[#3DD6C8]" /> : <Copy size={14} className="text-[#3DD6C8]" />}
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-2 mt-3">
+                                <div className="w-1.5 h-1.5 rounded-full bg-[#3DD6C8] animate-pulse shadow-[0_0_8px_rgba(61,214,200,0.8)]" />
+                                <span className="text-[8px] font-black text-[#3DD6C8] uppercase tracking-widest">{referralCopied ? 'Copied!' : 'Tap to Copy'}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* CTA */}
+                    <div className="flex flex-col sm:flex-row items-center justify-between gap-6 pt-4 border-t border-white/5">
+                        <p className="text-[10px] font-bold text-white/30 uppercase tracking-[0.2em] leading-relaxed max-w-md">
+                            Earn a perpetual <span className="text-indigo-400 font-black">20% commission</span> from every member you refer. Share your code and watch your network grow.
+                        </p>
+                        <Link
+                            href="/invite"
+                            className="flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-indigo-500 to-violet-500 text-white rounded-[20px] font-black uppercase tracking-[0.2em] text-[11px] hover:scale-105 active:scale-95 transition-all shadow-[0_0_40px_rgba(99,102,241,0.3)] hover:shadow-[0_0_60px_rgba(99,102,241,0.5)] shrink-0"
+                        >
+                            <Share2 size={16} />
+                            Invite & Earn
+                        </Link>
+                    </div>
+                </div>
+            </div>
+
+            {/* QUICK ACCESS GRID */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 {[
-                    { icon: Play, label: t('start_tasks_label'), desc: t('optimize_now'), href: '/start', color: 'text-[#3DD6C8]' },
-                    { icon: Clock, label: t('activity_records_label'), desc: t('settlements'), href: '/record', color: 'text-amber-400' },
-                    { icon: Headset, label: 'Customer Support', desc: 'Active Protocol', href: '/concierge', color: 'text-indigo-400' },
+                    { icon: Play, label: t('start_tasks_label'), desc: 'Start Earning', href: '/start', color: 'text-[#3DD6C8]' },
+                    { icon: Clock, label: t('activity_records_label'), desc: 'View Records', href: '/record', color: 'text-amber-400' },
+                    { icon: Headset, label: 'Customer Support', desc: 'Get Help', href: '/concierge', color: 'text-indigo-400' },
                     { icon: ShieldCheck, label: t('legal_governance_label'), desc: 'Compliance', href: '/rules', color: 'text-emerald-400' }
-                ].map((node, i) => (
-                    <Link key={i} href={node.href} className="group p-8 rounded-[40px] bg-[#0B0B1E] border border-white/5 flex flex-col items-center text-center gap-6 hover:border-white/10 transition-all duration-700 hover:-translate-y-1">
-                        <div className={`w-14 h-14 rounded-3xl bg-white/5 flex items-center justify-center ${node.color} group-hover:scale-110 transition-transform`}>
-                            <node.icon size={26} />
+                ].map((item, i) => (
+                    <Link key={i} href={item.href} className="group p-8 rounded-[40px] bg-[#0B0B1E] border border-white/5 flex flex-col items-center text-center gap-6 hover:border-white/10 transition-all duration-700 hover:-translate-y-1">
+                        <div className={`w-14 h-14 rounded-3xl bg-white/5 flex items-center justify-center ${item.color} group-hover:scale-110 transition-transform`}>
+                            <item.icon size={26} />
                         </div>
                         <div className="space-y-1">
-                             <h4 className="text-[11px] font-black text-white uppercase tracking-widest leading-none">{node.label}</h4>
-                             <p className="text-[9px] font-black text-white/20 uppercase tracking-[0.2em]">{node.desc}</p>
+                             <h4 className="text-[11px] font-black text-white uppercase tracking-widest leading-none">{item.label}</h4>
+                             <p className="text-[9px] font-black text-white/20 uppercase tracking-[0.2em]">{item.desc}</p>
                         </div>
                     </Link>
                 ))}

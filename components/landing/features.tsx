@@ -195,6 +195,63 @@ export function Features() {
             </motion.div>
           </div>
         </motion.div>
+
+        {/* Team Photos Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="mt-24"
+        >
+          <div className="text-center mb-12">
+            <h3 className="text-3xl font-bold text-foreground mb-3">
+              Our Team at Work
+            </h3>
+            <p className="text-muted-foreground max-w-lg mx-auto">
+              Dedicated professionals working to deliver the best experience for our members
+            </p>
+          </div>
+          <div className="grid md:grid-cols-2 gap-6">
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="relative rounded-3xl overflow-hidden border border-border group"
+            >
+              <img
+                src="/team-photo-1.jpg"
+                alt="SmartBugMedia team collaborating on strategy"
+                className="w-full h-72 object-cover group-hover:scale-105 transition-transform duration-700"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
+              <div className="absolute bottom-6 left-6">
+                <p className="text-sm font-semibold text-foreground">Strategy & Planning</p>
+                <p className="text-xs text-muted-foreground mt-1">SmartBugMedia Operations Team</p>
+              </div>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+              className="relative rounded-3xl overflow-hidden border border-border group"
+            >
+              <img
+                src="/team-photo-2.jpg"
+                alt="SmartBugMedia team members working together"
+                className="w-full h-72 object-cover group-hover:scale-105 transition-transform duration-700"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
+              <div className="absolute bottom-6 left-6">
+                <p className="text-sm font-semibold text-foreground">Member Success</p>
+                <p className="text-xs text-muted-foreground mt-1">Helping members achieve their goals</p>
+              </div>
+            </motion.div>
+          </div>
+        </motion.div>
+
       </div>
     </section>
   );

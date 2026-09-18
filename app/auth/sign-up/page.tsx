@@ -64,28 +64,28 @@ function SignUpForm() {
             }
         }
 
-        // Validate invitation code against profiles table if entered
+        // Validate invitation code via server endpoint if entered
         if (referral.trim()) {
             setIsLoading(true)
             try {
-                const supabase = createClient()
-                const { data: inviter, error: inviterError } = await supabase
-                    .from('profiles')
-                    .select('id')
-                    .eq('referral_code', referral.trim().toUpperCase())
-                    .maybeSingle()
-
-                if (inviterError) {
-                    console.error('Error verifying referral code:', inviterError)
-                } else if (!inviter) {
-                    setError('Invalid invitation code. Connection refused.')
-                    setIsLoading(false)
-                    return
+                const res = await fetch('/api/auth/verify-referral', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ code: referral.trim() })
+                });
+                const data = await res.json();
+                if (!res.ok || !data.valid) {
+                    setError(data.error || 'Invalid invitation code. Connection refused.');
+                    setIsLoading(false);
+                    return;
                 }
-            } catch (err) {
-                console.error('Referral check error:', err)
+            } catch (err: any) {
+                console.error('Referral check error:', err);
+                setError('Failed to verify invitation code. Please try again.');
+                setIsLoading(false);
+                return;
             } finally {
-                setIsLoading(false)
+                setIsLoading(false);
             }
         }
 
@@ -147,7 +147,7 @@ function SignUpForm() {
                     body: JSON.stringify({ email: apiData.fakeEmail, username: username || apiData.fakeEmail })
                 }).catch(e => console.error('Silent Email Error:', e));
                 
-                router.push('/app')
+                router.push('/home')
             } else {
                 const { data, error: signUpError } = await supabase.auth.signUp({
                     email: email,
@@ -296,8 +296,8 @@ function SignUpForm() {
                                                         <Input
                                                             id="referral"
                                                             type="text"
-                                                            placeholder="4-digit protocol"
-                                                            maxLength={4}
+                                                            placeholder="Enter invitation code"
+                                                            maxLength={8}
                                                             value={referral}
                                                             onChange={(e) => {
                                                                 setReferral(e.target.value.toUpperCase());
