@@ -196,60 +196,151 @@ export function Features() {
           </div>
         </motion.div>
 
-        {/* Team Photos Section */}
+        {/* Premium Photo Gallery */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="mt-24"
+          transition={{ duration: 0.7, delay: 0.2 }}
+          className="mt-28"
         >
-          <div className="text-center mb-12">
-            <h3 className="text-3xl font-bold text-foreground mb-3">
-              Our Team at Work
+          {/* Section label */}
+          <div className="text-center mb-14">
+            <motion.span
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              className="inline-flex items-center gap-2 rounded-full bg-accent/10 border border-accent/20 px-4 py-1.5 text-[11px] font-bold uppercase tracking-widest text-accent mb-5"
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
+              SmartBugMedia in Action
+            </motion.span>
+            <h3 className="text-4xl sm:text-5xl font-extrabold text-foreground mb-4 leading-tight">
+              Real people.{" "}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-indigo-500">
+                Real results.
+              </span>
             </h3>
-            <p className="text-muted-foreground max-w-lg mx-auto">
-              Dedicated professionals working to deliver the best experience for our members
+            <p className="text-muted-foreground max-w-xl mx-auto text-base">
+              Our members and team work together every day to build smarter earnings through strategy and collaboration.
             </p>
           </div>
-          <div className="grid md:grid-cols-2 gap-6">
+
+          {/* Asymmetric 3-photo layout */}
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-5">
+
+            {/* Large left card */}
             <motion.div
-              initial={{ opacity: 0, x: -20 }}
+              initial={{ opacity: 0, x: -30 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
-              className="relative rounded-3xl overflow-hidden border border-border group"
+              transition={{ duration: 0.7 }}
+              className="md:col-span-7 relative rounded-[28px] overflow-hidden border border-white/5 group shadow-2xl"
             >
               <img
-                src="/team-photo-1.jpg"
-                alt="SmartBugMedia team collaborating on strategy"
-                className="w-full h-72 object-cover group-hover:scale-105 transition-transform duration-700"
+                src="/landing-team-1.jpg"
+                alt="SmartBugMedia strategy session"
+                className="w-full h-[360px] md:h-[440px] object-cover group-hover:scale-105 transition-transform duration-700"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
-              <div className="absolute bottom-6 left-6">
-                <p className="text-sm font-semibold text-foreground">Strategy & Planning</p>
-                <p className="text-xs text-muted-foreground mt-1">SmartBugMedia Operations Team</p>
+              {/* Gradient overlay */}
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/20 to-transparent" />
+              {/* Top badge */}
+              <div className="absolute top-5 left-5">
+                <span className="px-3 py-1.5 rounded-full bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 text-[10px] font-bold uppercase tracking-widest backdrop-blur-sm">
+                  ✦ Live Operations
+                </span>
+              </div>
+              {/* Bottom caption */}
+              <div className="absolute bottom-7 left-7 right-7">
+                <p className="text-xl font-bold text-white leading-snug mb-1">Strategy & Planning</p>
+                <p className="text-sm text-slate-300 opacity-80">Our team aligns on every campaign and optimization cycle daily.</p>
+                <div className="flex items-center gap-3 mt-4">
+                  <div className="flex -space-x-2">
+                    {[1,2,3].map(i => (
+                      <div key={i} className="w-7 h-7 rounded-full bg-gradient-to-br from-cyan-400 to-indigo-500 border-2 border-slate-950 flex items-center justify-center text-[9px] font-bold text-white">{i}</div>
+                    ))}
+                  </div>
+                  <span className="text-[11px] text-slate-400 font-medium">SmartBugMedia Ops Team</span>
+                </div>
               </div>
             </motion.div>
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.1 }}
-              className="relative rounded-3xl overflow-hidden border border-border group"
-            >
-              <img
-                src="/team-photo-2.jpg"
-                alt="SmartBugMedia team members working together"
-                className="w-full h-72 object-cover group-hover:scale-105 transition-transform duration-700"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
-              <div className="absolute bottom-6 left-6">
-                <p className="text-sm font-semibold text-foreground">Member Success</p>
-                <p className="text-xs text-muted-foreground mt-1">Helping members achieve their goals</p>
-              </div>
-            </motion.div>
+
+            {/* Right column — stacked 2 cards */}
+            <div className="md:col-span-5 flex flex-col gap-5">
+
+              {/* Top right card */}
+              <motion.div
+                initial={{ opacity: 0, x: 30 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.7, delay: 0.1 }}
+                className="relative rounded-[28px] overflow-hidden border border-white/5 group shadow-2xl flex-1"
+              >
+                <img
+                  src="/landing-team-2.jpg"
+                  alt="SmartBugMedia members collaborating"
+                  className="w-full h-[200px] md:h-[205px] object-cover group-hover:scale-105 transition-transform duration-700"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/10 to-transparent" />
+                <div className="absolute top-5 left-5">
+                  <span className="px-3 py-1.5 rounded-full bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 text-[10px] font-bold uppercase tracking-widest backdrop-blur-sm">
+                    ✦ Member Success
+                  </span>
+                </div>
+                <div className="absolute bottom-5 left-5 right-5">
+                  <p className="text-base font-bold text-white mb-0.5">Together We Grow</p>
+                  <p className="text-xs text-slate-400">Collaboration drives better outcomes for every member.</p>
+                </div>
+              </motion.div>
+
+              {/* Bottom right card - SmartBug branded */}
+              <motion.div
+                initial={{ opacity: 0, x: 30 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.7, delay: 0.2 }}
+                className="relative rounded-[28px] overflow-hidden border border-white/5 group shadow-2xl flex-1"
+              >
+                <img
+                  src="/landing-team-3.jpg"
+                  alt="SmartBugMedia - The Beginner's Guide to Business Operations"
+                  className="w-full h-[200px] md:h-[205px] object-cover object-top group-hover:scale-105 transition-transform duration-700"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/10 to-transparent" />
+                <div className="absolute top-5 left-5">
+                  <span className="px-3 py-1.5 rounded-full bg-amber-500/20 border border-amber-500/30 text-amber-300 text-[10px] font-bold uppercase tracking-widest backdrop-blur-sm">
+                    ✦ Education Hub
+                  </span>
+                </div>
+                <div className="absolute bottom-5 left-5 right-5">
+                  <p className="text-base font-bold text-white mb-0.5">Resources & Guides</p>
+                  <p className="text-xs text-slate-400">Expert resources to maximize your earnings from day one.</p>
+                </div>
+              </motion.div>
+
+            </div>
           </div>
+
+          {/* Bottom trust strip */}
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="mt-8 flex flex-wrap items-center justify-center gap-8 py-6 px-8 rounded-2xl bg-white/[0.02] border border-white/5"
+          >
+            {[
+              { value: "2,800+", label: "Active Members" },
+              { value: "$4.2M+", label: "Total Payouts" },
+              { value: "98.7%", label: "Satisfaction Rate" },
+              { value: "24/7", label: "Platform Uptime" },
+            ].map((stat) => (
+              <div key={stat.label} className="text-center">
+                <p className="text-2xl font-extrabold text-white tracking-tight">{stat.value}</p>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mt-0.5">{stat.label}</p>
+              </div>
+            ))}
+          </motion.div>
         </motion.div>
 
       </div>
