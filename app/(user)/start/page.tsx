@@ -30,7 +30,9 @@ import {
     ArrowDownLeft,
     ArrowUpRight,
     Lock,
-    Copy 
+    Copy,
+    Clock,
+    ShieldCheck
 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -358,6 +360,42 @@ export default function StartPage() {
                             </motion.div>
                         );
                     })}
+                </div>
+
+                {/* WORKING TIME DIRECTIVE */}
+                <div className="w-full max-w-3xl mx-auto mt-6 z-10 px-1.5 md:px-4">
+                    <div className="p-6 md:p-8 rounded-[32px] bg-[#0B0B1E]/90 border border-white/10 backdrop-blur-xl shadow-2xl relative overflow-hidden group">
+                        <div className="absolute top-0 right-0 w-64 h-64 bg-[#3DD6C8]/5 blur-[80px] rounded-full pointer-events-none" />
+                        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+                            <div className="flex items-start gap-4">
+                                <div className="p-3.5 rounded-2xl bg-[#3DD6C8]/10 border border-[#3DD6C8]/20 text-[#3DD6C8] shadow-[0_0_20px_rgba(61,214,200,0.15)] shrink-0">
+                                    <Clock size={24} />
+                                </div>
+                                <div className="space-y-1.5">
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-[10px] font-black text-[#3DD6C8] uppercase tracking-[0.3em]">Operational Schedule</span>
+                                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
+                                    </div>
+                                    <h3 className="text-base md:text-lg font-black text-white uppercase tracking-tight italic">
+                                        US Central Time: 10:00 AM – 7:00 PM
+                                    </h3>
+                                    <p className="text-[10px] font-bold text-white/50 uppercase tracking-widest">
+                                        Monday through Sunday • Daily Active Cloud Settlements
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="flex flex-col md:items-end justify-center gap-1.5 pt-4 md:pt-0 border-t md:border-t-0 border-white/5">
+                                <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10">
+                                    <ShieldCheck size={14} className="text-[#3DD6C8]" />
+                                    <span className="text-[9px] font-black text-white/70 uppercase tracking-widest">CS Verified Protocol</span>
+                                </div>
+                                <span className="text-[8px] font-bold text-white/30 uppercase tracking-wider text-right">
+                                    Submissions & payouts verified by CS during working hours
+                                </span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 

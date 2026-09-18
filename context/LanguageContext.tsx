@@ -10,14 +10,14 @@ const translations: Record<LanguageCode, Record<string, string>> = {
     English: {
         home: 'Home',
         start: 'Start',
-        record: 'Record',
+        record: 'Task record',
         dashboard: 'Dashboard',
         welcome: 'Welcome back',
         welcome_back: 'Welcome back',
         wallet: 'Wallet',
-        vip_map: 'Vip map',
+        vip_map: 'Vip map and reward structure',
         profile: 'Profile',
-        support: 'Support',
+        support: 'Customer support',
         logout: 'Sign out',
         sign_out: 'Sign out',
         settings: 'Settings',
@@ -90,7 +90,7 @@ const translations: Record<LanguageCode, Record<string, string>> = {
         commission_rate: 'Comm. rate',
         about_us: 'About us',
         important_notes: 'Important notes',
-        working_hours_note: 'Hours of operation (Eastern Time): 09:00 AM - 09:00 PM. If you have any questions, please contact the Concierge Desk via the Support button on the home page.',
+        working_hours_note: 'Hours of operation: Monday to Sunday, US Central Time 10:00 AM – 7:00 PM. If you have any questions, please contact Customer Support via the Support button on the home page.',
         deposit_description: 'Add funds to your account',
         withdraw_description: 'Request earnings payout',
         start_tasks_desc: 'Match tasks and earn commission',
@@ -108,7 +108,7 @@ const translations: Record<LanguageCode, Record<string, string>> = {
         click_to_optimize_now: 'Click to start task now',
         view_recent_settlements: 'View recent settlements',
         start_tasks: 'Start tasks',
-        activity_records: 'Record',
+        activity_records: 'Task record',
         my_profile: 'My profile',
         faq: 'Faq',
         legal_governance: 'Legal governance',
@@ -814,10 +814,41 @@ const translations: Record<LanguageCode, Record<string, string>> = {
     }
 };
 
+export const LANGUAGE_CODE_MAP: Record<string, LanguageCode> = {
+    en: 'English',
+    es: 'Spanish',
+    fr: 'French',
+    de: 'German',
+    zh: 'Chinese',
+    ja: 'Japanese',
+    ar: 'Arabic',
+    pt: 'Portuguese',
+    tr: 'Turkish',
+    ru: 'Russian',
+    hi: 'Hindi',
+    vi: 'Vietnamese',
+    it: 'Spanish',
+    gh: 'English'
+};
+
+export const normalizeLanguage = (lang?: string | null): LanguageCode | null => {
+    if (!lang) return null;
+    if (translations[lang as LanguageCode]) return lang as LanguageCode;
+    const lower = lang.toLowerCase().trim();
+    if (LANGUAGE_CODE_MAP[lower]) return LANGUAGE_CODE_MAP[lower];
+    for (const [key, val] of Object.entries(LANGUAGE_CODE_MAP)) {
+        if (lower.startsWith(key)) return val;
+    }
+    for (const key of Object.keys(translations)) {
+        if (key.toLowerCase() === lower) return key as LanguageCode;
+    }
+    return null;
+};
+
 interface LanguageContextType {
     language: LanguageCode;
     availableLanguages: LanguageCode[];
-    setLanguage: (lang: LanguageCode) => void;
+    setLanguage: (lang: LanguageCode | string) => void;
     t: (key: string) => string;
 }
 
@@ -834,43 +865,67 @@ import { useSiteSettings } from './SettingsContext';
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
     const { profile } = useAuth();
-    const { languages: backendLanguages } = useSiteSettings();
+    const siteSettings = useSiteSettings() as any;
     const [language, setLanguage] = useState<LanguageCode>('English');
-    const [availableLanguages, setAvailableLanguages] = useState<LanguageCode[]>(['English', 'Spanish', 'French', 'German', 'Chinese', 'Japanese', 'Arabic', 'Portuguese', 'Turkish', 'Russian', 'Hindi', 'Vietnamese']);
+    const [availableLanguages, setAvailableLanguages] = useState<LanguageCode[]>([
+        'English', 'Spanish', 'French', 'German', 'Chinese', 'Japanese', 
+        'Arabic', 'Portuguese', 'Turkish', 'Russian', 'Hindi', 'Vietnamese'
+    ]);
 
     useEffect(() => {
-        if (backendLanguages && Array.isArray(backendLanguages)) {
-            setAvailableLanguages(backendLanguages as LanguageCode[]);
+        if (siteSettings?.languages && Array.isArray(siteSettings.languages)) {
+            const mapped = siteSettings.languages
+                .map((l: string) => normalizeLanguage(l))
+                .filter(Boolean) as LanguageCode[];
+            if (mapped.length > 0) setAvailableLanguages(mapped);
         }
-    }, [backendLanguages]);
+    }, [siteSettings?.languages]);
 
     useEffect(() => {
-        const savedLang = localStorage.getItem('language') as LanguageCode;
-        if (savedLang && translations[savedLang]) {
-            setLanguage(savedLang);
-        } else if (profile?.language && translations[profile.language as LanguageCode]) {
-            setLanguage(profile.language as LanguageCode);
+        // Priority 1: User's explicit local choice
+        const savedLang = localStorage.getItem('language');
+        const normalizedSaved = normalizeLanguage(savedLang);
+        if (normalizedSaved) {
+            setLanguage(normalizedSaved);
+            return;
         }
-    }, [profile]);
 
-    const handleSetLanguage = async (lang: LanguageCode) => {
-        setLanguage(lang);
-        localStorage.setItem('language', lang);
+        // Priority 2: User profile language setting
+        const profileLang = normalizeLanguage(profile?.language);
+        if (profileLang) {
+            setLanguage(profileLang);
+            return;
+        }
+
+        // Priority 3: Global platform default set by Admin
+        const defaultSettingLang = normalizeLanguage(siteSettings?.default_language);
+        if (defaultSettingLang) {
+            setLanguage(defaultSettingLang);
+        }
+    }, [profile?.language, siteSettings?.default_language]);
+
+    const handleSetLanguage = async (rawLang: LanguageCode | string) => {
+        const normalized = normalizeLanguage(rawLang) || 'English';
+        setLanguage(normalized);
+        localStorage.setItem('language', normalized);
+        if (typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('languagechange', { detail: normalized }));
+        }
 
         if (profile?.id) {
             try {
                 await supabase
                     .from('profiles')
-                    .update({ language: lang })
+                    .update({ language: normalized })
                     .eq('id', profile.id);
             } catch (err) {
-                console.error('Failed to persist language setting:', err);
+                // Graceful fallback if database column does not exist
             }
         }
     };
 
     const t = (key: string) => {
-        return translations[language][key] || translations['English'][key] || key;
+        return translations[language]?.[key] || translations['English']?.[key] || key;
     };
 
     return (
@@ -879,3 +934,4 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
         </LanguageContext.Provider>
     );
 }
+

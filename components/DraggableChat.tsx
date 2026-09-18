@@ -4,28 +4,34 @@ import { motion, useDragControls } from 'framer-motion';
 import { Headset } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
+import { usePathname } from 'next/navigation';
+
 export default function DraggableChat() {
     const [isVisible, setIsVisible] = useState(false);
+    const pathname = usePathname();
     
     useEffect(() => {
         // Delay visibility to ensure Tawk is loaded
-        const timer = setTimeout(() => setIsVisible(true), 2000);
+        const timer = setTimeout(() => setIsVisible(true), 1500);
         return () => clearTimeout(timer);
     }, []);
 
     const toggleChat = () => {
         const tawk = (window as any).Tawk_API;
-        if (tawk) {
+        if (tawk && typeof tawk.maximize === 'function') {
             if (typeof tawk.isChatMaximized === 'function' && tawk.isChatMaximized()) {
                 tawk.minimize?.();
+                tawk.hideWidget?.();
             } else {
                 tawk.showWidget?.();
                 tawk.maximize?.();
             }
+        } else {
+            window.location.href = '/service';
         }
     };
 
-    if (!isVisible) return null;
+    if (!isVisible || pathname?.startsWith('/admin')) return null;
 
     return (
         <motion.div

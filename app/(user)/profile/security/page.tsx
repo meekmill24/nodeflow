@@ -149,7 +149,7 @@ export default function SecurityCenterPage() {
                         <AlertCircle className="text-accent-light shrink-0 mt-0.5" size={18} />
                         <div className="text-xs text-text-secondary leading-relaxed">
                             <p className="font-semibold text-text-primary mb-1">Security Advice</p>
-                            <p>Do not share your Security PIN with anyone. The Concierge Desk will never ask for your PIN.</p>
+                            <p>Do not share your Security PIN with anyone. Customer Support will never ask for your PIN.</p>
                         </div>
                     </div>
                 </div>

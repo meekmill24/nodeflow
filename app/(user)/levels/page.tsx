@@ -71,7 +71,7 @@ export default function LevelsPage() {
                                 <div className="h-px w-12 bg-[#3DD6C8]/30" />
                             </div>
                             <h1 className="text-3xl md:text-5xl font-black text-white italic uppercase tracking-tighter leading-none">
-                                VIP Evolution <span className="text-white/40">Map.</span>
+                                VIP Map & <span className="text-[#3DD6C8]">Reward Structure</span>
                             </h1>
                         </div>
                     </div>

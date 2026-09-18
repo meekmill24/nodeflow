@@ -8,7 +8,8 @@ import Link from 'next/link';
 
 export default function BindWalletPage() {
     const { profile, refreshProfile, signOut } = useAuth();
-    const [network, setNetwork] = useState<'USDT-TRC20' | 'USDT-BEP20' | 'ETH' | 'BTC'>('USDT-TRC20');
+    type BoundNetwork = 'USDT-TRC20' | 'USDT-BEP20' | 'USDC' | 'BNB' | 'PAYPALUSD' | 'ETH' | 'BTC';
+    const [network, setNetwork] = useState<BoundNetwork>('USDT-TRC20');
     const [walletAddress, setWalletAddress] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
@@ -27,19 +28,19 @@ export default function BindWalletPage() {
         e.preventDefault();
 
         if (!walletAddress.trim()) {
-            setMessage({ type: 'error', text: `Please enter a valid ${network} wallet address` });
+            setMessage({ type: 'error', text: `Please enter a valid ${network} address` });
             return;
         }
 
-        // Basic validation
+        // Validation for each network
         if (network === 'USDT-TRC20') {
             if (!walletAddress.startsWith('T') || walletAddress.length !== 34) {
-                setMessage({ type: 'error', text: 'Invalid TRC20 address format' });
+                setMessage({ type: 'error', text: 'Invalid TRC20 address format (must start with T and be 34 characters)' });
                 return;
             }
-        } else if (network === 'USDT-BEP20' || network === 'ETH') {
+        } else if (network === 'USDT-BEP20' || network === 'ETH' || network === 'USDC' || network === 'BNB' || network === 'PAYPALUSD') {
             if (!walletAddress.startsWith('0x') || walletAddress.length !== 42) {
-                setMessage({ type: 'error', text: `Invalid ${network} address format` });
+                setMessage({ type: 'error', text: `Invalid ${network} address format (must start with 0x and be 42 characters)` });
                 return;
             }
         } else if (network === 'BTC') {
@@ -92,18 +93,22 @@ export default function BindWalletPage() {
                     {/* Network Selector Scroller */}
                     <div className="flex border-b border-black/5 dark:border-white/5 overflow-x-auto no-scrollbar bg-black/5 dark:bg-white/5">
                         {[
-                            { id: 'USDT-TRC20', label: 'USDT-TRC20', icon: 'https://cryptologos.cc/logos/tether-usdt-logo.png' },
-                            { id: 'USDT-BEP20', label: 'USDT-BEP20', icon: 'https://cryptologos.cc/logos/tether-usdt-logo.png' },
-                            { id: 'ETH', label: 'ETH', icon: 'https://cryptologos.cc/logos/ethereum-eth-logo.png' },
-                            { id: 'BTC', label: 'BTC', icon: 'https://cryptologos.cc/logos/bitcoin-btc-logo.png' }
+                            { id: 'USDT-TRC20', label: 'USDT-TRC20', icon: 'https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/usdt.png' },
+                            { id: 'USDT-BEP20', label: 'USDT-BEP20', icon: 'https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/usdt.png' },
+                            { id: 'ETH', label: 'Ethereum (ETH)', icon: 'https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/eth.png' },
+                            { id: 'BTC', label: 'Bitcoin (BTC)', icon: 'https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/btc.png' },
+                            { id: 'USDC', label: 'USDC', icon: 'https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/usdc.png' },
+                            { id: 'BNB', label: 'BNB Chain', icon: 'https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/bnb.png' },
+                            { id: 'PAYPALUSD', label: 'PayPal USD', icon: 'https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/usdc.png' }
                         ].map((net) => (
                             <button 
                                 key={net.id}
+                                type="button"
                                 onClick={() => { setNetwork(net.id as any); setWalletAddress(''); setMessage(null); }}
-                                className={`flex-1 min-w-[120px] py-4 px-2 flex flex-col items-center gap-2 transition-all relative ${network === net.id ? 'text-primary-light' : 'text-text-secondary opacity-50 hover:opacity-100'}`}
+                                className={`flex-1 min-w-[100px] py-4 px-2 flex flex-col items-center gap-1.5 transition-all relative ${network === net.id ? 'text-primary-light' : 'text-text-secondary opacity-50 hover:opacity-100'}`}
                             >
-                                <img src={net.icon} alt={net.label} className={`w-6 h-6 object-contain ${network === net.id ? 'grayscale-0' : 'grayscale opacity-50'}`} />
-                                <span className="text-[10px] font-black uppercase tracking-wider">{net.label}</span>
+                                <img src={net.icon} alt={net.label} className={`w-5 h-5 object-contain ${network === net.id ? 'grayscale-0' : 'grayscale opacity-50'}`} />
+                                <span className="text-[9px] font-black uppercase tracking-wider whitespace-nowrap">{net.label}</span>
                                 {network === net.id && <div className="absolute bottom-0 left-0 right-0 h-1 bg-primary shadow-[0_0_10px_var(--color-primary)]" />}
                             </button>
                         ))}
@@ -114,19 +119,23 @@ export default function BindWalletPage() {
                             <div className={`w-16 h-16 rounded-full flex flex-col items-center justify-center border-2 shadow-[0_0_30px_rgba(var(--primary),0.3)] transition-all ${
                                 network === 'BTC' ? 'bg-orange-500/20 border-orange-500/30 shadow-orange-500/20' : 
                                 network === 'ETH' ? 'bg-indigo-500/20 border-indigo-500/30' :
+                                network === 'BNB' ? 'bg-amber-500/20 border-amber-500/30' :
                                 'bg-primary/20 border-primary/30'
                             }`}>
                                 <Wallet size={32} className={
                                     network === 'BTC' ? 'text-orange-400' :
                                     network === 'ETH' ? 'text-indigo-400' :
+                                    network === 'BNB' ? 'text-amber-400' :
                                     'text-primary-light'
                                 } />
                             </div>
                         </div>
 
-                        <h2 className="text-xl font-bold text-text-primary text-center mb-2">{network} Address</h2>
+                        <h2 className="text-xl font-bold text-text-primary text-center mb-2">
+                            {network} Address
+                        </h2>
                         <p className="text-sm text-text-secondary text-center mb-8">
-                            Ensure the network matches exactly for successful transactions.
+                            Ensure the network matches exactly for successful payouts and balance settlements.
                         </p>
 
                         <form onSubmit={handleSave} className="space-y-6">
@@ -142,8 +151,8 @@ export default function BindWalletPage() {
                                         type="text"
                                         value={walletAddress}
                                         onChange={(e) => setWalletAddress(e.target.value)}
-                                        placeholder="Enter wallet address"
-                                        className="w-full bg-text-primary/5 border border-text-primary/10 rounded-xl py-4 pl-12 pr-4 text-text-primary placeholder-text-primary/30 focus:border-primary-light focus:bg-text-primary/10 transition-all outline-none"
+                                        placeholder={network === 'PayPal' ? 'e.g. yourname@gmail.com' : `Enter ${network} address`}
+                                        className="w-full bg-text-primary/5 border border-text-primary/10 rounded-xl py-4 pl-12 pr-4 text-text-primary placeholder-text-primary/30 focus:border-primary-light focus:bg-text-primary/10 transition-all outline-none font-mono text-sm"
                                     />
                                 </div>
                             </div>
@@ -161,10 +170,12 @@ export default function BindWalletPage() {
                                 className={`btn-primary w-full py-4 text-lg font-bold flex justify-center items-center shadow-[0_0_20px_rgba(var(--primary),0.4)] ${
                                     network === 'BTC' ? 'from-orange-500 to-orange-600 shadow-orange-500/30' : 
                                     network === 'ETH' ? 'from-indigo-500 to-indigo-600 shadow-indigo-500/30' :
+                                    network === 'BNB' ? 'from-amber-500 to-amber-600 shadow-amber-500/30' :
+                                    network === 'PayPal' ? 'from-sky-500 to-blue-600 shadow-sky-500/30' :
                                     ''
                                 }`}
                             >
-                                {isLoading ? <Loader2 size={24} className="animate-spin text-text-primary" /> : `Save ${network} Wallet`}
+                                {isLoading ? <Loader2 size={24} className="animate-spin text-text-primary" /> : `Save ${network} Configuration`}
                             </button>
                         </form>
                     </div>
@@ -178,7 +189,7 @@ export default function BindWalletPage() {
                             <ul className="list-disc pl-4 space-y-1">
                                 <li>Ensure the network matches your selection ({network}).</li>
                                 <li>Entering an incorrect address will result in permanent loss of funds.</li>
-                                <li>Once bound, the address cannot be easily modified for your security. Please contact the Concierge Desk for help.</li>
+                                <li>Once bound, the address cannot be easily modified for your security. Please contact Customer Support for help.</li>
                             </ul>
                         </div>
                     </div>

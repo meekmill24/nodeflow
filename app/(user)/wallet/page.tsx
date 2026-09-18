@@ -14,16 +14,21 @@ import {
     CreditCard,
     Zap,
     Lock,
-    RefreshCw
+    RefreshCw,
+    X,
+    ArrowDownToLine,
+    ArrowUpFromLine
 } from 'lucide-react';
 import Link from 'next/link';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
+import Portal from '@/components/Portal';
 
 export default function WalletPage() {
     const { profile } = useAuth();
     const { t } = useLanguage();
     const { format } = useCurrency();
+    const [showHistoryModal, setShowHistoryModal] = useState(false);
     
     const containerRef = useRef<HTMLDivElement>(null);
     const balanceRef = useRef<HTMLDivElement>(null);
@@ -225,8 +230,24 @@ export default function WalletPage() {
 
             {/* Quick Stats / History Secondary Menu */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 reveal-up">
+                {/* History Logs Trigger Card */}
+                <button 
+                    type="button"
+                    onClick={() => setShowHistoryModal(true)} 
+                    className="group text-left w-full focus:outline-none"
+                >
+                    <div className="glass-card-strong p-8 flex flex-col gap-6 hover:bg-white/5 transition-all border border-white/5 rounded-[32px] group-hover:-translate-y-2 group-hover:border-white/10 shadow-xl cursor-pointer">
+                        <div className="w-14 h-14 rounded-[20px] bg-surface/80 flex items-center justify-center text-text-secondary group-hover:text-primary transition-all group-hover:shadow-[0_0_30px_rgba(157,80,187,0.2)]">
+                            <History size={24} />
+                        </div>
+                        <div className="space-y-1">
+                            <h4 className="font-black text-text-primary dark:text-white text-sm uppercase tracking-[0.1em]">History Logs</h4>
+                            <p className="text-[10px] text-text-secondary tracking-widest uppercase font-black opacity-30 group-hover:opacity-60 transition-opacity">Select deposit or withdrawal records</p>
+                        </div>
+                    </div>
+                </button>
+
                 {[
-                    { icon: History, label: 'History Logs', desc: 'Audit clearance records', href: '/record' },
                     { icon: CreditCard, label: 'Payment Node', desc: 'Secure payout endpoint', href: '/profile/wallet' },
                     { icon: ShieldCheck, label: 'Asset Protection', desc: 'Biometric security layer', href: '/profile/security' }
                 ].map((item, i) => (
@@ -243,6 +264,81 @@ export default function WalletPage() {
                     </Link>
                 ))}
             </div>
+
+            {/* History Selection Modal */}
+            {showHistoryModal && (
+                <Portal>
+                    <div 
+                        className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in"
+                        onClick={() => setShowHistoryModal(false)}
+                    >
+                        <div 
+                            className="bg-[#0B0B1E] border border-white/10 w-full max-w-md rounded-[36px] overflow-hidden shadow-[0_20px_70px_rgba(0,0,0,0.8)] p-6 md:p-8 space-y-6 animate-scale-in"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <div className="flex items-center justify-between pb-4 border-b border-white/5">
+                                <div>
+                                    <h3 className="font-black text-white uppercase tracking-wider text-base">Select History Log</h3>
+                                    <p className="text-[10px] font-black text-white/40 uppercase tracking-widest mt-0.5">Audit clearance records</p>
+                                </div>
+                                <button 
+                                    onClick={() => setShowHistoryModal(false)}
+                                    className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-white/60 hover:text-white transition-all"
+                                >
+                                    <X size={18} />
+                                </button>
+                            </div>
+
+                            <div className="grid grid-cols-1 gap-4">
+                                <Link
+                                    href="/record/deposit"
+                                    onClick={() => setShowHistoryModal(false)}
+                                    className="p-5 rounded-3xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 flex items-center gap-4 group transition-all duration-300"
+                                >
+                                    <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 flex items-center justify-center text-emerald-400 group-hover:scale-110 transition-transform">
+                                        <ArrowDownToLine size={24} />
+                                    </div>
+                                    <div className="flex-1">
+                                        <h4 className="font-black text-white uppercase tracking-wider text-sm">Deposit History</h4>
+                                        <p className="text-[10px] text-white/50 uppercase tracking-widest font-semibold mt-0.5">View incoming recharge transactions</p>
+                                    </div>
+                                    <ChevronRight size={18} className="text-white/40 group-hover:translate-x-1 group-hover:text-emerald-400 transition-all" />
+                                </Link>
+
+                                <Link
+                                    href="/record/withdraw"
+                                    onClick={() => setShowHistoryModal(false)}
+                                    className="p-5 rounded-3xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/20 flex items-center gap-4 group transition-all duration-300"
+                                >
+                                    <div className="w-12 h-12 rounded-2xl bg-amber-500/20 flex items-center justify-center text-amber-400 group-hover:scale-110 transition-transform">
+                                        <ArrowUpFromLine size={24} />
+                                    </div>
+                                    <div className="flex-1">
+                                        <h4 className="font-black text-white uppercase tracking-wider text-sm">Withdrawal History</h4>
+                                        <p className="text-[10px] text-white/50 uppercase tracking-widest font-semibold mt-0.5">View outbound payout settlements</p>
+                                    </div>
+                                    <ChevronRight size={18} className="text-white/40 group-hover:translate-x-1 group-hover:text-amber-400 transition-all" />
+                                </Link>
+
+                                <Link
+                                    href="/record"
+                                    onClick={() => setShowHistoryModal(false)}
+                                    className="p-4 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/5 flex items-center gap-3 group transition-all duration-300"
+                                >
+                                    <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-[#3DD6C8] group-hover:scale-110 transition-transform">
+                                        <History size={20} />
+                                    </div>
+                                    <div className="flex-1">
+                                        <h4 className="font-black text-white/80 uppercase tracking-wider text-xs">Task Record Log</h4>
+                                        <p className="text-[9px] text-white/40 uppercase tracking-widest font-semibold">View task commission orders</p>
+                                    </div>
+                                    <ChevronRight size={16} className="text-white/30 group-hover:translate-x-1 group-hover:text-white transition-all" />
+                                </Link>
+                            </div>
+                        </div>
+                    </div>
+                </Portal>
+            )}
         </div>
     );
 }

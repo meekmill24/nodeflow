@@ -5,6 +5,58 @@ import { Star, MapPin, TrendingUp, Clock, ChevronLeft, ChevronRight } from "luci
 
 const testimonials = [
   {
+    name: "Brandon M.",
+    role: "Digital Marketing Specialist",
+    location: "Austin, Texas, USA",
+    avatar: "https://i.pravatar.cc/150?u=brandon-austin",
+    content: "Living in Austin with rising living costs, having an extra consistent yield stream makes a huge difference. SmartBugMedia pays out directly to my PayPal and USDC wallet without delay. The customer service team verified my payout on the same day.",
+    earnings: "$8,450",
+    joined: "6 months ago",
+    tasks: 1120,
+    rating: 5,
+    verified: true,
+    tag: "US Verified"
+  },
+  {
+    name: "Sarah Jenkins",
+    role: "Logistics Operations Lead",
+    location: "Chicago, Illinois, USA",
+    avatar: "https://i.pravatar.cc/150?u=sarah-chicago",
+    content: "I work Central Time, so having customer service and withdrawal approvals active right through US Central Time 10am to 7pm every day is perfect. The platform is responsive, dependable, and pays exactly as promised.",
+    earnings: "$7,190",
+    joined: "5 months ago",
+    tasks: 940,
+    rating: 5,
+    verified: true,
+    tag: "Central Time User"
+  },
+  {
+    name: "David R.",
+    role: "IT Solutions Consultant",
+    location: "Atlanta, Georgia, USA",
+    avatar: "https://i.pravatar.cc/150?u=david-atlanta",
+    content: "The multi-currency options sealed the deal for me. Withdrawing via PayPal USD or BNB gives me total flexibility. Customer support verified and approved my payouts promptly every single cycle.",
+    earnings: "$10,320",
+    joined: "8 months ago",
+    tasks: 1480,
+    rating: 5,
+    verified: true,
+    tag: "Senior Node"
+  },
+  {
+    name: "Tyler V.",
+    role: "E-Commerce Merchant",
+    location: "Miami, Florida, USA",
+    avatar: "https://i.pravatar.cc/150?u=tyler-miami",
+    content: "Started with a modest level 1 node and upgraded as my tasks accumulated. The 20% referral commissions from inviting my network have created a solid passive income stream on top of daily tasks.",
+    earnings: "$12,850",
+    joined: "10 months ago",
+    tasks: 1820,
+    rating: 5,
+    verified: true,
+    tag: "Top US Earner"
+  },
+  {
     name: "Marcus T.",
     role: "Warehouse Supervisor",
     location: "Lagos, Nigeria",
@@ -18,6 +70,32 @@ const testimonials = [
     tag: "Daily user"
   },
   {
+    name: "Zara M.",
+    role: "Nurse",
+    location: "Birmingham, UK",
+    avatar: "https://i.pravatar.cc/150?u=zara-m",
+    content: "Long shifts leave me drained but the tasks take like 20 minutes max. Do them on my commute mostly. What surprised me is how consistent it is — same routine every day, same results. That predictability is underrated.",
+    earnings: "$5,560",
+    joined: "6 months ago",
+    tasks: 810,
+    rating: 5,
+    verified: true,
+    tag: "Consistent earner"
+  },
+  {
+    name: "Sandra K.",
+    role: "Stay-at-home Mum",
+    location: "Nairobi, Kenya",
+    avatar: "https://i.pravatar.cc/150?u=sandra-k",
+    content: "My husband thought it was a scam until I showed him the bank transfer. Now he does it too lol. I do it during nap time and after the kids sleep. The tasks don't take long and the app never crashes on me.",
+    earnings: "$9,400",
+    joined: "9 months ago",
+    tasks: 1240,
+    rating: 5,
+    verified: true,
+    tag: "Top earner"
+  },
+  {
     name: "Priya S.",
     role: "Freelance Designer",
     location: "Mumbai, India",
@@ -29,58 +107,6 @@ const testimonials = [
     rating: 5,
     verified: true,
     tag: "Referral earner"
-  },
-  {
-    name: "James O.",
-    role: "University Student",
-    location: "Accra, Ghana",
-    avatar: "https://i.pravatar.cc/150?u=james-o",
-    content: "I started during exam break with $100. Used some of the early earnings to upgrade my level, which gave me more tasks per day. The math just made sense. Paying for half my rent now which is wild for a 21-year-old honestly.",
-    earnings: "$3,120",
-    joined: "4 months ago",
-    tasks: 480,
-    rating: 5,
-    verified: true,
-    tag: "Student earner"
-  },
-  {
-    name: "Sandra K.",
-    role: "Stay-at-home Mum",
-    location: "Nairobi, Kenya",
-    avatar: "https://i.pravatar.cc/150?u=sandra-k",
-    content: "My husband thought it was a scam until I showed him the bank transfer. Now he does it too lol. I do it during nap time and after the kids sleep. The tasks don't take long and the app never crashes on me which I appreciate.",
-    earnings: "$9,400",
-    joined: "9 months ago",
-    tasks: 1240,
-    rating: 5,
-    verified: true,
-    tag: "Top earner"
-  },
-  {
-    name: "Kweku A.",
-    role: "Small Business Owner",
-    location: "Kumasi, Ghana",
-    avatar: "https://i.pravatar.cc/150?u=kweku-a",
-    content: "Used profits from my first 3 months to buy a new delivery motorbike for my shop. That's real. Not some abstract number on a screen — an actual physical thing I bought. That moment made me go all in on inviting my whole team.",
-    earnings: "$11,700",
-    joined: "11 months ago",
-    tasks: 1650,
-    rating: 5,
-    verified: true,
-    tag: "Team builder"
-  },
-  {
-    name: "Zara M.",
-    role: "Nurse",
-    location: "Birmingham, UK",
-    avatar: "https://i.pravatar.cc/150?u=zara-m",
-    content: "Long shifts leave me drained but the tasks take like 20 minutes max. Do them on my commute mostly. What surprised me is how consistent it is — same routine every day, same results. That predictability is underrated when everything else feels uncertain.",
-    earnings: "$5,560",
-    joined: "6 months ago",
-    tasks: 810,
-    rating: 5,
-    verified: true,
-    tag: "Consistent earner"
   },
 ];
 

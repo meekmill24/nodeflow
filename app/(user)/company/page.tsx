@@ -61,7 +61,7 @@ export default function CompanyPage() {
                     </div>
                     <div className="space-y-4 text-sm font-bold text-white/50 leading-relaxed uppercase tracking-widest text-justify">
                         <p>
-                            SmartBugMedia was founded on June 30, 2007, with a mission to help businesses in Canada, Mexico and the United States leverage technology to grow, automate operations, and succeed in an increasingly digital world.
+                            SmartBugMedia was founded in 2007 by Ryan Malone and Julia Feldman with a mission to help businesses in Canada, Mexico and the United States leverage technology to grow, automate operations, and succeed in an increasingly digital world. Under the executive leadership of CEO Adam Bleitreu, the company continues its institutional mission of global optimization excellence.
                         </p>
                         <p>
                             Inspired by the innovation culture of leading digital companies, SmartBugMedia began as a small team of passionate technologists dedicated to building practical, scalable solutions for modern businesses.

@@ -31,7 +31,8 @@ export default function WithdrawPage() {
     const { profile, refreshProfile } = useAuth();
     const [amount, setAmount] = useState('');
     const [walletAddress, setWalletAddress] = useState(profile?.wallet_address || '');
-    const [network, setNetwork] = useState<'TRX' | 'BEP20' | 'ERC20' | 'BTC'>('TRX');
+    type WithdrawNetwork = 'TRX' | 'BEP20' | 'ERC20' | 'ETH' | 'BTC' | 'USDC' | 'BNB' | 'PAYPALUSD';
+    const [network, setNetwork] = useState<WithdrawNetwork>('TRX');
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
     const [error, setError] = useState('');
@@ -77,7 +78,7 @@ export default function WithdrawPage() {
             return;
         }
         if (!walletAddress.trim()) {
-            setError('Please enter your USDT wallet address.');
+            setError(network === 'PAYPAL' ? 'Please enter your PayPal email or account ID.' : `Please enter your ${network} destination address.`);
             return;
         }
 
@@ -99,7 +100,7 @@ export default function WithdrawPage() {
                 amount: amt,
                 status: 'pending',
                 wallet_address: walletAddress,
-                description: `Withdrawal (${network}) to ${walletAddress.substring(0, 8)}... (${levelName})`,
+                description: `Withdrawal (${network}) to ${walletAddress.substring(0, 10)}... (${levelName})`,
             });
 
             await refreshProfile();
@@ -119,9 +120,11 @@ export default function WithdrawPage() {
                 </div>
                 <div>
                     <h2 className="text-2xl font-black text-text-primary dark:text-white uppercase tracking-tight">Withdrawal request submitted</h2>
-                    <p className="text-text-secondary text-sm mt-2 max-w-xs mx-auto">
+                    <p className="text-text-secondary text-sm mt-2 max-w-sm mx-auto">
                         Your request for <span className="text-text-primary dark:text-white font-bold">${amount}</span> is under review. <br />
-                        <span className="text-warning font-bold mt-2 inline-block italic">Under withdrawal usually take up to 24 hours to be processed.</span>
+                        <span className="text-warning font-bold mt-2 inline-block italic">
+                            Withdrawal requests are processed during working hours (US Central Time 10:00 AM – 7:00 PM, Mon–Sun) after verification and approval by customer service.
+                        </span>
                     </p>
                 </div>
                 <div className="flex flex-col sm:flex-row gap-4 w-full justify-center">
@@ -236,23 +239,27 @@ export default function WithdrawPage() {
                         {/* Network Switcher */}
                         <div className="space-y-4">
                             <label className="text-[10px] font-black text-text-secondary uppercase tracking-[0.2em] block">Target Network</label>
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 p-2 bg-black/40 rounded-[24px] border border-white/5">
+                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 p-2 bg-black/40 rounded-[24px] border border-white/5">
                                 {[
                                     { id: 'TRX', label: 'USDT-TRC20', icon: 'https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/usdt.png' },
                                     { id: 'BEP20', label: 'USDT-BEP20', icon: 'https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/usdt.png' },
-                                    { id: 'ERC20', label: 'ETH', icon: 'https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/eth.png' },
-                                    { id: 'BTC', label: 'BTC', icon: 'https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/btc.png' }
+                                    { id: 'ERC20', label: 'USDT-ERC20', icon: 'https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/usdt.png' },
+                                    { id: 'ETH', label: 'Ethereum', icon: 'https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/eth.png' },
+                                    { id: 'BTC', label: 'Bitcoin', icon: 'https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/btc.png' },
+                                    { id: 'USDC', label: 'USDC', icon: 'https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/usdc.png' },
+                                    { id: 'BNB', label: 'BNB Chain', icon: 'https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/bnb.png' },
+                                    { id: 'PAYPALUSD', label: 'PayPal USD', icon: 'https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/usdc.png' }
                                 ].map(net => (
                                     <button
                                         key={net.id}
                                         type="button"
                                         onClick={() => setNetwork(net.id as any)}
-                                        className={`py-4 rounded-xl flex flex-col items-center gap-1.5 transition-all ${network === net.id 
+                                        className={`py-3.5 px-2 rounded-xl flex flex-col items-center gap-1.5 transition-all ${network === net.id 
                                             ? 'bg-primary text-white shadow-lg shadow-primary/20 scale-[1.02] border border-primary-light/30' 
                                             : 'text-text-secondary hover:bg-white/5 hover:text-white border border-transparent'}`}
                                     >
                                         <img src={net.icon} alt="" className="w-5 h-5 object-contain" />
-                                        <span className="text-[9px] font-black uppercase tracking-widest">{net.id === 'ERC20' ? 'ETH' : net.id === 'BTC' ? 'BTC' : net.label}</span>
+                                        <span className="text-[9px] font-black uppercase tracking-widest truncate max-w-full">{net.label}</span>
                                     </button>
                                 ))}
                             </div>
@@ -261,7 +268,13 @@ export default function WithdrawPage() {
                         {/* Wallet Field */}
                         <div className="space-y-4">
                             <label className="text-[10px] font-black text-text-secondary uppercase tracking-[0.2em] block">
-                                {network === 'ERC20' ? 'Ethereum (ETH)' : network === 'BEP20' ? 'USDT BEP-20' : network === 'BTC' ? 'Bitcoin (BTC)' : 'USDT TRC-20'} Address
+                                {network === 'ETH' ? 'Ethereum (ETH) Address (0x...)' : 
+                                 network === 'ERC20' ? 'USDT ERC-20 Address (0x...)' : 
+                                 network === 'BTC' ? 'Bitcoin (BTC) Address' : 
+                                 network === 'USDC' ? 'USDC Destination Address' : 
+                                 network === 'BNB' ? 'BNB Chain Address (BEP-20)' : 
+                                 network === 'PAYPALUSD' ? 'PayPal USD (PYUSD) Address' : 
+                                 network === 'BEP20' ? 'USDT BEP-20 Address' : 'USDT TRC-20 Address'}
                             </label>
                             <div className="relative group">
                                 <Wallet size={20} className="absolute left-6 top-1/2 -translate-y-1/2 text-primary-light transition-all group-focus-within:scale-110" />
@@ -269,7 +282,11 @@ export default function WithdrawPage() {
                                     type="text"
                                     value={walletAddress}
                                     onChange={(e) => setWalletAddress(e.target.value)}
-                                    placeholder={`Enter ${network === 'ERC20' ? 'ETH' : network === 'BTC' ? 'BTC' : network} Wallet Address`}
+                                    placeholder={
+                                        network === 'ETH' || network === 'ERC20' ? 'Enter 0x... Ethereum address' :
+                                        network === 'BTC' ? 'Enter Bitcoin destination address' :
+                                        `Enter ${network} Destination Address`
+                                    }
                                     className="w-full bg-black/40 border border-white/10 rounded-[24px] py-6 pl-14 pr-6 text-base md:text-lg font-black font-mono text-white placeholder:text-text-secondary/10 focus:border-primary/50 focus:bg-primary/5 transition-all outline-none tracking-tight"
                                 />
                             </div>
@@ -337,8 +354,7 @@ export default function WithdrawPage() {
                             <Info size={20} className="text-primary-light" />
                         </div>
                         <p className="text-[10px] font-bold text-text-secondary leading-relaxed uppercase tracking-wider italic">
-                            Withdrawals are processed based on your current level tier and verified task sets. 
-                            Our automatic review protocol usually takes up to 24 business hours to settle assets.
+                            Withdrawal requests are verified and approved by customer service during official working hours (US Central Time 10:00 AM – 7:00 PM, Monday to Sunday).
                         </p>
                     </div>
                 </div>

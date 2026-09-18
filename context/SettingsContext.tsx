@@ -45,10 +45,14 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
         if (!colors || typeof window === 'undefined') return;
         const root = document.documentElement;
         Object.entries(colors).forEach(([key, color]) => {
-            if (color) {
-                // Change underscores to hyphens for CSS variable naming convention
+            if (color && typeof color === 'string') {
                 const cssVarName = `--${key.replace(/_/g, '-')}`;
-                root.style.setProperty(cssVarName, color as string);
+                root.style.setProperty(cssVarName, color);
+                
+                // If primary color is set, derive primary glow
+                if (key === 'primary') {
+                    root.style.setProperty('--primary-glow', `${color}40`);
+                }
             }
         });
     };
@@ -72,6 +76,13 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
                         newSettings[item.key] = item.value;
                     });
                     
+                    if (newSettings.default_currency) {
+                        newSettings.currency = {
+                            ...(newSettings.currency || {}),
+                            default: newSettings.default_currency
+                        };
+                    }
+
                     setSettings(newSettings);
 
                     // Apply colors immediately
@@ -79,7 +90,6 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
                         applyThemeColors(newSettings.theme_colors);
                     }
                 } else {
-                    // No data found, but no error (might be empty table)
                     setSettings(prev => ({ ...prev, loading: false }));
                 }
             } catch (err) {

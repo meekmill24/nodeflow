@@ -156,6 +156,32 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         };
     }, [fetchProfile]);
 
+    // Real-time balance and profile synchronization
+    useEffect(() => {
+        if (!user?.id) return;
+
+        const profileChannel = supabase
+            .channel(`realtime-profile-${user.id}`)
+            .on(
+                'postgres_changes',
+                {
+                    event: '*',
+                    schema: 'public',
+                    table: 'profiles',
+                    filter: `id=eq.${user.id}`,
+                },
+                (payload) => {
+                    console.log("Realtime profile update received:", payload);
+                    fetchProfile(user.id);
+                }
+            )
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(profileChannel);
+        };
+    }, [user?.id, fetchProfile]);
+
     const signOut = useCallback(async () => {
         await supabase.auth.signOut();
         setUser(null);

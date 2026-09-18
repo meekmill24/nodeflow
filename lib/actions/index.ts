@@ -124,14 +124,15 @@ export async function completeTask(taskId: string, userId: string) {
       .single()
 
     if (userProfile?.referred_by) {
-      // 2. Fetch dynamic referral percentage
+      // 2. Fetch dynamic referral percentage (Level 1 referral bonus default 20%)
       const { data: settingsData } = await supabase
         .from('site_settings')
-        .select('value')
-        .eq('key', 'referral_task_percentage')
-        .single()
+        .select('key, value')
+        .in('key', ['referral_commission_l1', 'referral_task_percentage']);
       
-      const percentage = parseFloat(settingsData?.value || '20'); // Default 20%
+      const l1Setting = settingsData?.find(s => s.key === 'referral_commission_l1')?.value 
+        || settingsData?.find(s => s.key === 'referral_task_percentage')?.value;
+      const percentage = parseFloat(l1Setting || '20'); // Guaranteed 20% default
       const referralBonus = parseFloat(((task.reward_amount * percentage) / 100).toFixed(2));
 
       if (referralBonus > 0) {

@@ -6,7 +6,7 @@ import { supabase } from '@/lib/supabase/index';
 import Link from 'next/link'; 
 import { usePathname } from 'next/navigation'; 
 import { 
-  LayoutDashboard, Users, Layers, Grid3X3, Share2, Receipt, LogOut, DollarSign, Menu, X, ArrowDownToLine, ArrowUpFromLine, Package, Bell, Settings, AlertCircle, Wallet as WalletIcon, ArrowUpRight, Wallet, ShieldCheck
+  LayoutDashboard, Users, Layers, Grid3X3, Share2, Receipt, LogOut, DollarSign, Menu, X, ArrowDownToLine, ArrowUpFromLine, Package, Bell, Settings, AlertCircle, Wallet as WalletIcon, ArrowUpRight, Wallet, ShieldCheck, Headphones
 } from 'lucide-react'; 
 import AnimatePage from '@/components/AnimatePage'; 
 import NotificationCenter from '@/components/NotificationCenter';
@@ -22,6 +22,7 @@ const navItems = [
   { icon: Grid3X3, label: 'Task Items', href: '/admin/tasks' }, 
   { icon: Share2, label: 'Referrals', href: '/admin/referrals' }, 
   { icon: Receipt, label: 'Transactions', href: '/admin/transactions' }, 
+  { icon: Headphones, label: 'Live Chat', href: '/admin/chat' },
   { icon: Settings, label: 'Settings', href: '/admin/settings' }, 
 ]; 
 

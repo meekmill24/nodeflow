@@ -10,31 +10,70 @@ export default function TawkMessenger() {
     const widgetId = settings?.tawkto_widget_id || '1jshhdhta';
 
     useEffect(() => {
-        // 1. Prevent double injection in React strict mode
-        if (document.getElementById('tawk-script')) return;
-
-        // 2. Initialize Tawk variables on the window object
+        // Initialize Tawk variables on the window object
         (window as any).Tawk_API = (window as any).Tawk_API || {};
         (window as any).Tawk_LoadStart = new Date();
 
-        // 3. Create the script element manually
-        const s1 = document.createElement("script");
-        const s0 = document.getElementsByTagName("script")[0];
-        s1.async = true;
-        s1.src = `https://embed.tawk.to/${propertyId}/${widgetId}`;
-        s1.charset = 'UTF-8';
-        s1.setAttribute('crossorigin', '*');
-        s1.id = 'tawk-script'; // Tag it so we know it's injected
-        
-        // 4. Inject it safely into the DOM
-        if (s0 && s0.parentNode) {
-            s0.parentNode.insertBefore(s1, s0);
-        } else {
-            document.head.appendChild(s1);
+        // 1. Immediately hide default green launcher widget once Tawk finishes loading
+        (window as any).Tawk_API.onLoad = function () {
+            try {
+                (window as any).Tawk_API.hideWidget();
+            } catch (err) {
+                console.error('Tawk hideWidget error:', err);
+            }
+        };
+
+        // 2. When chat is minimized or hidden, ensure default launcher stays hidden
+        (window as any).Tawk_API.onChatMinimized = function () {
+            try {
+                (window as any).Tawk_API.hideWidget();
+            } catch (err) {
+                console.error('Tawk hideWidget error:', err);
+            }
+        };
+
+        (window as any).Tawk_API.onChatHidden = function () {
+            try {
+                (window as any).Tawk_API.hideWidget();
+            } catch (err) {
+                console.error('Tawk hideWidget error:', err);
+            }
+        };
+
+        // 3. Inject script safely into the DOM
+        if (!document.getElementById('tawk-script')) {
+            const s1 = document.createElement("script");
+            const s0 = document.getElementsByTagName("script")[0];
+            s1.async = true;
+            s1.src = `https://embed.tawk.to/${propertyId}/${widgetId}`;
+            s1.charset = 'UTF-8';
+            s1.setAttribute('crossorigin', '*');
+            s1.id = 'tawk-script';
+            
+            if (s0 && s0.parentNode) {
+                s0.parentNode.insertBefore(s1, s0);
+            } else {
+                document.head.appendChild(s1);
+            }
         }
-        
-        // Note: We intentionally do NOT remove the script on unmount.
-        // We want Tawk to persist across all Next.js route navigations.
+
+        // 4. Periodic watchdog to ensure the default widget launcher is never visible when chat is minimized
+        const watchdog = setInterval(() => {
+            const tawk = (window as any).Tawk_API;
+            if (tawk && typeof tawk.hideWidget === 'function') {
+                if (typeof tawk.isChatMaximized === 'function') {
+                    if (!tawk.isChatMaximized()) {
+                        tawk.hideWidget();
+                    }
+                } else {
+                    tawk.hideWidget();
+                }
+            }
+        }, 500);
+
+        return () => {
+            clearInterval(watchdog);
+        };
     }, [propertyId, widgetId]);
 
     return null;

@@ -186,22 +186,23 @@ export default function HomePage() {
                         <h3 className="text-[10px] font-black text-white/50 uppercase tracking-[0.4em]">QUICK HUB SELECT</h3>
                     </div>
                     
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
                         {[
                             { icon: ArrowDownLeft, label: t('deposit'), href: '/deposit', color: 'text-[#3DD6C8]', bg: 'bg-[#3DD6C8]/5' },
                             { icon: ArrowUpRight, label: t('withdraw'), href: '/withdraw', color: 'text-amber-500', bg: 'bg-amber-500/5' },
+                            { icon: TrendingUp, label: 'Salary Structure', href: '/salary', color: 'text-cyan-400', bg: 'bg-cyan-400/5' },
                             { icon: Building2, label: t('company'), href: '/company', color: 'text-indigo-400', bg: 'bg-indigo-400/5' },
                             { icon: FileText, label: 'Certificate', href: '/certificate', color: 'text-pink-500', bg: 'bg-pink-500/5' },
-                            { icon: ShieldCheck, label: 'Terms', href: '/rules', color: 'text-emerald-500', bg: 'bg-emerald-500/5' },
+                            { icon: ShieldCheck, label: 'Terms and Conditions', href: '/rules', color: 'text-emerald-500', bg: 'bg-emerald-500/5' },
                             { icon: HelpCircle, label: 'FAQ', href: '/faq', color: 'text-blue-500', bg: 'bg-blue-500/5' },
                             { icon: ShieldAlert, label: 'Privacy', href: '/privacy', color: 'text-orange-500', bg: 'bg-orange-500/5' },
-                            { icon: Headset, label: 'Concierge', href: '/concierge', color: 'text-rose-500', bg: 'bg-rose-500/5' },
+                            { icon: Headset, label: 'Customer Support', href: '/concierge', color: 'text-rose-500', bg: 'bg-rose-500/5' },
                         ].map((hub, i) => (
                             <Link key={i} href={hub.href} className="group p-6 rounded-[36px] bg-[#0B0B1E] border border-white/5 flex flex-col items-center gap-4 hover:border-white/10 transition-all duration-500 hover:-translate-y-1">
                                 <div className={`w-12 h-12 rounded-2xl ${hub.bg} border border-white/5 flex items-center justify-center ${hub.color} group-hover:scale-110 transition-transform duration-700`}>
                                     <hub.icon size={22} />
                                 </div>
-                                <span className="text-[10px] font-black text-white/60 uppercase tracking-[0.3em] text-center">{hub.label}</span>
+                                <span className="text-[10px] font-black text-white/60 uppercase tracking-[0.25em] text-center">{hub.label}</span>
                             </Link>
                         ))}
                     </div>
@@ -296,7 +297,7 @@ export default function HomePage() {
                 {[
                     { icon: Play, label: t('start_tasks_label'), desc: t('optimize_now'), href: '/start', color: 'text-[#3DD6C8]' },
                     { icon: Clock, label: t('activity_records_label'), desc: t('settlements'), href: '/record', color: 'text-amber-400' },
-                    { icon: Headset, label: 'Concierge Hub', desc: 'Active Protocol', href: '/concierge', color: 'text-indigo-400' },
+                    { icon: Headset, label: 'Customer Support', desc: 'Active Protocol', href: '/concierge', color: 'text-indigo-400' },
                     { icon: ShieldCheck, label: t('legal_governance_label'), desc: 'Compliance', href: '/rules', color: 'text-emerald-400' }
                 ].map((node, i) => (
                     <Link key={i} href={node.href} className="group p-8 rounded-[40px] bg-[#0B0B1E] border border-white/5 flex flex-col items-center text-center gap-6 hover:border-white/10 transition-all duration-700 hover:-translate-y-1">

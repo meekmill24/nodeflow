@@ -18,15 +18,17 @@ import {
     Headset,
     Compass,
     Activity,
-    Cpu
+    Cpu,
+    TrendingUp
 } from 'lucide-react';
 
 const menuItems = [
     { label: 'Home', icon: Home, href: '/home', category: 'DASHBOARD PROTOCOL' },
     { label: 'Start tasks', icon: PlayCircle, href: '/start', category: 'DASHBOARD PROTOCOL' },
-    { label: 'Record', icon: FileText, href: '/record', category: 'DASHBOARD PROTOCOL' },
+    { label: 'Task record', icon: FileText, href: '/record', category: 'DASHBOARD PROTOCOL' },
     { label: 'Wallet', icon: Wallet, href: '/wallet', category: 'QUICK HUB' },
-    { label: 'Vip map', icon: Shield, href: '/levels', category: 'QUICK HUB' },
+    { label: 'Salary structure', icon: TrendingUp, href: '/salary', category: 'QUICK HUB' },
+    { label: 'Vip map and reward structure', icon: Shield, href: '/levels', category: 'QUICK HUB' },
     { label: 'My profile', icon: User, href: '/profile', category: 'QUICK HUB' },
     { label: 'Live support', icon: Headset, href: '#', isAction: true, category: 'QUICK HUB' },
 ];

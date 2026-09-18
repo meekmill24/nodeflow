@@ -159,13 +159,13 @@ export default function FirstDepositRewardPage() {
                 <FileText size={40} className="text-accent-light mb-6 opacity-40" />
                 <h3 className="text-xl font-black text-white uppercase tracking-tight mb-4">Official Disclaimer</h3>
                 <p className="text-xs font-bold text-text-secondary uppercase tracking-widest leading-relaxed max-w-lg mb-10 opacity-60">
-                    All rewards are subject to internal audit and account verification. To claim your bonus manually, please contact the SmartBugMedia. Concierge Desk.
+                    All rewards are subject to internal audit and account verification. To claim your bonus manually, please contact the SmartBugMedia. Customer Support team.
                 </p>
                 <button 
                     onClick={() => (window as any).Tawk_API?.maximize()}
                     className="w-full max-w-sm py-5 rounded-3xl bg-primary text-white font-black uppercase tracking-[0.2em] text-xs flex items-center justify-center gap-3 shadow-2xl shadow-primary/40 hover:scale-[1.02] active:scale-[0.98] transition-all"
                 >
-                    Contact Live Concierge <ChevronRight size={18} />
+                    Contact Customer Support <ChevronRight size={18} />
                 </button>
             </div>
         </div>

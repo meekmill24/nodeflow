@@ -153,55 +153,83 @@ export default function CertificatePage() {
                                         </div>
                                     </div>
 
-                                    <div className="space-y-8 flex-1 flex flex-col justify-center max-w-2xl mt-12">
+                                    <div className="space-y-6 flex-1 flex flex-col justify-center max-w-2xl mt-8">
                                         <div className="relative inline-block">
-                                            <h3 className="text-4xl md:text-6xl font-black text-white uppercase tracking-[0.2em] px-8 py-2 font-serif">
+                                            <h3 className="text-3xl md:text-5xl font-black text-white uppercase tracking-[0.2em] px-8 py-2 font-serif">
                                                 SmartBugMedia. GLOBAL OPS
                                             </h3>
                                             <div className="absolute -bottom-2 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-amber-500 to-transparent opacity-80" />
                                         </div>
-                                        <div className="flex flex-col items-center mt-4">
+
+                                        <p className="text-[11px] text-amber-400/90 font-bold uppercase tracking-[0.25em] max-w-xl mx-auto">
+                                            Smartbug Media was founded in 2007 by Ryan Malone and Julia Feldman
+                                        </p>
+
+                                        <div className="flex flex-col items-center mt-2">
                                             <span className="text-[10px] font-black text-amber-500 uppercase tracking-widest mb-1 opacity-60">Authorized Holder</span>
-                                            <span className="text-xl font-bold text-white uppercase tracking-widest">{profile?.username || 'REGISTERED AGENT'}</span>
+                                            <span className="text-xl font-bold text-white uppercase tracking-widest">Adam Bleitreu</span>
+                                            <span className="text-[9px] font-black text-amber-400 uppercase tracking-[0.3em] mt-0.5">Chief Executive Officer</span>
                                         </div>
-                                        <div className="grid grid-cols-2 gap-12 mt-8">
-                                            <div className="text-left space-y-2">
+
+                                        <div className="grid grid-cols-2 gap-8 mt-4">
+                                            <div className="text-left space-y-1">
                                                 <span className="text-[9px] font-black text-white/40 uppercase tracking-widest">Registration No.</span>
-                                                <p className="text-lg font-black text-white tracking-widest font-mono">SBM-GLOBAL-99B2-2026</p>
+                                                <p className="text-base font-black text-white tracking-widest font-mono">SBM-GLOBAL-99B2-2026</p>
                                             </div>
-                                            <div className="text-right space-y-2">
+                                            <div className="text-right space-y-1">
                                                 <span className="text-[9px] font-black text-white/40 uppercase tracking-widest">Jurisdiction</span>
-                                                <p className="text-lg font-black text-white tracking-widest">GLOBAL OPERATIONAL</p>
+                                                <p className="text-base font-black text-white tracking-widest">GLOBAL OPERATIONAL</p>
                                             </div>
                                         </div>
-                                        <p className="text-[11px] text-white/80 leading-[2] font-semibold px-4 md:px-12 backdrop-blur-[4px] py-6 border-y border-white/10 uppercase tracking-widest italic">
+
+                                        <p className="text-[11px] text-white/80 leading-[2] font-semibold px-4 md:px-12 backdrop-blur-[4px] py-4 border-y border-white/10 uppercase tracking-widest italic">
                                             This entity is duly registered and authorized to conduct large-scale neural network optimization, 
                                             liquidity matching, and cross-border digital asset settlements under the 
                                             <span className="text-amber-500"> Financial Integrity Protocol v4.5</span>.
                                         </p>
                                     </div>
 
-                                    <div className="grid grid-cols-3 gap-8 w-full items-end mt-12 pb-4">
-                                        <div className="flex flex-col items-center">
-                                            <div className="w-24 h-24 border border-white/20 rounded-full flex items-center justify-center opacity-40">
-                                                <Globe size={40} className="text-white" />
+                                    {/* Institutional Endorsement, Signature & Seal */}
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full items-end mt-8 pb-4">
+                                        {/* CEO Endorsement & Signature */}
+                                        <div className="flex flex-col items-center text-center space-y-2">
+                                            <div className="relative flex flex-col items-center">
+                                                {/* Digital Stylized Signature of Adam Bleitreu */}
+                                                <div className="relative py-1">
+                                                    <span className="font-serif italic text-2xl md:text-3xl text-amber-300 font-extrabold tracking-tight select-none drop-shadow-[0_0_12px_rgba(251,191,36,0.5)] transform -rotate-3 block">
+                                                        Adam Bleitreu
+                                                    </span>
+                                                    <svg className="w-36 h-3 text-amber-400/80 -mt-1 mx-auto overflow-visible" viewBox="0 0 140 12" fill="none">
+                                                        <path d="M2 7 C35 1, 75 12, 138 3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                                                    </svg>
+                                                </div>
+                                                <div className="w-36 h-[1px] bg-amber-400/30 mt-1" />
                                             </div>
-                                            <span className="text-[8px] font-black text-white/40 uppercase tracking-widest mt-2">Global Coverage</span>
+                                            <div className="flex flex-col items-center">
+                                                <span className="text-[11px] font-black text-white uppercase tracking-widest">Adam Bleitreu</span>
+                                                <span className="text-[9px] font-black text-amber-400 uppercase tracking-[0.3em]">Chief Executive Officer</span>
+                                            </div>
                                         </div>
-                                        <div className="flex flex-col items-center justify-center -mb-4">
-                                            <div className="w-32 h-32 relative flex items-center justify-center">
+
+                                        {/* Golden Seal */}
+                                        <div className="flex flex-col items-center justify-center -mb-2">
+                                            <div className="w-28 h-28 relative flex items-center justify-center">
                                                 <div className="absolute inset-0 border-8 border-double border-amber-600/30 rounded-full animate-spin-slow" />
-                                                <div className="w-20 h-20 rounded-full bg-amber-600/20 border border-amber-500/40 flex items-center justify-center backdrop-blur-md">
-                                                    <ShieldCheck size={40} className="text-amber-500" />
+                                                <div className="w-18 h-18 rounded-full bg-amber-600/20 border border-amber-500/40 flex items-center justify-center backdrop-blur-md">
+                                                    <ShieldCheck size={36} className="text-amber-500" />
                                                 </div>
                                             </div>
                                             <span className="text-[9px] font-black text-amber-500 uppercase tracking-[0.4em] mt-2">GOLD SEAL VERIFIED</span>
                                         </div>
-                                        <div className="flex flex-col items-center">
-                                            <div className="p-4 border border-white/20 rounded-xl opacity-40">
-                                                <Building size={32} className="text-white" />
+
+                                        {/* Founders & Certification Body */}
+                                        <div className="flex flex-col items-center text-center space-y-2">
+                                            <div className="w-32 h-[1px] bg-white/20 mb-2" />
+                                            <div className="flex flex-col items-center">
+                                                <span className="text-[8px] font-black text-white/40 uppercase tracking-[0.25em] mb-1">Founded 2007 by</span>
+                                                <span className="text-[10px] font-bold text-white uppercase tracking-wider">Ryan Malone & Julia Feldman</span>
+                                                <span className="text-[8px] font-bold text-amber-400/80 uppercase tracking-widest mt-1">Smartbug Media Governance</span>
                                             </div>
-                                            <span className="text-[8px] font-black text-white/40 uppercase tracking-widest mt-2">Institutional Hub</span>
                                         </div>
                                     </div>
                                 </>

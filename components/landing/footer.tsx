@@ -24,7 +24,7 @@ const footerLinks = {
     { label: "About Us", href: "/about" },
   ],
   legal: [
-    { label: "Terms of Service", href: "/rules" },
+    { label: "Terms and Conditions", href: "/rules" },
     { label: "Privacy Policy", href: "/privacy" },
     { label: "Platform Rules", href: "/service" },
   ],

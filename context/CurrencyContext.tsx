@@ -5,7 +5,7 @@ import { useAuth } from './AuthContext';
 import { useSiteSettings } from './SettingsContext';
 import { supabase } from '@/lib/supabase/index';
 
-export type CurrencyCode = 'USD' | 'EUR' | 'GBP' | 'JPY' | 'CAD' | 'CHF' | 'AUD' | 'SGD' | 'AED' | 'ZAR' | 'BRL' | 'GHC' | 'BTC' | 'INR' | 'CNY' | 'KRW' | 'HKD' | 'NZD' | 'MXN' | 'RUB' | 'SAR' | 'TRY' | 'IDR' | 'MYR' | 'THB' | 'PHP' | 'VND';
+export type CurrencyCode = 'USD' | 'EUR' | 'GBP' | 'JPY' | 'CAD' | 'CHF' | 'AUD' | 'SGD' | 'AED' | 'ZAR' | 'BRL' | 'GHC' | 'BTC' | 'ETH' | 'INR' | 'CNY' | 'KRW' | 'HKD' | 'NZD' | 'MXN' | 'RUB' | 'SAR' | 'TRY' | 'IDR' | 'MYR' | 'THB' | 'PHP' | 'VND' | 'USDC' | 'PAYPALUSD' | 'BNB';
 
 interface Currency {
     code: CurrencyCode;
@@ -27,6 +27,7 @@ const currencies: Record<CurrencyCode, Currency> = {
     BRL: { code: 'BRL', symbol: 'R$', rate: 4.97 },
     GHC: { code: 'GHC', symbol: 'GH₵', rate: 12.85 },
     BTC: { code: 'BTC', symbol: '₿', rate: 0.000015 },
+    ETH: { code: 'ETH', symbol: 'Ξ ', rate: 0.00035 },
     INR: { code: 'INR', symbol: '₹', rate: 82.95 },
     CNY: { code: 'CNY', symbol: '¥', rate: 7.19 },
     KRW: { code: 'KRW', symbol: '₩', rate: 1335.5 },
@@ -41,6 +42,9 @@ const currencies: Record<CurrencyCode, Currency> = {
     THB: { code: 'THB', symbol: '฿', rate: 35.85 },
     PHP: { code: 'PHP', symbol: '₱', rate: 56.05 },
     VND: { code: 'VND', symbol: '₫', rate: 24650 },
+    USDC: { code: 'USDC', symbol: 'USDC ', rate: 1 },
+    PAYPALUSD: { code: 'PAYPALUSD', symbol: 'PYUSD ', rate: 1 },
+    BNB: { code: 'BNB', symbol: 'BNB ', rate: 0.0017 },
 };
 
 interface CurrencyContextType {
@@ -54,31 +58,54 @@ const CurrencyContext = createContext<CurrencyContextType | undefined>(undefined
 
 export function CurrencyProvider({ children }: { children: React.ReactNode }) {
     const { profile } = useAuth();
-    const { currency: backendCurrency, loading } = useSiteSettings();
-    const [currentCurrency, setCurrentCurrency] = useState<Currency>(currencies.USD);
+    const siteSettings = useSiteSettings() as any;
+    const [currentCurrency, setCurrentCurrency] = useState<Currency>(() => {
+        if (typeof window !== 'undefined') {
+            const saved = localStorage.getItem('currency') as CurrencyCode;
+            if (saved && currencies[saved]) return currencies[saved];
+        }
+        return currencies.USD;
+    });
 
     useEffect(() => {
-        if (loading) return;
-        
-        // If the admin has defined a global override, use it as default
-        const defaultCurrency = backendCurrency?.default && currencies[backendCurrency.default as CurrencyCode] 
-            ? { ...currencies[backendCurrency.default as CurrencyCode], symbol: backendCurrency.symbol || currencies[backendCurrency.default as CurrencyCode].symbol }
-            : currencies.USD;
+        // Determine default from admin override or saved state
+        const adminDefaultCode = (siteSettings?.default_currency || siteSettings?.currency?.default) as CurrencyCode;
+        const adminCurrency = adminDefaultCode && currencies[adminDefaultCode] ? currencies[adminDefaultCode] : currencies.USD;
 
-        const savedCurrency = localStorage.getItem('currency') as CurrencyCode;
+        const savedCurrency = (typeof window !== 'undefined' ? localStorage.getItem('currency') : null) as CurrencyCode;
+
         if (savedCurrency && currencies[savedCurrency]) {
             setCurrentCurrency(currencies[savedCurrency]);
         } else if (profile?.currency && currencies[profile.currency as CurrencyCode]) {
             setCurrentCurrency(currencies[profile.currency as CurrencyCode]);
-        } else {
-            setCurrentCurrency(defaultCurrency);
+        } else if (adminCurrency) {
+            setCurrentCurrency(adminCurrency);
         }
-    }, [profile?.currency, backendCurrency, loading]);
+    }, [profile?.currency, siteSettings?.default_currency, siteSettings?.currency?.default, siteSettings?.loading]);
+
+    // Listen for storage / custom currency-change events across components
+    useEffect(() => {
+        const handleSync = () => {
+            const saved = localStorage.getItem('currency') as CurrencyCode;
+            if (saved && currencies[saved]) {
+                setCurrentCurrency(currencies[saved]);
+            }
+        };
+        window.addEventListener('storage', handleSync);
+        window.addEventListener('currency-changed', handleSync);
+        return () => {
+            window.removeEventListener('storage', handleSync);
+            window.removeEventListener('currency-changed', handleSync);
+        };
+    }, []);
 
     const handleSetCurrency = async (code: CurrencyCode) => {
         if (currencies[code]) {
             setCurrentCurrency(currencies[code]);
-            localStorage.setItem('currency', code);
+            if (typeof window !== 'undefined') {
+                localStorage.setItem('currency', code);
+                window.dispatchEvent(new Event('currency-changed'));
+            }
 
             if (profile?.id) {
                 try {
@@ -86,15 +113,15 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
                         .from('profiles')
                         .update({ currency: code })
                         .eq('id', profile.id);
-                } catch (err) {
-                    console.error('Failed to persist currency setting:', err);
+                } catch {
+                    // Fallback to local storage if database column doesn't exist
                 }
             }
         }
     };
 
     const convert = (amount: number) => {
-        return amount * currentCurrency.rate;
+        return (Number(amount) || 0) * currentCurrency.rate;
     };
 
     const format = (amount: number) => {
@@ -104,6 +131,12 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
         }
         if (currentCurrency.code === 'BTC') {
             return `${currentCurrency.symbol}${converted.toFixed(8)}`;
+        }
+        if (currentCurrency.code === 'ETH') {
+            return `${currentCurrency.symbol}${converted.toFixed(5)}`;
+        }
+        if (currentCurrency.code === 'BNB') {
+            return `${currentCurrency.symbol}${converted.toFixed(4)}`;
         }
         return `${currentCurrency.symbol}${converted.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
     };

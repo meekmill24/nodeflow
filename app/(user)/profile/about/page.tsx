@@ -60,8 +60,8 @@ export default function AboutPage() {
             <div className="glass-card p-5 animate-slide-up" style={{ animationDelay: '0.25s' }}>
                 <h3 className="font-bold text-text-primary mb-3">Contact Us</h3>
                 <p className="text-sm text-text-secondary leading-relaxed">
-                    For support, please use the **Concierge Desk** link on your dashboard or navigation. Our team
-                    is available during operating hours (9:00 AM - 9:00 PM Eastern Time).
+                    For support, please use the **Customer Support** link on your dashboard or navigation. Our team
+                    is available during operating hours (US Central Time: 10:00 AM – 7:00 PM).
                 </p>
             </div>
 

@@ -14,6 +14,7 @@ import { ThemeProvider } from '@/context/ThemeContext'
 import { NotificationProvider } from '@/context/NotificationContext'
 import { Toaster } from 'sonner'
 import TawkMessenger from '@/components/TawkMessenger'
+import DraggableChat from '@/components/DraggableChat'
 
 export const metadata: Metadata = {
   title: 'SmartBugMedia. | Precision Optimization & Amplified Returns',
@@ -40,6 +41,7 @@ export default function RootLayout({
                     <Analytics />
                     
                     <TawkMessenger />
+                    <DraggableChat />
                   </NotificationProvider>
                 </ThemeProvider>
               </LanguageProvider>

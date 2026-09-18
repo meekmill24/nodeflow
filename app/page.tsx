@@ -265,7 +265,7 @@ export default function LandingPage() {
     {
       id: '02',
       title: 'Fund & Activate',
-      desc: 'Deposit USDT, ETH, or BTC to activate your node tier. Minimum deposit of just $30 to get started instantly.',
+      desc: 'Deposit USDT, USDC, PayPal, PayPal USD (PYUSD), BNB, ETH, or BTC to activate your node tier. Minimum deposit of just $30 to start instantly.',
       icon: Zap,
       color: 'cyan',
       accent: 'from-cyan-500/20 to-indigo-500/20',
@@ -273,7 +273,7 @@ export default function LandingPage() {
     {
       id: '03',
       title: 'Execute & Earn',
-      desc: 'Run daily optimization tasks. Commissions credit to your wallet immediately. Withdraw anytime, 24/7.',
+      desc: 'Run daily optimization tasks. Commissions credit to your wallet immediately. Withdrawals are processed during working hours upon customer service verification and approval.',
       icon: Trophy,
       color: 'violet',
       accent: 'from-indigo-500/20 to-violet-500/20',
@@ -356,11 +356,11 @@ export default function LandingPage() {
   const faqs = [
     {
       q: 'How do I start earning?',
-      a: 'Simply register an account, log in, and top up your secure balance using USDT, ETH, or BTC. Once funded, access the agent terminal to run optimization tasks. Daily earnings are added to your wallet immediately.',
+      a: 'Simply register an account, log in, and top up your secure balance using USDT, USDC, PayPal, PayPal USD (PYUSD), BNB, ETH, or BTC. Once funded, access the agent terminal to run optimization tasks. Daily earnings are added to your wallet immediately.',
     },
     {
       q: 'What are the minimum deposit and withdrawal amounts?',
-      a: 'You can start with a minimum deposit of just $30. The minimum withdrawal is only $10. Withdrawals are processed immediately and usually hit your external crypto wallet within 5 to 30 minutes.',
+      a: 'You can start with a minimum deposit of just $30. The minimum withdrawal is only $10. Withdrawals can be requested 24/7 and are processed during official working hours following customer service verification and approval.',
     },
     {
       q: 'How does the referral commission model work?',
@@ -376,7 +376,11 @@ export default function LandingPage() {
     },
     {
       q: 'How quickly can I withdraw my earnings?',
-      a: 'Withdrawals are available 24/7 with a minimum of $10. Once submitted, funds typically arrive in your external crypto wallet within 5 to 30 minutes — no queues, no business-day restrictions.',
+      a: 'Withdrawal requests are processed during platform working hours (US Central Time 10:00 AM – 7:00 PM, Monday to Sunday), where customer service verifies and approves every payout for security and speed.',
+    },
+    {
+      q: 'What are the platform working hours?',
+      a: 'Working hours are US Central Time 10:00 AM to 7:00 PM from Monday to Sunday. During these hours, our customer service team verifies transactions, approves withdrawals, and provides real-time support.',
     },
   ];
 

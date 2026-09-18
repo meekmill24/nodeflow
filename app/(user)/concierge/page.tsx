@@ -75,7 +75,7 @@ export default function ConciergeHubPage() {
                     <ArrowLeft size={20} />
                 </Link>
                 <div>
-                    <h1 className="text-2xl font-black text-text-primary tracking-tight uppercase">Concierge Hub</h1>
+                    <h1 className="text-2xl font-black text-text-primary tracking-tight uppercase">Customer Support</h1>
                     <p className="text-[10px] font-black text-text-secondary uppercase tracking-[0.2em] opacity-60">Priority Protocol & Support</p>
                 </div>
             </div>
@@ -93,11 +93,11 @@ export default function ConciergeHubPage() {
                     
                     <div className="space-y-2">
                         <h2 className="text-3xl font-black text-text-primary tracking-tight uppercase leading-tight">
-                            Personalized <br />
-                            <span className="text-primary-light">VIP Concierge</span>
+                            Official <br />
+                            <span className="text-primary-light">Customer Support</span>
                         </h2>
                         <p className="max-w-md text-xs text-text-secondary font-medium leading-relaxed">
-                            Our priority support team is active 24/7 to handle account inquiries, large settlements, and tier advancement consultations.
+                            Our priority support team is available during working hours to handle account inquiries, large settlements, and tier advancement consultations.
                         </p>
                     </div>
 

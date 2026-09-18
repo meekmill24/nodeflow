@@ -17,9 +17,62 @@ import {
   ArrowDownLeft,
   Wallet,
   Target,
-  Gift
+  Gift,
+  Mail,
+  Sparkles,
+  Brush,
+  Eye,
+  RotateCcw
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
+
+const THEME_PRESETS = [
+  {
+    id: 'cyber-cyan',
+    name: 'Cyber Cyan',
+    primary: '#3DD6C8',
+    accent: '#E34304',
+    background: '#0B0B1E',
+    surface: 'rgba(15, 23, 42, 0.6)',
+    desc: 'Default Neon Cyan with Radiant Ember Accent'
+  },
+  {
+    id: 'electric-violet',
+    name: 'Electric Violet',
+    primary: '#8B5CF6',
+    accent: '#EC4899',
+    background: '#0E0720',
+    surface: 'rgba(24, 12, 46, 0.6)',
+    desc: 'Deep Cosmic Purple with Laser Pink Highlights'
+  },
+  {
+    id: 'apex-emerald',
+    name: 'Apex Emerald',
+    primary: '#10B981',
+    accent: '#F59E0B',
+    background: '#051811',
+    surface: 'rgba(6, 32, 22, 0.6)',
+    desc: 'Fintech Emerald with Bullion Gold Tones'
+  },
+  {
+    id: 'solar-crimson',
+    name: 'Solar Crimson',
+    primary: '#F59E0B',
+    accent: '#EF4444',
+    background: '#160E04',
+    surface: 'rgba(34, 20, 6, 0.6)',
+    desc: 'Warm Radiant Amber with Laser Red Flare'
+  },
+  {
+    id: 'abyss-azure',
+    name: 'Abyss Azure',
+    primary: '#0EA5E9',
+    accent: '#6366F1',
+    background: '#041122',
+    surface: 'rgba(8, 28, 54, 0.6)',
+    desc: 'Deep Marine Azure with Futuristic Indigo'
+  }
+];
 
 interface SiteSetting {
   id: string;
@@ -53,7 +106,21 @@ export default function AdminSettingsPage() {
   };
 
   const handleUpdate = (key: string, value: any) => {
-    setSettings(prev => prev.map(s => s.key === key ? { ...s, value } : s));
+    setSettings(prev => {
+      const exists = prev.some(s => s.key === key);
+      let updated = exists 
+        ? prev.map(s => s.key === key ? { ...s, value } : s)
+        : [...prev, { id: key, key, value, description: null }];
+
+      if (key === 'referral_commission_l1') {
+        const hasTaskPct = updated.some(s => s.key === 'referral_task_percentage');
+        updated = hasTaskPct
+          ? updated.map(s => s.key === 'referral_task_percentage' ? { ...s, value } : s)
+          : [...updated, { id: 'referral_task_percentage', key: 'referral_task_percentage', value, description: 'Task Referral %' }];
+      }
+
+      return updated;
+    });
     setSuccess(false);
   };
 
@@ -179,29 +246,76 @@ export default function AdminSettingsPage() {
                     <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-600 ml-1">Default Platform Language</label>
                     <select 
                       className="w-full bg-black/60 border border-white/5 rounded-2xl px-6 py-4 text-white focus:outline-none focus:ring-2 focus:ring-[#3DD6C8]/20 transition-all font-black uppercase tracking-widest text-[10px] appearance-none cursor-pointer"
-                      value={settings.find(s => s.key === 'default_language')?.value || 'en'}
+                      value={settings.find(s => s.key === 'default_language')?.value || 'English'}
                       onChange={(e) => {
                         const newValue = e.target.value;
-                        const updated = settings.map(s => s.key === 'default_language' ? { ...s, value: newValue } : s);
+                        const updated = settings.some(s => s.key === 'default_language')
+                          ? settings.map(s => s.key === 'default_language' ? { ...s, value: newValue } : s)
+                          : [...settings, { id: 'default_language', key: 'default_language', value: newValue, description: 'Default site language' }];
                         setSettings(updated);
                         handleSave(updated);
                       }}
                     >
-                      <option value="en">English (US)</option>
-                      <option value="es">Español</option>
-                      <option value="fr">Français</option>
-                      <option value="de">Deutsch</option>
-                      <option value="it">Italiano</option>
-                      <option value="pt">Português</option>
-                      <option value="ru">Русский</option>
-                      <option value="zh">中文 (Chinese)</option>
-                      <option value="ja">日本語 (Japanese)</option>
-                      <option value="ko">한국어 (Korean)</option>
-                      <option value="ar">العربية (Arabic)</option>
-                      <option value="tr">Türkçe</option>
-                      <option value="gh">Ghanaian (Ewe/Twi/Ga)</option>
+                      <option value="English">English (US)</option>
+                      <option value="Spanish">Español (Spanish)</option>
+                      <option value="French">Français (French)</option>
+                      <option value="German">Deutsch (German)</option>
+                      <option value="Portuguese">Português (Portuguese)</option>
+                      <option value="Russian">Русский (Russian)</option>
+                      <option value="Chinese">中文 (Chinese)</option>
+                      <option value="Japanese">日本語 (Japanese)</option>
+                      <option value="Arabic">العربية (Arabic)</option>
+                      <option value="Turkish">Türkçe (Turkish)</option>
+                      <option value="Hindi">हिन्दी (Hindi)</option>
+                      <option value="Vietnamese">Tiếng Việt (Vietnamese)</option>
                     </select>
                 </div>
+            </div>
+          </section>
+
+          {/* EMAIL & COMMUNICATION SECTION */}
+          <section className="bg-slate-900/40 border border-white/5 p-10 rounded-[48px] backdrop-blur-xl group hover:border-violet-500/20 transition-all">
+            <div className="flex items-center gap-4 mb-8">
+              <div className="p-3 bg-violet-500/10 rounded-2xl text-violet-400 ring-1 ring-violet-500/20">
+                <Mail size={24} />
+              </div>
+              <div>
+                <h3 className="text-xl font-black text-white italic uppercase tracking-tighter leading-none">Email Matrix</h3>
+                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1">Support & Operations Dispatch</p>
+              </div>
+            </div>
+
+            <div className="space-y-6">
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-600 ml-1">1. Primary Member Support Email</label>
+                <input 
+                  className="w-full bg-black/40 border border-white/5 rounded-2xl px-6 py-4 text-white font-mono text-[11px] focus:outline-none focus:ring-2 focus:ring-violet-500/20 transition-all" 
+                  value={settings.find(s => s.key === 'support_email')?.value || ''} 
+                  onChange={(e) => handleUpdate('support_email', e.target.value)} 
+                  placeholder="support@smartbugmedia.io" 
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-600 ml-1">2. Admin Alert Email (Second Email)</label>
+                <input 
+                  className="w-full bg-black/40 border border-white/5 rounded-2xl px-6 py-4 text-white font-mono text-[11px] focus:outline-none focus:ring-2 focus:ring-violet-500/20 transition-all" 
+                  value={settings.find(s => s.key === 'admin_notification_email')?.value || ''} 
+                  onChange={(e) => handleUpdate('admin_notification_email', e.target.value)} 
+                  placeholder="operations@smartbugmedia.io" 
+                />
+                <p className="text-[9px] text-slate-600 font-bold ml-1">Receives automated notifications for deposit slips & withdrawals.</p>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-600 ml-1">3. Resend Dispatch Sender</label>
+                <input 
+                  className="w-full bg-black/40 border border-white/5 rounded-2xl px-6 py-4 text-violet-300 font-mono text-[11px] focus:outline-none focus:ring-2 focus:ring-violet-500/20 transition-all" 
+                  value={settings.find(s => s.key === 'resend_from_email')?.value || ''} 
+                  onChange={(e) => handleUpdate('resend_from_email', e.target.value)} 
+                  placeholder="SmartBugMedia <notifications@smartbugmedia.io>" 
+                />
+              </div>
             </div>
           </section>
         </div>
@@ -226,7 +340,7 @@ export default function AdminSettingsPage() {
                 {[
                     { key: 'min_deposit', label: 'Minimum Influx', icon: ArrowDownLeft, suffix: 'USD', placeholder: '10' },
                     { key: 'min_withdrawal', label: 'Minimum Extraction', icon: ArrowUpRight, suffix: 'USD', placeholder: '30' },
-                    { key: 'referral_commission_l1', label: 'L1 Growth Yield', icon: Share2, suffix: '%', placeholder: '16' },
+                    { key: 'referral_commission_l1', label: 'L1 Growth Yield', icon: Share2, suffix: '%', placeholder: '20' },
                     { key: 'referral_commission_l2', label: 'L2 Growth Yield', icon: Share2, suffix: '%', placeholder: '8' },
                     { key: 'referral_commission_l3', label: 'L3 Growth Yield', icon: Share2, suffix: '%', placeholder: '4' },
                     { key: 'signup_bonus', label: 'Referral Signup Bonus', icon: UserPlus, suffix: 'USD', placeholder: '2' },
@@ -294,16 +408,24 @@ export default function AdminSettingsPage() {
                       <option value="PHP">PHP (₱)</option>
                       <option value="VND">VND (₫)</option>
                       <option value="BTC">BTC (₿)</option>
+                      <option value="ETH">ETH (Ξ)</option>
+                      <option value="USDC">USDC (USDC)</option>
+                      <option value="BNB">BNB (BNB)</option>
+                      <option value="PAYPALUSD">PYUSD (PayPal USD)</option>
                     </select>
                 </div>
              </div>
 
              <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-8 pt-10 border-t border-white/5">
                 {[
-                    { key: 'wallet_trc20', label: 'TRC20 RECEIVING NODE', icon: Wallet, placeholder: 'T...' },
-                    { key: 'wallet_erc20', label: 'ERC20 (ETH) NODE', icon: Palette, placeholder: '0x...' },
+                    { key: 'wallet_trc20', label: 'USDT (TRC20) RECEIVING NODE', icon: Wallet, placeholder: 'T...' },
+                    { key: 'wallet_erc20', label: 'USDT (ERC20) NODE', icon: Palette, placeholder: '0x...' },
+                    { key: 'wallet_bep20', label: 'USDT (BEP20) NODE', icon: ShieldCheck, placeholder: '0x...' },
+                    { key: 'wallet_eth', label: 'ETHEREUM (ETH) RECEIVING NODE', icon: Wallet, placeholder: '0x...' },
                     { key: 'wallet_btc', label: 'BTC RECEIVING NODE', icon: Target, placeholder: '1... or 3... or bc1...' },
-                    { key: 'wallet_bep20', label: 'BEP20 (BNB) NODE', icon: ShieldCheck, placeholder: '0x...' },
+                    { key: 'wallet_usdc', label: 'USDC RECEIVING NODE', icon: Wallet, placeholder: '0x... or Solana address' },
+                    { key: 'wallet_bnb', label: 'BNB CHAIN (BEP20) NODE', icon: ShieldCheck, placeholder: '0x...' },
+                    { key: 'wallet_paypalusd', label: 'PAYPAL USD (PYUSD) NODE', icon: Wallet, placeholder: '0x...' },
                 ].map((cfg) => {
                     const item = settings.find(s => s.key === cfg.key);
                     return (
@@ -371,6 +493,277 @@ export default function AdminSettingsPage() {
                         </div>
                     </div>
                 </div>
+           </section>
+
+           {/* PILLAR 3: VISUAL APPEARANCE & THEME ENGINE */}
+           <section className="bg-slate-900/40 border border-white/5 p-10 rounded-[48px] backdrop-blur-xl relative overflow-hidden group hover:border-[#3DD6C8]/20 transition-all duration-700">
+             <div className="absolute top-0 right-0 w-96 h-96 bg-[#3DD6C8]/5 blur-[120px] rounded-full pointer-events-none" />
+             
+             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10 pb-8 border-b border-white/5">
+                <div className="flex items-center gap-4">
+                  <div className="p-3.5 bg-[#3DD6C8]/10 rounded-2xl text-[#3DD6C8] ring-1 ring-[#3DD6C8]/30 shadow-[0_0_20px_rgba(61,214,200,0.2)]">
+                    <Brush size={26} />
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-black text-white italic uppercase tracking-tighter leading-none flex items-center gap-3">
+                      Visual Terminal & Theme Engine
+                      <span className="px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-widest bg-[#3DD6C8]/10 text-[#3DD6C8] border border-[#3DD6C8]/30">Live Sync</span>
+                    </h3>
+                    <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1.5">
+                      Configure platform colors, accent tones, and terminal styling in real time.
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    const defaultTheme = {
+                      primary: '#3DD6C8',
+                      accent: '#E34304',
+                      background: '#0B0B1E',
+                      surface: 'rgba(15, 23, 42, 0.6)'
+                    };
+                    handleUpdate('theme_colors', defaultTheme);
+                    if (typeof document !== 'undefined') {
+                      const root = document.documentElement;
+                      root.style.setProperty('--primary', defaultTheme.primary);
+                      root.style.setProperty('--primary-glow', `${defaultTheme.primary}40`);
+                      root.style.setProperty('--accent', defaultTheme.accent);
+                      root.style.setProperty('--background', defaultTheme.background);
+                    }
+                    toast.success('Reset to Default Theme');
+                  }}
+                  className="flex items-center gap-2 px-5 py-3 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 text-slate-300 text-[10px] font-black uppercase tracking-widest transition-all w-fit"
+                >
+                  <RotateCcw size={14} /> Reset Defaults
+                </button>
+             </div>
+
+             {/* 1-Click Theme Presets */}
+             <div className="space-y-4 mb-10">
+                <label className="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400 flex items-center gap-2">
+                  <Sparkles size={14} className="text-[#3DD6C8]" />
+                  Instant 1-Click Theme Presets
+                </label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                  {THEME_PRESETS.map((preset) => {
+                    const themeValue = settings.find(s => s.key === 'theme_colors')?.value || {};
+                    const isSelected = themeValue?.primary?.toLowerCase() === preset.primary.toLowerCase();
+                    return (
+                      <button
+                        key={preset.id}
+                        type="button"
+                        onClick={() => {
+                          const updated = {
+                            primary: preset.primary,
+                            accent: preset.accent,
+                            background: preset.background,
+                            surface: preset.surface
+                          };
+                          handleUpdate('theme_colors', updated);
+                          if (typeof document !== 'undefined') {
+                            const root = document.documentElement;
+                            root.style.setProperty('--primary', preset.primary);
+                            root.style.setProperty('--primary-glow', `${preset.primary}40`);
+                            root.style.setProperty('--accent', preset.accent);
+                            root.style.setProperty('--background', preset.background);
+                          }
+                          toast.success(`Preset "${preset.name}" Applied`);
+                        }}
+                        className={`p-5 rounded-3xl text-left border transition-all duration-300 relative group overflow-hidden ${
+                          isSelected 
+                            ? 'bg-white/10 border-[#3DD6C8] shadow-[0_0_25px_rgba(61,214,200,0.15)] scale-[1.02]' 
+                            : 'bg-black/30 border-white/5 hover:border-white/20 hover:bg-white/5'
+                        }`}
+                      >
+                        <div className="flex items-center gap-2 mb-3">
+                          <div className="w-5 h-5 rounded-full shadow-md border border-white/20" style={{ backgroundColor: preset.primary }} />
+                          <div className="w-3.5 h-3.5 rounded-full shadow-md border border-white/20" style={{ backgroundColor: preset.accent }} />
+                          <div className="w-3 h-3 rounded-full border border-white/10 ml-auto" style={{ backgroundColor: preset.background }} />
+                        </div>
+                        <h4 className="text-xs font-black text-white uppercase tracking-tight mb-1">{preset.name}</h4>
+                        <p className="text-[9px] text-slate-500 font-medium leading-relaxed">{preset.desc}</p>
+                        {isSelected && (
+                          <div className="mt-3 flex items-center gap-1.5 text-[8px] font-black uppercase tracking-widest text-[#3DD6C8]">
+                            <CheckCircle2 size={12} /> Active Preset
+                          </div>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+             </div>
+
+             {/* Custom Color Controls & Live Interactive Terminal Preview */}
+             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+                {/* Color Controls */}
+                <div className="lg:col-span-6 space-y-6">
+                  <label className="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400 block">
+                    Custom Color Palette Calibration
+                  </label>
+
+                  {/* Primary Color */}
+                  {(() => {
+                    const themeValue = settings.find(s => s.key === 'theme_colors')?.value || {};
+                    const primary = themeValue?.primary || '#3DD6C8';
+                    const accent = themeValue?.accent || '#E34304';
+                    const background = themeValue?.background || '#0B0B1E';
+
+                    const updateColor = (key: string, val: string) => {
+                      const updated = {
+                        primary,
+                        accent,
+                        background,
+                        surface: 'rgba(15, 23, 42, 0.6)',
+                        [key]: val
+                      };
+                      handleUpdate('theme_colors', updated);
+                      if (typeof document !== 'undefined') {
+                        const root = document.documentElement;
+                        root.style.setProperty(`--${key}`, val);
+                        if (key === 'primary') root.style.setProperty('--primary-glow', `${val}40`);
+                      }
+                    };
+
+                    return (
+                      <div className="space-y-4">
+                        <div className="p-4 bg-black/40 rounded-3xl border border-white/5 flex items-center justify-between gap-4">
+                          <div className="flex items-center gap-3">
+                            <input 
+                              type="color" 
+                              value={primary.startsWith('#') ? primary : '#3DD6C8'} 
+                              onChange={(e) => updateColor('primary', e.target.value)}
+                              className="w-10 h-10 rounded-2xl cursor-pointer bg-transparent border-0"
+                            />
+                            <div>
+                              <span className="text-xs font-black text-white uppercase tracking-wider block">Primary Brand Color</span>
+                              <span className="text-[9px] text-slate-500 font-bold uppercase tracking-widest">Buttons, glow borders, badges</span>
+                            </div>
+                          </div>
+                          <input 
+                            type="text" 
+                            value={primary} 
+                            onChange={(e) => updateColor('primary', e.target.value)}
+                            className="w-28 bg-black/60 border border-white/10 rounded-xl px-3 py-2 text-right font-mono font-bold text-xs text-white focus:outline-none focus:border-[#3DD6C8]"
+                          />
+                        </div>
+
+                        <div className="p-4 bg-black/40 rounded-3xl border border-white/5 flex items-center justify-between gap-4">
+                          <div className="flex items-center gap-3">
+                            <input 
+                              type="color" 
+                              value={accent.startsWith('#') ? accent : '#E34304'} 
+                              onChange={(e) => updateColor('accent', e.target.value)}
+                              className="w-10 h-10 rounded-2xl cursor-pointer bg-transparent border-0"
+                            />
+                            <div>
+                              <span className="text-xs font-black text-white uppercase tracking-wider block">Accent / Hot Action Tone</span>
+                              <span className="text-[9px] text-slate-500 font-bold uppercase tracking-widest">Withdrawal, badges, alert dots</span>
+                            </div>
+                          </div>
+                          <input 
+                            type="text" 
+                            value={accent} 
+                            onChange={(e) => updateColor('accent', e.target.value)}
+                            className="w-28 bg-black/60 border border-white/10 rounded-xl px-3 py-2 text-right font-mono font-bold text-xs text-white focus:outline-none focus:border-amber-400"
+                          />
+                        </div>
+
+                        <div className="p-4 bg-black/40 rounded-3xl border border-white/5 flex items-center justify-between gap-4">
+                          <div className="flex items-center gap-3">
+                            <input 
+                              type="color" 
+                              value={background.startsWith('#') ? background : '#0B0B1E'} 
+                              onChange={(e) => updateColor('background', e.target.value)}
+                              className="w-10 h-10 rounded-2xl cursor-pointer bg-transparent border-0"
+                            />
+                            <div>
+                              <span className="text-xs font-black text-white uppercase tracking-wider block">Terminal Base Tint</span>
+                              <span className="text-[9px] text-slate-500 font-bold uppercase tracking-widest">Global platform canvas background</span>
+                            </div>
+                          </div>
+                          <input 
+                            type="text" 
+                            value={background} 
+                            onChange={(e) => updateColor('background', e.target.value)}
+                            className="w-28 bg-black/60 border border-white/10 rounded-xl px-3 py-2 text-right font-mono font-bold text-xs text-white focus:outline-none focus:border-blue-400"
+                          />
+                        </div>
+                      </div>
+                    );
+                  })()}
+                </div>
+
+                {/* Live Preview Card */}
+                <div className="lg:col-span-6">
+                  {(() => {
+                    const themeValue = settings.find(s => s.key === 'theme_colors')?.value || {};
+                    const primary = themeValue?.primary || '#3DD6C8';
+                    const accent = themeValue?.accent || '#E34304';
+                    const background = themeValue?.background || '#0B0B1E';
+
+                    return (
+                      <div 
+                        className="h-full rounded-3xl p-8 border border-white/10 relative overflow-hidden flex flex-col justify-between shadow-2xl transition-all duration-500"
+                        style={{ backgroundColor: background }}
+                      >
+                        <div className="flex items-center justify-between pb-6 border-b border-white/10">
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-xl flex items-center justify-center font-black text-xs" style={{ backgroundColor: `${primary}25`, color: primary, border: `1px solid ${primary}40` }}>
+                              <Eye size={16} />
+                            </div>
+                            <div>
+                              <span className="text-xs font-black text-white uppercase tracking-wider block">Real-Time Terminal Preview</span>
+                              <span className="text-[9px] text-slate-400 font-bold uppercase tracking-widest">Simulated Member View</span>
+                            </div>
+                          </div>
+                          <div className="px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest flex items-center gap-1.5" style={{ backgroundColor: `${primary}15`, color: primary, border: `1px solid ${primary}30` }}>
+                            <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: primary }} />
+                            Live Matrix
+                          </div>
+                        </div>
+
+                        <div className="my-6 space-y-4">
+                          <div className="p-5 rounded-2xl border border-white/10 backdrop-blur-md bg-white/5 space-y-2">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">Yield Optimization Balance</span>
+                              <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-full" style={{ backgroundColor: `${accent}25`, color: accent }}>Hot Shard</span>
+                            </div>
+                            <div className="text-3xl font-black italic tracking-tight text-white flex items-baseline gap-2">
+                              $14,850.00
+                              <span className="text-xs font-mono font-bold" style={{ color: primary }}>+18.4%</span>
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-3">
+                            <button
+                              type="button"
+                              className="py-3.5 px-4 rounded-xl font-black text-[10px] uppercase tracking-widest shadow-lg transition-transform hover:scale-105"
+                              style={{ backgroundColor: primary, color: '#0B0B1E', boxShadow: `0 0 25px ${primary}40` }}
+                            >
+                              Start Optimization
+                            </button>
+                            <button
+                              type="button"
+                              className="py-3.5 px-4 rounded-xl font-black text-[10px] uppercase tracking-widest border transition-colors hover:bg-white/10"
+                              style={{ borderColor: `${accent}60`, color: accent }}
+                            >
+                              Withdraw Funds
+                            </button>
+                          </div>
+                        </div>
+
+                        <div className="pt-4 border-t border-white/10 flex items-center justify-between text-[9px] font-bold text-slate-400 uppercase tracking-wider">
+                          <span>Primary: <span className="font-mono text-white">{primary}</span></span>
+                          <span>Accent: <span className="font-mono text-white">{accent}</span></span>
+                          <span>Canvas: <span className="font-mono text-white">{background}</span></span>
+                        </div>
+                      </div>
+                    );
+                  })()}
+                </div>
+             </div>
            </section>
         </div>
       </div> 

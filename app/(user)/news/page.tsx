@@ -19,7 +19,7 @@ const newsItems = [
         date: '2026-03-05',
         tag: 'Events',
         color: 'text-success bg-success/10',
-        desc: 'Elite contributors can now apply for the VIP5+ program, offering priority task access and 24/7 concierge settlement support.',
+        desc: 'Elite contributors can now apply for the VIP5+ program, offering priority task access and customer support settlement assistance during operational hours.',
         icon: Trophy
     },
     {

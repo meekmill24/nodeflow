@@ -26,39 +26,63 @@ export default function SettingsPage() {
     }, []);
     
     // Selection states
-    const [language, setLanguage] = useState(profile?.language || 'English');
-    const [currency, setCurrency] = useState(profile?.currency || 'USD');
+    const [language, setLanguage] = useState(() => {
+        if (typeof window !== 'undefined') {
+            const saved = localStorage.getItem('language');
+            if (saved) return saved;
+        }
+        return profile?.language || 'English';
+    });
+    const [currency, setCurrency] = useState(() => {
+        if (typeof window !== 'undefined') {
+            const saved = localStorage.getItem('currency');
+            if (saved) return saved;
+        }
+        return profile?.currency || 'USD';
+    });
     const [walletAddress, setWalletAddress] = useState(profile?.wallet_address || '');
 
     useEffect(() => {
         if (profile) {
-            setLanguage(profile.language || 'English');
-            setCurrency(profile.currency || 'USD');
+            if (profile.language) {
+                setLanguage(profile.language);
+                localStorage.setItem('language', profile.language);
+            }
+            if (profile.currency) {
+                setCurrency(profile.currency);
+                localStorage.setItem('currency', profile.currency);
+            }
             setNotifications(profile.notifications_enabled !== false);
             setWalletAddress(profile.wallet_address || '');
         }
     }, [profile]);
 
     const handleUpdateProfileSetting = async (field: 'language' | 'currency' | 'notifications_enabled', value: any) => {
-        if (!user) return;
-        try {
-            const { error } = await supabase.from('profiles').update({ [field]: value }).eq('id', user.id);
-            if (error) throw error;
-            
-            if (field === 'language') {
-                setLanguage(value);
-                updateContextLanguage(value as any);
-            } else if (field === 'currency') {
-                setCurrency(value);
-                updateContextCurrency(value as any);
-            } else if (field === 'notifications_enabled') {
-                setNotifications(value);
-                localStorage.setItem('notifications_enabled', String(value));
+        // 1. Immediately apply to local state & context
+        if (field === 'language') {
+            setLanguage(value);
+            updateContextLanguage(value as any);
+            if (typeof window !== 'undefined') localStorage.setItem('language', String(value));
+        } else if (field === 'currency') {
+            setCurrency(value);
+            updateContextCurrency(value as any);
+            if (typeof window !== 'undefined') {
+                localStorage.setItem('currency', String(value));
+                window.dispatchEvent(new Event('currency-changed'));
             }
-            
+        } else if (field === 'notifications_enabled') {
+            setNotifications(value);
+            if (typeof window !== 'undefined') localStorage.setItem('notifications_enabled', String(value));
+        }
+
+        if (!user) return;
+
+        // 2. Persist to database gracefully
+        try {
+            await supabase.from('profiles').update({ [field]: value }).eq('id', user.id);
             await refreshProfile();
         } catch (error: any) {
-            console.error(`Failed to update ${field}:`, error.message);
+            console.warn(`Profile sync for ${field} fallback to client storage:`, error.message);
         }
     };
     
@@ -396,7 +420,11 @@ export default function SettingsPage() {
                                     { code: 'THB', name: 'Thai Baht', symbol: '฿' },
                                     { code: 'PHP', name: 'Philippine Peso', symbol: '₱' },
                                     { code: 'VND', name: 'Vietnamese Dong', symbol: '₫' },
-                                    { code: 'BTC', name: 'Bitcoin', symbol: '₿' }
+                                    { code: 'BTC', name: 'Bitcoin', symbol: '₿' },
+                                    { code: 'ETH', name: 'Ethereum', symbol: 'Ξ' },
+                                    { code: 'USDC', name: 'USD Coin', symbol: 'USDC' },
+                                    { code: 'BNB', name: 'Binance Coin', symbol: 'BNB' },
+                                    { code: 'PAYPALUSD', name: 'PayPal USD', symbol: 'PYUSD' }
                                 ].map((opt) => (
                                     <button 
                                         key={opt.code}

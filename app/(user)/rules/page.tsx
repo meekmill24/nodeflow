@@ -151,7 +151,7 @@ export default function RulesPage() {
                     </div>
                     <div className="space-y-10">
                         <div>
-                            <h2 className="text-3xl font-black text-white uppercase italic tracking-tighter leading-none mb-3">User Agreement & Terms of Service</h2>
+                            <h2 className="text-3xl font-black text-white uppercase italic tracking-tighter leading-none mb-3">User Agreement & Terms and Conditions</h2>
                             <p className="text-[10px] font-black text-white/30 uppercase tracking-[0.4em]">SmartBugMedia. Institutional Protocol v4.5</p>
                         </div>
                         

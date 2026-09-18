@@ -28,7 +28,8 @@ export default function DepositPage() {
     const { profile } = useAuth();
     const [amount, setAmount] = useState('30');
     const [customAmount, setCustomAmount] = useState('');
-    const [network, setNetwork] = useState<'TRX' | 'BEP20' | 'ERC20' | 'BTC'>('TRX');
+    type DepositNetwork = 'TRX' | 'BEP20' | 'ERC20' | 'ETH' | 'BTC' | 'USDC' | 'BNB' | 'PAYPALUSD';
+    const [network, setNetwork] = useState<DepositNetwork>('TRX');
     const [copied, setCopied] = useState(false);
     const [loading, setLoading] = useState(false);
     const [submitted, setSubmitted] = useState(false);
@@ -41,8 +42,12 @@ export default function DepositPage() {
     
     const depositAddress = useMemo(() => {
         if (network === 'BTC') return settings?.wallet_btc || '1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa';
+        if (network === 'ETH') return settings?.wallet_eth || settings?.wallet_erc20 || '0x0000000000000000000000000000000000000000';
         if (network === 'ERC20') return settings?.wallet_erc20 || '0x0000000000000000000000000000000000000000';
         if (network === 'BEP20') return settings?.wallet_bep20 || '0x0000000000000000000000000000000000000000';
+        if (network === 'USDC') return settings?.wallet_usdc || settings?.wallet_erc20 || '0x0000000000000000000000000000000000000000';
+        if (network === 'BNB') return settings?.wallet_bnb || settings?.wallet_bep20 || '0x0000000000000000000000000000000000000000';
+        if (network === 'PAYPALUSD') return settings?.wallet_paypalusd || settings?.wallet_erc20 || '0x0000000000000000000000000000000000000000';
         return settings?.wallet_trc20 || 'TRx9mK2pQbN7cVh3dJwXeGfLkAoYsUP5rI8';
     }, [network, settings]);
 
@@ -104,7 +109,7 @@ export default function DepositPage() {
                 user_id: profile.id,
                 type: 'deposit',
                 amount: parseFloat(finalAmount),
-                description: `Deposit via USDT (${network})`,
+                description: `Deposit via ${network} ($${finalAmount})`,
                 status: 'pending',
                 proof_url: publicUrl
             });
@@ -152,21 +157,23 @@ export default function DepositPage() {
                 <div>
                     <h2 className="text-2xl font-black text-text-primary dark:text-white uppercase tracking-tight">Add Funds</h2>
                     <p className="text-text-secondary text-xs mt-1 font-bold uppercase tracking-widest">
-                        Deposit via {network === 'ERC20' ? 'ETH' : network === 'BTC' ? 'BTC' : 'USDT'} ({network})
+                        Deposit via {network === 'ETH' ? 'Ethereum (ETH)' : network === 'BTC' ? 'Bitcoin (BTC)' : network === 'BNB' ? 'BNB Chain' : network === 'USDC' ? 'USD Coin (USDC)' : network === 'PAYPALUSD' ? 'PayPal USD (PYUSD)' : `USDT (${network})`}
                     </p>
                 </div>
                 <div className="flex items-center gap-2 bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 px-4 py-2 rounded-xl">
                     <img 
                         src={
-                            network === 'ERC20' ? "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/eth.png" : 
+                            network === 'ETH' ? "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/eth.png" : 
                             network === 'BTC' ? "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/btc.png" : 
+                            network === 'BNB' ? "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/bnb.png" : 
+                            network === 'USDC' || network === 'PAYPALUSD' ? "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/usdc.png" : 
                             "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/usdt.png"
                         } 
                         alt={network} 
                         className="w-8 h-8 object-contain" 
                     />
                     <span className="text-sm font-black text-text-primary dark:text-white uppercase tracking-tighter">
-                        {network === 'ERC20' ? 'ETH' : network === 'BTC' ? 'BTC' : 'USDT'}
+                        {network === 'ETH' ? 'ETH' : network === 'BTC' ? 'BTC' : network === 'BNB' ? 'BNB' : network === 'USDC' ? 'USDC' : network === 'PAYPALUSD' ? 'PYUSD' : 'USDT'}
                     </span>
                 </div>
             </div>
@@ -182,22 +189,27 @@ export default function DepositPage() {
                         </h3>
 
                         {/* Network Switcher */}
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 p-2 bg-black/40 rounded-[24px] border border-white/5">
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 p-2 bg-black/40 rounded-[24px] border border-white/5">
                             {[
                                 { id: 'TRX', label: 'USDT-TRC20', icon: 'https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/usdt.png' },
                                 { id: 'BEP20', label: 'USDT-BEP20', icon: 'https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/usdt.png' },
-                                { id: 'ERC20', label: 'ETH', icon: 'https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/eth.png' },
-                                { id: 'BTC', label: 'BTC', icon: 'https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/btc.png' }
+                                { id: 'ERC20', label: 'USDT-ERC20', icon: 'https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/usdt.png' },
+                                { id: 'ETH', label: 'Ethereum', icon: 'https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/eth.png' },
+                                { id: 'BTC', label: 'Bitcoin', icon: 'https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/btc.png' },
+                                { id: 'USDC', label: 'USDC', icon: 'https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/usdc.png' },
+                                { id: 'BNB', label: 'BNB Chain', icon: 'https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/bnb.png' },
+                                { id: 'PAYPALUSD', label: 'PayPal USD', icon: 'https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/usdc.png' }
                             ].map(net => (
                                 <button
                                     key={net.id}
+                                    type="button"
                                     onClick={() => setNetwork(net.id as any)}
-                                    className={`py-4 rounded-xl flex flex-col items-center gap-1.5 transition-all ${network === net.id 
+                                    className={`py-3.5 px-2 rounded-xl flex flex-col items-center gap-1.5 transition-all ${network === net.id 
                                         ? 'bg-primary text-white shadow-lg shadow-primary/20 scale-[1.02] border border-primary-light/30' 
                                         : 'text-text-secondary hover:bg-white/5 hover:text-white border border-transparent'}`}
                                 >
                                     <img src={net.icon} alt="" className="w-5 h-5 object-contain" />
-                                    <span className="text-[9px] font-black uppercase tracking-widest">{net.label}</span>
+                                    <span className="text-[9px] font-black uppercase tracking-widest truncate max-w-full">{net.label}</span>
                                 </button>
                             ))}
                         </div>
@@ -206,6 +218,7 @@ export default function DepositPage() {
                             {PRESET_AMOUNTS.map((val) => (
                                 <button
                                     key={val}
+                                    type="button"
                                     onClick={() => {
                                         setAmount(String(val));
                                         setCustomAmount('');
@@ -223,8 +236,10 @@ export default function DepositPage() {
                                             </span>
                                             <img 
                                                 src={
-                                                    network === 'ERC20' ? "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/eth.png" : 
+                                                    network === 'ETH' ? "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/eth.png" : 
                                                     network === 'BTC' ? "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/btc.png" : 
+                                                    network === 'BNB' ? "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/bnb.png" : 
+                                                    network === 'USDC' || network === 'PAYPALUSD' ? "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/usdc.png" : 
                                                     "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/usdt.png"
                                                 } 
                                                 className="w-4 h-4 object-contain opacity-60" 
@@ -232,7 +247,7 @@ export default function DepositPage() {
                                             />
                                         </div>
                                         <span className="text-[10px] uppercase font-bold tracking-widest opacity-40">
-                                            {network === 'ERC20' ? 'ETH' : network === 'BTC' ? 'BTC' : 'USDT'}
+                                            {network === 'ETH' ? 'ETH' : network === 'BTC' ? 'BTC' : network === 'BNB' ? 'BNB' : network === 'USDC' ? 'USDC' : network === 'PAYPALUSD' ? 'PYUSD' : 'USDT'}
                                         </span>
                                     </div>
                                     {amount === String(val) && !customAmount && (
@@ -326,11 +341,12 @@ export default function DepositPage() {
                         <div className="w-full space-y-4">
                             <div className="text-center">
                                 <p className="text-[10px] font-black text-text-secondary uppercase tracking-[0.2em] mb-2">
-                                    {network === 'ERC20' ? 'ETH' : network === 'BTC' ? 'BTC' : network} Address
+                                    {network === 'ETH' ? 'ETH Address (ERC-20)' : network === 'BTC' ? 'BTC Address' : network === 'USDC' ? 'USDC Address' : network === 'BNB' ? 'BNB Chain Address' : network === 'PAYPALUSD' ? 'PYUSD Address' : `${network} Address`}
                                 </p>
                                 <div className="glass-card px-4 py-4 border border-white/20 flex items-center justify-between group overflow-hidden bg-black/40">
                                     <span className="text-sm md:text-base font-black font-mono text-white truncate max-w-[220px] tracking-tight">{depositAddress}</span>
                                     <button 
+                                        type="button"
                                         onClick={copyAddress}
                                         className="text-primary-light hover:text-white transition-all scale-125 ml-2 relative z-10"
                                     >
@@ -359,7 +375,7 @@ export default function DepositPage() {
 
                     <div className="flex items-center gap-3 p-4 bg-white/5 rounded-2xl text-[10px] font-bold text-text-secondary leading-relaxed uppercase tracking-wider italic">
                         <AlertCircle size={14} className="shrink-0 text-warning" />
-                        Only send {network === 'ERC20' ? 'ETH' : network === 'BTC' ? 'BTC' : 'USDT'} ({network}) to this address. Other assets will be permanently lost and cannot be recovered.
+                        Only send {network === 'ETH' ? 'ETH' : network === 'BTC' ? 'BTC' : network === 'BNB' ? 'BNB' : network === 'USDC' ? 'USDC' : network === 'PAYPALUSD' ? 'PYUSD' : 'USDT'} ({network}) to this address. Other assets will be permanently lost and cannot be recovered.
                     </div>
                 </div>
 

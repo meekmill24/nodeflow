@@ -71,7 +71,7 @@ export default function CustomerServicePage() {
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-2xl font-black text-white uppercase tracking-tight">Concierge Hub</h1>
+                    <h1 className="text-2xl font-black text-white uppercase tracking-tight">Customer Support</h1>
                     <p className="text-text-secondary text-xs mt-1 font-bold uppercase tracking-widest font-mono opacity-60">Operations & Support Gateway</p>
                 </div>
                 <div className="flex items-center gap-3">

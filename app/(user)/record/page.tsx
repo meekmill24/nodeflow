@@ -134,7 +134,7 @@ export default function RecordPage() {
         <div className="max-w-7xl mx-auto px-4 md:px-8 py-4 space-y-4 animate-fade-in pb-12 font-record">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h2 className="text-2xl font-black text-text-primary uppercase tracking-tight">Activity records</h2>
+                    <h2 className="text-2xl font-black text-text-primary uppercase tracking-tight">Task Record</h2>
                     <p className="text-text-secondary text-xs mt-1 font-bold uppercase tracking-widest">{filteredTasks.length} total records found</p>
                 </div>
 
