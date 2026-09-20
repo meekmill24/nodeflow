@@ -211,10 +211,11 @@ export default function HomePage() {
                             { icon: ArrowUpRight, label: t('withdraw'), href: '/withdraw', color: 'text-amber-500', bg: 'bg-amber-500/5' },
                             { icon: Building2, label: t('company'), href: '/company', color: 'text-indigo-400', bg: 'bg-indigo-400/5' },
                             { icon: FileText, label: 'Certificate', href: '/certificate', color: 'text-pink-500', bg: 'bg-pink-500/5' },
-                            { icon: ShieldCheck, label: 'Terms and Conditions', href: '/rules', color: 'text-emerald-500', bg: 'bg-emerald-500/5' },
+                            { icon: ShieldCheck, label: 'Security Compliance', href: '/compliance', color: 'text-emerald-400', bg: 'bg-emerald-400/5' },
+                            { icon: FileText, label: 'Operating Protocol', href: '/protocol', color: 'text-[#3DD6C8]', bg: 'bg-[#3DD6C8]/5' },
+                            { icon: ShieldCheck, label: 'Terms and Conditions', href: '/rules', color: 'text-teal-500', bg: 'bg-teal-500/5' },
                             { icon: HelpCircle, label: 'FAQ', href: '/faq', color: 'text-blue-500', bg: 'bg-blue-500/5' },
                             { icon: ShieldAlert, label: 'Privacy', href: '/privacy', color: 'text-orange-500', bg: 'bg-orange-500/5' },
-                            { icon: Headset, label: 'Customer Support', href: '/concierge', color: 'text-rose-500', bg: 'bg-rose-500/5' },
                             { icon: Map, label: 'VIP Map & Rewards', href: '/levels', color: 'text-violet-400', bg: 'bg-violet-400/5' },
                             { icon: TrendingUp, label: 'Salary Structure', href: '/salary', color: 'text-cyan-400', bg: 'bg-cyan-400/5' },
                         ].map((hub, i) => (
@@ -426,24 +427,89 @@ export default function HomePage() {
                 </div>
             </div>
 
-            {/* QUICK ACCESS GRID */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                {[
-                    { icon: Play, label: t('start_tasks_label'), desc: 'Start Earning', href: '/start', color: 'text-[#3DD6C8]' },
-                    { icon: Clock, label: t('activity_records_label'), desc: 'View Records', href: '/record', color: 'text-amber-400' },
-                    { icon: Headset, label: 'Customer Support', desc: 'Get Help', href: '/concierge', color: 'text-indigo-400' },
-                    { icon: ShieldCheck, label: t('legal_governance_label'), desc: 'Compliance', href: '/rules', color: 'text-emerald-400' }
-                ].map((item, i) => (
-                    <Link key={i} href={item.href} className="group p-8 rounded-[40px] bg-[#0B0B1E] border border-white/5 flex flex-col items-center text-center gap-6 hover:border-white/10 transition-all duration-700 hover:-translate-y-1">
-                        <div className={`w-14 h-14 rounded-3xl bg-white/5 flex items-center justify-center ${item.color} group-hover:scale-110 transition-transform`}>
-                            <item.icon size={26} />
+            {/* VERIFIED MEMBER TESTIMONIALS */}
+            <div className="space-y-6 pt-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-2">
+                    <div>
+                        <div className="flex items-center gap-2 mb-1">
+                            <Star className="text-amber-400 fill-amber-400" size={14} />
+                            <span className="text-[10px] font-black text-amber-400 uppercase tracking-[0.3em]">Verified Worker Community</span>
                         </div>
-                        <div className="space-y-1">
-                             <h4 className="text-[11px] font-black text-white uppercase tracking-widest leading-none">{item.label}</h4>
-                             <p className="text-[9px] font-black text-white/20 uppercase tracking-[0.2em]">{item.desc}</p>
+                        <h3 className="text-2xl font-black text-white uppercase italic tracking-tight">
+                            Optimization Specialist <span className="text-[#3DD6C8]">Testimonials</span>
+                        </h3>
+                    </div>
+                    <div className="flex items-center gap-2 px-4 py-2 rounded-2xl bg-white/5 border border-white/10 self-start sm:self-auto">
+                        <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                        <span className="text-[10px] font-black text-white/80 uppercase tracking-widest">99.4% Payout Satisfaction</span>
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {[
+                        {
+                            name: 'Marcus Vance',
+                            role: 'Senior Agent',
+                            location: 'Chicago, IL',
+                            payout: '$2,450.00 Settled',
+                            avatar: '/landing-asset-1.jpg',
+                            quote: 'The daily task optimization sets are completely seamless. Once I hit my 40/40 milestone, my salary bonus was credited directly to my wallet. Withdrawal was verified and approved in under 20 minutes.'
+                        },
+                        {
+                            name: 'Elena Rostova',
+                            role: 'Mentor Agent',
+                            location: 'Austin, TX',
+                            payout: '$3,800.00 Settled',
+                            avatar: '/landing-asset-4.jpg',
+                            quote: 'Working across the US Central hours fits my schedule perfectly. The Super Order combo packages give huge rebate multipliers and customer support is always active whenever I need a node reset.'
+                        },
+                        {
+                            name: 'David K. Chen',
+                            role: 'Intermediate Agent',
+                            location: 'Toronto, ON',
+                            payout: '$1,260.00 Settled',
+                            avatar: '/landing-asset-6.jpg',
+                            quote: 'The security compliance rules and operating protocol keep everything crystal clear. Transparent calculations, fast crypto deposits, and genuine daily earnings. Highly recommended.'
+                        }
+                    ].map((testi, idx) => (
+                        <div 
+                            key={idx} 
+                            className="p-8 rounded-[36px] bg-[#0B0B1E] border border-white/5 hover:border-[#3DD6C8]/30 transition-all duration-700 flex flex-col justify-between gap-6 group hover:-translate-y-1 shadow-xl"
+                        >
+                            <div className="space-y-4">
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-1">
+                                        {[...Array(5)].map((_, s) => (
+                                            <Star key={s} size={14} className="text-amber-400 fill-amber-400" />
+                                        ))}
+                                    </div>
+                                    <span className="px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[9px] font-black uppercase tracking-widest">
+                                        {testi.payout}
+                                    </span>
+                                </div>
+                                <p className="text-xs font-bold text-white/60 uppercase tracking-wider leading-relaxed">
+                                    "{testi.quote}"
+                                </p>
+                            </div>
+
+                            <div className="flex items-center gap-4 pt-4 border-t border-white/5">
+                                <img 
+                                    src={testi.avatar} 
+                                    alt={testi.name} 
+                                    className="w-11 h-11 rounded-2xl object-cover border border-white/10 group-hover:border-[#3DD6C8]/50 transition-colors"
+                                />
+                                <div className="space-y-0.5">
+                                    <h4 className="text-xs font-black text-white uppercase tracking-tight">{testi.name}</h4>
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-[9px] font-black text-[#3DD6C8] uppercase tracking-widest">{testi.role}</span>
+                                        <span className="text-white/20 text-[9px]">•</span>
+                                        <span className="text-[9px] font-bold text-white/40 uppercase tracking-widest">{testi.location}</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                    </Link>
-                ))}
+                    ))}
+                </div>
             </div>
         </div>
     );

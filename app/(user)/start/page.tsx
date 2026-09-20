@@ -34,7 +34,8 @@ import {
     Clock,
     ShieldCheck,
     Headphones,
-    Award
+    Award,
+    ArrowLeft
 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -291,6 +292,19 @@ export default function StartPage() {
                     </div>
                 </div>
             )}
+            {/* Top Navigation */}
+            <div className="flex items-center justify-between">
+                <Link 
+                    href="/home" 
+                    className="inline-flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 text-white/80 hover:text-white text-xs font-black uppercase tracking-wider transition-all"
+                >
+                    <ArrowLeft size={16} /> Back to Home
+                </Link>
+                <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#3DD6C8]/10 border border-[#3DD6C8]/20 text-[#3DD6C8] text-[10px] font-black uppercase tracking-widest">
+                    <Activity size={14} /> Optimization Node
+                </div>
+            </div>
+
             {/* ACTIVE HUB BANNER */}
             <div className="bg-[#0B0B1E] border border-white/5 p-10 md:p-14 rounded-[48px] shadow-2xl relative overflow-hidden group">
                  <div className="absolute top-0 right-0 w-96 h-96 bg-[#3DD6C8]/5 blur-[120px] rounded-full pointer-events-none" />

@@ -60,8 +60,8 @@ export default function SalaryPage() {
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                    <Link href="/profile" className="p-2 rounded-xl bg-black/5 dark:bg-white/5 hover:bg-black/10 transition-colors">
-                        <ChevronLeft size={20} />
+                    <Link href="/home" className="inline-flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 text-white/80 hover:text-white text-xs font-black uppercase tracking-wider transition-all">
+                        <ChevronLeft size={16} /> Back to Home
                     </Link>
                     <div>
                         <h1 className="text-2xl font-black text-text-primary uppercase tracking-tight">Salary Structure</h1>

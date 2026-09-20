@@ -23,6 +23,7 @@ import {
     Activity,
     Network,
     ArrowRight,
+    ArrowLeft,
     Award
 } from 'lucide-react';
 
@@ -44,12 +45,11 @@ export default function LevelsPage() {
 
     useEffect(() => {
         const fetchLevels = async () => {
-            const [{ data }, settingsRes] = await Promise.all([
-                supabase.from('levels').select('*').order('price', { ascending: true }),
-                supabase.from('site_settings').select('value').eq('key', 'referral_commission_l1').maybeSingle()
-            ]);
-            if (data && data.length > 0) setLevels(data);
-            if (settingsRes.data?.value) setReferralRate(settingsRes.data.value);
+            const { data } = await supabase
+                .from('levels')
+                .select('*')
+                .order('id', { ascending: true });
+            if (data) setLevels(data);
             setLoading(false);
         };
         fetchLevels();
@@ -60,6 +60,18 @@ export default function LevelsPage() {
 
     return (
         <div className="space-y-10 animate-in fade-in duration-1000 pb-20 max-w-7xl mx-auto">
+            {/* Top Navigation */}
+            <div className="flex items-center justify-between">
+                <Link 
+                    href="/home" 
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 text-white/80 hover:text-white text-xs font-black uppercase tracking-wider transition-all"
+                >
+                    <ArrowLeft size={16} /> Back to Home
+                </Link>
+                <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-violet-500/10 border border-violet-500/20 text-violet-400 text-[10px] font-black uppercase tracking-widest">
+                    <Trophy size={14} /> Tier Governance
+                </div>
+            </div>
             
             {/* VIP STATUS HEADER - REDESIGNED */}
             <div className="bg-[#0B0B1E] border border-white/5 p-8 md:p-12 rounded-[40px] shadow-2xl relative overflow-hidden group">

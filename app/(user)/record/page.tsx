@@ -8,8 +8,9 @@ import { useAuth } from '@/context/AuthContext';
 import { useLanguage } from '@/context/LanguageContext';
 import { useCurrency } from '@/context/CurrencyContext';
 import type { UserTask, TaskItem } from '@/lib/types';
-import { Clock, CheckCircle, XCircle, Search, Filter, ChevronRight, Zap, Headset, Loader2, TrendingUp } from 'lucide-react';
+import { Clock, CheckCircle, XCircle, Search, Filter, ChevronRight, Zap, Headset, Loader2, TrendingUp, ArrowLeft } from 'lucide-react';
 import Portal from '@/components/Portal';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 export default function RecordPage() {
@@ -132,6 +133,18 @@ export default function RecordPage() {
 
     return (
         <div className="max-w-7xl mx-auto px-4 md:px-8 py-4 space-y-4 animate-fade-in pb-12 font-record">
+            {/* Top Navigation */}
+            <div className="flex items-center justify-between pb-2">
+                <Link 
+                    href="/home" 
+                    className="inline-flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 text-white/80 hover:text-white text-xs font-black uppercase tracking-wider transition-all"
+                >
+                    <ArrowLeft size={16} /> Back to Home
+                </Link>
+                <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-[10px] font-black uppercase tracking-widest">
+                    <Clock size={14} /> Optimization Ledger
+                </div>
+            </div>
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
                     <h2 className="text-2xl font-black text-text-primary uppercase tracking-tight">Task Record</h2>

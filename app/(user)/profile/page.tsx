@@ -99,21 +99,28 @@ export default function ProfilePage() {
                                 onClick={() => {
                                     if (profile?.referral_code) {
                                         navigator.clipboard.writeText(profile.referral_code);
-                                        toast.success('Protocol Token Copied to Clipboard');
+                                        toast.success('Referral Code Copied to Clipboard');
                                     }
                                 }}
                                 className="flex flex-col cursor-pointer group/ref hover:scale-105 active:scale-95 transition-all bg-white/5 border border-white/5 hover:border-[#3DD6C8]/30 px-3 py-2 rounded-xl"
                              >
-                                <span className="text-[7px] font-black text-white/30 uppercase tracking-[0.5em] mb-1 leading-none italic group-hover/ref:text-[#3DD6C8] transition-colors">SECURE ACCESS TOKEN</span>
+                                <span className="text-[8px] font-black text-white/40 uppercase tracking-[0.3em] mb-1 leading-none group-hover/ref:text-[#3DD6C8] transition-colors">REFERRAL CODE</span>
                                 <div className="flex items-center gap-2">
-                                    <span className="text-xs font-black text-white/60 tracking-widest leading-none group-hover/ref:text-white transition-colors">{profile?.referral_code || '--- --- ---'}</span>
+                                    <span className="text-xs font-black text-white/80 tracking-widest leading-none group-hover/ref:text-white transition-colors">{profile?.referral_code || '--- --- ---'}</span>
                                     <Activity size={10} className="text-[#3DD6C8] opacity-0 group-hover/ref:opacity-100 transition-opacity" />
                                 </div>
                              </div>
                              <div className="h-6 w-[1px] bg-white/10" />
                              <div className="flex flex-col">
-                                <span className="text-[7px] font-black text-white/30 uppercase tracking-[0.5em] mb-1 leading-none italic">SYSTEM LV. STATUS</span>
-                                <span className="text-xs font-black text-[#3DD6C8] tracking-widest leading-none">ELITE SHARD LV.{profile?.level_id || 1}</span>
+                                <span className="text-[8px] font-black text-white/40 uppercase tracking-[0.3em] mb-1 leading-none">USER LEVEL</span>
+                                <span className="text-xs font-black text-[#3DD6C8] tracking-widest leading-none uppercase">
+                                    {(profile as any)?.level?.name || (
+                                        profile?.level_id === 2 ? 'Junior Agent' :
+                                        profile?.level_id === 1 ? 'Intermediate Agent' :
+                                        profile?.level_id === 3 ? 'Senior Agent' :
+                                        profile?.level_id === 4 ? 'Mentor Agent' : 'Junior Agent'
+                                    )}
+                                </span>
                              </div>
                         </div>
                     </div>

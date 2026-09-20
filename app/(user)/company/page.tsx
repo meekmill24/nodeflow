@@ -1,6 +1,8 @@
 'use client';
 
+import Link from 'next/link';
 import { 
+    ArrowLeft,
     Users, 
     Target, 
     Globe, 
@@ -9,7 +11,10 @@ import {
     Blocks,
     Cpu,
     ShieldCheck,
-    Quote
+    Quote,
+    Building2,
+    Sparkles,
+    CheckCircle2
 } from 'lucide-react';
 
 const STATS = [
@@ -19,22 +24,104 @@ const STATS = [
     { label: 'Quality Index', value: '96.3%', icon: Cpu },
 ];
 
+const COMPANY_PHOTOS = [
+    {
+        title: 'Global Operations Headquarters',
+        desc: 'Advanced marketing optimization & distributed CRM operations hub.',
+        image: '/landing-asset-2.jpg',
+        badge: 'Headquarters'
+    },
+    {
+        title: 'Digital Engineering Laboratory',
+        desc: 'High-concurrency data analytics, automation deployment & neural systems.',
+        image: '/landing-asset-3.jpg',
+        badge: 'Tech Hub'
+    },
+    {
+        title: 'Strategic Client Workstations',
+        desc: 'Dedicated institutional account management and tier-level support teams.',
+        image: '/landing-asset-7.jpg',
+        badge: 'Operations'
+    },
+    {
+        title: 'Cloud Architecture & Settlement',
+        desc: 'Continuous task ledger synchronization and secure multi-network verification.',
+        image: '/landing-asset-8.jpg',
+        badge: 'Infrastructure'
+    }
+];
+
 export default function CompanyPage() {
     return (
-        <div className="max-w-5xl mx-auto pb-20 animate-fade-in space-y-16">
+        <div className="max-w-5xl mx-auto pb-24 animate-fade-in space-y-16">
             
+            {/* Top Navigation */}
+            <div className="flex items-center justify-between">
+                <Link 
+                    href="/home" 
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 text-white/80 hover:text-white text-xs font-black uppercase tracking-wider transition-all"
+                >
+                    <ArrowLeft size={16} /> Back to Home
+                </Link>
+                <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary-light text-[10px] font-black uppercase tracking-widest">
+                    <Building2 size={14} /> Established 2007
+                </div>
+            </div>
+
             {/* Hero Section */}
             <div className="text-center space-y-4">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary-light text-[10px] font-black uppercase tracking-[0.2em] mb-4">
                     <Blocks size={12} />
                     The SmartBugMedia Genesis
                 </div>
-                <h1 className="text-5xl font-black text-white uppercase italic tracking-tighter leading-none">
+                <h1 className="text-4xl md:text-6xl font-black text-white uppercase italic tracking-tighter leading-none">
                     Engineering The <span className="text-primary-light">Digital Matrix</span>
                 </h1>
                 <p className="max-w-2xl mx-auto text-white/40 text-xs font-bold uppercase tracking-widest leading-relaxed">
                     A global technology partner dedicated to helping businesses leverage high-fidelity automation and neural optimization since 2007.
                 </p>
+            </div>
+
+            {/* Corporate Photo Showcase */}
+            <div className="space-y-6">
+                <div className="flex items-center justify-between px-2">
+                    <div className="space-y-1">
+                        <span className="text-[10px] font-black text-primary-light uppercase tracking-[0.3em]">Institutional Facilities</span>
+                        <h3 className="text-xl font-black text-white uppercase tracking-tight">Our Workspaces & Global Hubs</h3>
+                    </div>
+                    <span className="text-[10px] font-bold text-white/30 uppercase tracking-widest">North America • Global Remote</span>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {COMPANY_PHOTOS.map((photo, i) => (
+                        <div 
+                            key={i} 
+                            className="group rounded-[32px] overflow-hidden bg-[#0B0B1E] border border-white/5 hover:border-primary/40 transition-all duration-700 shadow-2xl relative flex flex-col"
+                        >
+                            <div className="relative h-64 md:h-72 w-full overflow-hidden bg-slate-950">
+                                <img 
+                                    src={photo.image} 
+                                    alt={photo.title}
+                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-[#0B0B1E] via-transparent to-transparent opacity-90" />
+                                <div className="absolute top-4 right-4">
+                                    <span className="px-3 py-1 rounded-full bg-slate-900/80 backdrop-blur-md border border-white/10 text-white text-[9px] font-black uppercase tracking-widest">
+                                        {photo.badge}
+                                    </span>
+                                </div>
+                            </div>
+                            <div className="p-6 space-y-2 relative -mt-6 z-10">
+                                <h4 className="text-base font-black text-white uppercase tracking-tight group-hover:text-primary-light transition-colors">
+                                    {photo.title}
+                                </h4>
+                                <p className="text-xs font-bold text-white/50 uppercase tracking-wider leading-relaxed">
+                                    {photo.desc}
+                                </p>
+                            </div>
+                        </div>
+                    ))}
+                </div>
             </div>
 
             {/* Stats Grid */}
@@ -78,10 +165,14 @@ export default function CompanyPage() {
                         "Our mission is simple: help businesses work smarter through technology. By combining creativity and technical expertise, we empower organizations to build scalable digital platforms."
                     </p>
                     <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 rounded-full bg-primary/20" />
+                        <img 
+                            src="/landing-asset-1.jpg" 
+                            alt="Leadership" 
+                            className="w-12 h-12 rounded-full object-cover border border-white/20" 
+                        />
                         <div>
-                            <p className="text-xs font-black text-white uppercase tracking-widest">Neural Matrix Team</p>
-                            <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest">Architectural Governance</p>
+                            <p className="text-xs font-black text-white uppercase tracking-widest">Adam Bleitreu</p>
+                            <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest">Chief Executive Officer</p>
                         </div>
                     </div>
                 </div>

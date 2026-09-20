@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { 
     Plus, 
     Minus, 
@@ -9,8 +10,9 @@ import {
     Mail, 
     ShieldCheck, 
     Clock, 
-    TrendingUp,
-    ShieldAlert
+    TrendingUp, 
+    ShieldAlert,
+    ArrowLeft
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -79,8 +81,20 @@ export default function FAQPage() {
     };
 
     return (
-        <div className="max-w-4xl mx-auto pb-20 animate-fade-in space-y-12">
-            
+        <div className="max-w-4xl mx-auto pb-20 animate-fade-in space-y-10">
+            {/* Top Navigation */}
+            <div className="flex items-center justify-between">
+                <Link 
+                    href="/home" 
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 text-white/80 hover:text-white text-xs font-black uppercase tracking-wider transition-all"
+                >
+                    <ArrowLeft size={16} /> Back to Home
+                </Link>
+                <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[10px] font-black uppercase tracking-widest">
+                    <HelpCircle size={14} /> Knowledge Base
+                </div>
+            </div>
+
             {/* Header */}
             <div className="flex flex-col md:flex-row items-center justify-between gap-6">
                 <div className="space-y-2 text-center md:text-left">

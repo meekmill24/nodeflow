@@ -1,13 +1,27 @@
 'use client';
 
+import Link from 'next/link';
 import { 
     FileText, 
-    ShieldCheck
+    ShieldCheck,
+    ArrowLeft
 } from 'lucide-react';
 
 export default function RulesPage() {
     return (
         <div className="max-w-5xl mx-auto pb-20 animate-fade-in space-y-10">
+            {/* Top Navigation */}
+            <div className="flex items-center justify-between">
+                <Link 
+                    href="/home" 
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 text-white/80 hover:text-white text-xs font-black uppercase tracking-wider transition-all"
+                >
+                    <ArrowLeft size={16} /> Back to Home
+                </Link>
+                <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary-light text-[10px] font-black uppercase tracking-widest">
+                    <ShieldCheck size={14} /> Official Terms
+                </div>
+            </div>
 
             {/* Terms of Engagement Section */}
             <div className="glass-card-strong p-10 md:p-14 border border-white/5 space-y-12 bg-slate-900/40 backdrop-blur-3xl overflow-hidden relative rounded-[36px]">
