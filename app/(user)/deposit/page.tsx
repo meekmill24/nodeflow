@@ -21,12 +21,12 @@ import {
 import Link from 'next/link';
 import { QRCodeSVG } from 'qrcode.react';
 
-// Pre-set amounts from reference
-const PRESET_AMOUNTS = [30, 50, 100, 300, 500, 1000, 3100, 6200];
+// Pre-set amounts matching $60 minimum task balance
+const PRESET_AMOUNTS = [60, 100, 300, 500, 1000, 2500, 5000];
 
 export default function DepositPage() {
     const { profile } = useAuth();
-    const [amount, setAmount] = useState('30');
+    const [amount, setAmount] = useState('60');
     const [customAmount, setCustomAmount] = useState('');
     type DepositNetwork = 'TRX' | 'BEP20' | 'ERC20' | 'ETH' | 'BTC' | 'USDC' | 'BNB' | 'PAYPALUSD';
     const [network, setNetwork] = useState<DepositNetwork>('TRX');
