@@ -76,8 +76,8 @@ export async function POST(req: NextRequest) {
                 .from('notifications')
                 .insert({
                     user_id: data.user.id,
-                    title: 'System Activation Reward',
-                    message: `Welcome to NodeFlow. Your node has been initialized with a credit of $${welcomeBalance.toFixed(2)}.`,
+                    title: 'Welcome Bonus Received 🎉',
+                    message: `Welcome to SmartBugMedia! You've received a $${welcomeBalance.toFixed(2)} first user signup bonus credited to your account.`,
                     type: 'success',
                     is_read: false
                 });

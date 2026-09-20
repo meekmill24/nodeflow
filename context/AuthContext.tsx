@@ -64,6 +64,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 console.warn(`Profile node not found in any matrix layer for: ${userId}`);
                 setProfile(null);
             } else {
+                // Auto-correct displayed level based on wallet_balance.
+                // Finds the highest level the user qualifies for (balance >= price).
+                // Overrides display only — DB level_id (task access) is unchanged.
+                const { data: allLevels } = await supabase
+                    .from('levels')
+                    .select('*')
+                    .order('price', { ascending: true });
+
+                if (allLevels && allLevels.length > 0) {
+                    const walletBalance = Number(data.wallet_balance || 0);
+                    const qualifiedLevel = [...allLevels]
+                        .filter((l: any) => walletBalance >= Number(l.price))
+                        .pop(); // highest qualifying level
+                    const effectiveLevel = qualifiedLevel || allLevels[0];
+                    data = { ...data, level: effectiveLevel };
+                }
+
                 setProfile(data);
             }
         } catch (err) {

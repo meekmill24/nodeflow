@@ -35,7 +35,8 @@ import {
     ExternalLink,
     Star,
     Share2,
-    Check
+    Check,
+    BarChart3
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -55,17 +56,20 @@ export default function HomePage() {
     const [referralCopied, setReferralCopied] = useState(false);
     const [levels, setLevels] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const [referralRate, setReferralRate] = useState('20');
 
     useEffect(() => {
         const fetchData = async () => {
             if (!profile) return;
             setLoading(true);
             try {
-                const [allRes, levelsResult, referralRes] = await Promise.all([
+                const [allRes, levelsResult, referralRes, settingsRes] = await Promise.all([
                     supabase.from('user_tasks').select('*', { count: 'exact', head: true }).eq('user_id', profile.id),
                     supabase.from('levels').select('*').order('price', { ascending: true }).limit(4),
-                    supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('referred_by', profile.id)
+                    supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('referred_by', profile.id),
+                    supabase.from('site_settings').select('key, value').eq('key', 'referral_commission_l1')
                 ]);
+                if (settingsRes.data?.[0]?.value) setReferralRate(settingsRes.data[0].value);
                 setStats({
                     totalTasks: allRes.count || 0,
                     completedTasks: profile.completed_count || 0,
@@ -228,6 +232,13 @@ export default function HomePage() {
                             </div>
                             <span className="text-[10px] font-black text-white/60 uppercase tracking-[0.25em] text-center">WFP</span>
                         </a>
+                        {/* VIP Earning Matrix */}
+                        <Link href="/salary" className="group p-6 rounded-[36px] bg-[#0B0B1E] border border-white/5 flex flex-col items-center gap-4 hover:border-white/10 transition-all duration-500 hover:-translate-y-1">
+                            <div className="w-12 h-12 rounded-2xl bg-amber-500/5 border border-white/5 flex items-center justify-center text-amber-400 group-hover:scale-110 transition-transform duration-700">
+                                <BarChart3 size={22} />
+                            </div>
+                            <span className="text-[10px] font-black text-white/60 uppercase tracking-[0.25em] text-center">VIP Earning Matrix</span>
+                        </Link>
                     </div>
                 </div>
 
@@ -305,7 +316,7 @@ export default function HomePage() {
                             <span className="text-white/40 group-hover:text-white transition-all duration-700">Wealth Extraction.</span>
                         </h3>
                         <p className="text-[11px] font-bold text-white/30 uppercase tracking-[0.2em] leading-relaxed">
-                            Invite your friends and earn 20% commission from their daily task earnings.
+                            Invite your friends and earn {referralRate}% commission from their daily task earnings.
                         </p>
                     </div>
                     

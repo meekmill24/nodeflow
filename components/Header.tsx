@@ -161,7 +161,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
                                         </div>
                                         <div className="flex flex-col">
                                             <span className="text-xs font-black text-white">{profile?.username}</span>
-                                            <span className="text-[8px] font-black text-white/20 uppercase tracking-[0.2em]">Node Verified</span>
+                                            <span className="text-[8px] font-black text-white/20 uppercase tracking-[0.2em]">{profile?.level?.name ? profile.level.name : ('VIP Lv.' + (profile?.level_id || 1))}</span>
                                         </div>
                                      </div>
                                      <div className="p-3">

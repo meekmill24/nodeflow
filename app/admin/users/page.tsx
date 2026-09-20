@@ -11,7 +11,9 @@ export default function AdminUsersPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editData, setEditData] = useState<Partial<Profile>>({});
-  
+  const [originalLevelId, setOriginalLevelId] = useState<number | null>(null);
+  const [levels, setLevels] = useState<any[]>([]);
+
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [newUser, setNewUser] = useState({ email: '', password: '', username: '', phone: '', role: 'user' as const });
   const [creating, setCreating] = useState(false);
@@ -40,6 +42,12 @@ export default function AdminUsersPage() {
   }, []); 
 
   useEffect(() => { fetchUsers(); }, [fetchUsers]); 
+
+  // Fetch levels (max 4) for the dropdown
+  useEffect(() => {
+    supabase.from('levels').select('*').order('price', { ascending: true }).limit(4)
+      .then(({ data }) => { if (data) setLevels(data); });
+  }, []);
 
   const handleSave = async () => {
     if (!editingId) return;
@@ -76,7 +84,7 @@ export default function AdminUsersPage() {
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || 'Failed to recalibrate node');
 
-        toast.success(`Matrix node calibrated! Balance: $${Number(updatePayload.wallet_balance).toFixed(2)}`);
+        toast.success(`User account calibrated! Balance: $${Number(updatePayload.wallet_balance).toFixed(2)}`);
         setEditingId(null);
         fetchUsers();
     } catch (err: any) {
@@ -315,16 +323,26 @@ export default function AdminUsersPage() {
                           <select 
                             className="bg-black/40 border border-[#3DD6C8]/50 rounded-xl px-3 py-1.5 text-blue-400 text-xs focus:outline-none appearance-none cursor-pointer font-bold uppercase"
                             value={editData.level_id || 1}
-                            onChange={(e) => setEditData({...editData, level_id: parseInt(e.target.value)})}
+                            onChange={(e) => {
+                              const newLvlId = parseInt(e.target.value);
+                              // If level changed, auto-reset task counter & set
+                              if (newLvlId !== originalLevelId) {
+                                setEditData({ ...editData, level_id: newLvlId, completed_count: 0, current_set: 1 });
+                              } else {
+                                setEditData({ ...editData, level_id: newLvlId });
+                              }
+                            }}
                           >
-                            {[1,2,3,4,5,6,7,8].map(lvl => <option key={lvl} value={lvl}>LVL {lvl}</option>)}
+                            {levels.map(l => <option key={l.id} value={l.id}>LVL {l.id} — {l.name}</option>)}
                           </select>
                         ) : (
                           <span className="px-3 py-1 rounded-full bg-blue-500/10 text-blue-400 text-[9px] font-black uppercase tracking-widest border border-blue-500/20">
                              LVL {user.level_id || 0}
                           </span>
                         )}
-                        <div className="text-[9px] font-black text-slate-700 uppercase">{user.completed_count || 0}/40 Tasks</div>
+                        <div className="text-[9px] font-black text-slate-700 uppercase">
+                          {user.completed_count || 0}/{levels.find(l => l.id === user.level_id)?.tasks_per_set || 40} Tasks
+                        </div>
                       </div>
                     </div>
                   </td>
@@ -477,7 +495,7 @@ export default function AdminUsersPage() {
                                 <Zap size={16} />
                             </button>
                             <button 
-                                onClick={() => { setEditingId(user.id); setEditData(user); }}
+                                onClick={() => { setEditingId(user.id); setEditData(user); setOriginalLevelId(user.level_id || null); }}
                                 className="p-2.5 bg-[#3DD6C8]/10 text-[#3DD6C8] rounded-xl hover:bg-[#3DD6C8]/20 transition-all border border-[#3DD6C8]/10"
                                 title="Edit Node Parameters"
                             >

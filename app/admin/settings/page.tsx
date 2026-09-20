@@ -340,11 +340,12 @@ export default function AdminSettingsPage() {
                 {[
                     { key: 'min_deposit', label: 'Minimum Influx', icon: ArrowDownLeft, suffix: 'USD', placeholder: '10' },
                     { key: 'min_withdrawal', label: 'Minimum Extraction', icon: ArrowUpRight, suffix: 'USD', placeholder: '30' },
+                    { key: 'min_task_balance', label: 'Minimum Task Balance', icon: Wallet, suffix: 'USD', placeholder: '65' },
                     { key: 'referral_commission_l1', label: 'L1 Growth Yield', icon: Share2, suffix: '%', placeholder: '20' },
                     { key: 'referral_commission_l2', label: 'L2 Growth Yield', icon: Share2, suffix: '%', placeholder: '8' },
                     { key: 'referral_commission_l3', label: 'L3 Growth Yield', icon: Share2, suffix: '%', placeholder: '4' },
                     { key: 'signup_bonus', label: 'Referral Signup Bonus', icon: UserPlus, suffix: 'USD', placeholder: '2' },
-                    { key: 'welcome_bonus', label: 'Initial Node Capital', icon: Wallet, suffix: 'USD', placeholder: '25' },
+                    { key: 'welcome_bonus', label: 'First User Signup Bonus', icon: Wallet, suffix: 'USD', placeholder: '25' },
                     { key: 'reward_tier_1', label: 'Reward Tier 1 (Req/Bonus)', icon: Gift, suffix: 'USD', placeholder: '100/10' },
                     { key: 'reward_tier_2', label: 'Reward Tier 2 (Req/Bonus)', icon: Gift, suffix: 'USD', placeholder: '500/50' },
                     { key: 'reward_tier_3', label: 'Reward Tier 3 (Req/Bonus)', icon: Gift, suffix: 'USD', placeholder: '1000/120' },

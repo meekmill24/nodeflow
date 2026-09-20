@@ -212,7 +212,7 @@ export default function AdminLiveChatPage() {
             </div>
             <h4 className="text-sm font-black text-white uppercase tracking-tight">Deposit Proof Verification</h4>
             <p className="text-slate-400 text-xs leading-relaxed font-medium">
-              When users upload transaction receipts (USDT, USDC, PayPal, BNB, PYUSD), verify the blockchain TXID or PayPal transaction ID in your respective gateway before approving.
+              When users upload transaction receipts (USDT, USDC, BNB, PayPal USD), verify the blockchain TXID or gateway transaction ID in your respective gateway before approving.
             </p>
           </div>
 

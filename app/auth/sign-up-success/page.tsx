@@ -49,8 +49,8 @@ export default function SignUpSuccess() {
         <p className='mb-10 text-lg text-slate-500 font-medium leading-relaxed italic'>
           Your account is verified. Welcome to the elite community of asset growth and protocol optimization.
           {welcomeBonus && (
-            <span className="block mt-4 text-[#3DD6C8] font-black uppercase tracking-widest text-sm drop-shadow-sm">
-              Node Initialized: ${welcomeBonus} Welcome Balance Credited
+            <span className="block mt-4 text-emerald-600 font-black uppercase tracking-widest text-sm drop-shadow-sm">
+              🎉 ${welcomeBonus} First User Signup Bonus Credited
             </span>
           )}
         </p>

@@ -98,7 +98,7 @@ export default function Page() {
 
           <Card className="shadow-2xl rounded-[40px] overflow-hidden" style={{background: 'rgba(26,26,46,0.9)', border: '1px solid rgba(61,214,200,0.15)'}}>
             <CardHeader className="pt-10 pb-6 text-center">
-              <CardTitle className="text-2xl font-black tracking-tighter text-white">Access Your Node</CardTitle>
+              <CardTitle className="text-2xl font-black tracking-tighter text-white">Access Your Account</CardTitle>
               <CardDescription className="text-[10px] font-black uppercase tracking-widest mt-2" style={{color:'rgba(255,255,255,0.4)'}}>
                 Authorize your session to start optimizing
               </CardDescription>

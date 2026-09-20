@@ -71,6 +71,7 @@ export default function StartPage() {
     const [setsPerDay, setSetsPerDay] = useState(3);
     const [taskBaseOffset, setTaskBaseOffset] = useState(0);
     const [commissionRate, setCommissionRate] = useState(0.0045);
+    const [minTaskBalance, setMinTaskBalance] = useState(65);
     const [isLoadingData, setIsLoadingData] = useState(true);
     
     const [dbCompletedCount, setDbCompletedCount] = useState(0);
@@ -90,15 +91,20 @@ export default function StartPage() {
             setIsLoadingData(true);
             try {
                 const filterDate = profile.last_reset_at ? new Date(profile.last_reset_at).toISOString() : new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-                const [levelsRes, pastTasksRes, itemsRes] = await Promise.all([
+                const [levelsRes, pastTasksRes, itemsRes, settingsRes] = await Promise.all([
                     supabase.from('levels').select('id, tasks_per_set, sets_per_day, commission_rate').order('price', { ascending: true }),
                     supabase.from('user_tasks').select('task_item_id, status, completed_at').eq('user_id', profile.id).neq('status', 'cancelled').gt('completed_at', filterDate),
-                    supabase.from('task_items').select('*').eq('is_active', true).eq('level_id', profile.level_id).order('created_at', { ascending: false }).limit(300)
+                    supabase.from('task_items').select('*').eq('is_active', true).eq('level_id', profile.level_id).order('created_at', { ascending: false }).limit(300),
+                    supabase.from('site_settings').select('key, value').in('key', ['min_task_balance'])
                 ]);
 
                 if (pastTasksRes.data) {
                     setHasPendingTask((pastTasksRes.data as any[]).some(t => t.status === 'pending'));
                     setDbCompletedCount((pastTasksRes.data as any[]).filter(t => t.status === 'completed').length);
+                }
+                if (settingsRes.data) {
+                    const minBal = settingsRes.data.find((s: any) => s.key === 'min_task_balance')?.value;
+                    if (minBal) setMinTaskBalance(parseFloat(minBal));
                 }
                 if (levelsRes.data) {
                     const currentLevel = levelsRes.data.find(l => l.id === profile.level_id);
@@ -150,7 +156,7 @@ export default function StartPage() {
     const handleStart = useCallback(async () => {
         if (isSpinning || items.length === 0) return;
         const walletBalance = profile?.wallet_balance || 0;
-        if (walletBalance < 65 && walletBalance >= 0) { setShowMinBalanceModal(true); return; }
+        if (walletBalance < minTaskBalance && walletBalance >= 0) { setShowMinBalanceModal(true); return; }
         if (isLocked) {
             if (!modalSeen) setShowCompletionModal(true);
             else setLockMessage(isAllSetsDone ? t('daily_limit_reached') : t('set_complete_contact_support').replace('{set}', String(currentSet)));

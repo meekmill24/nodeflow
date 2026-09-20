@@ -40,19 +40,23 @@ export default function LevelsPage() {
     const { profile } = useAuth();
     const [levels, setLevels] = useState<Level[]>([]);
     const [loading, setLoading] = useState(true);
+    const [referralRate, setReferralRate] = useState('20');
 
     useEffect(() => {
         const fetchLevels = async () => {
-            const { data } = await supabase.from('levels').select('*').order('price', { ascending: true });
+            const [{ data }, settingsRes] = await Promise.all([
+                supabase.from('levels').select('*').order('price', { ascending: true }),
+                supabase.from('site_settings').select('value').eq('key', 'referral_commission_l1').maybeSingle()
+            ]);
             if (data && data.length > 0) setLevels(data);
+            if (settingsRes.data?.value) setReferralRate(settingsRes.data.value);
             setLoading(false);
         };
         fetchLevels();
     }, []);
 
     const currentLevelId = profile?.level_id || 1;
-    const currentTasks = (profile?.completed_count || 0) % 40; // Default fallback
-    const progressPercent = Math.min(100, Math.round((currentTasks / 40) * 100));
+    const completedCount = profile?.completed_count || 0;
 
     return (
         <div className="space-y-10 animate-in fade-in duration-1000 pb-20 max-w-7xl mx-auto">
@@ -93,6 +97,9 @@ export default function LevelsPage() {
                         const isLocked = level.id > currentLevelId;
                         const isCompleted = level.id < currentLevelId;
 
+                        const tasksPerSet = level.tasks_per_set || 40;
+                        const currentTasks = completedCount % tasksPerSet;
+                        const progressPercent = Math.min(100, Math.round((currentTasks / tasksPerSet) * 100));
                         const levelProgress = isCurrentLevel ? progressPercent : (isCompleted ? 100 : 0);
 
                         return (
@@ -217,11 +224,11 @@ export default function LevelsPage() {
                         <div className="absolute top-0 right-0 w-48 h-48 bg-[#3DD6C8]/5 blur-3xl rounded-full pointer-events-none" />
                         <div className="flex items-center justify-between mb-4">
                             <span className="text-[10px] font-black text-[#3DD6C8] uppercase tracking-[0.25em]">Direct Tier 1</span>
-                            <span className="text-xs px-2.5 py-1 rounded-full bg-[#3DD6C8]/10 text-[#3DD6C8] font-bold">20% Yield</span>
+                            <span className="text-xs px-2.5 py-1 rounded-full bg-[#3DD6C8]/10 text-[#3DD6C8] font-bold">{referralRate}% Yield</span>
                         </div>
                         <h3 className="text-xl font-black text-white uppercase italic tracking-tight mb-2">Direct Referrals</h3>
                         <p className="text-xs font-bold text-white/50 leading-relaxed uppercase tracking-wider mb-6">
-                            Earn an instant 20% perpetual rebate commission from every task cycle completed by your direct invites.
+                            Earn an instant {referralRate}% perpetual rebate commission from every task cycle completed by your direct invites.
                         </p>
                         <div className="pt-4 border-t border-white/5 flex items-center justify-between">
                             <span className="text-[10px] font-black text-white/30 uppercase tracking-widest">Settlement</span>

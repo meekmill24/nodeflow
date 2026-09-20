@@ -27,6 +27,7 @@ export default function InvitePage() {
         commissionEarned: 0
     });
     const [copied, setCopied] = useState(false);
+    const [referralRate, setReferralRate] = useState('20');
 
     useEffect(() => {
         const fetchReferralStats = async () => {
@@ -37,6 +38,14 @@ export default function InvitePage() {
                 .from('profiles')
                 .select('*', { count: 'exact', head: true })
                 .eq('referred_by', profile.id);
+
+            // 2. Get referral commission rate from site settings
+            const { data: settingsData } = await supabase
+                .from('site_settings')
+                .select('value')
+                .eq('key', 'referral_commission_l1')
+                .maybeSingle();
+            if (settingsData?.value) setReferralRate(settingsData.value);
 
             setStats({
                 totalReferrals: referralCount || 0,
@@ -157,7 +166,7 @@ export default function InvitePage() {
                     {
                         icon: ShieldCheck,
                         title: '03. Yield',
-                        desc: 'Earn a perpetual 20% yield from their successful optimization tasks.',
+                        desc: `Earn a perpetual ${referralRate}% yield from their successful optimization tasks.`,
                         color: 'text-success'
                     }
                 ].map((step, i) => (

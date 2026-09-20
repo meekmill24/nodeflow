@@ -71,7 +71,7 @@ export default function FirstDepositRewardPage() {
                 
                 toast.success('Pinging Concierge Desk... Verification in progress.');
             } else {
-                toast.error('No administrative nodes active. Use Live Chat.');
+                toast.error('No support agents active. Use Live Chat.');
             }
         } catch (err) {
             console.error('Claim Error:', err);
@@ -110,7 +110,7 @@ export default function FirstDepositRewardPage() {
                     </div>
                     <h2 className="text-4xl md:text-5xl font-black text-white uppercase tracking-tighter mb-4 leading-none">First Deposit <br className="md:hidden" /> Rewards</h2>
                     <p className="text-sm text-text-secondary max-w-lg uppercase font-bold tracking-[0.1em] leading-relaxed opacity-60">
-                        Join our optimization network today. High-yield bonuses for new partners on initial node synchronization.
+                        Join our optimization network today. High-yield bonuses for new partners on initial account activation.
                     </p>
                 </div>
             </div>
@@ -134,12 +134,12 @@ export default function FirstDepositRewardPage() {
                             </div>
                             
                             <div className="text-sm font-black text-white text-center">
-                                ${format(reward.amount)}
+                                {format(reward.amount)}
                             </div>
 
                             <div className="text-right flex flex-col items-end">
                                 <div className="text-lg font-black text-success-light flex items-center gap-1.5 drop-shadow-glow-success">
-                                    +${format(reward.receive)}
+                                    +{format(reward.receive)}
                                 </div>
                                 <button 
                                     onClick={() => handleClaim(reward)}

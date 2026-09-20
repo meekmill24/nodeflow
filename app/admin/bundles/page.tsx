@@ -257,7 +257,7 @@ export default function AdminBundlesPage() {
         if (bonusPresetValue === 'pct_200') return parseFloat((productAmount * 2.00).toFixed(2));
         if (bonusPresetValue === 'fix_50') return 50;
         if (bonusPresetValue === 'fix_100') return 100;
-        if (bonusPresetValue === 'fix_500') return 50;
+        if (bonusPresetValue === 'fix_500') return 500;
         if (bonusPresetValue === 'custom_pct') {
             const r = typeof assignForm.rate === 'number' ? assignForm.rate : parseFloat(assignForm.rate as string) || 0;
             return parseFloat((productAmount * (r / 100)).toFixed(2));

@@ -104,8 +104,11 @@ export default function AdminTasksPage() {
     };
 
     const fetchLevels = async () => {
-        const { data } = await supabase.from('levels').select('id, name, price, tasks_per_set, sets_per_day').order('price', { ascending: true });
-        if (data) setLevels(data);
+        const { data } = await supabase.from('levels').select('id, name, price, tasks_per_set, sets_per_day').order('id', { ascending: true });
+        if (data) {
+            const sorted = [...data].sort((a, b) => Number(a.id) - Number(b.id));
+            setLevels(sorted);
+        }
     };
 
     useEffect(() => { 
@@ -369,8 +372,8 @@ export default function AdminTasksPage() {
             return matchesLevel && matchesSearch;
         })
         .sort((a, b) => {
-            if (sortOrder === 'asc') return (a.title || '').localeCompare(b.title || '');
-            return (b.title || '').localeCompare(a.title || '');
+            if (sortOrder === 'asc') return (Number(a.id) || 0) - (Number(b.id) || 0);
+            return (Number(b.id) || 0) - (Number(a.id) || 0);
         });
 
     let finalItems = filteredItems;
@@ -455,6 +458,15 @@ export default function AdminTasksPage() {
                                 onChange={e => setSearchQuery(e.target.value)}
                             />
                         </div>
+
+                        <button
+                            onClick={() => setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc')}
+                            className="bg-slate-950 border border-white/10 hover:border-white/20 rounded-2xl py-3 px-4 flex items-center gap-2 text-[11px] font-black uppercase tracking-widest text-slate-300 transition-all"
+                            title="Toggle ID sort order"
+                        >
+                            <ArrowUpDown size={14} className="text-[#3DD6C8]" />
+                            <span>ID {sortOrder === 'asc' ? '1→9 (ASC)' : '9→1 (DESC)'}</span>
+                        </button>
 
                         <div className="relative min-w-[180px]">
                             <button 

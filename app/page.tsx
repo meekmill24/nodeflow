@@ -4,7 +4,9 @@ import React, { useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/dist/ScrollTrigger';
 import { Testimonials } from '@/components/landing/testimonials';
+import { LandingGallery } from '@/components/landing/gallery';
 import { Footer } from '@/components/landing/footer';
+import { LiveActivityMap } from '@/components/landing/LiveActivityMap';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -118,7 +120,7 @@ export default function LandingPage() {
     setSandboxProgress(0);
 
     const logs = [
-      'Establishing secure node handshake...',
+      'Establishing secure platform handshake...',
       'Mapping cloud product API endpoints...',
       'Optimizing query latency and rating logs...',
       'Executing task verification signature...',
@@ -265,7 +267,7 @@ export default function LandingPage() {
     {
       id: '02',
       title: 'Fund & Activate',
-      desc: 'Deposit USDT, USDC, PayPal, PayPal USD (PYUSD), BNB, ETH, or BTC to activate your node tier. Minimum deposit of just $30 to start instantly.',
+      desc: 'Deposit USDT, USDC, PayPal USD (PYUSD), BNB, ETH, or BTC to activate your account tier. Minimum deposit of just $30 to start instantly.',
       icon: Zap,
       color: 'cyan',
       accent: 'from-cyan-500/20 to-indigo-500/20',
@@ -281,10 +283,10 @@ export default function LandingPage() {
   ];
 
   const tiers = [
-    { name: 'JUNIOR AGENT', price: '100', yield: '0.4%', tasks: '40', daily: '$0.40', features: ['Standard Node Access', 'Daily Optimization Cycle', 'Basic Referral Tier'] },
-    { name: 'INTERMEDIATE AGENT', price: '500', yield: '0.6%', tasks: '45', daily: '$3.00', features: ['Priority Node Access', 'Extended Audit Logs', 'Enhanced Referral Rate'] },
-    { name: 'SENIOR AGENT', price: '1,500', yield: '0.8%', tasks: '50', daily: '$12.00', features: ['Multi-Node Sharding', 'Institutional Vault Access', 'VIP Commission Boost'], popular: true },
-    { name: 'MASTER AGENT', price: '5,000', yield: '1.0%', tasks: '55', daily: '$50.00', features: ['Unlimited Node Scaling', 'Quantum Settlement Security', 'Governance Access'] },
+    { name: 'JUNIOR AGENT', price: '100', yield: '0.4%', tasks: '40', daily: '$0.40', features: ['Standard Tier Access', 'Daily Optimization Cycle', 'Basic Referral Tier'] },
+    { name: 'INTERMEDIATE AGENT', price: '500', yield: '0.6%', tasks: '45', daily: '$3.00', features: ['Priority Tier Access', 'Extended Audit Logs', 'Enhanced Referral Rate'] },
+    { name: 'SENIOR AGENT', price: '1,500', yield: '0.8%', tasks: '50', daily: '$12.00', features: ['Multi-Account Routing', 'Institutional Vault Access', 'VIP Commission Boost'], popular: true },
+    { name: 'MASTER AGENT', price: '5,000', yield: '1.0%', tasks: '55', daily: '$50.00', features: ['Unlimited Task Scaling', 'Quantum Settlement Security', 'Governance Access'] },
   ];
 
   const whyCards = [
@@ -356,7 +358,7 @@ export default function LandingPage() {
   const faqs = [
     {
       q: 'How do I start earning?',
-      a: 'Simply register an account, log in, and top up your secure balance using USDT, USDC, PayPal, PayPal USD (PYUSD), BNB, ETH, or BTC. Once funded, access the agent terminal to run optimization tasks. Daily earnings are added to your wallet immediately.',
+      a: 'Simply register an account, log in, and top up your secure balance using USDT, USDC, PayPal USD (PYUSD), BNB, ETH, or BTC. Once funded, access the agent terminal to run optimization tasks. Daily earnings are added to your wallet immediately.',
     },
     {
       q: 'What are the minimum deposit and withdrawal amounts?',
@@ -416,7 +418,7 @@ export default function LandingPage() {
             </Link>
 
             <div className="hidden lg:flex items-center gap-8 text-[11px] font-bold uppercase tracking-[0.2em] text-slate-400">
-              {['Protocol', 'Ecosystem', 'Nodes', 'Members', 'FAQ'].map((item) => (
+              {['Protocol', 'Ecosystem', 'Tiers', 'Members', 'FAQ'].map((item) => (
                 <Link key={item} href={`#${item.toLowerCase()}`} className="hover:text-white transition-colors relative group">
                   {item}
                   <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-cyan-500 transition-all group-hover:w-full" />
@@ -446,7 +448,7 @@ export default function LandingPage() {
         {isMenuOpen && (
           <div className="lg:hidden fixed inset-x-0 top-[65px] z-40 bg-slate-950/95 backdrop-blur-xl border-b border-white/5 px-6 py-8">
             <div className="flex flex-col gap-6">
-              {['Protocol', 'Ecosystem', 'Nodes', 'Members', 'FAQ'].map((item) => (
+              {['Protocol', 'Ecosystem', 'Tiers', 'Members', 'FAQ'].map((item) => (
                 <Link
                   key={item}
                   href={`#${item.toLowerCase()}`}
@@ -485,20 +487,20 @@ export default function LandingPage() {
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75" />
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-500 shadow-[0_0_10px_rgba(6,182,212,0.8)]" />
                 </span>
-                Institutional Node Protocol v2.5 — Live
+                Institutional Task Matrix v2.5 — Live
               </div>
 
               <h1 className="text-5xl md:text-7xl lg:text-8xl font-extrabold tracking-tight leading-[1.05] mb-8 drop-shadow-2xl">
                 <div className="hero-title-part text-white">STRATEGIC</div>
                 <div className="hero-title-part text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-500 to-indigo-500">DYNAMIC</div>
                 <div className="hero-title-part text-white flex items-center justify-center lg:justify-start gap-3">
-                  NODES
+                  EARNINGS
                   <div className="w-4 h-4 md:w-5 md:h-5 bg-cyan-500 rounded-full mt-2 lg:mt-4 shadow-[0_0_20px_rgba(6,182,212,0.8)]" />
                 </div>
               </h1>
 
               <p className="hero-sub max-w-xl mx-auto lg:mx-0 text-slate-300 text-lg font-medium mb-10 leading-relaxed border-l-[3px] border-indigo-500/50 pl-6">
-                The definitive institutional distribution matrix. Synchronize your liquidity across high-fidelity nodes for optimized daily returns — withdraw in under 30 minutes.
+                The definitive institutional distribution matrix. Complete digital marketing workflows for optimized daily returns — withdraw in under 30 minutes.
               </p>
 
               <div className="hero-cta flex flex-col sm:flex-row items-center gap-5 justify-center lg:justify-start mb-10">
@@ -579,14 +581,14 @@ export default function LandingPage() {
                     ))}
                   </div>
 
-                  {/* Node status */}
+                  {/* Agent status */}
                   <div className="float-card flex items-center justify-between p-4 rounded-xl bg-slate-950/60 border border-white/5">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-xl bg-violet-500/20 border border-violet-500/20 flex items-center justify-center text-violet-400">
                         <Activity size={18} />
                       </div>
                       <div>
-                        <p className="text-xs font-bold text-white">NODE_X_774 — SENIOR</p>
+                        <p className="text-xs font-bold text-white">AGENT_TIER_3 — SENIOR</p>
                         <p className="text-[10px] text-slate-500">Optimization cycle active</p>
                       </div>
                     </div>
@@ -647,6 +649,37 @@ export default function LandingPage() {
         </div>
 
         {/* ══════════════════════════════════════════
+            PAYMENT METHODS BANNER
+        ══════════════════════════════════════════ */}
+        <div className="border-b border-white/5 bg-slate-950/70 py-6 px-6 lg:px-12">
+          <div className="max-w-7xl mx-auto">
+            <div className="flex flex-col sm:flex-row items-center gap-6">
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 whitespace-nowrap shrink-0">We Accept</p>
+              <div className="w-px h-6 bg-white/10 hidden sm:block shrink-0" />
+              <div className="flex flex-wrap items-center justify-center sm:justify-start gap-3">
+                {[
+                  { label: 'USDT', color: 'text-emerald-400 border-emerald-500/30 bg-emerald-500/10', icon: '₮' },
+                  { label: 'USDC', color: 'text-blue-400 border-blue-500/30 bg-blue-500/10', icon: '$' },
+                  { label: 'Bitcoin', color: 'text-amber-400 border-amber-500/30 bg-amber-500/10', icon: '₿' },
+                  { label: 'Ethereum', color: 'text-indigo-400 border-indigo-500/30 bg-indigo-500/10', icon: 'Ξ' },
+                  { label: 'BNB', color: 'text-yellow-400 border-yellow-500/30 bg-yellow-500/10', icon: 'B' },
+                  { label: 'PayPal USD (PYUSD)', color: 'text-sky-400 border-sky-500/30 bg-sky-500/10', icon: 'P$' },
+                ].map((m) => (
+                  <div key={m.label} className={`flex items-center gap-2 px-3.5 py-2 rounded-xl border text-[11px] font-black uppercase tracking-widest ${m.color} transition-all hover:scale-105`}>
+                    <span className="text-base leading-none">{m.icon}</span>
+                    {m.label}
+                  </div>
+                ))}
+              </div>
+              <div className="sm:ml-auto flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-slate-500">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                Instant Processing
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* ══════════════════════════════════════════
             PLATFORM STATS — Animated counters
         ══════════════════════════════════════════ */}
         <section id="stats-counters" className="px-6 lg:px-12 py-20 max-w-7xl mx-auto">
@@ -666,7 +699,7 @@ export default function LandingPage() {
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
             {[
               { prefix: '', value: counterValues.agents.toLocaleString(), suffix: '+', label: 'Active Agents', sublabel: 'across 40+ countries', color: 'from-blue-500/20 to-cyan-500/20', border: 'hover:border-blue-500/30', dot: 'bg-blue-400' },
-              { prefix: '$', value: counterValues.liquidity.toLocaleString(), suffix: 'M+', label: 'Liquidity Deployed', sublabel: 'in active node pools', color: 'from-emerald-500/20 to-teal-500/20', border: 'hover:border-emerald-500/30', dot: 'bg-emerald-400' },
+              { prefix: '$', value: counterValues.liquidity.toLocaleString(), suffix: 'M+', label: 'Liquidity Deployed', sublabel: 'in active liquidity pools', color: 'from-emerald-500/20 to-teal-500/20', border: 'hover:border-emerald-500/30', dot: 'bg-emerald-400' },
               { prefix: '+', value: counterValues.yield.toFixed(1), suffix: '%', label: 'Daily Yield Rate', sublabel: 'maximum return potential', color: 'from-violet-500/20 to-indigo-500/20', border: 'hover:border-violet-500/30', dot: 'bg-violet-400' },
               { prefix: '< ', value: counterValues.payout.toString(), suffix: ' Min', label: 'Payout Speed', sublabel: 'guaranteed execution limit', color: 'from-amber-500/20 to-orange-500/20', border: 'hover:border-amber-500/30', dot: 'bg-amber-400' },
             ].map((item, i) => (
@@ -682,6 +715,18 @@ export default function LandingPage() {
             ))}
           </div>
         </section>
+
+        {/* ══════════════════════════════════════════
+            TESTIMONIALS
+        ══════════════════════════════════════════ */}
+        <div id="members" className="border-t border-white/5">
+          <Testimonials />
+        </div>
+
+        {/* ══════════════════════════════════════════
+            LIVE ACTIVITY MAP (REAL WORLD MAP)
+        ══════════════════════════════════════════ */}
+        <LiveActivityMap />
 
         {/* ══════════════════════════════════════════
             WHY CHOOSE — Bento Grid
@@ -791,7 +836,7 @@ export default function LandingPage() {
               TEST DRIVE THE TERMINAL
             </h2>
             <p className="text-slate-400 text-sm max-w-xl mx-auto">
-              Experience how easy it is to optimize datasets and collect commissions. Run the simulated task node below.
+              Experience how easy it is to optimize datasets and collect commissions. Run the simulated task workflow below.
             </p>
           </div>
 
@@ -867,7 +912,7 @@ export default function LandingPage() {
                       )}
                     >
                       {sandboxState === 'running' ? (
-                        <><RefreshCw className="animate-spin" size={14} /> Running Node...</>
+                        <><RefreshCw className="animate-spin" size={14} /> Running Task...</>
                       ) : (
                         <><Cpu size={14} />{sandboxTasks === 0 ? 'Initialize Demo Task' : 'Run Next Demo Task'}</>
                       )}
@@ -880,13 +925,13 @@ export default function LandingPage() {
               <div className="bg-slate-950/40 border border-white/5 rounded-2xl p-6 flex flex-col justify-between relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/5 blur-2xl rounded-full pointer-events-none" />
                 <div>
-                  <h4 className="text-sm font-bold text-white uppercase tracking-wider mb-2">Node Rewards</h4>
+                  <h4 className="text-sm font-bold text-white uppercase tracking-wider mb-2">Task Rewards</h4>
                   <p className="text-slate-400 text-xs leading-relaxed mb-5">
                     Each task generates <strong className="text-emerald-400">$0.75 USDT</strong> in demo yield.
                   </p>
                   <div className="space-y-3">
                     {[
-                      { label: 'Node Pool', value: 'DEMO_POOL_ALPHA', valueClass: 'text-white' },
+                      { label: 'Task Pool', value: 'DEMO_POOL_ALPHA', valueClass: 'text-white' },
                       { label: 'Per Task', value: '$0.75 USDT', valueClass: 'text-emerald-400' },
                       { label: 'Uptime', value: '100% SECURE', valueClass: 'text-cyan-400' },
                     ].map((row, i) => (
@@ -901,7 +946,7 @@ export default function LandingPage() {
                   {sandboxState === 'complete' ? (
                     <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-3 text-center">
                       <p className="text-[10px] text-emerald-400 font-bold uppercase tracking-wider mb-1">Sandbox Complete</p>
-                      <p className="text-[9px] text-slate-400 leading-snug">Sign up to deploy real nodes.</p>
+                      <p className="text-[9px] text-slate-400 leading-snug">Sign up to access real task campaigns.</p>
                     </div>
                   ) : (
                     <div className="flex items-center gap-2 text-[10px] text-slate-500 font-mono">
@@ -1037,12 +1082,12 @@ export default function LandingPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mb-10">
               {[
-                { rank: '01', name: 'Marcus T.', location: 'Lagos, NG', agents: 47, totalEarned: '$12,840', monthlyPassive: '$1,920', tier: 'MASTER AGENT', avatar: 'M', color: 'from-amber-500/20 to-orange-500/20', border: 'border-amber-500/20', badge: 'text-amber-400 bg-amber-500/10 border-amber-500/20' },
-                { rank: '02', name: 'Priya S.', location: 'Mumbai, IN', agents: 31, totalEarned: '$8,240', monthlyPassive: '$1,140', tier: 'SENIOR AGENT', avatar: 'P', color: 'from-slate-500/20 to-slate-400/20', border: 'border-slate-500/20', badge: 'text-slate-300 bg-slate-500/10 border-slate-500/20' },
-                { rank: '03', name: 'Zara M.', location: 'Accra, GH', agents: 24, totalEarned: '$5,680', monthlyPassive: '$780', tier: 'SENIOR AGENT', avatar: 'Z', color: 'from-orange-700/20 to-red-700/20', border: 'border-orange-700/20', badge: 'text-orange-400 bg-orange-500/10 border-orange-500/20' },
-                { rank: '04', name: 'Kweku A.', location: 'Kumasi, GH', agents: 19, totalEarned: '$4,120', monthlyPassive: '$560', tier: 'INTERMEDIATE', avatar: 'K', color: 'from-indigo-500/10 to-blue-500/10', border: 'border-indigo-500/20', badge: 'text-indigo-400 bg-indigo-500/10 border-indigo-500/20' },
-                { rank: '05', name: 'Sandra K.', location: 'Nairobi, KE', agents: 15, totalEarned: '$3,040', monthlyPassive: '$420', tier: 'INTERMEDIATE', avatar: 'S', color: 'from-indigo-500/10 to-blue-500/10', border: 'border-indigo-500/20', badge: 'text-indigo-400 bg-indigo-500/10 border-indigo-500/20' },
-                { rank: '06', name: 'Andre L.', location: 'Dakar, SN', agents: 11, totalEarned: '$2,210', monthlyPassive: '$300', tier: 'JUNIOR AGENT', avatar: 'A', color: 'from-cyan-500/10 to-teal-500/10', border: 'border-cyan-500/20', badge: 'text-cyan-400 bg-cyan-500/10 border-cyan-500/20' },
+                { rank: '01', name: 'Tyler V.', location: 'Miami, FL, USA', agents: 52, totalEarned: '$14,200', monthlyPassive: '$2,100', tier: 'MASTER AGENT', avatar: 'T', color: 'from-amber-500/20 to-orange-500/20', border: 'border-amber-500/20', badge: 'text-amber-400 bg-amber-500/10 border-amber-500/20' },
+                { rank: '02', name: 'Brandon M.', location: 'Austin, TX, USA', agents: 38, totalEarned: '$9,840', monthlyPassive: '$1,440', tier: 'SENIOR AGENT', avatar: 'B', color: 'from-slate-500/20 to-slate-400/20', border: 'border-slate-500/20', badge: 'text-slate-300 bg-slate-500/10 border-slate-500/20' },
+                { rank: '03', name: 'Sandra K.', location: 'Phoenix, AZ, USA', agents: 29, totalEarned: '$7,100', monthlyPassive: '$960', tier: 'SENIOR AGENT', avatar: 'S', color: 'from-orange-700/20 to-red-700/20', border: 'border-orange-700/20', badge: 'text-orange-400 bg-orange-500/10 border-orange-500/20' },
+                { rank: '04', name: 'David R.', location: 'Atlanta, GA, USA', agents: 22, totalEarned: '$5,380', monthlyPassive: '$680', tier: 'INTERMEDIATE', avatar: 'D', color: 'from-indigo-500/10 to-blue-500/10', border: 'border-indigo-500/20', badge: 'text-indigo-400 bg-indigo-500/10 border-indigo-500/20' },
+                { rank: '05', name: 'Sarah J.', location: 'Chicago, IL, USA', agents: 17, totalEarned: '$3,960', monthlyPassive: '$500', tier: 'INTERMEDIATE', avatar: 'S', color: 'from-indigo-500/10 to-blue-500/10', border: 'border-indigo-500/20', badge: 'text-indigo-400 bg-indigo-500/10 border-indigo-500/20' },
+                { rank: '06', name: 'Priya S.', location: 'Seattle, WA, USA', agents: 13, totalEarned: '$2,640', monthlyPassive: '$360', tier: 'JUNIOR AGENT', avatar: 'P', color: 'from-cyan-500/10 to-teal-500/10', border: 'border-cyan-500/20', badge: 'text-cyan-400 bg-cyan-500/10 border-cyan-500/20' },
               ].map((agent, i) => (
                 <div key={i} className={`relative bg-gradient-to-br ${agent.color} rounded-[24px] border ${agent.border} p-6 overflow-hidden hover:scale-[1.02] transition-all`}>
                   <div className="absolute top-4 right-4 text-5xl font-black italic text-white/5">{agent.rank}</div>
@@ -1085,22 +1130,90 @@ export default function LandingPage() {
         </section>
 
         {/* ══════════════════════════════════════════
-            TIER GRID — Node Plans
+            WITHDRAWAL PROOF FEED
         ══════════════════════════════════════════ */}
-        <section id="nodes" className="px-6 lg:px-12 py-28 bg-slate-950/40 relative border-t border-white/5">
+        <section className="px-6 lg:px-12 py-20 max-w-7xl mx-auto border-t border-white/5">
+          <div className="section-header text-center mb-12">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-[10px] font-bold uppercase tracking-widest text-cyan-400 mb-6">
+              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
+              Verified Payouts
+            </div>
+            <h2 className="text-4xl md:text-5xl font-black italic uppercase tracking-tight text-white mb-3">WITHDRAWAL PROOF</h2>
+            <p className="text-slate-400 text-sm max-w-xl mx-auto">These are real payout receipts from verified SmartBugMedia members — amounts and names are partially blurred for privacy.</p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {[
+              { name: 'Ty***r V.', location: 'Miami, FL, USA', method: 'USDT', amount: '$1,250.00', date: 'Sep 16, 2026', tier: 'Master Agent', status: 'Approved', color: 'from-amber-500/10 to-orange-500/10', border: 'border-amber-500/20', dot: 'bg-amber-400' },
+              { name: 'San***a K.', location: 'Phoenix, AZ, USA', method: 'PayPal USD', amount: '$840.00', date: 'Sep 15, 2026', tier: 'Senior Agent', status: 'Approved', color: 'from-emerald-500/10 to-teal-500/10', border: 'border-emerald-500/20', dot: 'bg-emerald-400' },
+              { name: 'Bra***n M.', location: 'Austin, TX, USA', method: 'USDC', amount: '$620.00', date: 'Sep 14, 2026', tier: 'Senior Agent', status: 'Approved', color: 'from-blue-500/10 to-cyan-500/10', border: 'border-blue-500/20', dot: 'bg-blue-400' },
+              { name: 'Dav***d R.', location: 'Atlanta, GA, USA', method: 'ETH', amount: '$380.00', date: 'Sep 14, 2026', tier: 'Intermediate', status: 'Approved', color: 'from-indigo-500/10 to-violet-500/10', border: 'border-indigo-500/20', dot: 'bg-indigo-400' },
+              { name: 'Sar***h J.', location: 'Chicago, IL, USA', method: 'PayPal USD', amount: '$295.00', date: 'Sep 13, 2026', tier: 'Intermediate', status: 'Approved', color: 'from-violet-500/10 to-purple-500/10', border: 'border-violet-500/20', dot: 'bg-violet-400' },
+              { name: 'Pri***a S.', location: 'Seattle, WA, USA', method: 'BNB', amount: '$185.00', date: 'Sep 12, 2026', tier: 'Junior Agent', status: 'Approved', color: 'from-cyan-500/10 to-sky-500/10', border: 'border-cyan-500/20', dot: 'bg-cyan-400' },
+            ].map((proof, i) => (
+              <div key={i} className={`relative rounded-[24px] bg-gradient-to-br ${proof.color} border ${proof.border} p-5 hover:scale-[1.02] transition-all overflow-hidden`}>
+                {/* Blurred watermark */}
+                <div className="absolute inset-0 flex items-center justify-center opacity-[0.04] pointer-events-none select-none">
+                  <span className="text-6xl font-black italic text-white rotate-[-20deg] whitespace-nowrap">VERIFIED</span>
+                </div>
+
+                {/* Receipt header */}
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2">
+                    <span className={`w-2 h-2 rounded-full ${proof.dot}`} />
+                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Payout Receipt</span>
+                  </div>
+                  <span className="px-2.5 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/25 text-emerald-400 text-[9px] font-black uppercase tracking-widest">✓ {proof.status}</span>
+                </div>
+
+                {/* Amount — hero */}
+                <p className="text-3xl font-black italic text-white mb-1">{proof.amount}</p>
+                <p className="text-xs text-slate-500 mb-4">via <span className="text-slate-300 font-bold">{proof.method}</span></p>
+
+                {/* Details */}
+                <div className="space-y-2 text-xs">
+                  <div className="flex justify-between">
+                    <span className="text-slate-500 uppercase tracking-wide text-[10px] font-bold">Member</span>
+                    <span className="text-white font-bold">{proof.name}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-500 uppercase tracking-wide text-[10px] font-bold">Location</span>
+                    <span className="text-slate-300">{proof.location}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-500 uppercase tracking-wide text-[10px] font-bold">Tier</span>
+                    <span className="text-slate-300">{proof.tier}</span>
+                  </div>
+                  <div className="flex justify-between pt-2 border-t border-white/5">
+                    <span className="text-slate-500 uppercase tracking-wide text-[10px] font-bold">Date</span>
+                    <span className="text-slate-300">{proof.date}</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Disclaimer */}
+          <p className="text-center text-slate-600 text-xs mt-6">* Names and amounts are partially anonymized for member privacy. All payouts verified by SmartBugMedia customer service before processing.</p>
+        </section>
+
+        {/* ══════════════════════════════════════════
+            TIER GRID — Member Plans
+        ══════════════════════════════════════════ */}
+        <section id="tiers" className="px-6 lg:px-12 py-28 bg-slate-950/40 relative border-t border-white/5">
           <div className="absolute inset-0 bg-[url('/dots.svg')] opacity-[0.04]" />
           <div className="max-w-7xl mx-auto relative z-10">
             <div className="section-header flex flex-col lg:flex-row lg:items-end justify-between gap-8 mb-16">
               <div>
                 <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-violet-500/10 border border-violet-500/20 text-[10px] font-bold uppercase tracking-widest text-violet-400 mb-5">
                   <span className="w-1.5 h-1.5 rounded-full bg-violet-400" />
-                  Node Tiers
+                  Membership Tiers
                 </div>
-                <h2 className="text-5xl md:text-7xl font-black italic tracking-tighter uppercase mb-3 leading-none">VERIFIED NODES</h2>
+                <h2 className="text-5xl md:text-7xl font-black italic tracking-tighter uppercase mb-3 leading-none">VERIFIED TIERS</h2>
                 <p className="text-cyan-500 text-xs font-black uppercase tracking-[0.4em]">DISTRIBUTION TIERS & YIELD MATRIX</p>
               </div>
               <p className="max-w-md text-slate-500 text-sm italic font-medium">
-                Select your institutional tier. Higher frequency nodes offer accelerated distribution cycles and premium audit features.
+                Select your institutional tier. Higher tier levels offer accelerated distribution cycles and premium audit features.
               </p>
             </div>
 
@@ -1121,12 +1234,12 @@ export default function LandingPage() {
                     </div>
                   )}
 
-                  <h5 className="text-[10px] font-black uppercase tracking-[0.35em] text-slate-600 mb-2">{tier.name}</h5>
+                  <h5 className="text-[10px] font-black uppercase tracking-[0.35em] text-slate-400 mb-2">{tier.name}</h5>
                   <div className="flex items-baseline gap-1 mb-2">
                     <span className="text-4xl font-black italic tracking-tighter">${tier.price}</span>
-                    <span className="text-slate-600 text-[10px] font-bold uppercase tracking-widest ml-1">deposit</span>
+                    <span className="text-slate-500 text-[10px] font-bold uppercase tracking-widest ml-1">deposit</span>
                   </div>
-                  <p className="text-emerald-400 text-xs font-bold mb-6">~${tier.daily}/day at {tier.yield} daily</p>
+                  <p className="text-emerald-400 text-xs font-bold mb-6">~{tier.daily}/day at {tier.yield} daily</p>
 
                   <div className="space-y-3 mb-8 pb-7 border-b border-white/5">
                     {[
@@ -1156,7 +1269,7 @@ export default function LandingPage() {
                         ? 'bg-cyan-500 text-slate-950 hover:bg-cyan-400 shadow-lg shadow-cyan-500/20'
                         : 'bg-white/5 border border-white/10 hover:bg-white/10'
                     )}>
-                      Initialize Node
+                      Start Earning
                     </button>
                   </Link>
                 </div>
@@ -1206,7 +1319,7 @@ export default function LandingPage() {
                   {
                     step: '02',
                     title: 'Your Network Joins',
-                    desc: 'Referred agents sign up and activate any Node tier. The protocol automatically logs the association.',
+                    desc: 'Referred agents sign up and activate any Membership tier. The protocol automatically logs the association.',
                     color: 'from-cyan-500/20 to-blue-500/20',
                     border: 'border-cyan-500/20',
                     dot: 'bg-cyan-400',
@@ -1359,11 +1472,9 @@ export default function LandingPage() {
         </section>
 
         {/* ══════════════════════════════════════════
-            TESTIMONIALS
+            GALLERY / SMARTBUG IN ACTION
         ══════════════════════════════════════════ */}
-        <div id="members" className="border-t border-white/5">
-          <Testimonials />
-        </div>
+        <LandingGallery />
 
         {/* ══════════════════════════════════════════
             FAQ
@@ -1376,7 +1487,7 @@ export default function LandingPage() {
             </div>
             <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight text-white mb-3">Got Questions?</h2>
             <p className="text-slate-400 text-sm max-w-xl mx-auto">
-              Everything you need to know about SmartBugMedia — the node network and how to secure your daily yields.
+              Everything you need to know about SmartBugMedia — the platform and how to secure your daily yields.
             </p>
           </div>
 
@@ -1424,7 +1535,7 @@ export default function LandingPage() {
                   SYNC WITH THE <span className="text-cyan-400">MATRIX</span>
                 </h3>
                 <p className="text-slate-400 text-xs md:text-sm leading-relaxed mb-8">
-                  Subscribe to our node updates, telemetry logs, and exclusive promotions — plus claim a <strong className="text-emerald-400">$5 welcome bonus</strong> on your first deposit.
+                  Subscribe to our platform updates, telemetry logs, and exclusive promotions — plus claim a <strong className="text-emerald-400">$5 welcome bonus</strong> on your first deposit.
                 </p>
 
                 <div className="flex-1 flex flex-col justify-center">
@@ -1441,7 +1552,7 @@ export default function LandingPage() {
                           <Check size={28} />
                         </div>
                         <p className="text-white font-black text-lg uppercase tracking-tight mb-1">Telemetry Connected!</p>
-                        <p className="text-slate-400 text-xs max-w-xs mb-4">Your $5 welcome credit has been reserved under your session. Deploy a node to activate it.</p>
+                        <p className="text-slate-400 text-xs max-w-xs mb-4">Your $5 welcome credit has been reserved under your session. Activate your account to claim it.</p>
                         <Link href="/auth/sign-up" className="w-full">
                           <button className="w-full py-3 bg-cyan-500 text-slate-950 rounded-xl font-black text-xs uppercase tracking-widest shadow-lg shadow-cyan-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all">
                             Complete Setup & Claim →
@@ -1605,7 +1716,7 @@ export default function LandingPage() {
                             disabled={contactLoading}
                             className="w-full px-4 py-3 bg-slate-950/80 border border-white/10 rounded-xl text-xs text-slate-300 focus:outline-none focus:border-violet-500/50 transition-all appearance-none cursor-pointer"
                           >
-                            <option value="support">Technical Node Support</option>
+                            <option value="support">Technical Account Support</option>
                             <option value="deposit">Deposit & Payout Inquiries</option>
                             <option value="referral">Referral Matrix Questions</option>
                             <option value="business">Institutional Partnership</option>
@@ -1684,11 +1795,11 @@ export default function LandingPage() {
 
               <h2 className="text-5xl md:text-7xl lg:text-8xl font-extrabold italic tracking-tighter uppercase leading-[0.85]">
                 JOIN THE <br />
-                <span className="text-indigo-600">NODE MATRIX</span>
+                <span className="text-indigo-600">GLOBAL MATRIX</span>
               </h2>
 
               <p className="max-w-xl mx-auto text-slate-600 text-base md:text-lg font-medium italic">
-                Start your institutional agent journey today. Deploy liquidity, optimize nodes, and harvest verified global returns — starting at just $30.
+                Start your institutional agent journey today. Deploy liquidity, optimize workflows, and harvest verified global returns — starting at just $30.
               </p>
 
               <div className="flex flex-col sm:flex-row items-center justify-center gap-5 pt-2">

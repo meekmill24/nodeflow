@@ -157,7 +157,9 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                              </div>
                              <div className="flex flex-col">
                                 <span className="text-xs font-black text-white group-hover:text-[#3DD6C8] transition-colors">{profile?.username || 'User'}</span>
-                                <span className="text-[8px] font-black text-white/30 uppercase tracking-[0.2em] mt-1 italic">Vip Node Lv.{profile?.level_id || 1}</span>
+                                <span className="text-[8px] font-black text-white/30 uppercase tracking-[0.2em] mt-1 italic">
+                                    {profile?.level?.name ? profile.level.name : `VIP Lv.${profile?.level_id || 1}`}
+                                </span>
                              </div>
                         </Link>
                         <button onClick={() => signOut()} className="p-2.5 rounded-xl bg-white/5 text-white/40 hover:text-rose-500 hover:bg-rose-500/10 border border-white/5 hover:border-rose-500/20 transition-all duration-300">

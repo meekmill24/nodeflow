@@ -37,8 +37,20 @@ export default function WithdrawPage() {
     const balance = profile?.wallet_balance || 0;
 
     useEffect(() => {
-        const fetchLevel = async () => {
-            if (!profile?.level_id) return;
+        const fetchSettings = async () => {
+            // Fetch global min_withdrawal from site_settings
+            const { data: siteData } = await supabase
+                .from('site_settings')
+                .select('key, value')
+                .eq('key', 'min_withdrawal')
+                .maybeSingle();
+            const globalMin = siteData ? parseFloat(siteData.value || '100') : 100;
+
+            if (!profile?.level_id) {
+                setMinWithdrawal(globalMin);
+                return;
+            }
+            // Level-specific min_withdrawal overrides global if set
             const { data } = await supabase
                 .from('levels')
                 .select('name, min_withdrawal')
@@ -48,10 +60,13 @@ export default function WithdrawPage() {
                 setLevelName(data.name);
                 const lvNum = data.name.match(/\d+/)?.[0] ? parseInt(data.name.match(/\d+/)![0]) : 1;
                 setLevelIndex(lvNum);
-                setMinWithdrawal(data.min_withdrawal || 100);
+                // Use level-specific value if set, otherwise global site setting
+                setMinWithdrawal(data.min_withdrawal || globalMin);
+            } else {
+                setMinWithdrawal(globalMin);
             }
         };
-        fetchLevel();
+        fetchSettings();
     }, [profile?.level_id]);
 
     const quickAmounts = Array.from(new Set([minWithdrawal, ...QUICK_WITHDRAW_PRESETS])).filter(v => v <= balance && v >= minWithdrawal);

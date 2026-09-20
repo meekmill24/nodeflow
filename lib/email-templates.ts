@@ -30,9 +30,9 @@ export const WelcomeEmail = (username: string) => `
           <!-- Body -->
           <tr>
             <td style="padding: 0 50px 40px 50px; text-align: center;">
-              <h2 style="font-size: 24px; font-weight: 800; margin-bottom: 16px;">Welcome, agent ${username}</h2>
+              <h2 style="font-size: 24px; font-weight: 800; margin-bottom: 16px;">Welcome, ${username}</h2>
               <p style="color: #94A3B8; font-size: 14px; line-height: 1.6; margin-bottom: 30px;">
-                Your node has been successfully provisioned within the SmartBugMedia ecosystem. You are now authorized to participate in premium task distribution and optimization sequences.
+                Your account has been successfully created and credited with your $25.00 first user signup bonus. You are now authorized to participate in premium task distribution and start earning.
               </p>
               
               <!-- Action Button -->

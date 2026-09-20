@@ -9,7 +9,7 @@ const testimonials = [
     role: "Digital Marketing Specialist",
     location: "Austin, Texas, USA",
     avatar: "https://i.pravatar.cc/150?u=brandon-austin",
-    content: "Living in Austin with rising living costs, having an extra consistent yield stream makes a huge difference. SmartBugMedia pays out directly to my PayPal and USDC wallet without delay. The customer service team verified my payout on the same day.",
+    content: "Living in Austin with rising living costs, having an extra consistent yield stream makes a huge difference. SmartBugMedia pays out directly to my PayPal USD and USDC wallet without delay. The customer service team verified my payout on the same day.",
     earnings: "$8,450",
     joined: "6 months ago",
     tasks: 1120,
@@ -61,7 +61,7 @@ const testimonials = [
     role: "Warehouse Supervisor",
     location: "Houston, Texas, USA",
     avatar: "https://i.pravatar.cc/150?u=marcus-t",
-    content: "Honestly I was skeptical at first. Spent 2 weeks just watching before I even signed up. But when my first payout hit my PayPal I nearly fell off my chair 😂 Now it's just part of my daily routine. Wake up, tasks done by 9am, go to work.",
+    content: "Honestly I was skeptical at first. Spent 2 weeks just watching before I even signed up. But when my first payout hit my PayPal USD I nearly fell off my chair 😂 Now it's just part of my daily routine. Wake up, tasks done by 9am, go to work.",
     earnings: "$6,240",
     joined: "7 months ago",
     tasks: 980,
@@ -87,7 +87,7 @@ const testimonials = [
     role: "Stay-at-home Mom",
     location: "Phoenix, Arizona, USA",
     avatar: "https://i.pravatar.cc/150?u=sandra-k",
-    content: "My husband thought it was a scam until I showed him the PayPal transfer. Now he does it too lol. I do it during nap time and after the kids sleep. The tasks don't take long and the app never crashes on me.",
+    content: "My husband thought it was a scam until I showed him the PayPal USD transfer. Now he does it too lol. I do it during nap time and after the kids sleep. The tasks don't take long and the app never crashes on me.",
     earnings: "$9,400",
     joined: "9 months ago",
     tasks: 1240,
@@ -130,8 +130,8 @@ export function Testimonials() {
               Real Members, Real Withdrawals
             </div>
             <h2 className="text-5xl md:text-6xl font-extrabold tracking-tight leading-[1.1] text-white">
-              What actual people<br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-indigo-500">are saying</span>
+              REAL PEOPLE.<br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-indigo-500">REAL RESULTS.</span>
             </h2>
           </div>
           {/* Nav arrows */}
