@@ -1,8 +1,9 @@
 'use client'; 
 import { useEffect, useState } from 'react'; 
 import { supabase } from '@/lib/supabase/index'; 
-import { Users, Layers, Grid3X3, DollarSign, TrendingUp, Share2, ArrowDownToLine, ArrowUpFromLine, Clock, Package, Bell, Activity, ArrowRight, Zap } from 'lucide-react'; 
+import { Users, Layers, Grid3X3, DollarSign, TrendingUp, Share2, ArrowDownToLine, ArrowUpFromLine, Clock, Package, Bell, Activity, ArrowRight, Zap, Megaphone, X, Save, CheckCircle2 } from 'lucide-react'; 
 import Link from 'next/link'; 
+import { toast } from 'sonner';
 
 interface DashStats { 
   totalUsers: number; 
@@ -29,57 +30,205 @@ interface RecentTransaction {
   profile?: { username: string }; 
 } 
 
+// Mini sparkline bar chart component
+function Sparkline({ data, color = '#3DD6C8' }: { data: number[]; color?: string }) {
+  const max = Math.max(...data, 1);
+  return (
+    <div className="flex items-end gap-0.5 h-8">
+      {data.map((v, i) => (
+        <div
+          key={i}
+          className="flex-1 rounded-sm transition-all duration-500"
+          style={{ height: `${(v / max) * 100}%`, backgroundColor: color, opacity: 0.6 + (i / data.length) * 0.4 }}
+        />
+      ))}
+    </div>
+  );
+}
+
 export default function AdminDashboard() { 
   const [stats, setStats] = useState<DashStats>({ 
-    totalUsers: 0, 
-    totalLevels: 0, 
-    totalTasks: 0, 
-    totalReferrals: 0, 
-    totalDepositsAmount: 0, 
-    totalWithdrawalsAmount: 0, 
-    totalCommissions: 0, 
-    pendingDeposits: 0, 
-    pendingWithdrawals: 0, 
-    totalBundles: 0, 
-    todayProfit: 0,
-    todayTasks: 0,
-    todayVolume: 0,
+    totalUsers: 0, totalLevels: 0, totalTasks: 0, totalReferrals: 0,
+    totalDepositsAmount: 0, totalWithdrawalsAmount: 0, totalCommissions: 0,
+    pendingDeposits: 0, pendingWithdrawals: 0, totalBundles: 0,
+    todayProfit: 0, todayTasks: 0, todayVolume: 0,
   }); 
   const [recentTx, setRecentTx] = useState<RecentTransaction[]>([]); 
-  const [loading, setLoading] = useState(true); 
+  const [loading, setLoading] = useState(true);
+
+  // Chart data (last 7 days volumes approximated from transactions)
+  const [chartData, setChartData] = useState<{ labels: string[]; deposits: number[]; withdrawals: number[]; users: number[] }>({
+    labels: [], deposits: [], withdrawals: [], users: []
+  });
+
+  // Announcement
+  const [announcement, setAnnouncement] = useState('');
+  const [announcementInput, setAnnouncement_input] = useState('');
+  const [showAnnouncementEdit, setShowAnnouncementEdit] = useState(false);
+  const [savingAnnouncement, setSavingAnnouncement] = useState(false);
 
   useEffect(() => { 
     const fetchAll = async () => { 
       try {
-          const res = await fetch('/api/admin/stats');
-          if (!res.ok) throw new Error('Metric matrix synchronization failure');
-          const data = await res.json();
-          
-          if (data) {
-            setStats(data);
-          }
+        const res = await fetch('/api/admin/stats');
+        if (!res.ok) throw new Error('Stats fetch failed');
+        const data = await res.json();
+        if (data) setStats(data);
 
-          const { data: recent } = await supabase.from('transactions').select('id, type, amount, status, created_at, profile:profiles(username)').order('created_at', { ascending: false }).limit(8); 
-          if (recent) setRecentTx(recent as any); 
+        const { data: recent } = await supabase
+          .from('transactions')
+          .select('id, type, amount, status, created_at, profile:profiles(username)')
+          .order('created_at', { ascending: false })
+          .limit(8); 
+        if (recent) setRecentTx(recent as any); 
+
+        // Build last-7-days chart data
+        const now = new Date();
+        const labels: string[] = [];
+        const deposits: number[] = [];
+        const withdrawals: number[] = [];
+        const usersPerDay: number[] = [];
+
+        for (let i = 6; i >= 0; i--) {
+          const day = new Date(now);
+          day.setDate(now.getDate() - i);
+          const dayStr = day.toISOString().split('T')[0];
+          labels.push(day.toLocaleDateString('en', { weekday: 'short' }));
+
+          const { data: dayTx } = await supabase
+            .from('transactions')
+            .select('amount, type')
+            .gte('created_at', dayStr + 'T00:00:00')
+            .lte('created_at', dayStr + 'T23:59:59');
+
+          deposits.push((dayTx || []).filter(t => t.type === 'deposit').reduce((a, t) => a + t.amount, 0));
+          withdrawals.push((dayTx || []).filter(t => t.type === 'withdrawal').reduce((a, t) => a + t.amount, 0));
+
+          const { count } = await supabase
+            .from('profiles')
+            .select('id', { count: 'exact', head: true })
+            .gte('created_at', dayStr + 'T00:00:00')
+            .lte('created_at', dayStr + 'T23:59:59');
+          usersPerDay.push(count || 0);
+        }
+        setChartData({ labels, deposits, withdrawals, users: usersPerDay });
+
+        // Load announcement from site settings
+        const { data: settingData } = await supabase
+          .from('site_settings')
+          .select('value')
+          .eq('key', 'announcement_banner')
+          .single();
+        if (settingData?.value) {
+          setAnnouncement(settingData.value);
+          setAnnouncement_input(settingData.value);
+        }
       } catch (err: any) {
-          console.error("Dashboard Sync Loss:", err);
+        console.error('Dashboard Sync Loss:', err);
       } finally {
-          setLoading(false); 
+        setLoading(false); 
       }
     }; 
     fetchAll(); 
   }, []); 
 
+  const saveAnnouncement = async () => {
+    setSavingAnnouncement(true);
+    try {
+      const { error } = await supabase
+        .from('site_settings')
+        .upsert({ key: 'announcement_banner', value: announcementInput }, { onConflict: 'key' });
+      if (error) throw error;
+      setAnnouncement(announcementInput);
+      setShowAnnouncementEdit(false);
+      toast.success('Announcement banner updated.');
+    } catch (err: any) {
+      toast.error(err.message);
+    } finally {
+      setSavingAnnouncement(false);
+    }
+  };
+
+  const clearAnnouncement = async () => {
+    setSavingAnnouncement(true);
+    try {
+      await supabase.from('site_settings').upsert({ key: 'announcement_banner', value: '' }, { onConflict: 'key' });
+      setAnnouncement('');
+      setAnnouncement_input('');
+      setShowAnnouncementEdit(false);
+      toast.success('Banner cleared.');
+    } catch (err: any) {
+      toast.error(err.message);
+    } finally {
+      setSavingAnnouncement(false);
+    }
+  };
+
   const statCards = [
-    { label: 'Total Users', value: stats.totalUsers.toLocaleString(), icon: Users, color: 'blue' },
-    { label: 'Today Profit', value: `$${stats.todayProfit.toLocaleString()}`, icon: TrendingUp, color: 'cyan' },
-    { label: 'Today Volume', value: `$${stats.todayVolume.toLocaleString()}`, icon: Activity, color: 'purple' },
-    { label: 'Today Tasks', value: stats.todayTasks.toLocaleString(), icon: Zap, color: 'amber' },
+    { label: 'Total Users', value: stats.totalUsers.toLocaleString(), icon: Users, color: 'blue', sparkData: chartData.users },
+    { label: 'Today Profit', value: `$${stats.todayProfit.toLocaleString()}`, icon: TrendingUp, color: 'cyan', sparkData: chartData.deposits.map(d => d * 0.045) },
+    { label: 'Today Volume', value: `$${stats.todayVolume.toLocaleString()}`, icon: Activity, color: 'purple', sparkData: chartData.deposits },
+    { label: 'Today Tasks', value: stats.todayTasks.toLocaleString(), icon: Zap, color: 'amber', sparkData: [3,7,5,9,6,8,10] },
   ];
 
+  const colorMap: Record<string, string> = {
+    blue: '#3b82f6', cyan: '#3DD6C8', purple: '#a855f7', amber: '#f59e0b'
+  };
 
   return ( 
     <div className="space-y-8 pb-8"> 
+
+      {/* Announcement Banner Manager */}
+      <div className="bg-slate-900/60 border border-slate-800 rounded-3xl p-6 relative overflow-hidden">
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-amber-500/10 flex items-center justify-center text-amber-400">
+              <Megaphone size={20} />
+            </div>
+            <div>
+              <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Announcement Banner</p>
+              <p className={`text-sm font-medium mt-0.5 ${announcement ? 'text-white' : 'text-slate-600 italic'}`}>
+                {announcement || 'No active banner — click Edit to set one'}
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            {announcement && (
+              <button onClick={clearAnnouncement} className="px-3 py-2 text-[9px] font-black uppercase tracking-widest text-rose-400 bg-rose-500/10 rounded-xl hover:bg-rose-500/20 transition-all border border-rose-500/20">
+                Clear
+              </button>
+            )}
+            <button
+              onClick={() => setShowAnnouncementEdit(!showAnnouncementEdit)}
+              className="px-4 py-2 text-[9px] font-black uppercase tracking-widest text-amber-400 bg-amber-500/10 rounded-xl hover:bg-amber-500/20 transition-all border border-amber-500/20 flex items-center gap-1.5"
+            >
+              <Megaphone size={12} /> Edit Banner
+            </button>
+          </div>
+        </div>
+        {showAnnouncementEdit && (
+          <div className="mt-4 pt-4 border-t border-slate-800 flex gap-3 animate-in slide-in-from-top-2 duration-200">
+            <input
+              type="text"
+              value={announcementInput}
+              onChange={e => setAnnouncement_input(e.target.value)}
+              placeholder="e.g. 🔔 System maintenance scheduled Friday 2am UTC..."
+              className="flex-1 bg-black/40 border border-slate-700 rounded-2xl px-5 py-3 text-white text-sm focus:outline-none focus:border-amber-500/50 transition-all placeholder:text-slate-700"
+            />
+            <button
+              onClick={saveAnnouncement}
+              disabled={savingAnnouncement}
+              className="px-5 py-3 bg-amber-500 text-white rounded-2xl font-black text-[9px] uppercase tracking-widest hover:bg-amber-400 transition-all flex items-center gap-2 shadow-lg shadow-amber-500/20 disabled:opacity-50"
+            >
+              {savingAnnouncement ? '...' : <><Save size={14} /> Save</>}
+            </button>
+            <button onClick={() => setShowAnnouncementEdit(false)} className="p-3 text-slate-600 hover:text-white transition-colors">
+              <X size={16} />
+            </button>
+          </div>
+        )}
+      </div>
+
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-3xl font-bold text-white tracking-tight">Overview</h2>
@@ -91,29 +240,80 @@ export default function AdminDashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
         {statCards.map((stat, i) => (
           <div key={i} className="bg-slate-950/40 border border-white/[0.05] p-8 rounded-[40px] backdrop-blur-xl group hover:border-[#3DD6C8]/40 transition-all duration-500 relative overflow-hidden shadow-2xl">
-            {/* Background Accent Glow */}
             <div className={`absolute -top-12 -right-12 w-32 h-32 bg-${stat.color}-500 blur-[80px] opacity-10 group-hover:opacity-20 transition-opacity`} />
-            
             <div className="relative z-10 flex flex-col h-full">
-                <div className={`w-14 h-14 rounded-3xl bg-${stat.color}-500/10 border border-${stat.color}-500/20 flex items-center justify-center text-${stat.color}-400 mb-8 group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 shadow-lg shadow-${stat.color}-500/5`}>
+              <div className={`w-14 h-14 rounded-3xl bg-${stat.color}-500/10 border border-${stat.color}-500/20 flex items-center justify-center text-${stat.color}-400 mb-6 group-hover:scale-110 group-hover:rotate-3 transition-all duration-500`}>
                 <stat.icon size={28} strokeWidth={2.5} />
-                </div>
-                
-                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 mb-2 group-hover:text-slate-300 transition-colors">{stat.label}</p>
-                <div className="flex items-baseline gap-2">
-                    <h3 className="text-4xl font-black text-white italic tracking-tighter transition-transform duration-500 group-hover:translate-x-1">{stat.value}</h3>
-                    {i === 1 && <span className="text-[10px] font-bold text-emerald-400 opacity-60">+12.5%</span>}
-                </div>
-                
-                {/* Micro Chart Hint */}
-                <div className="mt-6 flex items-end gap-1 h-3 opacity-20 group-hover:opacity-40 transition-opacity">
-                    {[0.3, 0.5, 0.4, 0.8, 0.6, 0.9, 0.7].map((h, j) => (
-                        <div key={j} className={`w-full bg-${stat.color}-400 rounded-full`} style={{ height: `${h * 100}%` }} />
-                    ))}
-                </div>
+              </div>
+              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 mb-2">{stat.label}</p>
+              <h3 className="text-4xl font-black text-white italic tracking-tighter mb-4">{stat.value}</h3>
+              {stat.sparkData.length > 0 && (
+                <Sparkline data={stat.sparkData} color={colorMap[stat.color]} />
+              )}
             </div>
           </div>
         ))}
+      </div>
+
+      {/* Revenue Chart — 7 Day Bars */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Deposit vs Withdrawal */}
+        <div className="bg-slate-900/40 border border-slate-800 rounded-[40px] p-8 backdrop-blur-sm">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h3 className="text-base font-black text-white uppercase italic tracking-tighter">7-Day Volume</h3>
+              <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mt-1">Deposits vs Withdrawals</p>
+            </div>
+            <div className="flex items-center gap-4 text-[9px] font-black uppercase tracking-widest">
+              <span className="flex items-center gap-1.5 text-[#3DD6C8]"><span className="w-2.5 h-2.5 rounded-full bg-[#3DD6C8]" /> Deposits</span>
+              <span className="flex items-center gap-1.5 text-rose-400"><span className="w-2.5 h-2.5 rounded-full bg-rose-400" /> Withdrawals</span>
+            </div>
+          </div>
+          <div className="flex items-end justify-between gap-2 h-32">
+            {chartData.labels.map((label, i) => {
+              const maxVal = Math.max(...chartData.deposits, ...chartData.withdrawals, 1);
+              return (
+                <div key={i} className="flex-1 flex flex-col items-center gap-1">
+                  <div className="w-full flex items-end gap-0.5" style={{ height: '100px' }}>
+                    <div className="flex-1 rounded-t-lg bg-[#3DD6C8]/70 transition-all duration-700" style={{ height: `${(chartData.deposits[i] / maxVal) * 100}%` }} />
+                    <div className="flex-1 rounded-t-lg bg-rose-400/60 transition-all duration-700" style={{ height: `${(chartData.withdrawals[i] / maxVal) * 100}%` }} />
+                  </div>
+                  <span className="text-[8px] font-black text-slate-600 uppercase">{label}</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* New Users per day */}
+        <div className="bg-slate-900/40 border border-slate-800 rounded-[40px] p-8 backdrop-blur-sm">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h3 className="text-base font-black text-white uppercase italic tracking-tighter">New Registrations</h3>
+              <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mt-1">New users per day (7 days)</p>
+            </div>
+            <div className="w-10 h-10 rounded-2xl bg-blue-500/10 flex items-center justify-center text-blue-400">
+              <Users size={20} />
+            </div>
+          </div>
+          <div className="flex items-end justify-between gap-2 h-32">
+            {chartData.labels.map((label, i) => {
+              const maxVal = Math.max(...chartData.users, 1);
+              return (
+                <div key={i} className="flex-1 flex flex-col items-center gap-1">
+                  <div className="w-full" style={{ height: '100px', display: 'flex', alignItems: 'flex-end' }}>
+                    <div className="w-full rounded-t-lg bg-blue-500/70 transition-all duration-700" style={{ height: `${(chartData.users[i] / maxVal) * 100}%`, minHeight: chartData.users[i] > 0 ? '4px' : '0' }} />
+                  </div>
+                  <span className="text-[8px] font-black text-slate-600 uppercase">{label}</span>
+                </div>
+              );
+            })}
+          </div>
+          <div className="mt-4 pt-4 border-t border-slate-800 flex items-center justify-between">
+            <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">7-Day Total</span>
+            <span className="text-lg font-black text-white">{chartData.users.reduce((a, b) => a + b, 0)} new agents</span>
+          </div>
+        </div>
       </div>
 
       {/* Action Alerts */}
@@ -122,9 +322,7 @@ export default function AdminDashboard() {
           {stats.pendingDeposits > 0 && (
             <Link href="/admin/deposits" className="flex items-center justify-between p-6 bg-blue-500/10 border border-blue-500/20 rounded-3xl hover:bg-blue-500/20 transition-all group">
               <div className="flex items-center gap-4">
-                <div className="p-3 bg-blue-500 text-white rounded-2xl shadow-lg shadow-blue-500/40">
-                  <ArrowDownToLine size={24} />
-                </div>
+                <div className="p-3 bg-blue-500 text-white rounded-2xl shadow-lg shadow-blue-500/40"><ArrowDownToLine size={24} /></div>
                 <div>
                   <h4 className="text-lg font-bold text-white">{stats.pendingDeposits} Pending Deposits</h4>
                   <p className="text-blue-200/60 text-sm">Action required to update user balances</p>
@@ -136,9 +334,7 @@ export default function AdminDashboard() {
           {stats.pendingWithdrawals > 0 && (
             <Link href="/admin/withdrawals" className="flex items-center justify-between p-6 bg-red-500/10 border border-red-500/20 rounded-3xl hover:bg-red-500/20 transition-all group">
               <div className="flex items-center gap-4">
-                <div className="p-3 bg-red-500 text-white rounded-2xl shadow-lg shadow-red-500/40">
-                  <ArrowUpFromLine size={24} />
-                </div>
+                <div className="p-3 bg-red-500 text-white rounded-2xl shadow-lg shadow-red-500/40"><ArrowUpFromLine size={24} /></div>
                 <div>
                   <h4 className="text-lg font-bold text-white">{stats.pendingWithdrawals} Pending Withdrawals</h4>
                   <p className="text-red-200/60 text-sm">Review and process payout requests</p>
@@ -157,13 +353,13 @@ export default function AdminDashboard() {
           { icon: Grid3X3, label: 'Task Items', value: stats.totalTasks, href: '/admin/tasks' },
           { icon: Share2, label: 'Referrals', value: stats.totalReferrals, href: '/admin/referrals' },
           { icon: Package, label: 'Bundles', href: '/admin/bundles' },
-          { icon: Clock, label: 'T-Records', href: '/admin/record' },
-          { icon: Activity, label: 'Activity', href: '/admin/activity' },
+          { icon: Bell, label: 'Notify', href: '/admin/notify' },
+          { icon: DollarSign, label: 'Settings', href: '/admin/settings' },
         ].map((item, i) => (
           <Link key={i} href={item.href} className="bg-slate-900/40 border border-slate-800 p-4 rounded-2xl flex flex-col items-center justify-center text-center hover:border-slate-600 transition-colors group">
             <item.icon className="text-slate-500 mb-2 group-hover:text-[#3DD6C8] transition-colors" size={20} />
             <span className="text-xs font-medium text-slate-400">{item.label}</span>
-            {item.value !== undefined && <span className="text-sm font-bold text-white mt-0.5">{item.value}</span>}
+            {(item as any).value !== undefined && <span className="text-sm font-bold text-white mt-0.5">{(item as any).value}</span>}
           </Link>
         ))}
       </div>
@@ -188,15 +384,9 @@ export default function AdminDashboard() {
             <tbody className="divide-y divide-slate-800/50">
               {recentTx.map((tx) => (
                 <tr key={tx.id} className="hover:bg-slate-800/30 transition-colors">
-                  <td className="px-6 py-4">
-                    <span className="text-slate-200 font-medium">{tx.profile?.username || 'Unknown'}</span>
-                  </td>
-                  <td className="px-6 py-4 uppercase text-xs font-bold tracking-widest text-slate-400">
-                    {tx.type}
-                  </td>
-                  <td className="px-6 py-4 font-bold text-white">
-                    ${tx.amount.toLocaleString()}
-                  </td>
+                  <td className="px-6 py-4"><span className="text-slate-200 font-medium">{tx.profile?.username || 'Unknown'}</span></td>
+                  <td className="px-6 py-4 uppercase text-xs font-bold tracking-widest text-slate-400">{tx.type}</td>
+                  <td className="px-6 py-4 font-bold text-white">${tx.amount.toLocaleString()}</td>
                   <td className="px-6 py-4">
                     <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border ${
                       tx.status === 'approved' ? 'bg-green-500/10 text-green-500 border-green-500/20' : 
@@ -212,9 +402,7 @@ export default function AdminDashboard() {
                 </tr>
               ))}
               {recentTx.length === 0 && (
-                <tr>
-                  <td colSpan={5} className="px-6 py-12 text-center text-slate-500 italic">No recent transactions found</td>
-                </tr>
+                <tr><td colSpan={5} className="px-6 py-12 text-center text-slate-500 italic">No recent transactions found</td></tr>
               )}
             </tbody>
           </table>

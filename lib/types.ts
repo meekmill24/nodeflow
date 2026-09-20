@@ -29,6 +29,7 @@ export interface Profile {
     wallet_network?: string | null;
     withdrawal_wallet_address?: string | null;
     is_verified: boolean;
+    is_frozen?: boolean;
     verification_status: 'unverified' | 'pending' | 'verified' | 'rejected';
     verification_doc_type?: 'id' | 'passport' | 'license' | null;
     verification_front_url?: string | null;

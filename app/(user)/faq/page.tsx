@@ -47,7 +47,7 @@ const FAQS = [
             },
             {
                 q: "How are user levels determined?",
-                a: "User levels (Junior, Mid-Level, Senior, Mentor) are determined by the initial deposit amount and task volume. Each level offers progressive return rates and base salaries (up to 400 USDT for Mentor level)."
+                a: "User levels (Junior, Intermediate, Senior, Mentor) are determined by the initial deposit amount and task volume. Each level offers progressive return rates and base salaries (up to 400 USDT for Mentor level)."
             }
         ]
     },

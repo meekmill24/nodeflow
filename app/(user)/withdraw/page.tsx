@@ -14,27 +14,39 @@ import {
     Info,
     ArrowUpFromLine,
     CreditCard,
-    Zap
+    Zap,
+    Headphones,
+    X
 } from 'lucide-react';
 import Link from 'next/link';
 
 // Default preset withdrawal tiers
-const QUICK_WITHDRAW_PRESETS = [100, 300, 500, 1000, 2000, 5000];
+const QUICK_WITHDRAW_PRESETS = [10, 50, 100, 300, 500, 1000, 1500, 2500, 5000];
+
+// Max limits per level id: Junior (2) = 1500, Intermediate (1) = 2500, Senior (3) = 5000, Mentor (4) = 5000
+const LEVEL_MAX_WITHDRAWAL: Record<number, number> = {
+    2: 1500, // Junior Agent
+    1: 2500, // Intermediate Agent
+    3: 5000, // Senior Agent
+    4: 5000  // Mentor Agent
+};
 
 export default function WithdrawPage() {
     const { profile, refreshProfile } = useAuth();
-    const [amount, setAmount] = useState('');
+    const [amount, setAmount] = useState('10');
     const [walletAddress, setWalletAddress] = useState(profile?.wallet_address || '');
     type WithdrawNetwork = 'TRX' | 'BEP20' | 'ERC20' | 'ETH' | 'BTC' | 'USDC' | 'BNB' | 'PAYPALUSD';
     const [network, setNetwork] = useState<WithdrawNetwork>('TRX');
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
     const [error, setError] = useState('');
-    const [minWithdrawal, setMinWithdrawal] = useState(100);
-    const [levelName, setLevelName] = useState('Level 1');
+    const [minWithdrawal, setMinWithdrawal] = useState(10);
+    const [levelName, setLevelName] = useState('Junior Agent');
     const [levelIndex, setLevelIndex] = useState(1);
+    const [showLimitModal, setShowLimitModal] = useState(false);
 
     const balance = profile?.wallet_balance || 0;
+    const maxWithdrawal = profile?.level_id ? (LEVEL_MAX_WITHDRAWAL[profile.level_id] || 1500) : 1500;
 
     useEffect(() => {
         const fetchSettings = async () => {
@@ -44,10 +56,11 @@ export default function WithdrawPage() {
                 .select('key, value')
                 .eq('key', 'min_withdrawal')
                 .maybeSingle();
-            const globalMin = siteData ? parseFloat(siteData.value || '100') : 100;
+            const globalMin = siteData ? parseFloat(siteData.value || '10') : 10;
 
             if (!profile?.level_id) {
                 setMinWithdrawal(globalMin);
+                setAmount(String(globalMin));
                 return;
             }
             // Level-specific min_withdrawal overrides global if set
@@ -60,16 +73,38 @@ export default function WithdrawPage() {
                 setLevelName(data.name);
                 const lvNum = data.name.match(/\d+/)?.[0] ? parseInt(data.name.match(/\d+/)![0]) : 1;
                 setLevelIndex(lvNum);
-                // Use level-specific value if set, otherwise global site setting
-                setMinWithdrawal(data.min_withdrawal || globalMin);
+                const effectiveMin = data.min_withdrawal || globalMin;
+                setMinWithdrawal(effectiveMin);
+                setAmount(String(effectiveMin));
             } else {
                 setMinWithdrawal(globalMin);
+                setAmount(String(globalMin));
             }
         };
         fetchSettings();
     }, [profile?.level_id]);
 
-    const quickAmounts = Array.from(new Set([minWithdrawal, ...QUICK_WITHDRAW_PRESETS])).filter(v => v <= balance && v >= minWithdrawal);
+    const selectableAmounts = Array.from(new Set([minWithdrawal, ...QUICK_WITHDRAW_PRESETS]))
+        .filter(v => v >= minWithdrawal && v <= maxWithdrawal);
+
+    const handleSelectAmount = (val: number) => {
+        if (val > maxWithdrawal) {
+            setShowLimitModal(true);
+            return;
+        }
+        setAmount(String(val));
+        setError('');
+    };
+
+    const handleMaxClick = () => {
+        if (balance > maxWithdrawal) {
+            setAmount(String(maxWithdrawal));
+            setShowLimitModal(true);
+        } else {
+            setAmount(String(Math.max(minWithdrawal, balance)));
+        }
+        setError('');
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -78,6 +113,11 @@ export default function WithdrawPage() {
         const amt = parseFloat(amount);
         if (!amt || amt < minWithdrawal) {
             setError(`Minimum withdrawal for ${levelName} is $${minWithdrawal.toFixed(2)}.`);
+            return;
+        }
+        if (amt > maxWithdrawal) {
+            setShowLimitModal(true);
+            setError(`Maximum withdrawal limit for ${levelName} is $${maxWithdrawal.toLocaleString()}. Please contact Customer Service.`);
             return;
         }
         if (amt > balance) {
@@ -209,52 +249,64 @@ export default function WithdrawPage() {
                     <form onSubmit={handleSubmit} className="glass-card-glow p-10 space-y-8 border border-white/10 relative overflow-hidden">
                         <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none" />
                         
-                        {/* Amount Field */}
+                        {/* Amount Selection Matrix - Custom Freeform Input Removed */}
                         <div className="space-y-4">
-                            <label className="text-[10px] font-black text-text-secondary uppercase tracking-[0.2em] block">Withdraw Amount</label>
-                            <div className="relative group">
-                                <div className="absolute left-6 top-1/2 -translate-y-1/2 text-primary font-black text-2xl">$</div>
-                                <input
-                                    type="number"
-                                    value={amount}
-                                    onChange={(e) => setAmount(e.target.value)}
-                                    placeholder="0.00"
-                                    className="w-full bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-[24px] py-6 pl-14 pr-6 text-3xl font-black text-text-primary dark:text-white placeholder:text-text-secondary/10 focus:border-primary/50 focus:bg-primary/5 transition-all outline-none"
-                                />
-                                <div className="absolute right-6 top-1/2 -translate-y-1/2 text-text-secondary text-xs font-black uppercase tracking-widest opacity-40">
-                                    {network === 'ERC20' ? 'ETH' : network === 'BTC' ? 'BTC' : 'USDT'}
+                            <div className="flex items-center justify-between">
+                                <label className="text-[10px] font-black text-text-secondary uppercase tracking-[0.2em] block">
+                                    Selected Withdrawal Tier
+                                </label>
+                                <span className="text-[10px] font-black text-[#3DD6C8] uppercase tracking-wider">
+                                    Tier Limit: ${maxWithdrawal.toLocaleString()}
+                                </span>
+                            </div>
+
+                            {/* Prominent Active Selected Amount Display (Not freeform input) */}
+                            <div className="p-6 bg-black/40 border border-[#3DD6C8]/30 rounded-[28px] flex items-center justify-between relative overflow-hidden shadow-inner">
+                                <div className="flex items-baseline gap-2">
+                                    <span className="text-4xl md:text-5xl font-black text-white tracking-tight italic">
+                                        ${Number(amount || minWithdrawal).toLocaleString()}
+                                    </span>
+                                    <span className="text-xs font-black text-[#3DD6C8] uppercase tracking-widest">
+                                        {network === 'ERC20' ? 'ETH' : network === 'BTC' ? 'BTC' : network === 'PAYPALUSD' ? 'PYUSD' : 'USDT'}
+                                    </span>
+                                </div>
+                                <div className="text-right">
+                                    <span className="text-[8px] font-black text-white/30 uppercase tracking-[0.2em] block">Status</span>
+                                    <span className="text-[10px] font-black text-emerald-400 uppercase tracking-widest">Verified Tier</span>
                                 </div>
                             </div>
                             
-                            {/* Quick Chips */}
-                            <div className="flex flex-wrap gap-2 pt-2">
-                                {quickAmounts.map(val => (
-                                    <button
-                                        key={val}
-                                        type="button"
-                                        onClick={() => setAmount(String(val))}
-                                        className="px-4 py-3 rounded-xl bg-white/5 border border-white/5 text-[11px] font-black text-white uppercase flex items-center gap-2 hover:bg-primary/20 hover:border-primary/30 transition-all shadow-sm"
-                                    >
-                                        <span>${val.toLocaleString()}</span>
-                                        <img 
-                                            src={
-                                                network === 'ERC20' ? "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/eth.png" : 
-                                                network === 'BTC' ? "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/btc.png" : 
-                                                "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/usdt.png"
-                                            } 
-                                            className="w-3.5 h-3.5 object-contain opacity-70" 
-                                            alt=""
-                                        />
-                                    </button>
-                                ))}
-                                <button
-                                    type="button"
-                                    onClick={() => setAmount(String(balance))}
-                                    className="px-5 py-3 rounded-xl bg-primary/10 border border-primary/20 text-[11px] font-black text-primary-light uppercase tracking-tighter hover:bg-primary/20 transition-all"
-                                >
-                                    MAX ALL
-                                </button>
+                            {/* Preset Selection Buttons */}
+                            <div className="space-y-2 pt-1">
+                                <span className="text-[9px] font-black text-white/40 uppercase tracking-[0.2em]">Select Preset Amount:</span>
+                                <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
+                                    {selectableAmounts.map(val => (
+                                        <button
+                                            key={val}
+                                            type="button"
+                                            onClick={() => handleSelectAmount(val)}
+                                            className={`py-3 px-2 rounded-2xl border text-xs font-black transition-all flex flex-col items-center gap-1 ${
+                                                parseFloat(amount) === val 
+                                                    ? 'bg-[#3DD6C8] text-[#0B0B1E] border-[#3DD6C8] shadow-[0_0_20px_rgba(61,214,200,0.4)] scale-105' 
+                                                    : 'bg-white/5 border-white/10 text-white/80 hover:bg-white/10 hover:border-white/20'
+                                            }`}
+                                        >
+                                            <span>${val.toLocaleString()}</span>
+                                            <span className="text-[7px] font-bold uppercase tracking-widest opacity-60">
+                                                {val === minWithdrawal ? 'MIN' : val === maxWithdrawal ? 'MAX' : 'TIER'}
+                                            </span>
+                                        </button>
+                                    ))}
+                                </div>
                             </div>
+
+                            <button
+                                type="button"
+                                onClick={handleMaxClick}
+                                className="w-full py-3 rounded-2xl bg-[#3DD6C8]/10 border border-[#3DD6C8]/20 text-[10px] font-black text-[#3DD6C8] uppercase tracking-[0.2em] hover:bg-[#3DD6C8]/20 transition-all flex items-center justify-center gap-2"
+                            >
+                                <Zap size={12} /> Claim Max Allowed (${Math.min(balance, maxWithdrawal).toLocaleString()})
+                            </button>
                         </div>
 
                         {/* Network Switcher */}
@@ -338,9 +390,51 @@ export default function WithdrawPage() {
                         </div>
                     </form>
                 </div>
-
             </div>
 
+            {/* Limit Reached Customer Service Modal */}
+            {showLimitModal && (
+                <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
+                    <div className="bg-[#0B0B1E] border border-amber-500/30 w-full max-w-md rounded-[36px] p-8 shadow-[0_30px_100px_rgba(0,0,0,0.9)] relative overflow-hidden text-center space-y-6 animate-scale-in">
+                        <div className="w-20 h-20 mx-auto rounded-3xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
+                            <Headphones size={36} className="animate-pulse" />
+                        </div>
+                        <div className="space-y-2">
+                            <span className="text-[10px] font-black text-amber-400 uppercase tracking-[0.3em]">Institutional Verification</span>
+                            <h3 className="text-2xl font-black text-white italic tracking-tight uppercase">Withdrawal Limit Notice</h3>
+                            <p className="text-xs text-white/60 leading-relaxed pt-2">
+                                You have reached or exceeded the single-transaction withdrawal quota for <strong className="text-white">{levelName}</strong> (${maxWithdrawal.toLocaleString()} max).
+                            </p>
+                            <p className="text-[11px] text-amber-400/90 font-bold leading-relaxed">
+                                To unlock higher clearance or finalize this payout, please contact your dedicated Customer Service agent.
+                            </p>
+                        </div>
+                        <div className="space-y-3 pt-2">
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setShowLimitModal(false);
+                                    if ((window as any).Tawk_API?.maximize) {
+                                        (window as any).Tawk_API.maximize();
+                                    } else {
+                                        window.location.href = '/concierge';
+                                    }
+                                }}
+                                className="w-full py-4 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 text-[#0B0B1E] font-black uppercase text-xs tracking-[0.2em] flex items-center justify-center gap-2 shadow-[0_0_25px_rgba(245,158,11,0.3)] hover:scale-[1.02] transition-all"
+                            >
+                                <Headphones size={16} /> Contact Customer Service
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setShowLimitModal(false)}
+                                className="w-full py-3 rounded-2xl bg-white/5 border border-white/10 text-white/50 hover:text-white font-black uppercase text-[10px] tracking-widest transition-colors"
+                            >
+                                Dismiss
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

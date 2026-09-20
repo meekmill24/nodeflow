@@ -19,7 +19,8 @@ export async function POST(req: NextRequest) {
             'completed_count', 'current_set', 'total_earned', 
             'total_volume', 'is_verified', 'verification_status',
             'pending_bundle', 'freeze_balance', 'is_admin',
-            'withdrawal_password', 'tasks_per_set_override', 'sets_per_day_override'
+            'withdrawal_password', 'tasks_per_set_override', 'sets_per_day_override',
+            'last_reset_at', 'is_frozen'
         ];
 
         Object.keys(updateData).forEach(key => {

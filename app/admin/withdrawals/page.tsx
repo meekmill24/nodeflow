@@ -1,7 +1,6 @@
 'use client'; 
 import { useEffect, useState } from 'react'; 
-import { supabase } from '@/lib/supabase/index'; 
-import { Check, X, Search, ArrowUpFromLine, Clock, Wallet, User as UserIcon, AlertTriangle, Loader2 } from 'lucide-react'; 
+import { Check, X, ArrowUpFromLine, Clock, Wallet, User as UserIcon, AlertTriangle, Loader2, CheckSquare, Square, CheckCheck, XSquare } from 'lucide-react'; 
 import { toast } from 'sonner';
 
 export default function AdminWithdrawalsPage() { 
@@ -9,6 +8,8 @@ export default function AdminWithdrawalsPage() {
   const [loading, setLoading] = useState(true); 
   const [processingId, setProcessingId] = useState<number | null>(null);
   const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'approved' | 'rejected'>('all');
+  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+  const [bulkProcessing, setBulkProcessing] = useState(false);
 
   const fetchWithdrawals = async () => { 
     setLoading(true);
@@ -53,7 +54,28 @@ export default function AdminWithdrawalsPage() {
     }
   }; 
 
-
+  const toggleSelect = (id: number) => {
+    setSelectedIds(prev => { const next = new Set(prev); next.has(id) ? next.delete(id) : next.add(id); return next; });
+  };
+  const selectAllPending = () => setSelectedIds(new Set(withdrawals.filter(w => w.status === 'pending').map(w => w.id)));
+  const clearSelection = () => setSelectedIds(new Set());
+  const handleBulkAction = async (status: 'approved' | 'rejected') => {
+    if (selectedIds.size === 0) return;
+    setBulkProcessing(true);
+    let successCount = 0; let failCount = 0;
+    for (const id of selectedIds) {
+      try {
+        const res = await fetch('/api/admin/transactions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, status, type: 'withdrawal' }) });
+        const data = await res.json();
+        if (!res.ok || !data.success) throw new Error();
+        successCount++;
+      } catch { failCount++; }
+    }
+    setBulkProcessing(false); setSelectedIds(new Set());
+    if (successCount > 0) toast.success(`${successCount} withdrawal${successCount > 1 ? 's' : ''} ${status}.`);
+    if (failCount > 0) toast.error(`${failCount} operation${failCount > 1 ? 's' : ''} failed.`);
+    fetchWithdrawals();
+  };
 
   return ( 
     <div className="space-y-8 animate-in fade-in duration-500"> 
@@ -62,19 +84,27 @@ export default function AdminWithdrawalsPage() {
           <h2 className="text-4xl font-black text-white tracking-tighter italic uppercase bg-gradient-to-r from-white to-white/40 bg-clip-text text-transparent">Withdrawal Requests</h2>
           <p className="text-slate-500 text-[10px] font-black uppercase tracking-[0.4em] mt-1">Review and process fund disbursement requests.</p>
         </div>
-        <div className="flex bg-slate-900 border border-slate-800 p-1.5 rounded-2xl gap-1 h-fit">
-          {['all', 'pending', 'approved', 'rejected'].map((s) => (
-            <button
-              key={s}
-              onClick={() => setStatusFilter(s as any)}
-              className={`
-                px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all
-                ${statusFilter === s ? 'bg-rose-600 text-white shadow-lg shadow-rose-500/20' : 'text-slate-500 hover:text-slate-300'}
-              `}
-            >
-              {s}
-            </button>
-          ))}
+        <div className="flex flex-wrap gap-3 items-center">
+          {selectedIds.size > 0 && (
+            <div className="flex items-center gap-2 px-4 py-2 bg-slate-800 rounded-2xl border border-slate-700 animate-in fade-in duration-200">
+              <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest">{selectedIds.size} selected</span>
+              <button onClick={() => handleBulkAction('approved')} disabled={bulkProcessing} className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 text-white rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-emerald-500 transition-all disabled:opacity-50">
+                {bulkProcessing ? <Loader2 size={10} className="animate-spin" /> : <CheckCheck size={10} />} Approve All
+              </button>
+              <button onClick={() => handleBulkAction('rejected')} disabled={bulkProcessing} className="flex items-center gap-1.5 px-3 py-1.5 bg-red-600 text-white rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-red-500 transition-all disabled:opacity-50">
+                {bulkProcessing ? <Loader2 size={10} className="animate-spin" /> : <XSquare size={10} />} Reject All
+              </button>
+              <button onClick={clearSelection} className="p-1.5 text-slate-500 hover:text-white transition-colors"><X size={14} /></button>
+            </div>
+          )}
+          <button onClick={selectAllPending} className="flex items-center gap-2 px-4 py-2.5 bg-emerald-500/10 text-emerald-400 rounded-2xl text-[9px] font-black uppercase tracking-widest hover:bg-emerald-500/20 transition-all border border-emerald-500/20">
+            <CheckSquare size={14} /> Select All Pending
+          </button>
+          <div className="flex bg-slate-900 border border-slate-800 p-1.5 rounded-2xl gap-1 h-fit">
+            {['all', 'pending', 'approved', 'rejected'].map((s) => (
+              <button key={s} onClick={() => setStatusFilter(s as any)} className={`px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all ${statusFilter === s ? 'bg-rose-600 text-white shadow-lg shadow-rose-500/20' : 'text-slate-500 hover:text-slate-300'}`}>{s}</button>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -105,6 +135,11 @@ export default function AdminWithdrawalsPage() {
           <table className="w-full text-sm">
             <thead>
               <tr className="text-left text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] border-b border-slate-800">
+                <th className="px-4 md:px-8 py-6 w-10">
+                  <button onClick={selectedIds.size > 0 ? clearSelection : selectAllPending} className="text-slate-600 hover:text-white transition-colors">
+                    {selectedIds.size > 0 ? <CheckSquare size={16} className="text-rose-400" /> : <Square size={16} />}
+                  </button>
+                </th>
                 <th className="px-4 md:px-8 py-6">Timestamp / ID</th>
                 <th className="px-4 md:px-8 py-6">Beneficiary & Destination Node</th>
                 <th className="px-4 md:px-8 py-6 font-bold text-white">Quantum</th>
@@ -114,7 +149,14 @@ export default function AdminWithdrawalsPage() {
             </thead>
             <tbody className="divide-y divide-slate-800/50">
               {withdrawals.map((withd) => (
-                <tr key={withd.id} className="hover:bg-slate-800/20 transition-colors group">
+                <tr key={withd.id} className={`hover:bg-slate-800/20 transition-colors group ${selectedIds.has(withd.id) ? 'bg-rose-500/5' : ''}`}>
+                  <td className="px-4 md:px-8 py-6">
+                    {withd.status === 'pending' && (
+                      <button onClick={() => toggleSelect(withd.id)} className="text-slate-600 hover:text-rose-400 transition-colors">
+                        {selectedIds.has(withd.id) ? <CheckSquare size={16} className="text-rose-400" /> : <Square size={16} />}
+                      </button>
+                    )}
+                  </td>
                   <td className="px-4 md:px-8 py-6 text-slate-500 font-mono text-xs">
                     <div className="flex items-center gap-2">
                        <Clock size={12} className="text-slate-700" />

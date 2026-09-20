@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { useNotifications } from '@/context/NotificationContext';
+import { supabase } from '@/lib/supabase/index';
 import { 
     Bell, 
     User, 
@@ -21,7 +22,9 @@ import {
     Cpu,
     Target,
     ChevronDown,
-    Globe
+    Globe,
+    Megaphone,
+    X as XIcon
 } from 'lucide-react';
 import { useCurrency, CurrencyCode } from '@/context/CurrencyContext';
 import { useLanguage } from '@/context/LanguageContext';
@@ -42,6 +45,8 @@ export default function Header({ onMenuClick }: HeaderProps) {
     const [isProfileOpen, setIsProfileOpen] = useState(false);
     const [isCurrencyOpen, setIsCurrencyOpen] = useState(false);
     const { theme, toggleTheme } = useTheme();
+    const [announcement, setAnnouncement] = useState('');
+    const [showBanner, setShowBanner] = useState(false);
     
     const notifRef = useRef<HTMLDivElement>(null);
     const profileRef = useRef<HTMLDivElement>(null);
@@ -59,6 +64,19 @@ export default function Header({ onMenuClick }: HeaderProps) {
     }, [profile]);
 
     useEffect(() => {
+        supabase.from('site_settings').select('value').eq('key', 'announcement_banner').single()
+            .then(({ data }) => {
+                if (data?.value) {
+                    const dismissedKey = `banner_dismissed_${data.value.slice(0, 20)}`;
+                    if (!sessionStorage.getItem(dismissedKey)) {
+                        setAnnouncement(data.value);
+                        setShowBanner(true);
+                    }
+                }
+            });
+    }, []);
+
+    useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
             if (notifRef.current && !notifRef.current.contains(event.target as Node)) setIsNotifOpen(false);
             if (profileRef.current && !profileRef.current.contains(event.target as Node)) setIsProfileOpen(false);
@@ -68,6 +86,21 @@ export default function Header({ onMenuClick }: HeaderProps) {
     }, []);
 
     return (
+        <>
+        {showBanner && announcement && (
+            <div className="sticky top-0 z-[60] flex items-center justify-between gap-3 px-4 py-2.5 bg-gradient-to-r from-amber-600/90 to-orange-600/90 backdrop-blur-xl border-b border-amber-500/30 shadow-lg shadow-amber-500/10">
+                <div className="flex items-center gap-2.5 flex-1">
+                    <Megaphone size={14} className="text-amber-100 shrink-0" />
+                    <p className="text-amber-50 text-[11px] font-bold tracking-wide">{announcement}</p>
+                </div>
+                <button
+                    onClick={() => { setShowBanner(false); sessionStorage.setItem(`banner_dismissed_${announcement.slice(0, 20)}`, '1'); }}
+                    className="p-1 text-amber-200/60 hover:text-white transition-colors shrink-0"
+                >
+                    <XIcon size={14} />
+                </button>
+            </div>
+        )}
         <header className="h-20 md:h-24 sticky top-0 z-50 flex items-center px-4 md:px-10 bg-[#0B0B1E]/80 backdrop-blur-2xl border-b border-white/5">
             <div className="max-w-7xl w-full mx-auto flex items-center justify-between gap-6">
                 
@@ -187,5 +220,6 @@ export default function Header({ onMenuClick }: HeaderProps) {
                 </div>
             </div>
         </header>
+        </>
     );
 }

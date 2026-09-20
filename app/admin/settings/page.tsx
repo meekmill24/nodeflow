@@ -339,8 +339,8 @@ export default function AdminSettingsPage() {
              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {[
                     { key: 'min_deposit', label: 'Minimum Influx', icon: ArrowDownLeft, suffix: 'USD', placeholder: '10' },
-                    { key: 'min_withdrawal', label: 'Minimum Extraction', icon: ArrowUpRight, suffix: 'USD', placeholder: '30' },
-                    { key: 'min_task_balance', label: 'Minimum Task Balance', icon: Wallet, suffix: 'USD', placeholder: '65' },
+                    { key: 'min_withdrawal', label: 'Minimum Extraction', icon: ArrowUpRight, suffix: 'USD', placeholder: '10' },
+                    { key: 'min_task_balance', label: 'Minimum Task Balance', icon: Wallet, suffix: 'USD', placeholder: '60' },
                     { key: 'referral_commission_l1', label: 'L1 Growth Yield', icon: Share2, suffix: '%', placeholder: '20' },
                     { key: 'referral_commission_l2', label: 'L2 Growth Yield', icon: Share2, suffix: '%', placeholder: '8' },
                     { key: 'referral_commission_l3', label: 'L3 Growth Yield', icon: Share2, suffix: '%', placeholder: '4' },

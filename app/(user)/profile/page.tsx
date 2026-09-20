@@ -154,10 +154,9 @@ export default function ProfilePage() {
                     </div>
                     <div className="bg-[#0B0B1E] border border-white/5 rounded-[40px] divide-y divide-white/5 overflow-hidden">
                         {[
-                            { icon: CheckCircle, label: t('task_history'), href: '/record', color: 'text-[#3DD6C8]' },
+                            { icon: Wallet, label: 'Wallet', href: '/wallet', color: 'text-[#3DD6C8]' },
                             { icon: ArrowDownToLine, label: t('deposit_record'), href: '/record/deposit', color: 'text-emerald-400' },
                             { icon: ArrowUpFromLine, label: t('withdrawal_record'), href: '/record/withdraw', color: 'text-amber-400' },
-                            { icon: Calendar, label: 'Asset Cycle Hub', href: '/salary', color: 'text-indigo-400' },
                         ].map((item, i) => (
                             <Link key={i} href={item.href} className="flex items-center justify-between p-6 hover:bg-white/[0.03] transition-all group">
                                 <div className="flex items-center gap-4">

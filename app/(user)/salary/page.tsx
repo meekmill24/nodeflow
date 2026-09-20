@@ -22,9 +22,9 @@ import { supabase } from '@/lib/supabase/index';
 
 const salaryData = [
     { level: 1, name: 'Junior', rewards: [100, 300, 800, 1500, 4000], total: 6700 },
-    { level: 2, name: 'Mid-Level', rewards: [200, 500, 1500, 3000, 6000], total: 11200 },
+    { level: 2, name: 'Intermediate', rewards: [200, 500, 1500, 3000, 6000], total: 11200 },
     { level: 3, name: 'Senior', rewards: [300, 700, 2500, 5000, 10000], total: 18000 },
-    { level: 4, name: 'Expert', rewards: [400, 900, 3500, 6000, 12000], total: 22800 },
+    { level: 4, name: 'Mentor', rewards: [400, 900, 3500, 6000, 12000], total: 22800 },
 ];
 
 const days = [2, 4, 7, 15, 30];

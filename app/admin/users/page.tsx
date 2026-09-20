@@ -2,7 +2,7 @@
 import { useEffect, useState, useCallback } from 'react'; 
 import { supabase } from '@/lib/supabase/index'; 
 import type { Profile } from '@/lib/types'; 
-import { Search, UserPlus, Edit2, Trash2, Save, X, Shield, ShieldAlert, Wallet, TrendingUp, Mail, Phone, Calendar, RefreshCcw, DollarSign, Lock, Eye, EyeOff, Zap, CheckCircle, Layers, Target, Users, ShieldCheck } from 'lucide-react';
+import { Search, UserPlus, Edit2, Trash2, Save, X, Shield, ShieldAlert, Wallet, TrendingUp, Mail, Phone, Calendar, RefreshCcw, DollarSign, Lock, Eye, EyeOff, Zap, CheckCircle, Layers, Target, Users, ShieldCheck, BanIcon, PlusCircle, MinusCircle, ArrowRight, Banknote } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function AdminUsersPage() { 
@@ -22,6 +22,13 @@ export default function AdminUsersPage() {
   const [resetUserId, setResetUserId] = useState<string | null>(null);
   const [resetType, setResetType] = useState<'full' | 'advance'>('full');
   const [resetting, setResetting] = useState(false);
+
+  // Wallet Credit/Debit Modal
+  const [walletModal, setWalletModal] = useState<{ userId: string; username: string } | null>(null);
+  const [walletAmount, setWalletAmount] = useState('');
+  const [walletMemo, setWalletMemo] = useState('');
+  const [walletType, setWalletType] = useState<'credit' | 'debit'>('credit');
+  const [walletProcessing, setWalletProcessing] = useState(false);
 
   const fetchUsers = useCallback(async () => { 
     setLoading(true);
@@ -93,6 +100,51 @@ export default function AdminUsersPage() {
     }
   };
 
+  const handleFreezeToggle = async (user: Profile) => {
+    const newFrozen = !user.is_frozen;
+    try {
+      const res = await fetch('/api/admin/update-user', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: user.id, updateData: { is_frozen: newFrozen } })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Freeze toggle failed');
+      toast.success(newFrozen ? `Node ${user.username} FROZEN.` : `Node ${user.username} UNFROZEN.`);
+      fetchUsers();
+    } catch (err: any) {
+      toast.error(err.message);
+    }
+  };
+
+  const handleWalletCredit = async () => {
+    if (!walletModal || !walletAmount) return;
+    setWalletProcessing(true);
+    try {
+      const res = await fetch('/api/admin/wallet-credit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: walletModal.userId,
+          amount: parseFloat(walletAmount),
+          type: walletType,
+          memo: walletMemo || undefined
+        })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Wallet operation failed');
+      toast.success(`${walletType === 'credit' ? 'Credited' : 'Debited'} $${parseFloat(walletAmount).toFixed(2)} ${walletType === 'credit' ? 'to' : 'from'} ${walletModal.username}`);
+      setWalletModal(null);
+      setWalletAmount('');
+      setWalletMemo('');
+      fetchUsers();
+    } catch (err: any) {
+      toast.error(err.message);
+    } finally {
+      setWalletProcessing(false);
+    }
+  };
+
   const handleResetRecord = async () => {
     if (!resetUserId) return;
     setResetting(true);
@@ -106,10 +158,20 @@ export default function AdminUsersPage() {
         const setList = await resSettings.json();
         const bonusSetting = Array.isArray(setList) ? setList.find((s: any) => s.key === 'welcome_bonus') : null;
         const bonus = bonusSetting?.value || '25';
-        updateData = { current_set: 1, completed_count: 0, profit: 0, wallet_balance: parseFloat(bonus) }; 
+        updateData = { 
+            current_set: 1, 
+            completed_count: 0, 
+            profit: 0, 
+            wallet_balance: parseFloat(bonus),
+            last_reset_at: new Date().toISOString()
+        }; 
     } else {
         const nextSet = (user.current_set || 1) + 1;
-        updateData = { current_set: nextSet };
+        updateData = { 
+            current_set: nextSet,
+            completed_count: 0,
+            last_reset_at: new Date().toISOString()
+        };
     }
 
     try {
@@ -317,6 +379,11 @@ export default function AdminUsersPage() {
                             STANDARD_NODE
                           </span>
                         )}
+                        {user.is_frozen && (
+                          <span className="flex items-center gap-1 px-2 py-1 rounded-full bg-red-500/10 text-red-400 text-[8px] font-black uppercase tracking-widest border border-red-500/20 animate-pulse">
+                            <BanIcon size={8} /> FROZEN
+                          </span>
+                        )}
                       </div>
                       <div className="flex items-center gap-2">
                         {editingId === user.id ? (
@@ -480,6 +547,26 @@ export default function AdminUsersPage() {
                         </>
                       ) : (
                         <>
+                            {/* Quick Wallet Credit */}
+                            <button
+                                onClick={() => { setWalletModal({ userId: user.id, username: user.username || 'user' }); setWalletType('credit'); }}
+                                title="Credit/Debit Wallet"
+                                className="p-2.5 bg-emerald-500/10 text-emerald-400 rounded-xl hover:bg-emerald-500/20 transition-all border border-emerald-500/10"
+                            >
+                                <Banknote size={16} />
+                            </button>
+                            {/* Freeze Toggle */}
+                            <button
+                                onClick={() => handleFreezeToggle(user)}
+                                title={user.is_frozen ? 'Unfreeze Account' : 'Freeze Account'}
+                                className={`p-2.5 rounded-xl transition-all border ${
+                                  user.is_frozen
+                                    ? 'bg-orange-500/20 text-orange-400 border-orange-500/20'
+                                    : 'bg-slate-800/50 text-slate-500 border-slate-700/50 hover:bg-red-500/10 hover:text-red-400 hover:border-red-500/20'
+                                }`}
+                            >
+                                <BanIcon size={16} />
+                            </button>
                             <button 
                                 onClick={() => { setResetUserId(user.id); setResetType('full'); }}
                                 title="Reset to Set 1"
@@ -615,6 +702,83 @@ export default function AdminUsersPage() {
                     </button>
                 </form>
             </div>
+        </div>
+      )}
+
+      {/* Wallet Credit / Debit Modal */}
+      {walletModal && (
+        <div className="fixed inset-0 z-[110] flex items-center justify-center p-6 backdrop-blur-xl bg-black/60 animate-in fade-in duration-300">
+          <div className="bg-[#0f0f12] border border-white/5 rounded-[40px] w-full max-w-sm p-10 shadow-2xl relative overflow-hidden">
+            <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent" />
+            <div className="flex items-center justify-between mb-8">
+              <div>
+                <h3 className="text-xl font-black text-white italic uppercase tracking-tighter">Wallet Operation</h3>
+                <p className="text-[10px] text-slate-500 font-black uppercase tracking-[0.3em] mt-1">{walletModal.username}</p>
+              </div>
+              <button onClick={() => setWalletModal(null)} className="p-2 text-slate-600 hover:text-white transition-colors"><X size={20} /></button>
+            </div>
+
+            {/* Credit / Debit toggle */}
+            <div className="flex gap-2 p-1 bg-slate-900 rounded-2xl mb-6">
+              <button
+                onClick={() => setWalletType('credit')}
+                className={`flex-1 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all flex items-center justify-center gap-2 ${
+                  walletType === 'credit' ? 'bg-emerald-500 text-white shadow-lg' : 'text-slate-500 hover:text-white'
+                }`}
+              >
+                <PlusCircle size={14} /> Credit
+              </button>
+              <button
+                onClick={() => setWalletType('debit')}
+                className={`flex-1 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all flex items-center justify-center gap-2 ${
+                  walletType === 'debit' ? 'bg-red-500 text-white shadow-lg' : 'text-slate-500 hover:text-white'
+                }`}
+              >
+                <MinusCircle size={14} /> Debit
+              </button>
+            </div>
+
+            <div className="space-y-4 mb-8">
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1">Amount (USD)</label>
+                <div className="relative">
+                  <DollarSign className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600" size={16} />
+                  <input
+                    type="number"
+                    min="0.01"
+                    step="0.01"
+                    placeholder="0.00"
+                    value={walletAmount}
+                    onChange={e => setWalletAmount(e.target.value)}
+                    className="w-full bg-black/40 border border-white/5 rounded-2xl pl-10 pr-4 py-4 text-white text-lg font-black focus:outline-none focus:border-emerald-500/50 transition-all"
+                  />
+                </div>
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1">Memo (optional)</label>
+                <input
+                  type="text"
+                  placeholder="e.g. Bonus credit, Admin adjustment..."
+                  value={walletMemo}
+                  onChange={e => setWalletMemo(e.target.value)}
+                  className="w-full bg-black/40 border border-white/5 rounded-2xl px-4 py-3.5 text-white text-sm font-medium focus:outline-none focus:border-emerald-500/50 transition-all placeholder:text-slate-700"
+                />
+              </div>
+            </div>
+
+            <button
+              onClick={handleWalletCredit}
+              disabled={walletProcessing || !walletAmount}
+              className={`w-full py-4 rounded-[28px] font-black text-[11px] uppercase tracking-widest transition-all flex items-center justify-center gap-3 shadow-xl active:scale-95 disabled:opacity-40 ${
+                walletType === 'credit'
+                  ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-500/20'
+                  : 'bg-red-600 hover:bg-red-500 text-white shadow-red-500/20'
+              }`}
+            >
+              {walletProcessing ? 'Processing...' : `${walletType === 'credit' ? 'Credit' : 'Debit'} $${parseFloat(walletAmount || '0').toFixed(2)}`}
+              <ArrowRight size={16} />
+            </button>
+          </div>
         </div>
       )}
 

@@ -181,6 +181,105 @@ export function LandingGallery() {
           </div>
         </div>
 
+        {/* Secondary Motion AI & Pinterest Inspired Operations Showcase */}
+        <div className="mt-12">
+          <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center gap-3">
+              <div className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_10px_rgba(6,182,212,0.8)]" />
+              <h3 className="text-xs font-black uppercase tracking-[0.35em] text-white/50">
+                Institutional Infrastructure &amp; Live Terminal Visuals
+              </h3>
+            </div>
+            <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500 hidden sm:block">
+              Motion AI • Real-Time Engine
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            {[
+              {
+                src: '/landing-asset-1.jpg',
+                tag: 'Operations Center',
+                title: 'Live Task Orchestration',
+                desc: 'Continuous real-time telemetry from enterprise partner integrations.'
+              },
+              {
+                src: '/landing-asset-2.jpg',
+                tag: 'Terminal Analytics',
+                title: 'High-Velocity Routing',
+                desc: 'Dynamic latency minimization across decentralized data pipelines.'
+              },
+              {
+                src: '/landing-asset-3.jpg',
+                tag: 'Neural Topology',
+                title: 'AI Product Allocation',
+                desc: 'Autonomous matching of merchant task batches directly to agent nodes.'
+              },
+              {
+                src: '/landing-asset-5.jpg',
+                tag: 'Treasury & Escrow',
+                title: 'Institutional Clearance',
+                desc: 'Multi-signature cold storage vaults backing every daily withdrawal.'
+              },
+              {
+                src: '/landing-asset-6.jpg',
+                tag: 'Global Nodes',
+                title: 'Tier-4 Data Centers',
+                desc: '99.98% SLA guaranteeing persistent agent availability.'
+              },
+              {
+                src: '/landing-asset-7.jpg',
+                tag: 'Collaborative Sprint',
+                title: 'Merchant Integration',
+                desc: 'Engineering team onboarding Fortune 500 catalog optimization workflows.'
+              },
+              {
+                src: '/landing-asset-9.jpg',
+                tag: 'Newport Beach HQ',
+                title: 'Corporate Headquarters',
+                desc: 'Strategic management and VIP customer support operations.'
+              },
+              {
+                src: '/landing-asset-10.jpg',
+                tag: 'Smart Contract',
+                title: 'Escrow Settlements',
+                desc: 'Instant cryptographic confirmation of completed task set commissions.'
+              }
+            ].map((item, idx) => (
+              <motion.div
+                key={idx}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: idx * 0.05 }}
+                className="group relative rounded-[28px] overflow-hidden border border-white/10 bg-slate-900/50 shadow-lg hover:border-cyan-500/40 transition-all duration-500"
+              >
+                <div className="relative h-56 w-full overflow-hidden">
+                  <img
+                    src={item.src}
+                    alt={item.title}
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent" />
+                  <div className="absolute top-4 left-4">
+                    <span className="px-2.5 py-1 rounded-full bg-black/60 border border-white/15 text-[9px] font-black uppercase tracking-wider text-cyan-300 backdrop-blur-md">
+                      {item.tag}
+                    </span>
+                  </div>
+                </div>
+                <div className="p-5">
+                  <h4 className="text-base font-black text-white italic tracking-tight group-hover:text-cyan-400 transition-colors mb-1.5">
+                    {item.title}
+                  </h4>
+                  <p className="text-slate-400 text-xs leading-relaxed line-clamp-2">
+                    {item.desc}
+                  </p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+
         {/* Bottom Metrics Banner */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}

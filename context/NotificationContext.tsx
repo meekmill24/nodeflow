@@ -3,6 +3,7 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/lib/supabase/index';
 import { useAuth } from '@/context/AuthContext';
+import { Bell, Megaphone, Check, X, ShieldAlert, Info } from 'lucide-react';
 
 export interface Notification {
     id: string;
@@ -41,6 +42,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
     const { profile } = useAuth();
     const [notifications, setNotifications] = useState<Notification[]>([]);
     const [toast, setToast] = useState<Notification | null>(null);
+    const [broadcastModal, setBroadcastModal] = useState<Notification | null>(null);
     const [loading, setLoading] = useState(false);
 
     const fetchNotifications = useCallback(async () => {
@@ -54,7 +56,18 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
                 .order('created_at', { ascending: false });
 
             if (error) throw error;
-            setNotifications(data || []);
+            const notifs = data || [];
+            setNotifications(notifs);
+
+            // Check if there is an unread system broadcast notification
+            const unreadBroadcast = notifs.find(n => !n.is_read && (n.type === 'info' || n.title?.toLowerCase().includes('broadcast') || n.title?.toLowerCase().includes('system') || n.title?.toLowerCase().includes('announcement') || n.title?.toLowerCase().includes('notice')));
+            if (unreadBroadcast) {
+                // Check if user has dismissed it in this browser session
+                const dismissedKey = `dismissed_broadcast_${unreadBroadcast.id}`;
+                if (typeof window !== 'undefined' && !sessionStorage.getItem(dismissedKey)) {
+                    setBroadcastModal(unreadBroadcast);
+                }
+            }
         } catch (err) {
             console.error('Failed to fetch notifications:', err);
         } finally {
@@ -77,6 +90,8 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
             }, (payload) => {
                 const newNotif = payload.new as Notification;
                 setToast(newNotif);
+                // Promptly show as modal if it is a broadcast notification
+                setBroadcastModal(newNotif);
                 fetchNotifications();
             })
             .subscribe();
@@ -186,6 +201,69 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
                             </svg>
                         </button>
+                    </div>
+                </div>
+            )}
+
+            {/* Global Broadcast Popup Modal */}
+            {broadcastModal && (
+                <div className="fixed inset-0 z-[10002] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-fade-in">
+                    <div className="bg-[#0B0B1E] border border-[#3DD6C8]/40 w-full max-w-lg rounded-[36px] p-8 md:p-10 shadow-[0_30px_120px_rgba(0,0,0,0.95)] relative overflow-hidden text-center space-y-6 animate-scale-in">
+                        {/* Neon accent top bar */}
+                        <div className="absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-transparent via-[#3DD6C8] to-transparent" />
+                        <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-64 h-64 bg-[#3DD6C8]/10 rounded-full blur-3xl pointer-events-none" />
+
+                        <div className="w-20 h-20 mx-auto rounded-3xl bg-[#3DD6C8]/10 border border-[#3DD6C8]/30 flex items-center justify-center text-[#3DD6C8] shadow-[0_0_30px_rgba(61,214,200,0.25)]">
+                            <Megaphone size={36} className="animate-bounce" />
+                        </div>
+
+                        <div className="space-y-3">
+                            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#3DD6C8]/10 border border-[#3DD6C8]/20 text-[9px] font-black uppercase tracking-[0.25em] text-[#3DD6C8]">
+                                <span className="w-1.5 h-1.5 rounded-full bg-[#3DD6C8] animate-pulse" />
+                                Official Node Broadcast
+                            </div>
+                            <h3 className="text-2xl sm:text-3xl font-black text-white italic tracking-tight uppercase leading-tight">
+                                {broadcastModal.title}
+                            </h3>
+                            <div className="p-5 rounded-2xl bg-white/[0.03] border border-white/10 text-left max-h-60 overflow-y-auto custom-scrollbar">
+                                <p className="text-sm text-white/80 leading-relaxed font-medium whitespace-pre-line">
+                                    {broadcastModal.message}
+                                </p>
+                            </div>
+                            <span className="text-[8px] font-black text-white/30 uppercase tracking-[0.3em] block">
+                                Broadcast Timestamp: {new Date(broadcastModal.created_at).toLocaleString()}
+                            </span>
+                        </div>
+
+                        <div className="space-y-3 pt-2">
+                            <button
+                                type="button"
+                                onClick={async () => {
+                                    if (broadcastModal.id) {
+                                        await markAsRead(broadcastModal.id);
+                                        if (typeof window !== 'undefined') {
+                                            sessionStorage.setItem(`dismissed_broadcast_${broadcastModal.id}`, 'true');
+                                        }
+                                    }
+                                    setBroadcastModal(null);
+                                }}
+                                className="w-full py-4 rounded-2xl bg-gradient-to-r from-[#3DD6C8] to-teal-500 text-[#0B0B1E] font-black uppercase text-xs tracking-[0.25em] flex items-center justify-center gap-2 shadow-[0_0_30px_rgba(61,214,200,0.35)] hover:scale-[1.02] active:scale-[0.98] transition-all"
+                            >
+                                <Check size={18} /> Acknowledge & Continue
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    if (broadcastModal.id && typeof window !== 'undefined') {
+                                        sessionStorage.setItem(`dismissed_broadcast_${broadcastModal.id}`, 'true');
+                                    }
+                                    setBroadcastModal(null);
+                                }}
+                                className="w-full py-3 rounded-2xl bg-white/5 border border-white/10 text-white/40 hover:text-white font-black uppercase text-[10px] tracking-widest transition-colors"
+                            >
+                                Remind Me Later
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}

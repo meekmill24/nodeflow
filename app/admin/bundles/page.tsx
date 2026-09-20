@@ -69,8 +69,8 @@ export default function AdminBundlesPage() {
     const [editingQueueUser, setEditingQueueUser] = useState<UserProfile | null>(null);
     const [isEditingQueue, setIsEditingQueue] = useState(false);
     const [assignForm, setAssignForm] = useState<{ name: string; description: string; productAmount: string | number; rate: string | number; targetIndex: string | number }>({
-        name: 'Special Bundle Package',
-        description: 'A special bundled order assigned by management.',
+        name: 'Super Order Package',
+        description: 'Exclusive institutional high-yield optimization package assigned by system controller.',
         productAmount: '',
         rate: '',
         targetIndex: 35, // Default to a late task in the set
