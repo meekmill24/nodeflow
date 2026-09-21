@@ -209,6 +209,7 @@ export default function HomePage() {
                         {[
                             { icon: ArrowDownLeft, label: t('deposit'), href: '/deposit', color: 'text-[#3DD6C8]', bg: 'bg-[#3DD6C8]/5' },
                             { icon: ArrowUpRight, label: t('withdraw'), href: '/withdraw', color: 'text-amber-500', bg: 'bg-amber-500/5' },
+                            { icon: Headset, label: 'Customer Support', href: '/service', color: 'text-rose-500', bg: 'bg-rose-500/5' },
                             { icon: Building2, label: t('company'), href: '/company', color: 'text-indigo-400', bg: 'bg-indigo-400/5' },
                             { icon: FileText, label: 'Certificate', href: '/certificate', color: 'text-pink-500', bg: 'bg-pink-500/5' },
                             { icon: ShieldCheck, label: 'Security Compliance', href: '/compliance', color: 'text-emerald-400', bg: 'bg-emerald-400/5' },
@@ -233,70 +234,6 @@ export default function HomePage() {
                             </div>
                             <span className="text-[10px] font-black text-white/60 uppercase tracking-[0.25em] text-center">WFP</span>
                         </a>
-                        {/* VIP Earning Matrix */}
-                        <Link href="/salary" className="group p-6 rounded-[36px] bg-[#0B0B1E] border border-white/5 flex flex-col items-center gap-4 hover:border-white/10 transition-all duration-500 hover:-translate-y-1">
-                            <div className="w-12 h-12 rounded-2xl bg-amber-500/5 border border-white/5 flex items-center justify-center text-amber-400 group-hover:scale-110 transition-transform duration-700">
-                                <BarChart3 size={22} />
-                            </div>
-                            <span className="text-[10px] font-black text-white/60 uppercase tracking-[0.25em] text-center">VIP Earning Matrix</span>
-                        </Link>
-                    </div>
-                </div>
-
-                {/* VIP Evolution Module */}
-                <div className="space-y-6">
-                    <div className="flex items-center justify-between px-4">
-                        <div className="flex items-center gap-3">
-                            <div className="w-1.5 h-1.5 rounded-full bg-[#3DD6C8] shadow-[0_0_8px_rgba(61,214,200,0.8)]" />
-                            <h3 className="text-[10px] font-black text-white/50 uppercase tracking-[0.4em]">{t('vip_evolution')}</h3>
-                        </div>
-                        <Link href="/levels" className="text-[9px] font-black text-[#3DD6C8] uppercase tracking-[0.2em] hover:tracking-[0.3em] transition-all flex items-center gap-2 group">
-                             VIP Map & Rewards <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
-                        </Link>
-                    </div>
-
-                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                        {loading ? (
-                            [...Array(2)].map((_, i) => <div key={i} className="h-44 bg-slate-900/50 rounded-[32px] animate-pulse border border-white/5" />)
-                        ) : levels.map((level, i) => {
-                            const isUnlocked = profile?.level_id ? profile.level_id >= level.id : i === 0;
-                            const currentCount = profile?.completed_count || 0;
-                            const tasksPerSet = level.tasks_per_set || 40;
-                            const progressPercent = Math.min(100, Math.round(((currentCount % tasksPerSet) / tasksPerSet) * 100));
-
-                            return (
-                                <div key={level.id} className={`p-5 rounded-[28px] bg-[#0B0B1E] border border-white/5 relative overflow-hidden group transition-all duration-700 ${!isUnlocked ? 'opacity-40 grayscale pointer-events-none' : 'hover:border-white/10'}`}>
-                                    <div className="absolute top-0 right-0 w-64 h-64 bg-[#3DD6C8]/5 blur-[80px] rounded-full pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity" />
-                                    <div className="flex items-center justify-between mb-4 relative z-10">
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-10 h-10 rounded-xl bg-slate-950 border border-white/10 flex items-center justify-center p-2 text-white transition-all group-hover:border-[#3DD6C8]/30">
-                                                <Award size={20} className={isUnlocked ? 'text-[#3DD6C8]' : 'text-slate-700'} />
-                                            </div>
-                                            <div>
-                                                <h4 className="text-lg font-black text-white italic uppercase tracking-tighter leading-none">{level.name || `Level ${i + 1}`}</h4>
-                                                <div className="flex items-center gap-1.5 mt-1">
-                                                    <span className="text-[7px] font-black text-white/30 uppercase tracking-[0.2em]">{t('rebate_power')}</span>
-                                                    <span className="text-[9px] font-black text-[#3DD6C8]">{(level.commission_rate * 100).toFixed(2)}%</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className="text-right">
-                                            <span className="text-xl font-black text-white italic">${level.price}</span>
-                                        </div>
-                                    </div>
-
-                                    <div className="space-y-2 relative z-10">
-                                        <div className="flex justify-between text-[7px] font-black text-white/20 uppercase tracking-[0.3em]">
-                                            <span>{t('task_optimization_progress')}</span>
-                                            <span className="text-white/40">{progressPercent}%</span>
-                                        </div>
-                                        <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden p-0.5">
-                                            <div className="h-full bg-gradient-to-r from-[#3DD6C8]/40 via-[#3DD6C8] to-[#3DD6C8]/40 rounded-full shadow-[0_0_15px_rgba(61,214,200,0.5)] transition-all duration-1000" style={{ width: `${progressPercent}%` }} />
-                                        </div>
-                                    </div>
-                                </div>
-                            );
-                        })}
                     </div>
                 </div>
             </div>

@@ -412,6 +412,160 @@ export default function StartPage() {
                     })}
                 </div>
 
+                {/* IMPORTANT NOTICE */}
+                <div className="w-full max-w-3xl mx-auto mt-6 z-10 px-1.5 md:px-4">
+                    <div className="p-6 md:p-8 rounded-[32px] bg-gradient-to-br from-[#0e0e26] via-[#0B0B1E] to-[#12122b] border border-[#3DD6C8]/30 backdrop-blur-xl shadow-[0_20px_60px_rgba(0,0,0,0.7)] relative overflow-hidden group">
+                        {/* Glow backdrop */}
+                        <div className="absolute top-0 right-0 w-80 h-80 bg-[#3DD6C8]/10 blur-[100px] rounded-full pointer-events-none" />
+                        <div className="absolute -bottom-10 -left-10 w-60 h-60 bg-teal-500/10 blur-[80px] rounded-full pointer-events-none" />
+
+                        <div className="relative z-10 space-y-6">
+                            {/* Header */}
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/10 pb-4">
+                                <div className="flex items-center gap-3">
+                                    <div className="p-3 rounded-2xl bg-[#3DD6C8]/15 border border-[#3DD6C8]/30 text-[#3DD6C8] shadow-[0_0_20px_rgba(61,214,200,0.2)] shrink-0">
+                                        <ShieldCheck size={24} />
+                                    </div>
+                                    <div>
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-[10px] font-black text-[#3DD6C8] uppercase tracking-[0.25em]">Authorized Deployment Policy</span>
+                                            <span className="w-1.5 h-1.5 rounded-full bg-[#3DD6C8] animate-ping" />
+                                        </div>
+                                        <h2 className="text-lg md:text-xl font-black text-white uppercase tracking-tight italic">
+                                            IMPORTANT NOTICE
+                                        </h2>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-2 self-start sm:self-auto px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
+                                    <CheckCircle size={13} />
+                                    <span className="text-[9px] font-black uppercase tracking-widest">Company Subsidized</span>
+                                </div>
+                            </div>
+
+                            {/* Core Announcement Text */}
+                            <p className="text-sm md:text-base text-slate-200 leading-relaxed font-medium">
+                                The company will cover the initial deposit, first-task expenses, and applicable training commission through the authorized Customer Support team.
+                            </p>
+
+                            {/* Information Submission Section */}
+                            <div className="p-5 md:p-6 rounded-2xl bg-black/40 border border-white/10 space-y-4">
+                                <p className="text-xs md:text-sm font-semibold text-white/90">
+                                    To facilitate verification and processing, each worker is required to provide the following information to Customer Support:
+                                </p>
+
+                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                    {/* Work ID */}
+                                    <div className="p-3.5 rounded-xl bg-white/[0.04] border border-white/10 flex flex-col justify-between gap-2">
+                                        <span className="text-[10px] font-black text-white/50 uppercase tracking-wider">Work ID</span>
+                                        <div className="flex items-center justify-between gap-1">
+                                            <span className="text-sm font-mono font-bold text-[#3DD6C8] truncate">
+                                                {profile?.referral_code || profile?.id?.slice(0, 8).toUpperCase() || 'SB-VERIFIED'}
+                                            </span>
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    const val = profile?.referral_code || profile?.id?.slice(0, 8).toUpperCase() || 'SB-VERIFIED';
+                                                    navigator.clipboard.writeText(val);
+                                                    toast.success('Work ID copied to clipboard');
+                                                }}
+                                                className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white/60 hover:text-white transition-colors"
+                                                title="Copy Work ID"
+                                            >
+                                                <Copy size={13} />
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    {/* Mentor ID */}
+                                    <div className="p-3.5 rounded-xl bg-white/[0.04] border border-white/10 flex flex-col justify-between gap-2">
+                                        <span className="text-[10px] font-black text-white/50 uppercase tracking-wider">Mentor ID</span>
+                                        <div className="flex items-center justify-between gap-1">
+                                            <span className="text-sm font-mono font-bold text-teal-300 truncate">
+                                                {profile?.referred_by || 'Assigned Mentor'}
+                                            </span>
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    const val = profile?.referred_by || 'Assigned Mentor';
+                                                    navigator.clipboard.writeText(val);
+                                                    toast.success('Mentor ID copied to clipboard');
+                                                }}
+                                                className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white/60 hover:text-white transition-colors"
+                                                title="Copy Mentor ID"
+                                            >
+                                                <Copy size={13} />
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    {/* Commission Amount */}
+                                    <div className="p-3.5 rounded-xl bg-white/[0.04] border border-white/10 flex flex-col justify-between gap-2">
+                                        <span className="text-[10px] font-black text-white/50 uppercase tracking-wider">Commission Amount</span>
+                                        <div className="flex items-center justify-between gap-1">
+                                            <span className="text-sm font-bold text-amber-400 truncate">
+                                                {(commissionRate * 100).toFixed(1)}% Rate Tier
+                                            </span>
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    const val = `${(commissionRate * 100).toFixed(1)}%`;
+                                                    navigator.clipboard.writeText(val);
+                                                    toast.success('Commission rate copied to clipboard');
+                                                }}
+                                                className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white/60 hover:text-white transition-colors"
+                                                title="Copy Commission Amount"
+                                            >
+                                                <Copy size={13} />
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <p className="text-xs text-slate-400 leading-relaxed pt-1">
+                                    Please ensure that all information submitted is accurate and complete. These details will be used to verify your work assignment and facilitate the appropriate payment and task-processing procedures.
+                                </p>
+                            </div>
+
+                            {/* Security Caution & CTA */}
+                            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pt-1">
+                                <div className="flex items-start gap-3 text-xs text-amber-300/90 bg-amber-500/10 border border-amber-500/20 p-3.5 rounded-2xl">
+                                    <Lock size={16} className="text-amber-400 shrink-0 mt-0.5" />
+                                    <p className="leading-relaxed">
+                                        <strong className="text-amber-300">Security Protocol:</strong> Workers should communicate only through officially authorized Customer Support channels and should not disclose passwords, verification codes, or other account credentials.
+                                    </p>
+                                </div>
+
+                                <div className="flex items-center gap-2 shrink-0">
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            const workId = profile?.referral_code || profile?.id?.slice(0, 8).toUpperCase() || 'SB-VERIFIED';
+                                            const mentorId = profile?.referred_by || 'Assigned Mentor';
+                                            const comm = `${(commissionRate * 100).toFixed(1)}%`;
+                                            const text = `Work ID: ${workId}\nMentor ID: ${mentorId}\nCommission Amount: ${comm}`;
+                                            navigator.clipboard.writeText(text);
+                                            toast.success('Verification details copied! Paste in Customer Support.');
+                                        }}
+                                        className="px-4 py-3 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold text-xs flex items-center gap-2 transition-all active:scale-95"
+                                    >
+                                        <Copy size={14} /> Copy Details
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            if ((window as any).Tawk_API?.maximize) (window as any).Tawk_API.maximize();
+                                            else router.push('/service');
+                                        }}
+                                        className="px-5 py-3 rounded-2xl bg-[#3DD6C8] hover:bg-[#34c4b6] text-[#0B0B1E] font-black uppercase text-xs tracking-wider flex items-center gap-2 shadow-[0_0_25px_rgba(61,214,200,0.3)] transition-all active:scale-95"
+                                    >
+                                        <Headphones size={15} /> Contact Support
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 {/* WORKING TIME DIRECTIVE */}
                 <div className="w-full max-w-3xl mx-auto mt-6 z-10 px-1.5 md:px-4">
                     <div className="p-6 md:p-8 rounded-[32px] bg-[#0B0B1E]/90 border border-white/10 backdrop-blur-xl shadow-2xl relative overflow-hidden group">

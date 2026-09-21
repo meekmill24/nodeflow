@@ -37,6 +37,13 @@ const levelColors = [
     'from-sky-400 to-transparent'
 ];
 
+const TIER_SPECS: Record<string, { depositRange: string; commPercent: string; sets: number; tasksPerSet: number; totalMaintenance: number }> = {
+    'Junior Agent': { depositRange: '$100 to $499', commPercent: '0.4%', sets: 3, tasksPerSet: 40, totalMaintenance: 120 },
+    'Intermediate Agent': { depositRange: '$500 to $1,499', commPercent: '0.6%', sets: 4, tasksPerSet: 45, totalMaintenance: 180 },
+    'Senior Agent': { depositRange: '$1,500 to $4,999', commPercent: '0.8%', sets: 5, tasksPerSet: 50, totalMaintenance: 250 },
+    'Mentor Agent': { depositRange: '$5,000 upwards', commPercent: '1.0%', sets: 6, tasksPerSet: 55, totalMaintenance: 330 }
+};
+
 export default function LevelsPage() {
     const { profile } = useAuth();
     const [levels, setLevels] = useState<Level[]>([]);
@@ -48,7 +55,7 @@ export default function LevelsPage() {
             const { data } = await supabase
                 .from('levels')
                 .select('*')
-                .order('id', { ascending: true });
+                .order('price', { ascending: true });
             if (data) setLevels(data);
             setLoading(false);
         };
@@ -109,7 +116,18 @@ export default function LevelsPage() {
                         const isLocked = level.id > currentLevelId;
                         const isCompleted = level.id < currentLevelId;
 
-                        const tasksPerSet = level.tasks_per_set || 40;
+                        const specs = TIER_SPECS[level.name] || {
+                            depositRange: `$${level.price} to $${level.price * 3}`,
+                            commPercent: `${(level.commission_rate * 100).toFixed(1)}%`,
+                            sets: level.sets_per_day || 3,
+                            tasksPerSet: level.tasks_per_set || 40,
+                            totalMaintenance: (level.sets_per_day || 3) * (level.tasks_per_set || 40)
+                        };
+
+                        const setsCount = level.sets_per_day || specs.sets;
+                        const tasksPerSet = level.tasks_per_set || specs.tasksPerSet;
+                        const totalMaintenance = setsCount * tasksPerSet;
+
                         const currentTasks = completedCount % tasksPerSet;
                         const progressPercent = Math.min(100, Math.round((currentTasks / tasksPerSet) * 100));
                         const levelProgress = isCurrentLevel ? progressPercent : (isCompleted ? 100 : 0);
@@ -118,16 +136,16 @@ export default function LevelsPage() {
                             <div key={level.id} className={`bg-[#0B0B1E] border p-7 rounded-[32px] relative overflow-hidden transition-all duration-700 flex flex-col justify-between h-full group ${isCurrentLevel ? 'border-[#3DD6C8] shadow-[0_30px_70px_rgba(0,0,0,0.6)] z-20' : 'border-white/5 hover:border-white/10'}`}>
                                 <div className={`absolute inset-0 bg-gradient-to-br ${colorClass} opacity-0 group-hover:opacity-100 transition-opacity duration-700`} />
                                 
-                                <div className="relative z-10 space-y-7">
+                                <div className="relative z-10 space-y-6">
                                     <div className="flex justify-between items-start">
                                         <div className={`w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center group-hover:bg-[#3DD6C8]/10 group-hover:border-[#3DD6C8]/30 transition-all duration-500`}>
                                             <Icon size={22} className={isCurrentLevel ? 'text-[#3DD6C8]' : 'text-white/40'} />
                                         </div>
                                         <div className="flex flex-col items-end gap-2">
                                             {isCurrentLevel ? (
-                                                <span className="text-[9px] font-black text-[#3DD6C8] uppercase tracking-[0.2em] px-2 py-0.5 bg-[#3DD6C8]/10 rounded-full border border-[#3DD6C8]/30">Active</span>
+                                                <span className="text-[9px] font-black text-[#3DD6C8] uppercase tracking-[0.2em] px-2.5 py-0.5 bg-[#3DD6C8]/10 rounded-full border border-[#3DD6C8]/30">Active</span>
                                             ) : isLocked ? (
-                                                <Lock size={12} className="text-white/10" />
+                                                <Lock size={12} className="text-white/20" />
                                             ) : (
                                                 <CheckCircle size={14} className="text-[#3DD6C8]" />
                                             )}
@@ -135,21 +153,40 @@ export default function LevelsPage() {
                                     </div>
 
                                     <div>
-                                        <h3 className="text-xl font-black text-white uppercase tracking-tighter leading-none mb-1 group-hover:text-[#3DD6C8] transition-colors">{level.name}</h3>
-                                        <div className="flex items-center justify-between mt-3 mb-1">
-                                            <span className="text-[8px] font-black text-white/30 uppercase tracking-[0.2em]">Rebate Power</span>
-                                            <span className="text-xs font-black text-[#3DD6C8]">{(level.commission_rate * 100).toFixed(2)}%</span>
+                                        <h3 className="text-xl font-black text-white uppercase tracking-tighter leading-none mb-3 group-hover:text-[#3DD6C8] transition-colors">{level.name}</h3>
+                                        
+                                        {/* Specification Table */}
+                                        <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/5 space-y-2.5">
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-[9px] font-black text-white/40 uppercase tracking-wider">In:</span>
+                                                <span className="text-[11px] font-black text-amber-400 font-mono">{specs.depositRange}</span>
+                                            </div>
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-[9px] font-black text-white/40 uppercase tracking-wider">Commission rate:</span>
+                                                <span className="text-[11px] font-black text-[#3DD6C8] font-mono">{specs.commPercent}</span>
+                                            </div>
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-[9px] font-black text-white/40 uppercase tracking-wider">Sets of tasks:</span>
+                                                <span className="text-[11px] font-black text-white font-mono">{setsCount} sets</span>
+                                            </div>
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-[9px] font-black text-white/40 uppercase tracking-wider">Products per task:</span>
+                                                <span className="text-[11px] font-black text-white font-mono">{tasksPerSet} products</span>
+                                            </div>
+                                            <div className="flex items-center justify-between pt-2 border-t border-white/5">
+                                                <span className="text-[9px] font-black text-white/50 uppercase tracking-wider">Total maintenance:</span>
+                                                <span className="text-[11px] font-black text-emerald-400 font-mono">{totalMaintenance} products</span>
+                                            </div>
                                         </div>
-                                        <p className="text-[12px] font-black text-white tracking-tight">${level.price.toLocaleString()}</p>
                                     </div>
 
                                     {/* PROGRESS ENGINE */}
-                                    <div className="pt-6 border-t border-white/5 space-y-3">
+                                    <div className="pt-2 border-t border-white/5 space-y-2">
                                         <div className="flex justify-between items-center">
-                                            <span className="text-[8px] font-black text-white/20 uppercase tracking-[0.2em]">Task Optimization Progress</span>
-                                            <span className="text-[9px] font-mono text-white/60">{levelProgress}%</span>
+                                            <span className="text-[8px] font-black text-white/30 uppercase tracking-[0.2em]">Task Progress</span>
+                                            <span className="text-[9px] font-mono text-white/70">{levelProgress}%</span>
                                         </div>
-                                        <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
+                                        <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
                                             <div 
                                                 className={`h-full bg-[#3DD6C8] transition-all duration-1000 ${isCurrentLevel ? 'opacity-100 shadow-[0_0_10px_rgba(61,214,200,0.5)]' : 'opacity-20'}`} 
                                                 style={{ width: `${levelProgress}%` }}
@@ -158,18 +195,18 @@ export default function LevelsPage() {
                                     </div>
                                 </div>
 
-                                <div className="mt-8 relative z-10">
+                                <div className="mt-6 relative z-10">
                                     {isCurrentLevel ? (
-                                        <div className="w-full py-3.5 bg-gradient-to-r from-[#3DD6C8]/10 to-transparent border border-[#3DD6C8]/20 rounded-xl text-[9px] font-black text-[#3DD6C8] uppercase tracking-[0.3em] text-center shadow-lg shadow-[#3DD6C8]/5">
+                                        <div className="w-full py-3 bg-gradient-to-r from-[#3DD6C8]/10 to-transparent border border-[#3DD6C8]/20 rounded-xl text-[9px] font-black text-[#3DD6C8] uppercase tracking-[0.3em] text-center shadow-lg shadow-[#3DD6C8]/5">
                                             ACTIVE LEVEL
                                         </div>
                                     ) : isLocked ? (
-                                        <button className="w-full py-3.5 bg-white/5 border border-white/5 rounded-xl text-[9px] font-black text-white/30 uppercase tracking-[0.3em] hover:bg-white/10 hover:text-white transition-all group-hover:border-white/20">
+                                        <button className="w-full py-3 bg-white/5 border border-white/5 rounded-xl text-[9px] font-black text-white/30 uppercase tracking-[0.3em] hover:bg-white/10 hover:text-white transition-all group-hover:border-white/20">
                                             LOCKED
                                         </button>
                                     ) : (
-                                        <div className="w-full py-3.5 bg-emerald-500/5 border border-emerald-500/10 rounded-xl text-[9px] font-black text-emerald-500/40 uppercase tracking-[0.3em] text-center">
-                                            UPGRADE SUCCESS
+                                        <div className="w-full py-3 bg-emerald-500/5 border border-emerald-500/10 rounded-xl text-[9px] font-black text-emerald-500/40 uppercase tracking-[0.3em] text-center">
+                                            UNLOCKED
                                         </div>
                                     )}
                                 </div>
