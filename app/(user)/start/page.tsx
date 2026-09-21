@@ -93,7 +93,8 @@ export default function StartPage() {
             if (!profile?.level_id || !profile?.id) return;
             setIsLoadingData(true);
             try {
-                const filterDate = profile.last_reset_at ? new Date(profile.last_reset_at).toISOString() : new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+                const resetTimestamp = (profile as any).last_reset_at || profile.updated_at;
+                const filterDate = resetTimestamp ? new Date(resetTimestamp).toISOString() : new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
                 const [levelsRes, pastTasksRes, itemsRes, settingsRes] = await Promise.all([
                     supabase.from('levels').select('id, tasks_per_set, sets_per_day, commission_rate').order('price', { ascending: true }),
                     supabase.from('user_tasks').select('task_item_id, status, completed_at').eq('user_id', profile.id).neq('status', 'cancelled').gt('completed_at', filterDate),
@@ -124,7 +125,7 @@ export default function StartPage() {
                     }
                 }
 
-                const lastResetDate = profile.last_reset_at ? new Date(profile.last_reset_at) : new Date(Date.now() - 24 * 60 * 60 * 1000);
+                const lastResetDate = resetTimestamp ? new Date(resetTimestamp) : new Date(Date.now() - 24 * 60 * 60 * 1000);
                 const recentIds = new Set(((pastTasksRes.data || []) as any[]).filter(t => t.completed_at && new Date(t.completed_at) > lastResetDate).map(t => t.task_item_id));
                 setRecentlyUsedIdsState(recentIds);
 

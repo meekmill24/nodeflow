@@ -62,7 +62,7 @@ export default function LevelsPage() {
         fetchLevels();
     }, []);
 
-    const currentLevelId = profile?.level_id || 1;
+    const currentLevelId = profile?.level_id || profile?.level?.id || 2;
     const completedCount = profile?.completed_count || 0;
 
     return (
@@ -112,9 +112,10 @@ export default function LevelsPage() {
                     levels.slice(0, 4).map((level, idx) => {
                         const Icon = levelIcons[idx] || Zap;
                         const colorClass = levelColors[idx] || levelColors[0];
-                        const isCurrentLevel = currentLevelId === level.id;
-                        const isLocked = level.id > currentLevelId;
-                        const isCompleted = level.id < currentLevelId;
+                        const userLevel = levels.find(l => l.id === currentLevelId) || levels.find(l => Number(l.price) === 100) || levels[0];
+                        const isCurrentLevel = userLevel ? userLevel.id === level.id : idx === 0;
+                        const isLocked = userLevel ? Number(level.price) > Number(userLevel.price) : idx > 0;
+                        const isCompleted = userLevel ? Number(level.price) < Number(userLevel.price) : false;
 
                         const specs = TIER_SPECS[level.name] || {
                             depositRange: `$${level.price} to $${level.price * 3}`,

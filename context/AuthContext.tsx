@@ -64,21 +64,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 console.warn(`Profile node not found in any matrix layer for: ${userId}`);
                 setProfile(null);
             } else {
-                // Auto-correct displayed level based on wallet_balance.
-                // Finds the highest level the user qualifies for (balance >= price).
-                // Overrides display only — DB level_id (task access) is unchanged.
+                // Resolve active level based on assigned DB level_id (default to Junior Agent / level_id: 2)
                 const { data: allLevels } = await supabase
                     .from('levels')
                     .select('*')
                     .order('price', { ascending: true });
 
                 if (allLevels && allLevels.length > 0) {
-                    const walletBalance = Number(data.wallet_balance || 0);
-                    const qualifiedLevel = [...allLevels]
-                        .filter((l: any) => walletBalance >= Number(l.price))
-                        .pop(); // highest qualifying level
-                    const effectiveLevel = qualifiedLevel || allLevels[0];
-                    data = { ...data, level: effectiveLevel };
+                    const targetLevelId = data.level_id || 2;
+                    const assignedLevel = allLevels.find((l: any) => l.id === targetLevelId) || allLevels.find((l: any) => l.price === 100) || allLevels[0];
+                    data = { ...data, level: assignedLevel };
                 }
 
                 setProfile(data);

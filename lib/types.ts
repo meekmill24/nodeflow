@@ -39,6 +39,7 @@ export interface Profile {
     sets_per_day_override?: number | null;
     level?: Level;
     created_at: string;
+    updated_at?: string;
 }
 
 export interface Level {

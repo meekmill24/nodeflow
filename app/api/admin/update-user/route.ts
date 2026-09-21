@@ -29,11 +29,25 @@ export async function POST(req: NextRequest) {
             }
         });
 
-        const { data, error } = await supabaseAdmin
+        let { data, error } = await supabaseAdmin
             .from('profiles')
             .update(payload)
             .eq('id', userId)
             .select();
+
+        // If last_reset_at column does not exist yet in DB, retry without last_reset_at and bump updated_at
+        if (error && (error.code === '42703' || error.message?.includes('last_reset_at'))) {
+            const fallbackPayload = { ...payload };
+            delete fallbackPayload.last_reset_at;
+            fallbackPayload.updated_at = new Date().toISOString();
+            const retry = await supabaseAdmin
+                .from('profiles')
+                .update(fallbackPayload)
+                .eq('id', userId)
+                .select();
+            data = retry.data;
+            error = retry.error;
+        }
 
         if (error) throw error;
 
