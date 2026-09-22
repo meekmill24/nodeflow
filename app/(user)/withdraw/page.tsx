@@ -83,21 +83,13 @@ export default function WithdrawPage() {
     }, [profile?.level_id]);
 
     const handleSelectAmount = (val: number) => {
-        if (val > maxWithdrawal) {
-            setShowLimitModal(true);
-            return;
-        }
         setAmount(String(val));
         setError('');
     };
 
     const handleMaxClick = () => {
-        if (balance > maxWithdrawal) {
-            setAmount(String(maxWithdrawal));
-            setShowLimitModal(true);
-        } else {
-            setAmount(String(maxWithdrawal));
-        }
+        const fullBalance = Math.max(0, balance);
+        setAmount(fullBalance.toFixed(2));
         setError('');
     };
 
@@ -107,12 +99,7 @@ export default function WithdrawPage() {
 
         const amt = parseFloat(amount);
         if (!amt || amt < minWithdrawal) {
-            setError(`Minimum withdrawal for ${levelName} is $${minWithdrawal.toFixed(2)}.`);
-            return;
-        }
-        if (amt > maxWithdrawal) {
-            setShowLimitModal(true);
-            setError(`Maximum withdrawal limit for ${levelName} is $${maxWithdrawal.toLocaleString()}. Please contact Customer Service.`);
+            setError(`Minimum withdrawal is $${minWithdrawal.toFixed(2)}.`);
             return;
         }
         if (amt > balance) {
@@ -263,7 +250,7 @@ export default function WithdrawPage() {
                                     Selected Withdrawal Tier
                                 </label>
                                 <span className="text-[10px] font-black text-[#3DD6C8] uppercase tracking-wider">
-                                    Tier Limit: ${maxWithdrawal.toLocaleString()}
+                                    Account Balance: ${balance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                 </span>
                             </div>
 
@@ -271,7 +258,7 @@ export default function WithdrawPage() {
                             <div className="p-6 bg-black/40 border border-[#3DD6C8]/30 rounded-[28px] flex items-center justify-between relative overflow-hidden shadow-inner">
                                 <div className="flex items-baseline gap-2">
                                     <span className="text-4xl md:text-5xl font-black text-white tracking-tight italic">
-                                        ${Number(amount || minWithdrawal).toLocaleString()}
+                                        ${Number(amount || minWithdrawal).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                     </span>
                                     <span className="text-xs font-black text-[#3DD6C8] uppercase tracking-widest">
                                         {network === 'ERC20' ? 'ETH' : network === 'BTC' ? 'BTC' : network === 'PAYPALUSD' ? 'PYUSD' : 'USDT'}
@@ -287,7 +274,7 @@ export default function WithdrawPage() {
                             <div className="space-y-2 pt-1">
                                 <div className="flex items-center justify-between">
                                     <span className="text-[9px] font-black text-white/40 uppercase tracking-[0.2em]">Select Preset Amount:</span>
-                                    <span className="text-[9px] font-mono text-white/40">Min: ${minWithdrawal} • Max: ${maxWithdrawal.toLocaleString()}</span>
+                                    <span className="text-[9px] font-mono text-white/40">Min: ${minWithdrawal} • Account: ${balance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                 </div>
                                 <div className="grid grid-cols-2 gap-3">
                                     <button
@@ -313,16 +300,16 @@ export default function WithdrawPage() {
                                         type="button"
                                         onClick={handleMaxClick}
                                         className={`py-4 px-4 rounded-2xl border text-xs font-black transition-all flex items-center justify-between ${
-                                            parseFloat(amount) === maxWithdrawal 
+                                            parseFloat(amount) === balance && balance > 0
                                                 ? 'bg-[#3DD6C8] text-[#0B0B1E] border-[#3DD6C8] shadow-[0_0_25px_rgba(61,214,200,0.35)] scale-[1.02]' 
                                                 : 'bg-white/5 border-white/10 text-white/80 hover:bg-white/10 hover:border-white/20'
                                         }`}
                                     >
                                         <div className="flex flex-col items-start gap-0.5">
-                                            <span className="text-[8px] font-black uppercase tracking-widest opacity-60">Maximum Limit</span>
-                                            <span className="text-sm font-mono font-black">${maxWithdrawal.toLocaleString()}</span>
+                                            <span className="text-[8px] font-black uppercase tracking-widest opacity-60">All Account Balance</span>
+                                            <span className="text-sm font-mono font-black">${balance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                         </div>
-                                        <span className="text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full bg-white/10">MAX</span>
+                                        <span className="text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300">MAX</span>
                                     </button>
                                 </div>
                             </div>

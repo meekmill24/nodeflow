@@ -66,15 +66,50 @@ export default function Header({ onMenuClick }: HeaderProps) {
     useEffect(() => {
         supabase.from('site_settings').select('value').eq('key', 'announcement_banner').single()
             .then(({ data }) => {
-                if (data?.value) {
-                    const dismissedKey = `banner_dismissed_${data.value.slice(0, 20)}`;
-                    if (!sessionStorage.getItem(dismissedKey)) {
-                        setAnnouncement(data.value);
-                        setShowBanner(true);
+                if (!data?.value) {
+                    setShowBanner(false);
+                    return;
+                }
+
+                let text = '';
+                let isTargeted = false;
+                let targetUserIds: string[] = [];
+
+                try {
+                    const parsed = JSON.parse(data.value);
+                    if (parsed && typeof parsed === 'object' && parsed.text !== undefined) {
+                        text = parsed.text || '';
+                        isTargeted = parsed.target === 'specific';
+                        targetUserIds = Array.isArray(parsed.targetUserIds) ? parsed.targetUserIds : [];
+                    } else {
+                        text = data.value;
+                    }
+                } catch {
+                    text = data.value;
+                }
+
+                if (!text) {
+                    setShowBanner(false);
+                    return;
+                }
+
+                // If targeted to specific users, only show if current worker's ID is included
+                if (isTargeted) {
+                    if (!profile?.id || !targetUserIds.includes(profile.id)) {
+                        setShowBanner(false);
+                        return;
                     }
                 }
+
+                const dismissedKey = `banner_dismissed_${text.slice(0, 20)}`;
+                if (!sessionStorage.getItem(dismissedKey)) {
+                    setAnnouncement(text);
+                    setShowBanner(true);
+                } else {
+                    setShowBanner(false);
+                }
             });
-    }, []);
+    }, [profile?.id]);
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {

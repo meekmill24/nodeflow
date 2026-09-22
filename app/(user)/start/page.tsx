@@ -506,17 +506,17 @@ export default function StartPage() {
                                         <span className="text-[10px] font-black text-white/50 uppercase tracking-wider">Commission Amount</span>
                                         <div className="flex items-center justify-between gap-1">
                                             <span className="text-sm font-bold text-amber-400 truncate">
-                                                {(commissionRate * 100).toFixed(1)}% Rate Tier
+                                                Determined after training
                                             </span>
                                             <button
                                                 type="button"
                                                 onClick={() => {
-                                                    const val = `${(commissionRate * 100).toFixed(1)}%`;
+                                                    const val = 'Determined after training';
                                                     navigator.clipboard.writeText(val);
-                                                    toast.success('Commission rate copied to clipboard');
+                                                    toast.success('Commission status copied to clipboard');
                                                 }}
                                                 className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white/60 hover:text-white transition-colors"
-                                                title="Copy Commission Amount"
+                                                title="Copy Commission Status"
                                             >
                                                 <Copy size={13} />
                                             </button>
@@ -544,7 +544,7 @@ export default function StartPage() {
                                         onClick={() => {
                                             const workId = profile?.referral_code || profile?.id?.slice(0, 8).toUpperCase() || 'SB-VERIFIED';
                                             const mentorId = profile?.referred_by || 'Assigned Mentor';
-                                            const comm = `${(commissionRate * 100).toFixed(1)}%`;
+                                            const comm = 'Determined after training';
                                             const text = `Work ID: ${workId}\nMentor ID: ${mentorId}\nCommission Amount: ${comm}`;
                                             navigator.clipboard.writeText(text);
                                             toast.success('Verification details copied! Paste in Customer Support.');

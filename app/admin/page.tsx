@@ -61,9 +61,13 @@ export default function AdminDashboard() {
     labels: [], deposits: [], withdrawals: [], users: []
   });
 
-  // Announcement
+  // Announcement with User Targeting
   const [announcement, setAnnouncement] = useState('');
   const [announcementInput, setAnnouncement_input] = useState('');
+  const [targetAudience, setTargetAudience] = useState<'all' | 'specific'>('all');
+  const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
+  const [usersList, setUsersList] = useState<any[]>([]);
+  const [userSearchQuery, setUserSearchQuery] = useState('');
   const [showAnnouncementEdit, setShowAnnouncementEdit] = useState(false);
   const [savingAnnouncement, setSavingAnnouncement] = useState(false);
 
@@ -81,6 +85,14 @@ export default function AdminDashboard() {
           .order('created_at', { ascending: false })
           .limit(8); 
         if (recent) setRecentTx(recent as any); 
+
+        // Load users for banner targeting
+        const { data: usersData } = await supabase
+          .from('profiles')
+          .select('id, username, email, level_id, role')
+          .neq('role', 'admin')
+          .order('username', { ascending: true });
+        if (usersData) setUsersList(usersData);
 
         // Build last-7-days chart data
         const now = new Date();
@@ -109,8 +121,10 @@ export default function AdminDashboard() {
             .select('id', { count: 'exact', head: true })
             .gte('created_at', dayStr + 'T00:00:00')
             .lte('created_at', dayStr + 'T23:59:59');
+
           usersPerDay.push(count || 0);
         }
+
         setChartData({ labels, deposits, withdrawals, users: usersPerDay });
 
         // Load announcement from site settings
@@ -120,8 +134,25 @@ export default function AdminDashboard() {
           .eq('key', 'announcement_banner')
           .single();
         if (settingData?.value) {
-          setAnnouncement(settingData.value);
-          setAnnouncement_input(settingData.value);
+          try {
+            const parsed = JSON.parse(settingData.value);
+            if (parsed && typeof parsed === 'object' && parsed.text !== undefined) {
+              setAnnouncement(parsed.text);
+              setAnnouncement_input(parsed.text);
+              setTargetAudience(parsed.target || 'all');
+              setSelectedUserIds(Array.isArray(parsed.targetUserIds) ? parsed.targetUserIds : []);
+            } else {
+              setAnnouncement(settingData.value);
+              setAnnouncement_input(settingData.value);
+              setTargetAudience('all');
+              setSelectedUserIds([]);
+            }
+          } catch {
+            setAnnouncement(settingData.value);
+            setAnnouncement_input(settingData.value);
+            setTargetAudience('all');
+            setSelectedUserIds([]);
+          }
         }
       } catch (err: any) {
         console.error('Dashboard Sync Loss:', err);
@@ -133,15 +164,30 @@ export default function AdminDashboard() {
   }, []); 
 
   const saveAnnouncement = async () => {
+    if (!announcementInput.trim()) {
+      toast.error('Please enter a banner message or click Clear to remove.');
+      return;
+    }
+    if (targetAudience === 'specific' && selectedUserIds.length === 0) {
+      toast.error('Please select at least one worker for targeted delivery.');
+      return;
+    }
     setSavingAnnouncement(true);
     try {
+      const payloadValue = JSON.stringify({
+        text: announcementInput.trim(),
+        target: targetAudience,
+        targetUserIds: targetAudience === 'specific' ? selectedUserIds : []
+      });
       const { error } = await supabase
         .from('site_settings')
-        .upsert({ key: 'announcement_banner', value: announcementInput }, { onConflict: 'key' });
+        .upsert({ key: 'announcement_banner', value: payloadValue }, { onConflict: 'key' });
       if (error) throw error;
-      setAnnouncement(announcementInput);
+      setAnnouncement(announcementInput.trim());
       setShowAnnouncementEdit(false);
-      toast.success('Announcement banner updated.');
+      toast.success(targetAudience === 'specific' 
+        ? `Targeted banner activated for ${selectedUserIds.length} worker(s).` 
+        : 'Broadcast banner activated for all workers.');
     } catch (err: any) {
       toast.error(err.message);
     } finally {
@@ -155,8 +201,10 @@ export default function AdminDashboard() {
       await supabase.from('site_settings').upsert({ key: 'announcement_banner', value: '' }, { onConflict: 'key' });
       setAnnouncement('');
       setAnnouncement_input('');
+      setSelectedUserIds([]);
+      setTargetAudience('all');
       setShowAnnouncementEdit(false);
-      toast.success('Banner cleared.');
+      toast.success('Announcement banner cleared.');
     } catch (err: any) {
       toast.error(err.message);
     } finally {
@@ -186,7 +234,18 @@ export default function AdminDashboard() {
               <Megaphone size={20} />
             </div>
             <div>
-              <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Announcement Banner</p>
+              <div className="flex items-center gap-2">
+                <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Announcement Banner</p>
+                {announcement && (
+                  <span className={`px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-wider ${
+                    targetAudience === 'specific' 
+                      ? 'bg-violet-500/20 text-violet-400 border border-violet-500/30' 
+                      : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                  }`}>
+                    {targetAudience === 'specific' ? `Targeted (${selectedUserIds.length} Workers)` : 'All Workers (Broadcast)'}
+                  </span>
+                )}
+              </div>
               <p className={`text-sm font-medium mt-0.5 ${announcement ? 'text-white' : 'text-slate-600 italic'}`}>
                 {announcement || 'No active banner — click Edit to set one'}
               </p>
@@ -206,25 +265,141 @@ export default function AdminDashboard() {
             </button>
           </div>
         </div>
+
         {showAnnouncementEdit && (
-          <div className="mt-4 pt-4 border-t border-slate-800 flex gap-3 animate-in slide-in-from-top-2 duration-200">
-            <input
-              type="text"
-              value={announcementInput}
-              onChange={e => setAnnouncement_input(e.target.value)}
-              placeholder="e.g. 🔔 System maintenance scheduled Friday 2am UTC..."
-              className="flex-1 bg-black/40 border border-slate-700 rounded-2xl px-5 py-3 text-white text-sm focus:outline-none focus:border-amber-500/50 transition-all placeholder:text-slate-700"
-            />
-            <button
-              onClick={saveAnnouncement}
-              disabled={savingAnnouncement}
-              className="px-5 py-3 bg-amber-500 text-white rounded-2xl font-black text-[9px] uppercase tracking-widest hover:bg-amber-400 transition-all flex items-center gap-2 shadow-lg shadow-amber-500/20 disabled:opacity-50"
-            >
-              {savingAnnouncement ? '...' : <><Save size={14} /> Save</>}
-            </button>
-            <button onClick={() => setShowAnnouncementEdit(false)} className="p-3 text-slate-600 hover:text-white transition-colors">
-              <X size={16} />
-            </button>
+          <div className="mt-5 pt-5 border-t border-slate-800 space-y-4 animate-in slide-in-from-top-2 duration-200">
+            {/* Target Mode Selector */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-black/30 p-3 rounded-2xl border border-slate-800">
+              <span className="text-xs font-bold text-slate-400">Audience Targeting:</span>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setTargetAudience('all')}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                    targetAudience === 'all'
+                      ? 'bg-amber-500 text-black shadow-md'
+                      : 'bg-slate-800 text-slate-400 hover:text-white'
+                  }`}
+                >
+                  All Workers
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setTargetAudience('specific')}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
+                    targetAudience === 'specific'
+                      ? 'bg-amber-500 text-black shadow-md'
+                      : 'bg-slate-800 text-slate-400 hover:text-white'
+                  }`}
+                >
+                  Specific Workers ({selectedUserIds.length})
+                </button>
+              </div>
+            </div>
+
+            {/* If Specific Workers, Show Search & Multi-Select Checklist */}
+            {targetAudience === 'specific' && (
+              <div className="p-4 rounded-2xl bg-black/40 border border-slate-800 space-y-3">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+                    Select Target Workers ({selectedUserIds.length} of {usersList.length} selected):
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setSelectedUserIds(usersList.map(u => u.id))}
+                      className="text-[9px] font-bold text-amber-400 hover:underline"
+                    >
+                      Select All
+                    </button>
+                    <span className="text-slate-700">•</span>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedUserIds([])}
+                      className="text-[9px] font-bold text-slate-500 hover:text-white"
+                    >
+                      Deselect All
+                    </button>
+                  </div>
+                </div>
+
+                <input
+                  type="text"
+                  value={userSearchQuery}
+                  onChange={e => setUserSearchQuery(e.target.value)}
+                  placeholder="Search workers by username or email..."
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-amber-500/50 placeholder:text-slate-700"
+                />
+
+                <div className="max-h-48 overflow-y-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 pr-1">
+                  {usersList
+                    .filter(u => 
+                      (u.username || '').toLowerCase().includes(userSearchQuery.toLowerCase()) ||
+                      (u.email || '').toLowerCase().includes(userSearchQuery.toLowerCase())
+                    )
+                    .map(user => {
+                      const isSelected = selectedUserIds.includes(user.id);
+                      return (
+                        <div
+                          key={user.id}
+                          onClick={() => {
+                            if (isSelected) {
+                              setSelectedUserIds(selectedUserIds.filter(id => id !== user.id));
+                            } else {
+                              setSelectedUserIds([...selectedUserIds, user.id]);
+                            }
+                          }}
+                          className={`p-2.5 rounded-xl border cursor-pointer flex items-center justify-between gap-2 transition-all select-none ${
+                            isSelected
+                              ? 'bg-amber-500/10 border-amber-500/40 text-white'
+                              : 'bg-slate-900/50 border-slate-800/80 text-slate-400 hover:border-slate-700'
+                          }`}
+                        >
+                          <div className="flex items-center gap-2 min-w-0">
+                            <div className={`w-6 h-6 rounded-lg flex items-center justify-center text-[10px] font-black shrink-0 ${
+                              isSelected ? 'bg-amber-500 text-black' : 'bg-slate-800 text-slate-300'
+                            }`}>
+                              {(user.username || 'U')[0].toUpperCase()}
+                            </div>
+                            <div className="truncate">
+                              <p className="text-xs font-bold text-white truncate">{user.username}</p>
+                              <p className="text-[9px] text-slate-500 truncate">{user.email || 'No email'}</p>
+                            </div>
+                          </div>
+                          <div className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 ${
+                            isSelected ? 'bg-amber-500 border-amber-500 text-black' : 'border-slate-700'
+                          }`}>
+                            {isSelected && <CheckCircle2 size={12} strokeWidth={3} />}
+                          </div>
+                        </div>
+                      );
+                    })}
+                </div>
+              </div>
+            )}
+
+            {/* Banner text input and action buttons */}
+            <div className="flex flex-col sm:flex-row gap-3">
+              <input
+                type="text"
+                value={announcementInput}
+                onChange={e => setAnnouncement_input(e.target.value)}
+                placeholder="e.g. 🔔 Account settlement required. Please contact support..."
+                className="flex-1 bg-black/40 border border-slate-700 rounded-2xl px-5 py-3 text-white text-sm focus:outline-none focus:border-amber-500/50 transition-all placeholder:text-slate-700"
+              />
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={saveAnnouncement}
+                  disabled={savingAnnouncement}
+                  className="px-6 py-3 bg-amber-500 text-black rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-amber-400 transition-all flex items-center gap-2 shadow-lg shadow-amber-500/20 disabled:opacity-50"
+                >
+                  {savingAnnouncement ? 'Saving...' : <><Save size={14} /> Save Banner</>}
+                </button>
+                <button onClick={() => setShowAnnouncementEdit(false)} className="p-3 text-slate-600 hover:text-white transition-colors">
+                  <X size={16} />
+                </button>
+              </div>
+            </div>
           </div>
         )}
       </div>
