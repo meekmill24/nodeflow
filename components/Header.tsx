@@ -179,43 +179,13 @@ export default function Header({ onMenuClick }: HeaderProps) {
                         </div>
 
                         {/* Profile Hub */}
-                        <div className="relative" ref={profileRef}>
-                             <button 
-                                onClick={() => { setIsProfileOpen(!isProfileOpen); setIsNotifOpen(false); }}
-                                className={`p-3 rounded-2xl transition-all border ${isProfileOpen ? 'bg-[#3DD6C8]/10 border-[#3DD6C8]/30 text-[#3DD6C8]' : 'bg-white/5 border-white/5 text-white/40 hover:text-white hover:bg-white/10'}`}
-                             >
-                                <User size={20} />
-                             </button>
-                             {isProfileOpen && (
-                                <div className="absolute top-full right-0 mt-4 w-64 bg-[#0B0B1E] border border-white/10 rounded-[32px] shadow-[0_40px_100px_rgba(0,0,0,0.8)] overflow-hidden animate-in slide-in-from-top-2 duration-300">
-                                     <div className="p-6 bg-white/[0.02] border-b border-white/5 flex items-center gap-4">
-                                        <div className="w-12 h-12 rounded-2xl bg-[#3DD6C8]/10 border border-[#3DD6C8]/20 flex items-center justify-center text-[#3DD6C8] font-black italic">
-                                            {profile?.username?.[0].toUpperCase()}
-                                        </div>
-                                        <div className="flex flex-col">
-                                            <span className="text-xs font-black text-white">{profile?.username}</span>
-                                            <span className="text-[8px] font-black text-white/20 uppercase tracking-[0.2em]">{profile?.level?.name ? profile.level.name : ('VIP Lv.' + (profile?.level_id || 1))}</span>
-                                        </div>
-                                     </div>
-                                     <div className="p-3">
-                                        {[
-                                            { icon: Settings, label: 'Settings', href: '/profile/settings' },
-                                            { icon: CreditCard, label: 'Assets', href: '/profile/wallet' },
-                                            { icon: ShieldCheck, label: 'Security', href: '/profile/security' },
-                                        ].map((link, i) => (
-                                            <Link key={i} href={link.href} onClick={() => setIsProfileOpen(false)} className="flex items-center gap-4 p-4 rounded-2xl hover:bg-white/5 text-white/40 hover:text-white transition-all group">
-                                                <link.icon size={16} className="group-hover:text-[#3DD6C8] transition-colors" />
-                                                <span className="text-[10px] font-black uppercase tracking-[0.2em]">{link.label}</span>
-                                            </Link>
-                                        ))}
-                                        <button onClick={() => { setIsProfileOpen(false); signOut(); }} className="w-full flex items-center gap-4 p-4 rounded-2xl bg-rose-500/5 hover:bg-rose-500/10 text-rose-500 transition-all mt-4 border border-rose-500/10">
-                                            <LogOut size={16} />
-                                            <span className="text-[10px] font-black uppercase tracking-[0.2em]">Disconnect</span>
-                                        </button>
-                                     </div>
-                                </div>
-                             )}
-                        </div>
+                        <Link 
+                            href="/profile"
+                            className="p-3 rounded-2xl transition-all border bg-white/5 border-white/5 text-white/40 hover:text-[#3DD6C8] hover:bg-white/10 hover:border-[#3DD6C8]/30 flex items-center justify-center"
+                            title="Profile"
+                        >
+                            <User size={20} />
+                        </Link>
                     </div>
                 </div>
             </div>

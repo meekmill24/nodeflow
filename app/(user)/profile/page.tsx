@@ -115,8 +115,8 @@ export default function ProfilePage() {
                                 <span className="text-[8px] font-black text-white/40 uppercase tracking-[0.3em] mb-1 leading-none">USER LEVEL</span>
                                 <span className="text-xs font-black text-[#3DD6C8] tracking-widest leading-none uppercase">
                                     {(profile as any)?.level?.name || (
-                                        profile?.level_id === 2 ? 'Junior Agent' :
-                                        profile?.level_id === 1 ? 'Intermediate Agent' :
+                                        profile?.level_id === 1 ? 'Junior Agent' :
+                                        profile?.level_id === 2 ? 'Intermediate Agent' :
                                         profile?.level_id === 3 ? 'Senior Agent' :
                                         profile?.level_id === 4 ? 'Mentor Agent' : 'Junior Agent'
                                     )}

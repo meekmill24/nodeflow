@@ -64,15 +64,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 console.warn(`Profile node not found in any matrix layer for: ${userId}`);
                 setProfile(null);
             } else {
-                // Resolve active level based on assigned DB level_id (default to Junior Agent / level_id: 2)
+                // Resolve active level based on assigned DB level_id (default to Junior Agent / level_id: 1)
                 const { data: allLevels } = await supabase
                     .from('levels')
                     .select('*')
-                    .order('price', { ascending: true });
+                    .order('id', { ascending: true });
 
                 if (allLevels && allLevels.length > 0) {
-                    const targetLevelId = data.level_id || 2;
-                    const assignedLevel = allLevels.find((l: any) => l.id === targetLevelId) || allLevels.find((l: any) => l.price === 100) || allLevels[0];
+                    const targetLevelId = data.level_id || 1;
+                    const assignedLevel = allLevels.find((l: any) => l.id === targetLevelId) || allLevels[0];
                     data = { ...data, level: assignedLevel };
                 }
 

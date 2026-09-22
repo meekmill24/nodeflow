@@ -73,7 +73,7 @@ export default function StartPage() {
     const [tasksPerSet, setTasksPerSet] = useState(40);
     const [setsPerDay, setSetsPerDay] = useState(3);
     const [taskBaseOffset, setTaskBaseOffset] = useState(0);
-    const [commissionRate, setCommissionRate] = useState(0.0045);
+    const [commissionRate, setCommissionRate] = useState(0.004);
     const [minTaskBalance, setMinTaskBalance] = useState(60);
     const [isLoadingData, setIsLoadingData] = useState(true);
     
@@ -111,11 +111,13 @@ export default function StartPage() {
                     if (minBal) setMinTaskBalance(parseFloat(minBal));
                 }
                 if (levelsRes.data) {
-                    const currentLevel = levelsRes.data.find(l => l.id === profile.level_id);
+                    const currentLevel = levelsRes.data.find(l => l.id === profile.level_id) || levelsRes.data[0];
                     if (currentLevel) {
-                        setTasksPerSet(currentLevel.tasks_per_set);
-                        setSetsPerDay(currentLevel.sets_per_day || 3);
-                        setCommissionRate(Number(currentLevel.commission_rate) || 0.0045);
+                        const effectiveTasksPerSet = profile.tasks_per_set_override || currentLevel.tasks_per_set || 40;
+                        const effectiveSetsPerDay = profile.sets_per_day_override || currentLevel.sets_per_day || 3;
+                        setTasksPerSet(effectiveTasksPerSet);
+                        setSetsPerDay(effectiveSetsPerDay);
+                        setCommissionRate(Number(currentLevel.commission_rate) || 0.004);
                         let offset = 0;
                         for (const level of levelsRes.data) {
                             if (level.id === profile.level_id) break;

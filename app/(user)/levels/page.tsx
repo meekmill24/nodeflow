@@ -62,7 +62,7 @@ export default function LevelsPage() {
         fetchLevels();
     }, []);
 
-    const currentLevelId = profile?.level_id || profile?.level?.id || 2;
+    const currentLevelId = profile?.level_id || profile?.level?.id || 1;
     const completedCount = profile?.completed_count || 0;
 
     return (

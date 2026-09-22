@@ -23,7 +23,7 @@ export default function AdminLevelsPage() {
 
   const fetchLevels = async () => { 
     setLoading(true);
-    const { data } = await supabase.from('levels').select('*').order('price', { ascending: true }); 
+    const { data } = await supabase.from('levels').select('*').order('id', { ascending: true }); 
     if (data) setLevels(data as Level[]); 
     setLoading(false); 
   }; 
@@ -208,7 +208,7 @@ export default function AdminLevelsPage() {
                   <div className="flex items-start justify-between mb-8"> 
                     <div> 
                       <div className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-[0.2em] mb-2 w-fit bg-white/5 border border-white/10" style={{ color: level.badge_color }}>
-                        Active Tier
+                        VIP {level.id} • Active Tier
                       </div>
                       <h3 className="text-2xl font-black text-white italic tracking-tight">{level.name.toUpperCase()}</h3> 
                     </div> 

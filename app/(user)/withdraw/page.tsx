@@ -20,27 +20,25 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 
-// Default preset withdrawal tiers
-const QUICK_WITHDRAW_PRESETS = [10, 50, 100, 300, 500, 1000, 1500, 2500, 5000];
-
-// Max limits per level id: Junior (2) = 1500, Intermediate (1) = 2500, Senior (3) = 5000, Mentor (4) = 5000
+// Default preset withdrawal tiers - Only MIN and MAX
+// Max limits per level id: Junior (1) = 1500, Intermediate (2) = 2500, Senior (3) = 5000, Mentor (4) = 5000
 const LEVEL_MAX_WITHDRAWAL: Record<number, number> = {
-    2: 1500, // Junior Agent
-    1: 2500, // Intermediate Agent
+    1: 1500, // Junior Agent
+    2: 2500, // Intermediate Agent
     3: 5000, // Senior Agent
     4: 5000  // Mentor Agent
 };
 
 export default function WithdrawPage() {
     const { profile, refreshProfile } = useAuth();
-    const [amount, setAmount] = useState('10');
+    const [amount, setAmount] = useState('30');
     const [walletAddress, setWalletAddress] = useState(profile?.wallet_address || '');
     type WithdrawNetwork = 'TRX' | 'BEP20' | 'ERC20' | 'ETH' | 'BTC' | 'USDC' | 'BNB' | 'PAYPALUSD';
     const [network, setNetwork] = useState<WithdrawNetwork>('TRX');
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
     const [error, setError] = useState('');
-    const [minWithdrawal, setMinWithdrawal] = useState(10);
+    const [minWithdrawal, setMinWithdrawal] = useState(30);
     const [levelName, setLevelName] = useState('Junior Agent');
     const [levelIndex, setLevelIndex] = useState(1);
     const [showLimitModal, setShowLimitModal] = useState(false);
@@ -56,7 +54,7 @@ export default function WithdrawPage() {
                 .select('key, value')
                 .eq('key', 'min_withdrawal')
                 .maybeSingle();
-            const globalMin = siteData ? parseFloat(siteData.value || '10') : 10;
+            const globalMin = siteData ? parseFloat(siteData.value || '30') : 30;
 
             if (!profile?.level_id) {
                 setMinWithdrawal(globalMin);
@@ -84,9 +82,6 @@ export default function WithdrawPage() {
         fetchSettings();
     }, [profile?.level_id]);
 
-    const selectableAmounts = Array.from(new Set([minWithdrawal, ...QUICK_WITHDRAW_PRESETS]))
-        .filter(v => v >= minWithdrawal && v <= maxWithdrawal);
-
     const handleSelectAmount = (val: number) => {
         if (val > maxWithdrawal) {
             setShowLimitModal(true);
@@ -101,7 +96,7 @@ export default function WithdrawPage() {
             setAmount(String(maxWithdrawal));
             setShowLimitModal(true);
         } else {
-            setAmount(String(Math.max(minWithdrawal, balance)));
+            setAmount(String(maxWithdrawal));
         }
         setError('');
     };
@@ -288,37 +283,49 @@ export default function WithdrawPage() {
                                 </div>
                             </div>
                             
-                            {/* Preset Selection Buttons */}
+                            {/* Preset Selection Buttons (MIN and MAX Only) */}
                             <div className="space-y-2 pt-1">
-                                <span className="text-[9px] font-black text-white/40 uppercase tracking-[0.2em]">Select Preset Amount:</span>
-                                <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
-                                    {selectableAmounts.map(val => (
-                                        <button
-                                            key={val}
-                                            type="button"
-                                            onClick={() => handleSelectAmount(val)}
-                                            className={`py-3 px-2 rounded-2xl border text-xs font-black transition-all flex flex-col items-center gap-1 ${
-                                                parseFloat(amount) === val 
-                                                    ? 'bg-[#3DD6C8] text-[#0B0B1E] border-[#3DD6C8] shadow-[0_0_20px_rgba(61,214,200,0.4)] scale-105' 
-                                                    : 'bg-white/5 border-white/10 text-white/80 hover:bg-white/10 hover:border-white/20'
-                                            }`}
-                                        >
-                                            <span>${val.toLocaleString()}</span>
-                                            <span className="text-[7px] font-bold uppercase tracking-widest opacity-60">
-                                                {val === minWithdrawal ? 'MIN' : val === maxWithdrawal ? 'MAX' : 'TIER'}
-                                            </span>
-                                        </button>
-                                    ))}
+                                <div className="flex items-center justify-between">
+                                    <span className="text-[9px] font-black text-white/40 uppercase tracking-[0.2em]">Select Preset Amount:</span>
+                                    <span className="text-[9px] font-mono text-white/40">Min: ${minWithdrawal} • Max: ${maxWithdrawal.toLocaleString()}</span>
+                                </div>
+                                <div className="grid grid-cols-2 gap-3">
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setAmount(String(minWithdrawal));
+                                            setError('');
+                                        }}
+                                        className={`py-4 px-4 rounded-2xl border text-xs font-black transition-all flex items-center justify-between ${
+                                            parseFloat(amount) === minWithdrawal 
+                                                ? 'bg-[#3DD6C8] text-[#0B0B1E] border-[#3DD6C8] shadow-[0_0_25px_rgba(61,214,200,0.35)] scale-[1.02]' 
+                                                : 'bg-white/5 border-white/10 text-white/80 hover:bg-white/10 hover:border-white/20'
+                                        }`}
+                                    >
+                                        <div className="flex flex-col items-start gap-0.5">
+                                            <span className="text-[8px] font-black uppercase tracking-widest opacity-60">Minimum</span>
+                                            <span className="text-sm font-mono font-black">${minWithdrawal}</span>
+                                        </div>
+                                        <span className="text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full bg-white/10">MIN</span>
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        onClick={handleMaxClick}
+                                        className={`py-4 px-4 rounded-2xl border text-xs font-black transition-all flex items-center justify-between ${
+                                            parseFloat(amount) === maxWithdrawal 
+                                                ? 'bg-[#3DD6C8] text-[#0B0B1E] border-[#3DD6C8] shadow-[0_0_25px_rgba(61,214,200,0.35)] scale-[1.02]' 
+                                                : 'bg-white/5 border-white/10 text-white/80 hover:bg-white/10 hover:border-white/20'
+                                        }`}
+                                    >
+                                        <div className="flex flex-col items-start gap-0.5">
+                                            <span className="text-[8px] font-black uppercase tracking-widest opacity-60">Maximum Limit</span>
+                                            <span className="text-sm font-mono font-black">${maxWithdrawal.toLocaleString()}</span>
+                                        </div>
+                                        <span className="text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full bg-white/10">MAX</span>
+                                    </button>
                                 </div>
                             </div>
-
-                            <button
-                                type="button"
-                                onClick={handleMaxClick}
-                                className="w-full py-3 rounded-2xl bg-[#3DD6C8]/10 border border-[#3DD6C8]/20 text-[10px] font-black text-[#3DD6C8] uppercase tracking-[0.2em] hover:bg-[#3DD6C8]/20 transition-all flex items-center justify-center gap-2"
-                            >
-                                <Zap size={12} /> Claim Max Allowed (${Math.min(balance, maxWithdrawal).toLocaleString()})
-                            </button>
                         </div>
 
                         {/* Network Switcher */}
