@@ -104,10 +104,10 @@ export default function LevelsPage() {
                  </div>
             </div>
 
-            {/* LEVEL GRID - REDESIGNED FOR DESKTOP EXCELLENCE */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+            {/* LEVEL GRID - RESPONSIVE: Mobile Horizontal Snap Scroll, Tablet 2-Col, PC 4-Col */}
+            <div className="flex overflow-x-auto pb-4 pt-1 snap-x snap-mandatory gap-4 -mx-4 px-4 scrollbar-none md:grid md:grid-cols-2 lg:grid-cols-4 md:gap-5 md:overflow-visible md:p-0 md:m-0">
                 {loading ? (
-                    Array(4).fill(0).map((_, i) => <div key={i} className="h-[420px] bg-slate-900/40 rounded-[32px] animate-pulse border border-white/5" />)
+                    Array(4).fill(0).map((_, i) => <div key={i} className="h-[460px] w-[85vw] max-w-[320px] shrink-0 md:w-auto md:max-w-none bg-slate-900/40 rounded-[32px] animate-pulse border border-white/5" />)
                 ) : (
                     levels.slice(0, 4).map((level, idx) => {
                         const Icon = levelIcons[idx] || Zap;
@@ -134,27 +134,44 @@ export default function LevelsPage() {
                         const levelProgress = isCurrentLevel ? progressPercent : (isCompleted ? 100 : 0);
 
                         return (
-                            <div key={level.id} className={`bg-[#0B0B1E] border p-7 rounded-[32px] relative overflow-hidden transition-all duration-700 flex flex-col justify-between h-full group ${isCurrentLevel ? 'border-[#3DD6C8] shadow-[0_30px_70px_rgba(0,0,0,0.6)] z-20' : 'border-white/5 hover:border-white/10'}`}>
-                                <div className={`absolute inset-0 bg-gradient-to-br ${colorClass} opacity-0 group-hover:opacity-100 transition-opacity duration-700`} />
+                            <div 
+                                key={level.id} 
+                                className={`w-[85vw] max-w-[320px] shrink-0 snap-center md:w-auto md:max-w-none bg-[#0B0B1E] border p-6 lg:p-7 rounded-[32px] relative overflow-hidden transition-all duration-500 flex flex-col justify-between group ${
+                                    isCurrentLevel 
+                                        ? 'border-[#3DD6C8] shadow-[0_0_30px_rgba(61,214,200,0.18)] z-10' 
+                                        : 'border-white/5 hover:border-white/10'
+                                }`}
+                            >
+                                <div className={`absolute inset-0 bg-gradient-to-br ${colorClass} opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none`} />
                                 
-                                <div className="relative z-10 space-y-6">
+                                <div className="relative z-10 flex-1 flex flex-col justify-between space-y-5">
+                                    {/* Card Top: Icon & Badge */}
                                     <div className="flex justify-between items-start">
-                                        <div className={`w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center group-hover:bg-[#3DD6C8]/10 group-hover:border-[#3DD6C8]/30 transition-all duration-500`}>
+                                        <div className={`w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center ${isCurrentLevel ? 'bg-[#3DD6C8]/10 border-[#3DD6C8]/30 shadow-[0_0_15px_rgba(61,214,200,0.15)]' : 'group-hover:bg-white/10'} transition-all duration-500`}>
                                             <Icon size={22} className={isCurrentLevel ? 'text-[#3DD6C8]' : 'text-white/40'} />
                                         </div>
-                                        <div className="flex flex-col items-end gap-2">
+                                        <div>
                                             {isCurrentLevel ? (
-                                                <span className="text-[9px] font-black text-[#3DD6C8] uppercase tracking-[0.2em] px-2.5 py-0.5 bg-[#3DD6C8]/10 rounded-full border border-[#3DD6C8]/30">Active</span>
+                                                <span className="text-[9px] font-black text-[#3DD6C8] uppercase tracking-[0.2em] px-3 py-1 bg-[#3DD6C8]/10 rounded-full border border-[#3DD6C8]/30">Active</span>
                                             ) : isLocked ? (
-                                                <Lock size={12} className="text-white/20" />
+                                                <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center">
+                                                    <Lock size={12} className="text-white/30" />
+                                                </div>
                                             ) : (
-                                                <CheckCircle size={14} className="text-[#3DD6C8]" />
+                                                <div className="w-8 h-8 rounded-full bg-[#3DD6C8]/10 flex items-center justify-center">
+                                                    <CheckCircle size={14} className="text-[#3DD6C8]" />
+                                                </div>
                                             )}
                                         </div>
                                     </div>
 
+                                    {/* Title Header with uniform height container for perfect horizontal alignment */}
                                     <div>
-                                        <h3 className="text-xl font-black text-white uppercase tracking-tighter leading-none mb-3 group-hover:text-[#3DD6C8] transition-colors">{level.name}</h3>
+                                        <div className="min-h-[44px] flex items-center mb-3">
+                                            <h3 className="text-base sm:text-lg xl:text-xl font-black text-white uppercase tracking-tight leading-tight group-hover:text-[#3DD6C8] transition-colors">
+                                                {level.name}
+                                            </h3>
+                                        </div>
                                         
                                         {/* Specification Table */}
                                         <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/5 space-y-2.5">
@@ -198,7 +215,7 @@ export default function LevelsPage() {
 
                                 <div className="mt-6 relative z-10">
                                     {isCurrentLevel ? (
-                                        <div className="w-full py-3 bg-gradient-to-r from-[#3DD6C8]/10 to-transparent border border-[#3DD6C8]/20 rounded-xl text-[9px] font-black text-[#3DD6C8] uppercase tracking-[0.3em] text-center shadow-lg shadow-[#3DD6C8]/5">
+                                        <div className="w-full py-3 bg-[#3DD6C8]/15 border border-[#3DD6C8]/40 rounded-xl text-[9px] font-black text-[#3DD6C8] uppercase tracking-[0.3em] text-center shadow-lg shadow-[#3DD6C8]/10">
                                             ACTIVE LEVEL
                                         </div>
                                     ) : isLocked ? (
