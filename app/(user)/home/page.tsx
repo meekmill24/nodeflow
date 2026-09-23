@@ -93,26 +93,29 @@ export default function HomePage() {
         <div className="space-y-12 animate-in fade-in duration-1000 pb-20">
             
             {/* TERMINAL HEADER */}
-            <div className="relative group perspective-1000 overflow-hidden rounded-[48px] bg-slate-900 shadow-2xl border border-white/5">
+            <div className="relative group perspective-1000 overflow-hidden rounded-[36px] md:rounded-[48px] bg-slate-900 shadow-2xl border border-white/5">
                 <div className="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-transparent via-[#3DD6C8] to-transparent opacity-30 blur-sm" />
-                <div className="relative p-10 md:p-14 flex flex-col md:flex-row md:items-center justify-between gap-10">
-                    <div className="flex-1 space-y-6">
-                        <div className="flex items-center gap-4">
-                            <div className="w-16 h-16 rounded-3xl bg-[#3DD6C8]/10 border border-[#3DD6C8]/30 flex items-center justify-center relative shadow-[0_0_30px_rgba(61,214,200,0.15)] overflow-hidden group-hover:scale-105 transition-transform duration-700">
+                <div className="relative p-6 sm:p-8 lg:p-12 flex flex-col lg:flex-row lg:items-center justify-between gap-6 lg:gap-8">
+                    <div className="flex-1 min-w-0">
+                        <div className="flex items-start sm:items-center gap-4">
+                            <div className="w-14 h-14 sm:w-16 sm:h-16 shrink-0 rounded-2xl sm:rounded-3xl bg-[#3DD6C8]/10 border border-[#3DD6C8]/30 flex items-center justify-center relative shadow-[0_0_30px_rgba(61,214,200,0.15)] overflow-hidden group-hover:scale-105 transition-transform duration-700">
                                 <div className="absolute inset-0 bg-gradient-to-br from-[#3DD6C8]/20 to-transparent animate-pulse" />
-                                <Cpu className="text-[#3DD6C8] relative z-10" size={32} />
+                                <Cpu className="text-[#3DD6C8] relative z-10" size={28} />
                             </div>
-                            <div>
-                                <h1 className="text-3xl md:text-5xl font-black text-white italic uppercase tracking-tighter leading-none flex items-baseline gap-2">
-                                    {t('welcome_back')}, <span className="bg-gradient-to-r from-white via-white to-white/40 bg-clip-text text-transparent">{profile?.username || 'Node'}</span>
-                                    <span className="text-[#E34304] scale-150 ml-0.5">.</span>
+                            <div className="min-w-0 flex-1">
+                                <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-black text-white italic uppercase tracking-tight leading-tight break-words">
+                                    {t('welcome_back')},{' '}
+                                    <span className="text-[#3DD6C8] drop-shadow-[0_0_20px_rgba(61,214,200,0.25)]">
+                                        {profile?.display_name || profile?.username || 'Node'}
+                                    </span>
+                                    <span className="text-[#E34304] scale-125 inline-block ml-1">.</span>
                                 </h1>
-                                <div className="flex flex-wrap items-center gap-3 mt-4">
+                                <div className="flex flex-wrap items-center gap-2 sm:gap-3 mt-3">
                                     <div className="flex items-center gap-2 px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-full">
                                         <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.8)]" />
                                         <span className="text-[9px] font-black text-emerald-400 uppercase tracking-[0.2em]">{t('neural_active')}</span>
                                     </div>
-                                    <span className="text-[9px] font-black text-white/30 uppercase tracking-[0.4em] italic">Verified Account</span>
+                                    <span className="text-[9px] font-black text-white/30 uppercase tracking-[0.3em] italic">Verified Account</span>
                                     <div className="flex items-center gap-2 px-3 py-1 bg-white/5 border border-white/10 rounded-full group/ref cursor-pointer hover:bg-white/10 transition-all" onClick={() => {
                                         navigator.clipboard.writeText(profile?.referral_code || '');
                                         toast.success('Referral Protocol Copied');
@@ -126,12 +129,12 @@ export default function HomePage() {
                         </div>
                     </div>
                     
-                    <div className="flex items-center gap-8 md:border-l border-white/10 md:pl-10">
-                         <div className="flex flex-col text-right">
-                             <span className="text-[10px] font-black text-white/40 uppercase tracking-[0.4em] mb-1">NETWORK LATENCY</span>
-                             <span className="text-xl font-mono font-black text-[#3DD6C8]">1.24ms</span>
+                    <div className="shrink-0 flex items-center justify-between sm:justify-end gap-6 lg:gap-8 lg:border-l border-white/10 lg:pl-8 pt-4 lg:pt-0 border-t border-white/5 lg:border-t-0">
+                         <div className="flex flex-col text-left sm:text-right whitespace-nowrap">
+                             <span className="text-[9px] sm:text-[10px] font-black text-white/40 uppercase tracking-[0.25em] mb-1">NETWORK LATENCY</span>
+                             <span className="text-lg sm:text-xl font-mono font-black text-[#3DD6C8]">1.24ms</span>
                          </div>
-                         <div className="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center p-1 relative overflow-hidden group/logo">
+                         <div className="w-11 h-11 sm:w-12 sm:h-12 shrink-0 rounded-full border border-white/10 flex items-center justify-center p-1.5 relative overflow-hidden group/logo">
                             <div className="absolute inset-0 bg-[#3DD6C8]/5 opacity-0 group-hover/logo:opacity-100 transition-opacity" />
                             <img src="/logo.png" alt="Logo" className="w-full h-full object-contain filter grayscale group-hover:grayscale-0 transition-all duration-700" />
                          </div>
