@@ -50,13 +50,13 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
         <>
             {isOpen && (
                 <div 
-                    className="fixed inset-0 bg-black/80 backdrop-blur-md z-[60] lg:hidden animate-in fade-in duration-500"
+                    className="fixed inset-0 bg-black/80 backdrop-blur-md z-[60] md:hidden animate-in fade-in duration-500"
                     onClick={onClose}
                 />
             )}
 
             <aside className={`
-                fixed top-0 left-0 h-screen w-72 z-[70] transition-all duration-500 transform lg:translate-x-0
+                fixed top-0 left-0 h-screen w-72 z-[70] transition-all duration-500 transform md:translate-x-0
                 ${isOpen ? 'translate-x-0' : '-translate-x-full'}
                 flex flex-col bg-[#0B0B1E]/95 backdrop-blur-3xl border-r border-white/5 shadow-[30px_0_60px_rgba(0,0,0,0.8)]
             `}>
@@ -75,7 +75,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                             <span className="text-[8px] font-black text-white/30 uppercase tracking-[0.4em] mt-1.5 leading-none">Node Controller</span>
                         </div>
                     </div>
-                    <button onClick={onClose} className="lg:hidden p-2 text-white/40 hover:text-white transition-colors"><X size={20} /></button> 
+                    <button onClick={onClose} className="md:hidden p-2 text-white/40 hover:text-white transition-colors"><X size={20} /></button> 
                 </div>
 
                 <div className="flex-1 overflow-y-auto custom-scrollbar px-6 py-8 space-y-10">

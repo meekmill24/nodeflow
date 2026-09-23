@@ -271,7 +271,7 @@ export default function StartPage() {
             {/* FROZEN ACCOUNT OVERLAY */}
             {profile?.is_frozen && (
                 <Portal>
-                    <div className="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-black/90 backdrop-blur-2xl lg:pl-72">
+                    <div className="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-black/90 backdrop-blur-2xl md:pl-72">
                         <div className="bg-[#0f0f12] border border-red-500/20 rounded-[48px] w-full max-w-md p-12 text-center space-y-8 shadow-[0_0_80px_rgba(239,68,68,0.15)] relative overflow-hidden">
                             <div className="absolute inset-0 bg-gradient-to-b from-red-500/5 to-transparent pointer-events-none" />
                             <div className="relative z-10 flex flex-col items-center gap-8">

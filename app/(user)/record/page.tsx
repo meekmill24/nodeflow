@@ -145,7 +145,7 @@ export default function RecordPage() {
                     <Clock size={14} /> Optimization Ledger
                 </div>
             </div>
-            <div className="flex flex-col md:flex-row lg:items-center justify-between gap-4">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
                     <h2 className="text-2xl font-black text-text-primary uppercase tracking-tight">Task Record</h2>
                     <p className="text-text-secondary text-xs mt-1 font-bold uppercase tracking-widest">{filteredTasks.length} total records found</p>
@@ -202,7 +202,7 @@ export default function RecordPage() {
 
             <div className="glass-card overflow-hidden border border-white/5 bg-surface/50">
                 {/* Desktop Header */}
-                <div className="hidden lg:grid grid-cols-5 bg-black/10 dark:bg-white/5 border-b border-white/5 text-[10px] font-black text-text-secondary uppercase tracking-[0.2em]">
+                <div className="hidden md:grid grid-cols-5 bg-black/10 dark:bg-white/5 border-b border-white/5 text-[10px] font-black text-text-secondary uppercase tracking-[0.2em]">
                     <span className="px-6 py-4 border-r border-white/5">{t('timestamp')}</span>
                     <span className="px-6 py-4 border-r border-white/5">Details</span>
                     <span className="px-6 py-4 border-r border-white/5">Capital</span>
@@ -222,9 +222,9 @@ export default function RecordPage() {
                         </div>
                     ) : (
                         filteredTasks.map((task, idx) => (
-                            <div key={task.id} className={`flex flex-col lg:grid lg:grid-cols-5 items-stretch hover:bg-white/[0.03] transition-all group border-b border-white/[0.05] last:border-0 ${idx % 2 === 0 ? 'bg-transparent' : 'bg-black/[0.01] dark:bg-white/[0.01]'}`}>
+                            <div key={task.id} className={`flex flex-col md:grid md:grid-cols-5 items-stretch hover:bg-white/[0.03] transition-all group border-b border-white/[0.05] last:border-0 ${idx % 2 === 0 ? 'bg-transparent' : 'bg-black/[0.01] dark:bg-white/[0.01]'}`}>
                                 {/* Mobile Header / Desktop Time */}
-                                <div className="px-4 md:px-6 py-4 md:py-5 border-r lg:border-white/5 flex flex-row lg:flex-col items-center lg:items-start justify-between lg:justify-center gap-2">
+                                <div className="px-4 md:px-6 py-4 md:py-5 border-r md:border-white/5 flex flex-row md:flex-col items-center md:items-start justify-between md:justify-center gap-2">
                                     <div className="flex flex-col">
                                         <p className="text-[11px] text-text-primary font-bold">
                                             {new Date(task.status === 'completed' && task.completed_at ? task.completed_at : task.created_at).toLocaleDateString(
@@ -249,13 +249,13 @@ export default function RecordPage() {
                                             )}
                                         </p>
                                     </div>
-                                    <div className="lg:hidden">
+                                    <div className="md:hidden">
                                         {statusBadge(task.status)}
                                     </div>
                                 </div>
 
                                 {/* Details */}
-                                <div className="flex flex-col px-4 md:px-6 py-4 md:py-5 border-r md:border-white/5 justify-center bg-white/[0.02] lg:bg-transparent">
+                                <div className="flex flex-col px-4 md:px-6 py-4 md:py-5 border-r md:border-white/5 justify-center bg-white/[0.02] md:bg-transparent">
                                     <div className="flex items-center gap-3">
                                         <div className="w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary-light shrink-0">
                                             <Zap size={18} />
@@ -275,13 +275,13 @@ export default function RecordPage() {
                                 </div>
 
                                 {/* Capital/Value */}
-                                <div className="px-4 md:px-6 py-4 md:py-5 border-r md:border-white/5 flex flex-row md:flex-col items-center md:items-start justify-between md:justify-center border-t lg:border-t-0 border-white/5">
+                                <div className="px-4 md:px-6 py-4 md:py-5 border-r md:border-white/5 flex flex-row md:flex-col items-center md:items-start justify-between md:justify-center border-t md:border-t-0 border-white/5">
                                     <div className="flex flex-col">
                                         <span className="text-[10px] opacity-30 uppercase tracking-[0.2em] font-black mb-0.5">Base Value</span>
                                         <span className="text-[13px] font-black text-text-primary tracking-tight">{format(task.cost_amount || 0)}</span>
                                     </div>
                                     {task.is_bundle && task.status === 'pending' && (
-                                        <div className="flex flex-col border-l lg:border-l-0 md:border-t border-white/10 pl-4 lg:pl-0 lg:pt-1.5">
+                                        <div className="flex flex-col border-l md:border-l-0 md:border-t border-white/10 pl-4 md:pl-0 md:pt-1.5">
                                             <span className="text-[9px] text-amber-500/80 uppercase tracking-widest font-black">
                                                 {profile && profile.wallet_balance < 0 ? 'Deficit' : 'Hold Status'}
                                             </span>
@@ -313,15 +313,15 @@ export default function RecordPage() {
                                 </div>
 
                                 {/* Desktop Status / Actions */}
-                                <div className="px-4 md:px-6 py-6 md:py-5 flex flex-col items-stretch lg:items-end justify-center gap-3 bg-white/[0.01] md:bg-transparent border-t md:border-t-0 border-white/10">
-                                    <div className="hidden lg:block">
+                                <div className="px-4 md:px-6 py-6 md:py-5 flex flex-col items-stretch md:items-end justify-center gap-3 bg-white/[0.01] md:bg-transparent border-t md:border-t-0 border-white/10">
+                                    <div className="hidden md:block">
                                         {statusBadge(task.status)}
                                     </div>
                                     {task.status === 'pending' && (
                                         profile && profile.wallet_balance < 0 ? (
                                             <button
                                                 onClick={() => router.push('/service')}
-                                                className="w-full lg:w-auto px-6 py-3 lg:py-2 rounded-xl bg-amber-500 text-white text-[10px] font-black uppercase tracking-widest shadow-xl shadow-amber-500/30 transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2 group"
+                                                className="w-full md:w-auto px-6 py-3 md:py-2 rounded-xl bg-amber-500 text-white text-[10px] font-black uppercase tracking-widest shadow-xl shadow-amber-500/30 transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2 group"
                                             >
                                                 <Headset size={14} className="group-hover:rotate-12 transition-transform" />
                                                 Contact Manager
