@@ -614,9 +614,9 @@ export default function StartPage() {
             {/* TASK SET COMPLETION MODAL */}
             {showCompletionModal && (
                 <Portal>
-                    <div className="fixed inset-0 z-[10001] flex items-start justify-center p-4 pt-10 sm:pt-14 md:pt-18 bg-black/85 backdrop-blur-md animate-fade-in md:pl-72 overflow-y-auto">
+                    <div className="fixed inset-0 z-[10001] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-fade-in md:pl-72 overflow-y-auto">
                         <div 
-                            className="bg-[#0B0B1E] border border-[#3DD6C8]/40 w-full max-w-md rounded-[36px] p-6 sm:p-8 shadow-[0_30px_120px_rgba(0,0,0,0.95)] relative overflow-hidden text-center space-y-5 animate-scale-in max-h-[90vh] overflow-y-auto custom-scrollbar"
+                            className="bg-[#0B0B1E] border border-[#3DD6C8]/40 w-full max-w-md rounded-[36px] p-6 sm:p-8 shadow-[0_30px_120px_rgba(0,0,0,0.95)] relative overflow-hidden text-center space-y-5 animate-scale-in max-h-[90vh] overflow-y-auto custom-scrollbar -translate-y-16 sm:-translate-y-24 md:-translate-y-28"
                             onClick={(e) => e.stopPropagation()}
                         >
                             <div className="absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-transparent via-[#3DD6C8] to-transparent" />
@@ -671,11 +671,11 @@ export default function StartPage() {
             {showMinBalanceModal && (
                 <Portal>
                     <div 
-                        className="fixed inset-0 z-[10001] flex items-start justify-center p-4 pt-12 sm:pt-16 md:pt-20 bg-black/80 backdrop-blur-md animate-fade-in md:pl-72 overflow-y-auto"
+                        className="fixed inset-0 z-[10001] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in md:pl-72 overflow-y-auto"
                         onClick={() => setShowMinBalanceModal(false)}
                     >
                         <div 
-                            className="bg-[#0B0B1E] border border-rose-500/30 w-full max-w-sm rounded-[32px] p-6 sm:p-7 shadow-[0_30px_100px_rgba(0,0,0,0.9)] text-center space-y-4 animate-scale-in max-h-[85vh] overflow-y-auto custom-scrollbar"
+                            className="bg-[#0B0B1E] border border-rose-500/30 w-full max-w-sm rounded-[32px] p-6 sm:p-7 shadow-[0_30px_100px_rgba(0,0,0,0.9)] text-center space-y-4 animate-scale-in max-h-[85vh] overflow-y-auto custom-scrollbar -translate-y-24 sm:-translate-y-32 md:-translate-y-36"
                             onClick={(e) => e.stopPropagation()}
                         >
                             <div className="w-16 h-16 mx-auto rounded-2xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-500">
