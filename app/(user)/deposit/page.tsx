@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { QRCodeSVG } from 'qrcode.react';
+import TransactionReceipt from '@/components/TransactionReceipt';
 
 // Pre-set amounts matching $60 minimum task balance
 const PRESET_AMOUNTS = [60, 100, 300, 500, 1000, 2500, 5000];
@@ -37,6 +38,7 @@ export default function DepositPage() {
     const [proofFile, setProofFile] = useState<File | null>(null);
     const [proofPreview, setProofPreview] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const [submittedTx, setSubmittedTx] = useState<{ id: string | number; amount: number; network: string; walletAddress: string; proofUrl?: string | null; date: string } | null>(null);
 
     const settings = useSiteSettings() as any;
     
@@ -105,13 +107,26 @@ export default function DepositPage() {
                 .getPublicUrl(filePath);
 
             // 2. Create transaction
-            await supabase.from('transactions').insert({
+            const { data: txData, error: txError } = await supabase.from('transactions').insert({
                 user_id: profile.id,
                 type: 'deposit',
                 amount: parseFloat(finalAmount),
                 description: `Deposit via ${network} ($${finalAmount})`,
                 status: 'pending',
                 proof_url: publicUrl
+            }).select().single();
+
+            if (txError) throw txError;
+            
+            const resolvedNetworkName = network === 'TRX' ? 'USDT (TRC-20)' : network === 'BEP20' ? 'USDT (BEP-20)' : network === 'ERC20' ? 'USDT (ERC-20)' : network;
+
+            setSubmittedTx({
+                id: txData?.id || Math.floor(100000 + Math.random() * 900000),
+                amount: parseFloat(finalAmount),
+                network: resolvedNetworkName,
+                walletAddress: depositAddress,
+                proofUrl: publicUrl,
+                date: new Date().toUTCString()
             });
             
             setSubmitted(true);
@@ -123,30 +138,19 @@ export default function DepositPage() {
         }
     };
 
-    if (submitted) {
+    if (submitted && submittedTx) {
         return (
-            <div className="flex flex-col items-center justify-center min-h-[60vh] text-center space-y-6 animate-scale-in">
-                <div className="w-20 h-20 rounded-full bg-success/20 flex items-center justify-center shadow-[0_0_30px_var(--color-success)]">
-                    <CheckCircle size={40} className="text-success" />
-                </div>
-                <div>
-                    <h2 className="text-2xl font-black text-white uppercase tracking-tight">Deposit submitted</h2>
-                    <p className="text-text-secondary text-sm mt-2 max-w-xs mx-auto italic">
-                        "Wait for Customer service to confirm you deposit"
-                    </p>
-                    <p className="text-text-secondary text-[11px] mt-4 max-w-xs mx-auto font-bold uppercase tracking-wider text-warning">
-                        Deposits are processed within 4-5 hours depending on the network and blockchain confirmation.
-                    </p>
-                </div>
-                <div className="flex flex-col sm:flex-row gap-4 w-full justify-center">
-                    <Link href="/home" className="px-8 py-3 bg-white/5 text-text-secondary font-black text-xs uppercase tracking-widest rounded-full border border-white/10 hover:bg-white/10 transition-all">
-                        Return to Dashboard
-                    </Link>
-                    <Link href="/record/deposit" className="px-8 py-3 bg-primary text-white font-black text-xs uppercase tracking-widest rounded-full shadow-lg shadow-primary/25 hover:bg-primary-light transition-all">
-                        View Deposit Records
-                    </Link>
-                </div>
-            </div>
+            <TransactionReceipt
+                type="deposit"
+                transactionId={submittedTx.id}
+                amount={submittedTx.amount}
+                network={submittedTx.network}
+                walletAddress={submittedTx.walletAddress}
+                proofUrl={submittedTx.proofUrl}
+                username={profile?.username || 'Agent'}
+                userId={profile?.id}
+                date={submittedTx.date}
+            />
         );
     }
 

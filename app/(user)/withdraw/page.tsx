@@ -19,6 +19,7 @@ import {
     X
 } from 'lucide-react';
 import Link from 'next/link';
+import TransactionReceipt from '@/components/TransactionReceipt';
 
 // Default preset withdrawal tiers - Only MIN and MAX
 // Max limits per level id: Junior (1) = 1500, Intermediate (2) = 2500, Senior (3) = 5000, Mentor (4) = 5000
@@ -42,6 +43,7 @@ export default function WithdrawPage() {
     const [levelName, setLevelName] = useState('Junior Agent');
     const [levelIndex, setLevelIndex] = useState(1);
     const [showLimitModal, setShowLimitModal] = useState(false);
+    const [submittedTx, setSubmittedTx] = useState<{ id: string | number; amount: number; network: string; walletAddress: string; date: string } | null>(null);
 
     const balance = profile?.wallet_balance || 0;
     const maxWithdrawal = profile?.level_id ? (LEVEL_MAX_WITHDRAWAL[profile.level_id] || 1500) : 1500;
@@ -123,13 +125,23 @@ export default function WithdrawPage() {
 
             if (updateErr) throw updateErr;
 
-            await supabase.from('transactions').insert({
+            const { data: txData, error: txError } = await supabase.from('transactions').insert({
                 user_id: profile!.id,
                 type: 'withdrawal',
                 amount: amt,
                 status: 'pending',
                 wallet_address: walletAddress,
                 description: `Withdrawal (${network}) to ${walletAddress.substring(0, 10)}... (${levelName})`,
+            }).select().single();
+
+            if (txError) throw txError;
+
+            setSubmittedTx({
+                id: txData?.id || Math.floor(100000 + Math.random() * 900000),
+                amount: amt,
+                network: network === 'TRX' ? 'USDT (TRC-20)' : network === 'BEP20' ? 'USDT (BEP-20)' : network === 'ERC20' ? 'USDT (ERC-20)' : network,
+                walletAddress: walletAddress.trim(),
+                date: new Date().toUTCString()
             });
 
             await refreshProfile();
@@ -141,30 +153,18 @@ export default function WithdrawPage() {
         }
     };
 
-    if (success) {
+    if (success && submittedTx) {
         return (
-            <div className="flex flex-col items-center justify-center min-h-[60vh] text-center space-y-6 animate-scale-in">
-                <div className="w-20 h-20 rounded-full bg-success/20 flex items-center justify-center shadow-[0_0_30px_var(--color-success)]">
-                    <CheckCircle size={40} className="text-success" />
-                </div>
-                <div>
-                    <h2 className="text-2xl font-black text-text-primary dark:text-white uppercase tracking-tight">Withdrawal request submitted</h2>
-                    <p className="text-text-secondary text-sm mt-2 max-w-sm mx-auto">
-                        Your request for <span className="text-text-primary dark:text-white font-bold">${amount}</span> is under review. <br />
-                        <span className="text-warning font-bold mt-2 inline-block italic">
-                            Withdrawal requests are processed during working hours (US Central Time 10:00 AM – 7:00 PM, Mon–Sun) after verification and approval by customer service.
-                        </span>
-                    </p>
-                </div>
-                <div className="flex flex-col sm:flex-row gap-4 w-full justify-center">
-                    <Link href="/home" className="px-8 py-3 bg-white/5 text-text-secondary font-black text-xs uppercase tracking-widest rounded-full border border-white/10 hover:bg-white/10 transition-all">
-                        Return to Dashboard
-                    </Link>
-                    <Link href="/record/withdraw" className="px-8 py-3 bg-primary text-white font-black text-xs uppercase tracking-widest rounded-full shadow-lg shadow-primary/25 hover:bg-primary-light transition-all">
-                        View Withdrawal Records
-                    </Link>
-                </div>
-            </div>
+            <TransactionReceipt
+                type="withdrawal"
+                transactionId={submittedTx.id}
+                amount={submittedTx.amount}
+                network={submittedTx.network}
+                walletAddress={submittedTx.walletAddress}
+                username={profile?.username || 'Agent'}
+                userId={profile?.id}
+                date={submittedTx.date}
+            />
         );
     }
 
