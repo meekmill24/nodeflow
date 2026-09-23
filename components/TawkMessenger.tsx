@@ -14,33 +14,33 @@ export default function TawkMessenger() {
         (window as any).Tawk_API = (window as any).Tawk_API || {};
         (window as any).Tawk_LoadStart = new Date();
 
-        // 1. Immediately hide default green launcher widget once Tawk finishes loading
+        let isHandlingState = false;
+
+        // 1. Immediately hide default launcher widget once Tawk finishes loading
         (window as any).Tawk_API.onLoad = function () {
             try {
-                (window as any).Tawk_API.hideWidget();
+                (window as any).Tawk_API.hideWidget?.();
             } catch (err) {
-                console.error('Tawk hideWidget error:', err);
+                console.error('Tawk hideWidget error on load:', err);
             }
         };
 
-        // 2. When chat is minimized or hidden, ensure default launcher stays hidden
+        // 2. When chat is minimized by user, hide the default widget launcher so only DraggableChat remains visible
         (window as any).Tawk_API.onChatMinimized = function () {
+            if (isHandlingState) return;
+            isHandlingState = true;
             try {
-                (window as any).Tawk_API.hideWidget();
+                (window as any).Tawk_API.hideWidget?.();
             } catch (err) {
-                console.error('Tawk hideWidget error:', err);
+                console.error('Tawk hideWidget error on minimize:', err);
+            } finally {
+                setTimeout(() => {
+                    isHandlingState = false;
+                }, 500);
             }
         };
 
-        (window as any).Tawk_API.onChatHidden = function () {
-            try {
-                (window as any).Tawk_API.hideWidget();
-            } catch (err) {
-                console.error('Tawk hideWidget error:', err);
-            }
-        };
-
-        // 3. Inject script safely into the DOM
+        // 3. Inject script safely into the DOM once
         if (!document.getElementById('tawk-script')) {
             const s1 = document.createElement("script");
             const s0 = document.getElementsByTagName("script")[0];
@@ -56,24 +56,6 @@ export default function TawkMessenger() {
                 document.head.appendChild(s1);
             }
         }
-
-        // 4. Periodic watchdog to ensure the default widget launcher is never visible when chat is minimized
-        const watchdog = setInterval(() => {
-            const tawk = (window as any).Tawk_API;
-            if (tawk && typeof tawk.hideWidget === 'function') {
-                if (typeof tawk.isChatMaximized === 'function') {
-                    if (!tawk.isChatMaximized()) {
-                        tawk.hideWidget();
-                    }
-                } else {
-                    tawk.hideWidget();
-                }
-            }
-        }, 500);
-
-        return () => {
-            clearInterval(watchdog);
-        };
     }, [propertyId, widgetId]);
 
     return null;
