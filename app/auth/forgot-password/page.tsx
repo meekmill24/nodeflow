@@ -52,7 +52,18 @@ export default function ForgotPasswordPage() {
             <div className="absolute bottom-[-10%] left-[-10%] w-[50%] h-[50%] bg-[#3DD6C8]/5 rounded-full blur-[120px] animate-pulse delay-700" />
 
             <div className="w-full max-w-md px-6 z-10">
-                <div className="flex flex-col gap-8">
+                <div className="flex flex-col gap-6">
+                    {/* Back to Landing Page Button */}
+                    <div className="flex items-center justify-start w-full">
+                        <Link 
+                            href="/" 
+                            className="inline-flex items-center gap-2 text-xs font-bold text-slate-400 hover:text-[#3DD6C8] transition-colors py-2 px-3.5 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/5 hover:border-[#3DD6C8]/30 group"
+                        >
+                            <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
+                            <span>Back to Home</span>
+                        </Link>
+                    </div>
+
                     <div className="flex flex-col items-center gap-2">
                         <div className="w-20 h-20 rounded-3xl flex items-center justify-center shadow-2xl mb-4 overflow-hidden border border-white/10 bg-slate-900/50 backdrop-blur-xl">
                             <NextImage src="/logo.png" alt="Logo" width={80} height={80} className="object-cover" />

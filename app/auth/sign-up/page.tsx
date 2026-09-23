@@ -15,7 +15,7 @@ import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useState, useEffect, Suspense } from 'react'
 import NextImage from 'next/image'
-import { ArrowRight, Sparkles, User, Mail, Lock, UserCheck, ShieldCheck, Share2, Phone, AtSign, AlertCircle } from 'lucide-react'
+import { ArrowRight, ArrowLeft, Sparkles, User, Mail, Lock, UserCheck, ShieldCheck, Share2, Phone, AtSign, AlertCircle } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '@/lib/utils'
 
@@ -192,7 +192,18 @@ function SignUpForm() {
             <div className="absolute bottom-[-10%] left-[-10%] w-[50%] h-[50%] bg-[#007CBA]/5 rounded-full blur-[120px] animate-pulse delay-700" />
             
             <div className="w-full max-w-md px-6 z-10">
-                <div className="flex flex-col gap-8">
+                <div className="flex flex-col gap-6">
+                    {/* Back to Landing Page Button */}
+                    <div className="flex items-center justify-start w-full">
+                        <Link 
+                            href="/" 
+                            className="inline-flex items-center gap-2 text-xs font-bold text-slate-500 hover:text-[#007CBA] transition-colors py-2 px-3.5 rounded-2xl bg-white hover:bg-slate-50 border border-slate-200 shadow-sm group"
+                        >
+                            <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
+                            <span>Back to Home</span>
+                        </Link>
+                    </div>
+
                     <div className="flex flex-col items-center gap-2">
                         <div className="w-16 h-16 rounded-2xl flex items-center justify-center shadow-2xl mb-2 overflow-hidden border-2 border-slate-200/50" style={{background: '#0F172A'}}>
                             <NextImage src="/logo.png" alt="Logo" width={64} height={64} className="object-cover" />

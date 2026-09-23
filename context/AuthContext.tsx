@@ -208,10 +208,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }, [user?.id, fetchProfile]);
 
     const signOut = useCallback(async () => {
-        await supabase.auth.signOut();
+        try {
+            await supabase.auth.signOut();
+        } catch (err) {
+            console.error('SignOut error:', err);
+        }
         setUser(null);
         setProfile(null);
-        router.push('/login');
+        router.replace('/auth/login');
     }, [router]);
 
     useEffect(() => {
