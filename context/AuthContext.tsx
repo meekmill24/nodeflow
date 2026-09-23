@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase/index';
 import type { Profile } from '@/lib/types';
@@ -30,6 +30,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [user, setUser] = useState<User | null>(null);
     const [profile, setProfile] = useState<Profile | null>(null);
     const [loading, setLoading] = useState(true);
+    const userRef = useRef<User | null>(null);
     const router = useRouter();
 
     const fetchProfile = useCallback(async (userId: string) => {
@@ -103,9 +104,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
                 if (session?.user) {
                     console.log("Session User:", session.user.email, "| ID:", session.user.id);
+                    userRef.current = session.user;
                     setUser(session.user);
                     await fetchProfile(session.user.id);
                 } else {
+                    userRef.current = null;
                     setUser(null);
                     setProfile(null);
                 }
@@ -116,9 +119,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 if (mounted) {
                     const { data: { user: fallbackUser } } = await supabase.auth.getUser();
                     if (fallbackUser) {
+                        userRef.current = fallbackUser;
                         setUser(fallbackUser);
                         await fetchProfile(fallbackUser.id);
                     } else {
+                        userRef.current = null;
                         setUser(null);
                         setProfile(null);
                     }
@@ -135,30 +140,38 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             async (event, session) => {
                 if (!mounted) return;
 
-                // LOGIC CALIBRATION: Prevent refreshes on simple background token updates
-                if (event === 'TOKEN_REFRESHED' && user?.id === session?.user?.id) {
+                // CRITICAL FIX: Background token refresh should be completely silent.
+                // Never trigger full-screen loading spinner or reload while user is idle.
+                if (event === 'TOKEN_REFRESHED') {
+                    if (session?.user) {
+                        userRef.current = session.user;
+                        setUser(session.user);
+                    }
                     return;
                 }
 
                 if (event === 'INITIAL_SESSION' && !initialized) return;
 
                 if (session?.user) {
-                    console.log("Logged in as:", session.user.email, "| ID:", session.user.id);
-                    // Only trigger full loading state if it is a new user context
-                    if (user?.id !== session.user.id) {
-                        setLoading(true);
-                        setUser(session.user);
+                    const currentUserId = userRef.current?.id;
+                    const isSameUser = currentUserId === session.user.id;
+
+                    userRef.current = session.user;
+                    setUser(session.user);
+
+                    // Only refetch profile if user ID changed or on initial load
+                    if (!isSameUser) {
+                        if (!initialized) setLoading(true);
                         await fetchProfile(session.user.id);
-                    } else {
-                        setUser(session.user);
                     }
                 } else if (event === 'SIGNED_OUT') {
                     console.log("Auth session signed out");
+                    userRef.current = null;
                     setUser(null);
                     setProfile(null);
                 }
 
-                if (mounted) setLoading(false);
+                if (mounted && !initialized) setLoading(false);
             }
         );
 

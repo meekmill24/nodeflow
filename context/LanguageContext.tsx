@@ -25,6 +25,7 @@ const translations: Record<LanguageCode, Record<string, string>> = {
         currency: 'Currency',
         dark_mode: 'Dark mode',
         notifications: 'Notifications',
+        mark_all_read: 'Mark all as read',
         account_security: 'Account & security',
         email_address: 'Email address',
         change_password: 'Change password',

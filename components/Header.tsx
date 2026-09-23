@@ -193,19 +193,42 @@ export default function Header({ onMenuClick }: HeaderProps) {
                                 {unreadCount > 0 && <span className="absolute top-2 right-2 w-2.5 h-2.5 rounded-full bg-[#E34304] border-2 border-[#0B0B1E] animate-pulse" />}
                              </button>
                              {isNotifOpen && (
-                                <div className="absolute top-full right-0 mt-4 w-80 bg-[#0B0B1E] border border-white/10 rounded-[32px] shadow-[0_40px_100px_rgba(0,0,0,0.8)] p-6 animate-in slide-in-from-top-2 duration-300">
-                                     <div className="flex items-center justify-between mb-6">
-                                        <h3 className="text-[10px] font-black text-white/40 uppercase tracking-[0.4em]">Signal Logs</h3>
-                                        <button onClick={markAllRead} className="text-[9px] font-black text-[#3DD6C8] uppercase tracking-[0.2em]">{t('mark_all_read')}</button>
+                                <div className="absolute top-full right-0 mt-3 w-80 sm:w-96 bg-[#0B0B1E]/95 backdrop-blur-2xl border border-white/10 rounded-[28px] shadow-[0_30px_90px_rgba(0,0,0,0.9)] p-5 z-50 animate-in slide-in-from-top-2 duration-300">
+                                     <div className="flex items-center justify-between pb-3.5 mb-3 border-b border-white/5">
+                                        <div className="flex items-center gap-2">
+                                            <span className="w-2 h-2 rounded-full bg-[#3DD6C8] animate-pulse" />
+                                            <h3 className="text-xs font-bold text-white tracking-wider uppercase">Signal Logs</h3>
+                                        </div>
+                                        {unreadCount > 0 && (
+                                            <button 
+                                                onClick={markAllRead} 
+                                                className="text-xs font-semibold text-[#3DD6C8] hover:text-[#3DD6C8]/80 transition-colors"
+                                            >
+                                                {t('mark_all_read')}
+                                            </button>
+                                        )}
                                      </div>
-                                     <div className="space-y-4 max-h-80 overflow-y-auto pr-1 custom-scrollbar">
+                                     <div className="space-y-2.5 max-h-80 overflow-y-auto pr-1 custom-scrollbar">
                                         {notifications.length === 0 ? (
-                                            <div className="py-10 text-center"><span className="text-[10px] font-black text-white/20 uppercase tracking-[0.4em]">No Signals Found</span></div>
-                                        ) : notifications.slice(0, 5).map(node => (
-                                            <div key={node.id} className="p-4 rounded-3xl bg-white/5 border border-white/5 hover:border-white/10 transition-all cursor-pointer group">
-                                                 <p className="text-[11px] font-black text-white transition-colors group-hover:text-[#3DD6C8]">{node.title}</p>
-                                                 <p className="text-[9px] text-white/40 mt-1 line-clamp-2">{node.message}</p>
-                                                 <span className="text-[7px] font-black text-white/20 uppercase tracking-[0.2em] mt-3 block">{new Date(node.created_at).toLocaleTimeString()}</span>
+                                            <div className="py-12 text-center text-white/30 text-xs font-medium">No signals found</div>
+                                        ) : notifications.slice(0, 10).map(node => (
+                                            <div 
+                                                key={node.id} 
+                                                onClick={() => markAsRead(node.id)}
+                                                className={`p-4 rounded-2xl border transition-all cursor-pointer group ${
+                                                    !node.is_read 
+                                                        ? 'bg-[#3DD6C8]/10 border-[#3DD6C8]/30 hover:border-[#3DD6C8]/50' 
+                                                        : 'bg-white/[0.03] border-white/5 hover:border-white/15 hover:bg-white/[0.06]'
+                                                }`}
+                                            >
+                                                 <div className="flex items-center justify-between gap-2">
+                                                     <p className="text-sm font-semibold text-white group-hover:text-[#3DD6C8] transition-colors">{node.title}</p>
+                                                     {!node.is_read && (
+                                                         <span className="w-1.5 h-1.5 rounded-full bg-[#3DD6C8] shrink-0" />
+                                                     )}
+                                                 </div>
+                                                 <p className="text-xs text-white/70 mt-1 line-clamp-3 leading-relaxed font-normal">{node.message}</p>
+                                                 <span className="text-[10px] font-medium text-white/40 mt-2 block">{new Date(node.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</span>
                                             </div>
                                         ))}
                                      </div>

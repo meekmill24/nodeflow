@@ -270,30 +270,32 @@ export default function StartPage() {
         <div className="space-y-12 animate-in fade-in duration-1000">
             {/* FROZEN ACCOUNT OVERLAY */}
             {profile?.is_frozen && (
-                <div className="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-black/90 backdrop-blur-2xl">
-                    <div className="bg-[#0f0f12] border border-red-500/20 rounded-[48px] w-full max-w-md p-12 text-center space-y-8 shadow-[0_0_80px_rgba(239,68,68,0.15)] relative overflow-hidden">
-                        <div className="absolute inset-0 bg-gradient-to-b from-red-500/5 to-transparent pointer-events-none" />
-                        <div className="relative z-10 flex flex-col items-center gap-8">
-                            <div className="w-24 h-24 rounded-[32px] bg-red-500/10 border border-red-500/20 flex items-center justify-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-red-400">
-                                    <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-                                </svg>
+                <Portal>
+                    <div className="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-black/90 backdrop-blur-2xl md:pl-72">
+                        <div className="bg-[#0f0f12] border border-red-500/20 rounded-[48px] w-full max-w-md p-12 text-center space-y-8 shadow-[0_0_80px_rgba(239,68,68,0.15)] relative overflow-hidden">
+                            <div className="absolute inset-0 bg-gradient-to-b from-red-500/5 to-transparent pointer-events-none" />
+                            <div className="relative z-10 flex flex-col items-center gap-8">
+                                <div className="w-24 h-24 rounded-[32px] bg-red-500/10 border border-red-500/20 flex items-center justify-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-red-400">
+                                        <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h2 className="text-2xl font-black text-white italic uppercase tracking-tighter mb-3">Account Suspended</h2>
+                                    <p className="text-slate-400 text-sm font-medium leading-relaxed">Your account has been temporarily frozen by the system administrator. Please contact customer support to resolve this issue.</p>
+                                </div>
+                                <a
+                                    href="https://wa.me/1234567890"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="w-full py-4 bg-[#3DD6C8] text-white rounded-[24px] font-black uppercase tracking-widest text-[11px] text-center hover:bg-[#3DD6C8]/90 transition-all shadow-xl shadow-[#3DD6C8]/20 active:scale-95"
+                                >
+                                    Contact Support
+                                </a>
                             </div>
-                            <div>
-                                <h2 className="text-2xl font-black text-white italic uppercase tracking-tighter mb-3">Account Suspended</h2>
-                                <p className="text-slate-400 text-sm font-medium leading-relaxed">Your account has been temporarily frozen by the system administrator. Please contact customer support to resolve this issue.</p>
-                            </div>
-                            <a
-                                href="https://wa.me/1234567890"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="w-full py-4 bg-[#3DD6C8] text-white rounded-[24px] font-black uppercase tracking-widest text-[11px] text-center hover:bg-[#3DD6C8]/90 transition-all shadow-xl shadow-[#3DD6C8]/20 active:scale-95"
-                            >
-                                Contact Support
-                            </a>
                         </div>
                     </div>
-                </div>
+                </Portal>
             )}
             {/* Top Navigation */}
             <div className="flex items-center justify-between">
@@ -611,86 +613,99 @@ export default function StartPage() {
 
             {/* TASK SET COMPLETION MODAL */}
             {showCompletionModal && (
-                <div className="fixed inset-0 z-[10001] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-fade-in">
-                    <div className="bg-[#0B0B1E] border border-[#3DD6C8]/40 w-full max-w-md rounded-[40px] p-8 md:p-10 shadow-[0_30px_120px_rgba(0,0,0,0.95)] relative overflow-hidden text-center space-y-6 animate-scale-in">
-                        <div className="absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-transparent via-[#3DD6C8] to-transparent" />
-                        <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-64 h-64 bg-[#3DD6C8]/15 rounded-full blur-3xl pointer-events-none" />
+                <Portal>
+                    <div className="fixed inset-0 z-[10001] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-fade-in md:pl-72">
+                        <div 
+                            className="bg-[#0B0B1E] border border-[#3DD6C8]/40 w-full max-w-md rounded-[40px] p-6 sm:p-8 md:p-10 shadow-[0_30px_120px_rgba(0,0,0,0.95)] relative overflow-hidden text-center space-y-6 animate-scale-in max-h-[90vh] overflow-y-auto custom-scrollbar"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <div className="absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-transparent via-[#3DD6C8] to-transparent" />
+                            <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-64 h-64 bg-[#3DD6C8]/15 rounded-full blur-3xl pointer-events-none" />
 
-                        <div className="w-24 h-24 mx-auto rounded-[32px] bg-[#3DD6C8]/10 border border-[#3DD6C8]/30 flex items-center justify-center text-[#3DD6C8] shadow-[0_0_40px_rgba(61,214,200,0.3)]">
-                            <Award size={48} className="animate-bounce" />
-                        </div>
+                            <div className="w-24 h-24 mx-auto rounded-[32px] bg-[#3DD6C8]/10 border border-[#3DD6C8]/30 flex items-center justify-center text-[#3DD6C8] shadow-[0_0_40px_rgba(61,214,200,0.3)]">
+                                <Award size={48} className="animate-bounce" />
+                            </div>
 
-                        <div className="space-y-3">
-                            <span className="px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[9px] font-black uppercase tracking-[0.25em] text-emerald-400 inline-block">
-                                Optimization Set Complete
-                            </span>
-                            <h3 className="text-3xl font-black text-white italic tracking-tight uppercase leading-none">
-                                Congratulations!
-                            </h3>
-                            <p className="text-sm text-white/80 leading-relaxed font-medium">
-                                You have successfully accomplished all <strong className="text-[#3DD6C8]">{tasksPerSet}</strong> optimization tasks for Set {currentSet}.
-                            </p>
-                            <div className="p-4 rounded-2xl bg-white/5 border border-white/5 space-y-2">
-                                <p className="text-xs text-amber-300 font-bold leading-relaxed">
-                                    Account requires clearance reset from Customer Service to continue next optimization set or process immediate payouts.
+                            <div className="space-y-3">
+                                <span className="px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[9px] font-black uppercase tracking-[0.25em] text-emerald-400 inline-block">
+                                    Optimization Set Complete
+                                </span>
+                                <h3 className="text-3xl font-black text-white italic tracking-tight uppercase leading-none">
+                                    Congratulations!
+                                </h3>
+                                <p className="text-sm text-white/80 leading-relaxed font-medium">
+                                    You have successfully accomplished all <strong className="text-[#3DD6C8]">{tasksPerSet}</strong> optimization tasks for Set {currentSet}.
                                 </p>
+                                <div className="p-4 rounded-2xl bg-white/5 border border-white/5 space-y-2">
+                                    <p className="text-xs text-amber-300 font-bold leading-relaxed">
+                                        Account requires clearance reset from Customer Service to continue next optimization set or process immediate payouts.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="space-y-3 pt-2">
+                                <button
+                                    type="button"
+                                    onClick={handleConfirmSettlement}
+                                    className="w-full py-4 rounded-2xl bg-gradient-to-r from-[#3DD6C8] to-teal-500 text-[#0B0B1E] font-black uppercase text-xs tracking-[0.25em] flex items-center justify-center gap-2 shadow-[0_0_30px_rgba(61,214,200,0.35)] hover:scale-[1.02] active:scale-[0.98] transition-all"
+                                >
+                                    <Headphones size={18} /> Contact Customer Service
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setModalSeen(true);
+                                        setShowCompletionModal(false);
+                                    }}
+                                    className="w-full py-3 rounded-2xl bg-white/5 border border-white/10 text-white/40 hover:text-white font-black uppercase text-[10px] tracking-widest transition-colors"
+                                >
+                                    Review Dashboard
+                                </button>
                             </div>
                         </div>
-
-                        <div className="space-y-3 pt-2">
-                            <button
-                                type="button"
-                                onClick={handleConfirmSettlement}
-                                className="w-full py-4 rounded-2xl bg-gradient-to-r from-[#3DD6C8] to-teal-500 text-[#0B0B1E] font-black uppercase text-xs tracking-[0.25em] flex items-center justify-center gap-2 shadow-[0_0_30px_rgba(61,214,200,0.35)] hover:scale-[1.02] active:scale-[0.98] transition-all"
-                            >
-                                <Headphones size={18} /> Contact Customer Service
-                            </button>
-                            <button
-                                type="button"
-                                onClick={() => {
-                                    setModalSeen(true);
-                                    setShowCompletionModal(false);
-                                }}
-                                className="w-full py-3 rounded-2xl bg-white/5 border border-white/10 text-white/40 hover:text-white font-black uppercase text-[10px] tracking-widest transition-colors"
-                            >
-                                Review Dashboard
-                            </button>
-                        </div>
                     </div>
-                </div>
+                </Portal>
             )}
 
             {/* MINIMUM TASK BALANCE MODAL */}
             {showMinBalanceModal && (
-                <div className="fixed inset-0 z-[10001] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
-                    <div className="bg-[#0B0B1E] border border-rose-500/30 w-full max-w-sm rounded-[36px] p-8 shadow-[0_30px_100px_rgba(0,0,0,0.9)] text-center space-y-6 animate-scale-in">
-                        <div className="w-20 h-20 mx-auto rounded-3xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-500">
-                            <Wallet size={36} />
-                        </div>
-                        <div className="space-y-2">
-                            <span className="text-[10px] font-black text-rose-500 uppercase tracking-[0.3em]">Balance Requirement</span>
-                            <h3 className="text-2xl font-black text-white italic tracking-tight uppercase">Minimum Influx Required</h3>
-                            <p className="text-xs text-white/60 leading-relaxed pt-2">
-                                Your account requires a minimum balance of <strong className="text-white">${minTaskBalance.toFixed(2)}</strong> to initiate task optimization sequences.
-                            </p>
-                        </div>
-                        <div className="space-y-3 pt-2">
-                            <Link
-                                href="/deposit"
-                                className="w-full py-4 rounded-2xl bg-rose-500 text-white font-black uppercase text-xs tracking-[0.2em] flex items-center justify-center gap-2 shadow-[0_0_25px_rgba(244,63,94,0.3)] hover:bg-rose-600 transition-all"
-                            >
-                                Top Up Account
-                            </Link>
-                            <button
-                                type="button"
-                                onClick={() => setShowMinBalanceModal(false)}
-                                className="w-full py-3 rounded-2xl bg-white/5 border border-white/10 text-white/50 hover:text-white font-black uppercase text-[10px] tracking-widest transition-colors"
-                            >
-                                Cancel
-                            </button>
+                <Portal>
+                    <div 
+                        className="fixed inset-0 z-[10001] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in md:pl-72"
+                        onClick={() => setShowMinBalanceModal(false)}
+                    >
+                        <div 
+                            className="bg-[#0B0B1E] border border-rose-500/30 w-full max-w-sm rounded-[36px] p-6 sm:p-8 shadow-[0_30px_100px_rgba(0,0,0,0.9)] text-center space-y-6 animate-scale-in max-h-[90vh] overflow-y-auto custom-scrollbar"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <div className="w-20 h-20 mx-auto rounded-3xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-500">
+                                <Wallet size={36} />
+                            </div>
+                            <div className="space-y-2">
+                                <span className="text-[10px] font-black text-rose-500 uppercase tracking-[0.3em]">Balance Requirement</span>
+                                <h3 className="text-2xl font-black text-white italic tracking-tight uppercase">Minimum Influx Required</h3>
+                                <p className="text-xs text-white/60 leading-relaxed pt-2">
+                                    Your account requires a minimum balance of <strong className="text-white">${minTaskBalance.toFixed(2)}</strong> to initiate task optimization sequences.
+                                </p>
+                            </div>
+                            <div className="space-y-3 pt-2">
+                                <Link
+                                    href="/deposit"
+                                    className="w-full py-4 rounded-2xl bg-rose-500 text-white font-black uppercase text-xs tracking-[0.2em] flex items-center justify-center gap-2 shadow-[0_0_25px_rgba(244,63,94,0.3)] hover:bg-rose-600 transition-all"
+                                >
+                                    Top Up Account
+                                </Link>
+                                <button
+                                    type="button"
+                                    onClick={() => setShowMinBalanceModal(false)}
+                                    className="w-full py-3 rounded-2xl bg-white/5 border border-white/10 text-white/50 hover:text-white font-black uppercase text-[10px] tracking-widest transition-colors"
+                                >
+                                    Cancel
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
+                </Portal>
             )}
         </div>
     );
