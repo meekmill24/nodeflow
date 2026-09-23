@@ -1,22 +1,95 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useLanguage } from '@/context/LanguageContext';
-import { ArrowLeft, Award, ShieldCheck, CheckCircle2, Globe, Building, Download, Share2 } from 'lucide-react';
+import { ArrowLeft, Award, ShieldCheck, CheckCircle2, Globe, Building, Download, Share2, Loader2 } from 'lucide-react';
 import Link from 'next/link';
+import { toast } from 'sonner';
 
 export default function CertificatePage() {
     const { profile } = useAuth();
     const { t } = useLanguage();
 
     const [view, setView] = useState<'personal' | 'company'>('personal');
+    const [isDownloading, setIsDownloading] = useState(false);
+    const certRef = useRef<HTMLDivElement>(null);
 
     const today = new Date().toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'long',
         day: 'numeric'
     });
+
+    const handleDownloadPDF = async () => {
+        if (!certRef.current || isDownloading) return;
+        setIsDownloading(true);
+        const toastId = toast.loading('Generating high-fidelity PDF certificate...');
+
+        try {
+            const html2canvas = (await import('html2canvas')).default;
+            const { jsPDF } = await import('jspdf');
+
+            const element = certRef.current;
+            const canvas = await html2canvas(element, {
+                scale: 2,
+                useCORS: true,
+                allowTaint: true,
+                backgroundColor: '#0a0510',
+                logging: false,
+            });
+
+            const imgData = canvas.toDataURL('image/png');
+            const imgWidth = canvas.width;
+            const imgHeight = canvas.height;
+
+            const orientation = imgWidth > imgHeight ? 'landscape' : 'portrait';
+            const pdf = new jsPDF({
+                orientation,
+                unit: 'px',
+                format: [imgWidth, imgHeight],
+            });
+
+            pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+            pdf.save(`SmartBugMedia_Certificate_${view}_${profile?.username || 'member'}.pdf`);
+
+            toast.success('Certificate PDF downloaded successfully!', { id: toastId });
+        } catch (err) {
+            console.error('PDF Generation Error:', err);
+            toast.dismiss(toastId);
+            toast.info('Printing certificate...');
+            window.print();
+        } finally {
+            setIsDownloading(false);
+        }
+    };
+
+    const handleShareProof = async () => {
+        const certTitle = view === 'personal' ? 'Node Optimization Certificate' : 'Institutional Operating License';
+        const certDesc = `SmartBugMedia Official Certificate for ${profile?.username || 'Worker'}`;
+        const url = typeof window !== 'undefined' ? window.location.href : '';
+
+        if (typeof navigator !== 'undefined' && navigator.share) {
+            try {
+                await navigator.share({
+                    title: certTitle,
+                    text: certDesc,
+                    url: url
+                });
+                toast.success('Certificate shared successfully!');
+                return;
+            } catch (err: any) {
+                if (err?.name === 'AbortError') return;
+            }
+        }
+
+        try {
+            await navigator.clipboard.writeText(url);
+            toast.success('Certificate verification link copied to clipboard!');
+        } catch {
+            toast.error('Unable to copy link to clipboard');
+        }
+    };
 
     return (
         <div className="space-y-8 pb-24">
@@ -53,7 +126,7 @@ export default function CertificatePage() {
             <div className="relative group perspective-1000 animate-slide-up [animation-delay:0.1s]">
                 <div className="absolute -inset-4 bg-gradient-to-r from-primary/30 via-accent/30 to-primary/30 rounded-[60px] blur-3xl opacity-30 group-hover:opacity-60 transition duration-1000"></div>
                 
-                <div className="relative glass-card-strong p-1 rounded-[48px] overflow-hidden border border-white/10 shadow-2xl shadow-primary/20">
+                <div ref={certRef} id="certificate-node" className="relative glass-card-strong p-1 rounded-[48px] overflow-hidden border border-white/10 shadow-2xl shadow-primary/20">
                     <div className="relative rounded-[46px] overflow-hidden aspect-[1/1.4] md:aspect-[1.4/1] min-h-[600px] flex items-center justify-center p-8 md:p-16">
                         {/* High-fidelity Background */}
                         <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900">
@@ -242,13 +315,17 @@ export default function CertificatePage() {
             {/* Actions */}
             <div className="grid grid-cols-2 gap-4 animate-slide-up [animation-delay:0.3s]">
                 <button 
-                    onClick={() => window.print()}
-                    className="flex items-center justify-center gap-3 p-4 rounded-2xl bg-primary text-white font-black uppercase tracking-widest text-xs shadow-lg shadow-primary/30 hover:bg-primary-hover transition-all active:scale-95"
+                    onClick={handleDownloadPDF}
+                    disabled={isDownloading}
+                    className="flex items-center justify-center gap-3 p-4 rounded-2xl bg-primary text-white font-black uppercase tracking-widest text-xs shadow-lg shadow-primary/30 hover:bg-primary-hover transition-all active:scale-95 disabled:opacity-60 cursor-pointer"
                 >
-                    <Download size={18} />
-                    Download PDF
+                    {isDownloading ? <Loader2 size={18} className="animate-spin" /> : <Download size={18} />}
+                    {isDownloading ? 'Generating PDF...' : 'Download PDF'}
                 </button>
-                <button className="flex items-center justify-center gap-3 p-4 rounded-2xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-text-primary font-black uppercase tracking-widest text-xs hover:bg-black/10 dark:hover:bg-white/10 transition-all active:scale-95">
+                <button 
+                    onClick={handleShareProof}
+                    className="flex items-center justify-center gap-3 p-4 rounded-2xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-text-primary font-black uppercase tracking-widest text-xs hover:bg-black/10 dark:hover:bg-white/10 transition-all active:scale-95 cursor-pointer"
+                >
                     <Share2 size={18} />
                     Share Proof
                 </button>

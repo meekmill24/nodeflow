@@ -614,40 +614,40 @@ export default function StartPage() {
             {/* TASK SET COMPLETION MODAL */}
             {showCompletionModal && (
                 <Portal>
-                    <div className="fixed inset-0 z-[10001] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-fade-in md:pl-72">
+                    <div className="fixed inset-0 z-[10001] flex items-start justify-center p-4 pt-10 sm:pt-14 md:pt-18 bg-black/85 backdrop-blur-md animate-fade-in md:pl-72 overflow-y-auto">
                         <div 
-                            className="bg-[#0B0B1E] border border-[#3DD6C8]/40 w-full max-w-md rounded-[40px] p-6 sm:p-8 md:p-10 shadow-[0_30px_120px_rgba(0,0,0,0.95)] relative overflow-hidden text-center space-y-6 animate-scale-in max-h-[90vh] overflow-y-auto custom-scrollbar"
+                            className="bg-[#0B0B1E] border border-[#3DD6C8]/40 w-full max-w-md rounded-[36px] p-6 sm:p-8 shadow-[0_30px_120px_rgba(0,0,0,0.95)] relative overflow-hidden text-center space-y-5 animate-scale-in max-h-[90vh] overflow-y-auto custom-scrollbar"
                             onClick={(e) => e.stopPropagation()}
                         >
                             <div className="absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-transparent via-[#3DD6C8] to-transparent" />
                             <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-64 h-64 bg-[#3DD6C8]/15 rounded-full blur-3xl pointer-events-none" />
 
-                            <div className="w-24 h-24 mx-auto rounded-[32px] bg-[#3DD6C8]/10 border border-[#3DD6C8]/30 flex items-center justify-center text-[#3DD6C8] shadow-[0_0_40px_rgba(61,214,200,0.3)]">
-                                <Award size={48} className="animate-bounce" />
+                            <div className="w-20 h-20 mx-auto rounded-3xl bg-[#3DD6C8]/10 border border-[#3DD6C8]/30 flex items-center justify-center text-[#3DD6C8] shadow-[0_0_40px_rgba(61,214,200,0.3)]">
+                                <Award size={40} className="animate-bounce" />
                             </div>
 
-                            <div className="space-y-3">
+                            <div className="space-y-2.5">
                                 <span className="px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[9px] font-black uppercase tracking-[0.25em] text-emerald-400 inline-block">
                                     Optimization Set Complete
                                 </span>
-                                <h3 className="text-3xl font-black text-white italic tracking-tight uppercase leading-none">
+                                <h3 className="text-2xl sm:text-3xl font-black text-white italic tracking-tight uppercase leading-none">
                                     Congratulations!
                                 </h3>
-                                <p className="text-sm text-white/80 leading-relaxed font-medium">
+                                <p className="text-xs sm:text-sm text-white/80 leading-relaxed font-medium">
                                     You have successfully accomplished all <strong className="text-[#3DD6C8]">{tasksPerSet}</strong> optimization tasks for Set {currentSet}.
                                 </p>
-                                <div className="p-4 rounded-2xl bg-white/5 border border-white/5 space-y-2">
+                                <div className="p-3.5 rounded-2xl bg-white/5 border border-white/5 space-y-1.5">
                                     <p className="text-xs text-amber-300 font-bold leading-relaxed">
                                         Account requires clearance reset from Customer Service to continue next optimization set or process immediate payouts.
                                     </p>
                                 </div>
                             </div>
 
-                            <div className="space-y-3 pt-2">
+                            <div className="space-y-2.5 pt-1">
                                 <button
                                     type="button"
                                     onClick={handleConfirmSettlement}
-                                    className="w-full py-4 rounded-2xl bg-gradient-to-r from-[#3DD6C8] to-teal-500 text-[#0B0B1E] font-black uppercase text-xs tracking-[0.25em] flex items-center justify-center gap-2 shadow-[0_0_30px_rgba(61,214,200,0.35)] hover:scale-[1.02] active:scale-[0.98] transition-all"
+                                    className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-[#3DD6C8] to-teal-500 text-[#0B0B1E] font-black uppercase text-xs tracking-[0.25em] flex items-center justify-center gap-2 shadow-[0_0_30px_rgba(61,214,200,0.35)] hover:scale-[1.02] active:scale-[0.98] transition-all"
                                 >
                                     <Headphones size={18} /> Contact Customer Service
                                 </button>
@@ -657,7 +657,7 @@ export default function StartPage() {
                                         setModalSeen(true);
                                         setShowCompletionModal(false);
                                     }}
-                                    className="w-full py-3 rounded-2xl bg-white/5 border border-white/10 text-white/40 hover:text-white font-black uppercase text-[10px] tracking-widest transition-colors"
+                                    className="w-full py-2.5 rounded-2xl bg-white/5 border border-white/10 text-white/40 hover:text-white font-black uppercase text-[10px] tracking-widest transition-colors"
                                 >
                                     Review Dashboard
                                 </button>
@@ -671,34 +671,34 @@ export default function StartPage() {
             {showMinBalanceModal && (
                 <Portal>
                     <div 
-                        className="fixed inset-0 z-[10001] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in md:pl-72"
+                        className="fixed inset-0 z-[10001] flex items-start justify-center p-4 pt-12 sm:pt-16 md:pt-20 bg-black/80 backdrop-blur-md animate-fade-in md:pl-72 overflow-y-auto"
                         onClick={() => setShowMinBalanceModal(false)}
                     >
                         <div 
-                            className="bg-[#0B0B1E] border border-rose-500/30 w-full max-w-sm rounded-[36px] p-6 sm:p-8 shadow-[0_30px_100px_rgba(0,0,0,0.9)] text-center space-y-6 animate-scale-in max-h-[90vh] overflow-y-auto custom-scrollbar"
+                            className="bg-[#0B0B1E] border border-rose-500/30 w-full max-w-sm rounded-[32px] p-6 sm:p-7 shadow-[0_30px_100px_rgba(0,0,0,0.9)] text-center space-y-4 animate-scale-in max-h-[85vh] overflow-y-auto custom-scrollbar"
                             onClick={(e) => e.stopPropagation()}
                         >
-                            <div className="w-20 h-20 mx-auto rounded-3xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-500">
-                                <Wallet size={36} />
+                            <div className="w-16 h-16 mx-auto rounded-2xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-500">
+                                <Wallet size={30} />
                             </div>
-                            <div className="space-y-2">
+                            <div className="space-y-1.5">
                                 <span className="text-[10px] font-black text-rose-500 uppercase tracking-[0.3em]">Balance Requirement</span>
-                                <h3 className="text-2xl font-black text-white italic tracking-tight uppercase">Minimum Influx Required</h3>
-                                <p className="text-xs text-white/60 leading-relaxed pt-2">
+                                <h3 className="text-xl sm:text-2xl font-black text-white italic tracking-tight uppercase">Minimum Influx Required</h3>
+                                <p className="text-xs text-white/60 leading-relaxed pt-1">
                                     Your account requires a minimum balance of <strong className="text-white">${minTaskBalance.toFixed(2)}</strong> to initiate task optimization sequences.
                                 </p>
                             </div>
-                            <div className="space-y-3 pt-2">
+                            <div className="space-y-2.5 pt-2">
                                 <Link
                                     href="/deposit"
-                                    className="w-full py-4 rounded-2xl bg-rose-500 text-white font-black uppercase text-xs tracking-[0.2em] flex items-center justify-center gap-2 shadow-[0_0_25px_rgba(244,63,94,0.3)] hover:bg-rose-600 transition-all"
+                                    className="w-full py-3.5 rounded-2xl bg-rose-500 text-white font-black uppercase text-xs tracking-[0.2em] flex items-center justify-center gap-2 shadow-[0_0_25px_rgba(244,63,94,0.3)] hover:bg-rose-600 transition-all"
                                 >
                                     Top Up Account
                                 </Link>
                                 <button
                                     type="button"
                                     onClick={() => setShowMinBalanceModal(false)}
-                                    className="w-full py-3 rounded-2xl bg-white/5 border border-white/10 text-white/50 hover:text-white font-black uppercase text-[10px] tracking-widest transition-colors"
+                                    className="w-full py-2.5 rounded-2xl bg-white/5 border border-white/10 text-white/50 hover:text-white font-black uppercase text-[10px] tracking-widest transition-colors"
                                 >
                                     Cancel
                                 </button>
