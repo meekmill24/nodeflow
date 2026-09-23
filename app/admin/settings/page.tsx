@@ -351,7 +351,6 @@ export default function AdminSettingsPage() {
                     { key: 'reward_tier_3', label: 'Reward Tier 3 (Req/Bonus)', icon: Gift, suffix: 'USD', placeholder: '1000/120' },
                     { key: 'reward_tier_4', label: 'Reward Tier 4 (Req/Bonus)', icon: Gift, suffix: 'USD', placeholder: '3000/500' },
                     { key: 'reward_tier_5', label: 'Reward Tier 5 (Req/Bonus)', icon: Gift, suffix: 'USD', placeholder: '5000/1000' },
-                    { key: 'reward_tier_6', label: 'Reward Tier 6 (Req/Bonus)', icon: Gift, suffix: 'USD', placeholder: '10000/2500' },
                 ].map((cfg) => {
                     const item = settings.find(s => s.key === cfg.key);
                     return (

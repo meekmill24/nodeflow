@@ -17,7 +17,6 @@ const DEFAULT_REWARDS = [
     { amount: 1000, receive: 120 },
     { amount: 3000, receive: 500 },
     { amount: 5000, receive: 1000 },
-    { amount: 10000, receive: 2500 },
 ];
 
 export default function FirstDepositRewardPage() {
@@ -32,7 +31,7 @@ export default function FirstDepositRewardPage() {
             const { data } = await supabase.from('site_settings').select('key, value');
             if (data) {
                 const dynamicRewards = [];
-                for (let i = 1; i <= 6; i++) {
+                for (let i = 1; i <= 5; i++) {
                     const setting = data.find(s => s.key === `reward_tier_${i}`);
                     if (setting?.value && setting.value.includes('/')) {
                         const [amount, receive] = setting.value.split('/').map((v: string) => parseFloat(v));
