@@ -22,7 +22,7 @@ export default function BottomNav() {
             {/* ULTRA GLASS DOCKSIDE */}
             <div className="absolute inset-0 bg-[#0B0B1E]/90 backdrop-blur-3xl border-t border-white/5 shadow-[0_-20px_60px_rgba(0,0,0,0.8)]" />
             
-            <div className="relative grid grid-cols-5 w-full h-20 items-center px-2">
+            <div className="relative grid grid-cols-5 w-full h-[4.5rem] sm:h-20 items-center px-1.5 sm:px-2">
                 {tabs.map((item) => {
                     const { icon: Icon, label, href, isCenter } = item;
                     const isActive = pathname === href;
