@@ -1,7 +1,7 @@
 'use client'; 
 import { useEffect, useState } from 'react'; 
 import { supabase } from '@/lib/supabase/index'; 
-import { Users, Layers, Grid3X3, DollarSign, TrendingUp, Share2, ArrowDownToLine, ArrowUpFromLine, Clock, Package, Bell, Activity, ArrowRight, Zap, Megaphone, X, Save, CheckCircle2 } from 'lucide-react'; 
+import { Users, Layers, Grid3X3, DollarSign, TrendingUp, Share2, ArrowDownToLine, ArrowUpFromLine, Clock, Package, Bell, Activity, ArrowRight, Zap, Megaphone, X, Save, CheckCircle2, Target, RefreshCcw } from 'lucide-react'; 
 import Link from 'next/link'; 
 import { toast } from 'sonner';
 
@@ -67,9 +67,32 @@ export default function AdminDashboard() {
   const [targetAudience, setTargetAudience] = useState<'all' | 'specific'>('all');
   const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
   const [usersList, setUsersList] = useState<any[]>([]);
+  const [loadingUsers, setLoadingUsers] = useState(false);
   const [userSearchQuery, setUserSearchQuery] = useState('');
   const [showAnnouncementEdit, setShowAnnouncementEdit] = useState(false);
   const [savingAnnouncement, setSavingAnnouncement] = useState(false);
+
+  const fetchWorkers = async () => {
+    setLoadingUsers(true);
+    try {
+      const res = await fetch('/api/admin/users');
+      if (res.ok) {
+        const u = await res.json();
+        if (Array.isArray(u)) {
+          const nonAdmin = u.filter((x: any) => x.role !== 'admin');
+          setUsersList(nonAdmin.length > 0 ? nonAdmin : u);
+        }
+      }
+    } catch (e) {
+      console.error('Failed to load workers:', e);
+    } finally {
+      setLoadingUsers(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchWorkers();
+  }, []);
 
   useEffect(() => { 
     const fetchAll = async () => { 
@@ -94,7 +117,7 @@ export default function AdminDashboard() {
             allUsers = await usersRes.json();
             if (Array.isArray(allUsers)) {
               const nonAdminUsers = allUsers.filter((u: any) => u.role !== 'admin');
-              setUsersList(nonAdminUsers);
+              setUsersList(nonAdminUsers.length > 0 ? nonAdminUsers : allUsers);
             }
           }
         } catch (uErr) {
@@ -264,18 +287,10 @@ export default function AdminDashboard() {
               </button>
             )}
             <button
-              onClick={async () => {
+              onClick={() => {
                 const nextState = !showAnnouncementEdit;
                 setShowAnnouncementEdit(nextState);
-                if (nextState && usersList.length === 0) {
-                  try {
-                    const res = await fetch('/api/admin/users');
-                    if (res.ok) {
-                      const u = await res.json();
-                      if (Array.isArray(u)) setUsersList(u.filter((x: any) => x.role !== 'admin'));
-                    }
-                  } catch {}
-                }
+                if (nextState) fetchWorkers();
               }}
               className="px-4 py-2 text-[9px] font-black uppercase tracking-widest text-amber-400 bg-amber-500/10 rounded-xl hover:bg-amber-500/20 transition-all border border-amber-500/20 flex items-center gap-1.5"
             >
@@ -287,41 +302,44 @@ export default function AdminDashboard() {
         {showAnnouncementEdit && (
           <div className="mt-5 pt-5 border-t border-slate-800 space-y-4 animate-in slide-in-from-top-2 duration-200">
             {/* Target Mode Selector */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-black/30 p-3 rounded-2xl border border-slate-800">
-              <span className="text-xs font-bold text-slate-400">Audience Targeting:</span>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-black/30 p-3.5 rounded-2xl border border-slate-800">
+              <div className="flex flex-col">
+                <span className="text-xs font-bold text-slate-300">Audience Targeting:</span>
+                <span className="text-[10px] text-slate-500">
+                  {targetAudience === 'all' 
+                    ? 'Banner will display to all platform workers' 
+                    : `Banner targeted to ${selectedUserIds.length} of ${usersList.length} worker(s)`}
+                </span>
+              </div>
               <div className="flex items-center gap-2">
                 <button
                   type="button"
                   onClick={() => setTargetAudience('all')}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                  className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
                     targetAudience === 'all'
-                      ? 'bg-amber-500 text-black shadow-md'
+                      ? 'bg-amber-500 text-black shadow-lg shadow-amber-500/20 font-black'
                       : 'bg-slate-800 text-slate-400 hover:text-white'
                   }`}
                 >
+                  <Users size={13} />
                   All Workers
                 </button>
                 <button
                   type="button"
-                  onClick={async () => {
+                  onClick={() => {
                     setTargetAudience('specific');
-                    if (usersList.length === 0) {
-                      try {
-                        const res = await fetch('/api/admin/users');
-                        if (res.ok) {
-                          const u = await res.json();
-                          if (Array.isArray(u)) setUsersList(u.filter((x: any) => x.role !== 'admin'));
-                        }
-                      } catch {}
-                    }
+                    if (usersList.length === 0) fetchWorkers();
                   }}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
+                  className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
                     targetAudience === 'specific'
-                      ? 'bg-amber-500 text-black shadow-md'
+                      ? 'bg-amber-500 text-black shadow-lg shadow-amber-500/20 font-black'
                       : 'bg-slate-800 text-slate-400 hover:text-white'
                   }`}
                 >
-                  Specific Workers ({selectedUserIds.length})
+                  <Target size={13} />
+                  {targetAudience === 'specific'
+                    ? `Specific Workers (${selectedUserIds.length} Selected)`
+                    : `Specific Workers (${usersList.length > 0 ? `${usersList.length} Available` : 'Custom'})`}
                 </button>
               </div>
             </div>
@@ -329,25 +347,39 @@ export default function AdminDashboard() {
             {/* If Specific Workers, Show Search & Multi-Select Checklist */}
             {targetAudience === 'specific' && (
               <div className="p-4 rounded-2xl bg-black/40 border border-slate-800 space-y-3">
-                <div className="flex items-center justify-between gap-2">
-                  <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">
-                    Select Target Workers ({selectedUserIds.length} of {usersList.length} selected):
-                  </span>
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+                      Select Target Workers:
+                    </span>
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/15 text-amber-400 border border-amber-500/30">
+                      {selectedUserIds.length} of {usersList.length} Selected
+                    </span>
+                  </div>
                   <div className="flex items-center gap-2">
                     <button
                       type="button"
                       onClick={() => setSelectedUserIds(usersList.map(u => u.id))}
-                      className="text-[9px] font-bold text-amber-400 hover:underline"
+                      className="text-[10px] font-bold text-amber-400 hover:text-amber-300 transition-colors"
                     >
-                      Select All
+                      Select All ({usersList.length})
                     </button>
                     <span className="text-slate-700">•</span>
                     <button
                       type="button"
                       onClick={() => setSelectedUserIds([])}
-                      className="text-[9px] font-bold text-slate-500 hover:text-white"
+                      className="text-[10px] font-bold text-slate-500 hover:text-white transition-colors"
                     >
                       Deselect All
+                    </button>
+                    <span className="text-slate-700">•</span>
+                    <button
+                      type="button"
+                      onClick={fetchWorkers}
+                      className="text-[10px] font-bold text-slate-500 hover:text-white transition-colors flex items-center gap-1"
+                    >
+                      <RefreshCcw size={10} className={loadingUsers ? 'animate-spin' : ''} />
+                      Refresh List
                     </button>
                   </div>
                 </div>
@@ -360,10 +392,21 @@ export default function AdminDashboard() {
                   className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-amber-500/50 placeholder:text-slate-700"
                 />
 
-                {usersList.length === 0 ? (
+                {loadingUsers && usersList.length === 0 ? (
                   <div className="py-6 text-center text-xs text-slate-500 flex items-center justify-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
                     Loading worker accounts...
+                  </div>
+                ) : usersList.length === 0 ? (
+                  <div className="py-6 text-center text-xs text-slate-500 space-y-2">
+                    <p>No worker accounts found.</p>
+                    <button
+                      type="button"
+                      onClick={fetchWorkers}
+                      className="px-3 py-1.5 bg-slate-800 text-xs text-white rounded-lg hover:bg-slate-700 transition-colors"
+                    >
+                      Retry Loading
+                    </button>
                   </div>
                 ) : usersList.filter(u => 
                     (u.username || '').toLowerCase().includes(userSearchQuery.toLowerCase()) ||
