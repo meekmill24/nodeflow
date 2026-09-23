@@ -7,8 +7,8 @@ import { useLanguage } from '@/context/LanguageContext';
 
 const tabs = [
     { icon: Home, label: 'home', href: '/home' },
-    { icon: FileText, label: 'record', href: '/record' },
     { icon: Zap, label: 'start', href: '/start', isCenter: true },
+    { icon: FileText, label: 'record', href: '/record' },
     { icon: Headset, label: 'support', href: '#', isSupport: true },
     { icon: User, label: 'profile', href: '/profile' },
 ];
