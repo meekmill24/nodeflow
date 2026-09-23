@@ -18,11 +18,11 @@ export default function BottomNav() {
     const { t } = useLanguage();
 
     return (
-        <nav className="fixed bottom-0 left-0 right-0 z-[100] md:hidden pb-safe">
+        <nav className="fixed bottom-0 left-0 right-0 z-[100] lg:hidden pb-safe">
             {/* ULTRA GLASS DOCKSIDE */}
             <div className="absolute inset-0 bg-[#0B0B1E]/90 backdrop-blur-3xl border-t border-white/5 shadow-[0_-20px_60px_rgba(0,0,0,0.8)]" />
             
-            <div className="relative grid grid-cols-5 w-full h-[4.5rem] sm:h-20 items-center px-1.5 sm:px-2">
+            <div className="relative grid grid-cols-5 w-full h-[4.5rem] sm:h-20 lg:h-20 items-center px-1 sm:px-2">
                 {tabs.map((item) => {
                     const { icon: Icon, label, href, isCenter } = item;
                     const isActive = pathname === href;
