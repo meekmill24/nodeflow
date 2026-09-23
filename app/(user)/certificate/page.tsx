@@ -48,7 +48,7 @@ export default function CertificatePage() {
         const toastId = toast.loading('Rendering high-fidelity A4 certificate PDF...');
 
         try {
-            const html2canvas = (await import('html2canvas')).default;
+            const html2canvas = (await import('html2canvas-pro')).default;
             const { jsPDF } = await import('jspdf');
 
             // Render at high DPI without external asset taint
@@ -96,7 +96,7 @@ export default function CertificatePage() {
         const toastId = toast.loading('Generating high-res certificate image...');
 
         try {
-            const html2canvas = (await import('html2canvas')).default;
+            const html2canvas = (await import('html2canvas-pro')).default;
             const canvas = await html2canvas(targetElement, {
                 scale: 2,
                 useCORS: true,
