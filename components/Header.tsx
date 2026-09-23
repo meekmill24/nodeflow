@@ -136,24 +136,24 @@ export default function Header({ onMenuClick }: HeaderProps) {
                 </button>
             </div>
         )}
-        <header className="h-20 md:h-24 sticky top-0 z-50 flex items-center px-4 md:px-10 bg-[#0B0B1E]/80 backdrop-blur-2xl border-b border-white/5">
+        <header className="h-16 sm:h-20 lg:h-24 sticky top-0 z-50 flex items-center px-3 sm:px-5 lg:px-10 bg-[#0B0B1E]/80 backdrop-blur-2xl border-b border-white/5">
             <div className="max-w-7xl w-full mx-auto flex items-center justify-between gap-6">
                 
                 {/* Mobile Menu & Logo */}
                 <div className="flex items-center gap-4">
                     <button 
                         onClick={onMenuClick}
-                        className="md:hidden p-3 rounded-2xl bg-white/5 border border-white/10 text-white shadow-xl active:scale-95 transition-all"
+                        className="lg:hidden p-2.5 sm:p-3 rounded-2xl bg-white/5 border border-white/10 text-white shadow-xl active:scale-95 transition-all"
                     >
                         <Menu size={20} />
                     </button>
-                    <div className="md:hidden flex items-center gap-3">
+                    <div className="lg:hidden flex items-center gap-3">
                          <div className="w-9 h-9 rounded-xl bg-slate-950 border border-[#3DD6C8]/20 flex items-center justify-center p-1.5 shadow-[0_0_15px_rgba(61,214,200,0.2)]">
                             <img src="/logo.png" alt="Logo" className="w-full h-full object-contain filter drop-shadow-[0_0_5px_rgba(61,214,200,0.5)]" />
                          </div>
                     </div>
                     {/* Desktop Status Indicators */}
-                    <div className="hidden md:flex items-center gap-6">
+                    <div className="hidden lg:flex items-center gap-6">
                          <div className="flex items-center gap-3 px-4 py-2 bg-[#3DD6C8]/5 border border-[#3DD6C8]/10 rounded-2xl">
                              <div className="w-2 h-2 rounded-full bg-[#3DD6C8] animate-pulse shadow-[0_0_10px_rgba(61,214,200,1)]" />
                              <span className="text-[10px] font-black text-[#3DD6C8] uppercase tracking-[0.3em]">Network Active</span>
@@ -165,24 +165,24 @@ export default function Header({ onMenuClick }: HeaderProps) {
                     </div>
                 </div>
 
-                <div className="flex items-center gap-3 md:gap-5 ml-auto">
+                <div className="flex items-center gap-2 sm:gap-3 lg:gap-5 ml-auto">
                     {/* ASSET PILL */}
-                    <div className="flex items-center gap-4 md:gap-8 rounded-[24px] px-5 py-2.5 bg-black/40 border border-white/10 shadow-2xl group cursor-pointer active:scale-95 transition-all">
+                    <div className="flex items-center gap-4 md:gap-8 rounded-[24px] px-3 sm:px-5 py-2 bg-black/40 border border-white/10 shadow-2xl group cursor-pointer active:scale-95 transition-all">
                         <div className="flex flex-col">
                             <span className="text-[7px] font-black text-white/30 uppercase tracking-[0.4em] leading-none mb-1">ASSET BALANCE</span>
-                            <span className="text-sm md:text-xl font-black text-white italic tracking-tighter uppercase leading-none drop-shadow-md">
+                            <span className="text-sm sm:text-base lg:text-xl font-black text-white italic tracking-tighter uppercase leading-none drop-shadow-md">
                                 {format(profile?.wallet_balance ?? 0)}
                             </span>
                         </div>
-                        <div className="w-10 h-10 rounded-2xl bg-[#3DD6C8]/10 border border-[#3DD6C8]/20 flex items-center justify-center text-[#3DD6C8] group-hover:scale-110 transition-transform">
+                        <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-2xl bg-[#3DD6C8]/10 border border-[#3DD6C8]/20 flex items-center justify-center text-[#3DD6C8] group-hover:scale-110 transition-transform">
                              <Wallet size={20} />
                         </div>
                     </div>
 
-                    <div className="h-10 w-[1px] bg-white/10 hidden md:block mx-1" />
+                    <div className="h-10 w-[1px] bg-white/10 hidden lg:block mx-1" />
 
                     {/* ACTIONS */}
-                    <div className="flex items-center gap-2 md:gap-3">
+                    <div className="flex items-center gap-1.5 sm:gap-2 lg:gap-3">
                         {/* Notifs */}
                         <div className="relative" ref={notifRef}>
                              <button 
