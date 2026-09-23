@@ -90,7 +90,7 @@ export default function HomePage() {
     }, [profile]);
 
     return (
-        <div className="space-y-12 animate-in fade-in duration-1000 pb-20">
+        <div className="space-y-8 sm:space-y-10 lg:space-y-12 animate-in fade-in duration-1000 pb-20">
             
             {/* TERMINAL HEADER */}
             <div className="relative group perspective-1000 overflow-hidden rounded-[36px] md:rounded-[48px] bg-slate-900 shadow-2xl border border-white/5">
@@ -143,8 +143,8 @@ export default function HomePage() {
             </div>
 
             {/* FINANCIAL SNAPSHOT MATRIX */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="md:col-span-3 lg:col-span-1 bg-[#0B0B1E] border border-white/5 p-8 rounded-[40px] shadow-2xl backdrop-blur-3xl relative overflow-hidden group hover:border-white/10 transition-all duration-700">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 lg:gap-6">
+                <div className="sm:col-span-2 lg:col-span-1 bg-[#0B0B1E] border border-white/5 p-5 sm:p-6 lg:p-8 rounded-[28px] sm:rounded-[34px] lg:rounded-[40px] shadow-2xl backdrop-blur-3xl relative overflow-hidden group hover:border-white/10 transition-all duration-700">
                     <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
                         <Wallet size={120} />
                     </div>
@@ -155,14 +155,14 @@ export default function HomePage() {
                         <span className="text-[10px] font-black text-white/30 uppercase tracking-[0.4em]">{t('available_balance')}</span>
                     </div>
                     <div className="space-y-1">
-                        <h2 className="text-5xl md:text-6xl font-black text-white tracking-tighter italic uppercase drop-shadow-[0_0_15px_rgba(255,255,255,0.1)]">
+                        <h2 className="text-3xl sm:text-4xl lg:text-6xl font-black text-white tracking-tighter italic uppercase drop-shadow-[0_0_15px_rgba(255,255,255,0.1)]">
                             {format(profile?.wallet_balance || 0)}
                         </h2>
                         <p className="text-[9px] font-black text-white/30 uppercase tracking-[0.2em]">{t('tether_holdings')}</p>
                     </div>
                 </div>
 
-                <div className="bg-[#0B0B1E] border border-white/5 p-8 rounded-[40px] shadow-2xl backdrop-blur-3xl relative overflow-hidden group hover:border-white/10 transition-all duration-700">
+                <div className="bg-[#0B0B1E] border border-white/5 p-5 sm:p-6 lg:p-8 rounded-[28px] sm:rounded-[34px] lg:rounded-[40px] shadow-2xl backdrop-blur-3xl relative overflow-hidden group hover:border-white/10 transition-all duration-700">
                     <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
                         <Zap size={120} />
                     </div>
@@ -173,7 +173,7 @@ export default function HomePage() {
                         <span className="text-[10px] font-black text-white/30 uppercase tracking-[0.4em]">{t('today_profit')}</span>
                     </div>
                     <div className="space-y-1">
-                        <h2 className="text-5xl md:text-6xl font-black text-amber-400 tracking-tighter italic uppercase drop-shadow-[0_0_15px_rgba(251,191,36,0.2)]">
+                        <h2 className="text-3xl sm:text-4xl lg:text-6xl font-black text-amber-400 tracking-tighter italic uppercase drop-shadow-[0_0_15px_rgba(251,191,36,0.2)]">
                             {format(profile?.profit || 0)}
                         </h2>
                         <p className="text-[9px] font-black text-white/30 uppercase tracking-[0.2em]">{t('secured_rebates')}</p>
@@ -191,7 +191,7 @@ export default function HomePage() {
                         <span className="text-[10px] font-black text-white/30 uppercase tracking-[0.4em]">{t('referral_bonus')}</span>
                     </div>
                     <div className="space-y-1">
-                        <h2 className="text-5xl md:text-6xl font-black text-indigo-400 tracking-tighter italic uppercase drop-shadow-[0_0_15px_rgba(129,140,248,0.2)]">
+                        <h2 className="text-3xl sm:text-4xl lg:text-6xl font-black text-indigo-400 tracking-tighter italic uppercase drop-shadow-[0_0_15px_rgba(129,140,248,0.2)]">
                             {format(profile?.referral_earned || 0)}
                         </h2>
                         <p className="text-[9px] font-black text-white/30 uppercase tracking-[0.2em]">{t('network_yield')}</p>
@@ -223,7 +223,7 @@ export default function HomePage() {
                             { icon: Map, label: 'VIP Map & Rewards', href: '/levels', color: 'text-violet-400', bg: 'bg-violet-400/5' },
                             { icon: TrendingUp, label: 'Salary Structure', href: '/salary', color: 'text-cyan-400', bg: 'bg-cyan-400/5' },
                         ].map((hub, i) => (
-                            <Link key={i} href={hub.href} className="group p-6 rounded-[36px] bg-[#0B0B1E] border border-white/5 flex flex-col items-center gap-4 hover:border-white/10 transition-all duration-500 hover:-translate-y-1">
+                            <Link key={i} href={hub.href} className="group p-4 sm:p-5 lg:p-6 rounded-[26px] sm:rounded-[30px] lg:rounded-[36px] bg-[#0B0B1E] border border-white/5 flex flex-col items-center gap-4 hover:border-white/10 transition-all duration-500 hover:-translate-y-1">
                                 <div className={`w-12 h-12 rounded-2xl ${hub.bg} border border-white/5 flex items-center justify-center ${hub.color} group-hover:scale-110 transition-transform duration-700`}>
                                     <hub.icon size={22} />
                                 </div>
@@ -244,7 +244,7 @@ export default function HomePage() {
             {/* ADVERTISING BANNER PROTOCOL */}
             <div className="relative group overflow-hidden rounded-[48px] bg-slate-900 border border-white/5">
                 <div className="absolute inset-0 bg-gradient-to-r from-[#3DD6C8]/20 to-transparent opacity-40 mix-blend-overlay" />
-                <div className="relative p-12 md:p-16 flex flex-col md:flex-row md:items-center justify-between gap-10">
+                <div className="relative p-6 sm:p-8 lg:p-16 flex flex-col md:flex-row md:items-center justify-between gap-10">
                     <div className="max-w-xl space-y-6">
                         <div className="flex items-center gap-3">
                             <div className="w-10 h-10 rounded-2xl bg-[#3DD6C8]/10 flex items-center justify-center text-[#3DD6C8] border border-[#3DD6C8]/20">
