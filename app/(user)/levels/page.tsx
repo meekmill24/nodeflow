@@ -117,16 +117,14 @@ export default function LevelsPage() {
                         const isLocked = userLevel ? Number(level.price) > Number(userLevel.price) : idx > 0;
                         const isCompleted = userLevel ? Number(level.price) < Number(userLevel.price) : false;
 
-                        const specs = TIER_SPECS[level.name] || {
-                            depositRange: `$${level.price} to $${level.price * 3}`,
-                            commPercent: `${(level.commission_rate * 100).toFixed(1)}%`,
-                            sets: level.sets_per_day || 3,
-                            tasksPerSet: level.tasks_per_set || 40,
-                            totalMaintenance: (level.sets_per_day || 3) * (level.tasks_per_set || 40)
-                        };
+                        const nextLevel = levels[idx + 1];
+                        const dynamicDepositRange = nextLevel
+                            ? `$${Number(level.price).toLocaleString()} to $${(Number(nextLevel.price) - 1).toLocaleString()}`
+                            : `$${Number(level.price).toLocaleString()} upwards`;
 
-                        const setsCount = level.sets_per_day || specs.sets;
-                        const tasksPerSet = level.tasks_per_set || specs.tasksPerSet;
+                        const commPercent = `${(Number(level.commission_rate) * 100).toFixed(1)}%`;
+                        const setsCount = Number(level.sets_per_day) || 3;
+                        const tasksPerSet = Number(level.tasks_per_set) || 40;
                         const totalMaintenance = setsCount * tasksPerSet;
 
                         const currentTasks = completedCount % tasksPerSet;
@@ -138,7 +136,7 @@ export default function LevelsPage() {
                                 key={level.id} 
                                 className={`w-[85vw] max-w-[320px] shrink-0 snap-center md:w-auto md:max-w-none bg-[#0B0B1E] border p-6 lg:p-7 rounded-[32px] relative overflow-hidden transition-all duration-500 flex flex-col justify-between group ${
                                     isCurrentLevel 
-                                        ? 'border-[#3DD6C8] shadow-[0_0_30px_rgba(61,214,200,0.18)] z-10' 
+                                        ? 'border-[#3DD6C8] shadow-[0_0_35px_rgba(61,214,200,0.18)] z-10' 
                                         : 'border-white/5 hover:border-white/10'
                                 }`}
                             >
@@ -152,7 +150,9 @@ export default function LevelsPage() {
                                         </div>
                                         <div>
                                             {isCurrentLevel ? (
-                                                <span className="text-[9px] font-black text-[#3DD6C8] uppercase tracking-[0.2em] px-3 py-1 bg-[#3DD6C8]/10 rounded-full border border-[#3DD6C8]/30">Active</span>
+                                                <span className="text-[9px] font-black text-[#3DD6C8] uppercase tracking-[0.2em] px-3 py-1 bg-[#3DD6C8]/10 rounded-full border border-[#3DD6C8]/30">
+                                                    Active
+                                                </span>
                                             ) : isLocked ? (
                                                 <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center">
                                                     <Lock size={12} className="text-white/30" />
@@ -167,33 +167,33 @@ export default function LevelsPage() {
 
                                     {/* Title Header with uniform height container for perfect horizontal alignment */}
                                     <div>
-                                        <div className="min-h-[44px] flex items-center mb-3">
-                                            <h3 className="text-base sm:text-lg xl:text-xl font-black text-white uppercase tracking-tight leading-tight group-hover:text-[#3DD6C8] transition-colors">
+                                        <div className="min-h-[48px] flex items-center mb-3">
+                                            <h3 className="text-lg xl:text-[19px] font-black text-white uppercase tracking-tight leading-snug group-hover:text-[#3DD6C8] transition-colors">
                                                 {level.name}
                                             </h3>
                                         </div>
                                         
-                                        {/* Specification Table */}
-                                        <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/5 space-y-2.5">
+                                        {/* Specification Table - DB Synced & Visually Formatted */}
+                                        <div className="p-4 sm:p-4.5 rounded-2xl bg-white/[0.03] border border-white/5 space-y-2.5">
                                             <div className="flex items-center justify-between">
-                                                <span className="text-[9px] font-black text-white/40 uppercase tracking-wider">In:</span>
-                                                <span className="text-[11px] font-black text-amber-400 font-mono">{specs.depositRange}</span>
+                                                <span className="text-[9px] font-black text-white/40 uppercase tracking-[0.16em]">In:</span>
+                                                <span className="text-[11px] sm:text-xs font-black text-amber-400 font-mono tracking-tight">{dynamicDepositRange}</span>
                                             </div>
                                             <div className="flex items-center justify-between">
-                                                <span className="text-[9px] font-black text-white/40 uppercase tracking-wider">Commission rate:</span>
-                                                <span className="text-[11px] font-black text-[#3DD6C8] font-mono">{specs.commPercent}</span>
+                                                <span className="text-[9px] font-black text-white/40 uppercase tracking-[0.16em]">Commission rate:</span>
+                                                <span className="text-[11px] sm:text-xs font-black text-[#3DD6C8] font-mono tracking-tight">{commPercent}</span>
                                             </div>
                                             <div className="flex items-center justify-between">
-                                                <span className="text-[9px] font-black text-white/40 uppercase tracking-wider">Sets of tasks:</span>
-                                                <span className="text-[11px] font-black text-white font-mono">{setsCount} sets</span>
+                                                <span className="text-[9px] font-black text-white/40 uppercase tracking-[0.16em]">Sets of tasks:</span>
+                                                <span className="text-[11px] sm:text-xs font-black text-white/90 font-mono tracking-tight">{setsCount} sets</span>
                                             </div>
                                             <div className="flex items-center justify-between">
-                                                <span className="text-[9px] font-black text-white/40 uppercase tracking-wider">Products per task:</span>
-                                                <span className="text-[11px] font-black text-white font-mono">{tasksPerSet} products</span>
+                                                <span className="text-[9px] font-black text-white/40 uppercase tracking-[0.16em]">Products per task:</span>
+                                                <span className="text-[11px] sm:text-xs font-black text-white/90 font-mono tracking-tight">{tasksPerSet} products</span>
                                             </div>
-                                            <div className="flex items-center justify-between pt-2 border-t border-white/5">
-                                                <span className="text-[9px] font-black text-white/50 uppercase tracking-wider">Total maintenance:</span>
-                                                <span className="text-[11px] font-black text-emerald-400 font-mono">{totalMaintenance} products</span>
+                                            <div className="flex items-center justify-between pt-2.5 border-t border-white/[0.07]">
+                                                <span className="text-[9px] font-black text-white/50 uppercase tracking-[0.16em]">Total maintenance:</span>
+                                                <span className="text-[11px] sm:text-xs font-black text-emerald-400 font-mono tracking-tight">{totalMaintenance} products</span>
                                             </div>
                                         </div>
                                     </div>
@@ -215,15 +215,15 @@ export default function LevelsPage() {
 
                                 <div className="mt-6 relative z-10">
                                     {isCurrentLevel ? (
-                                        <div className="w-full py-3 bg-[#3DD6C8]/15 border border-[#3DD6C8]/40 rounded-xl text-[9px] font-black text-[#3DD6C8] uppercase tracking-[0.3em] text-center shadow-lg shadow-[#3DD6C8]/10">
+                                        <div className="w-full py-3.5 bg-[#3DD6C8]/10 border border-[#3DD6C8]/30 rounded-2xl text-[10px] font-black text-[#3DD6C8] uppercase tracking-[0.3em] text-center shadow-[0_0_20px_rgba(61,214,200,0.12)]">
                                             ACTIVE LEVEL
                                         </div>
                                     ) : isLocked ? (
-                                        <button className="w-full py-3 bg-white/5 border border-white/5 rounded-xl text-[9px] font-black text-white/30 uppercase tracking-[0.3em] hover:bg-white/10 hover:text-white transition-all group-hover:border-white/20">
+                                        <div className="w-full py-3.5 bg-white/[0.03] border border-white/5 rounded-2xl text-[10px] font-black text-white/30 uppercase tracking-[0.3em] text-center">
                                             LOCKED
-                                        </button>
+                                        </div>
                                     ) : (
-                                        <div className="w-full py-3 bg-emerald-500/5 border border-emerald-500/10 rounded-xl text-[9px] font-black text-emerald-500/40 uppercase tracking-[0.3em] text-center">
+                                        <div className="w-full py-3.5 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl text-[10px] font-black text-emerald-400 uppercase tracking-[0.3em] text-center">
                                             UNLOCKED
                                         </div>
                                     )}
