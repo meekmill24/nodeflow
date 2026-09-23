@@ -390,7 +390,7 @@ export default function LandingPage() {
 
   return (
     <main
-      className="min-h-screen bg-[#020617] text-slate-100 font-sans selection:bg-cyan-500/40 selection:text-cyan-100 overflow-x-hidden"
+      className="min-h-screen w-full max-w-full bg-[#020617] text-slate-100 font-sans selection:bg-cyan-500/40 selection:text-cyan-100 overflow-x-hidden"
       ref={containerRef}
     >
       {/* ── Ambient Background ── */}
@@ -406,13 +406,13 @@ export default function LandingPage() {
         {/* ══════════════════════════════════════════
             NAV — Glassmorphism sticky
         ══════════════════════════════════════════ */}
-        <nav className="sticky top-0 z-50 px-6 py-4 lg:px-12 backdrop-blur-xl border-b border-white/5 bg-slate-950/60">
+        <nav className="sticky top-0 z-50 w-full px-4 sm:px-6 py-3 sm:py-4 lg:px-12 backdrop-blur-xl border-b border-white/5 bg-slate-950/60">
           <div className="max-w-7xl mx-auto flex items-center justify-between">
             <Link href="/" className="flex items-center gap-3 group">
               <div className="w-10 h-10 rounded-full bg-slate-900 border border-white/10 flex items-center justify-center p-1.5 shadow-lg shadow-cyan-500/20 overflow-hidden transition-transform group-hover:scale-110">
                 <Image src="/logo.png" alt="SmartBugMedia Logo" width={24} height={24} />
               </div>
-              <span className="text-2xl font-black tracking-tight text-white italic">
+              <span className="text-lg sm:text-2xl font-black tracking-tight text-white italic truncate max-w-[48vw] sm:max-w-none">
                 SmartBugMedia<span className="text-cyan-500">.</span>
               </span>
             </Link>
@@ -1281,7 +1281,7 @@ export default function LandingPage() {
         {/* ══════════════════════════════════════════
             REFER & EARN — Affiliate Program
         ══════════════════════════════════════════ */}
-        <section id="referral" className="px-6 lg:px-12 py-28 max-w-7xl mx-auto border-t border-white/5 relative overflow-hidden">
+        <section id="referral" className="px-4 sm:px-6 lg:px-12 py-16 sm:py-20 lg:py-28 max-w-7xl mx-auto border-t border-white/5 relative overflow-hidden">
           {/* Background glow */}
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-emerald-500/5 blur-[180px] rounded-full pointer-events-none" />
           <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-violet-600/5 blur-[150px] rounded-full pointer-events-none" />
