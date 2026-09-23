@@ -202,7 +202,7 @@ export default function RecordPage() {
 
             <div className="glass-card overflow-hidden border border-white/5 bg-surface/50">
                 {/* Desktop Header */}
-                <div className="hidden md:grid grid-cols-5 bg-black/10 dark:bg-white/5 border-b border-white/5 text-[10px] font-black text-text-secondary uppercase tracking-[0.2em]">
+                <div className="hidden lg:grid grid-cols-5 bg-black/10 dark:bg-white/5 border-b border-white/5 text-[10px] font-black text-text-secondary uppercase tracking-[0.2em]">
                     <span className="px-6 py-4 border-r border-white/5">{t('timestamp')}</span>
                     <span className="px-6 py-4 border-r border-white/5">Details</span>
                     <span className="px-6 py-4 border-r border-white/5">Capital</span>
@@ -222,7 +222,7 @@ export default function RecordPage() {
                         </div>
                     ) : (
                         filteredTasks.map((task, idx) => (
-                            <div key={task.id} className={`flex flex-col md:grid md:grid-cols-5 items-stretch hover:bg-white/[0.03] transition-all group border-b border-white/[0.05] last:border-0 ${idx % 2 === 0 ? 'bg-transparent' : 'bg-black/[0.01] dark:bg-white/[0.01]'}`}>
+                            <div key={task.id} className={`flex flex-col lg:grid lg:grid-cols-5 items-stretch hover:bg-white/[0.03] transition-all group border-b border-white/[0.05] last:border-0 ${idx % 2 === 0 ? 'bg-transparent' : 'bg-black/[0.01] dark:bg-white/[0.01]'}`}>
                                 {/* Mobile Header / Desktop Time */}
                                 <div className="px-4 md:px-6 py-4 md:py-5 border-r md:border-white/5 flex flex-row md:flex-col items-center md:items-start justify-between md:justify-center gap-2">
                                     <div className="flex flex-col">
