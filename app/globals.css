@@ -132,3 +132,127 @@ html {
 ::-webkit-scrollbar-thumb {
   @apply bg-white/10 rounded-full hover:bg-white/20 transition-colors;
 }
+
+/* ================================================================
+   Responsive hardening
+   Keeps the existing visual system intact while preventing
+   horizontal overflow and improving narrow-screen behavior.
+   ================================================================ */
+
+html,
+body {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: hidden;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  min-height: 100dvh;
+  overscroll-behavior-x: none;
+}
+
+img,
+video,
+canvas,
+svg {
+  max-width: 100%;
+}
+
+button,
+input,
+select,
+textarea {
+  max-width: 100%;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+input,
+select,
+textarea {
+  font-size: 16px;
+}
+
+::selection {
+  background: rgba(61, 214, 200, 0.28);
+  color: #fff;
+}
+
+/* Safe-area helpers for modern mobile devices */
+.pb-safe {
+  padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
+}
+
+.pt-safe {
+  padding-top: env(safe-area-inset-top);
+}
+
+.px-safe {
+  padding-left: max(1rem, env(safe-area-inset-left));
+  padding-right: max(1rem, env(safe-area-inset-right));
+}
+
+/* Avoid viewport-width based decorative elements creating page overflow */
+@media (max-width: 767px) {
+  section {
+    scroll-margin-top: 5rem;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    overflow-wrap: anywhere;
+  }
+
+  .mobile-full-width {
+    width: 100%;
+  }
+
+  .mobile-scroll-x {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+  }
+
+  .mobile-scroll-x > * {
+    min-width: max-content;
+  }
+}
+
+/* Tablet: tighten large desktop spacing without changing the design */
+@media (min-width: 768px) and (max-width: 1279px) {
+  .tablet-compact {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+/* Mobile */
+@media (max-width: 639px) {
+  .mobile-stack {
+    flex-direction: column !important;
+  }
+
+  .mobile-stack > * {
+    width: 100%;
+  }
+
+  .mobile-grid-1 {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .mobile-text-center {
+    text-align: center;
+  }
+}
