@@ -13,10 +13,11 @@ import { toast } from 'sonner';
 
 const DEFAULT_REWARDS = [
     { amount: 100, receive: 10 },
-    { amount: 500, receive: 50 },
-    { amount: 1000, receive: 120 },
-    { amount: 3000, receive: 500 },
+    { amount: 500, receive: 100 },
+    { amount: 1000, receive: 200 },
+    { amount: 3000, receive: 600 },
     { amount: 5000, receive: 1000 },
+    { amount: 10000, receive: 5000 },
 ];
 
 export default function FirstDepositRewardPage() {
@@ -31,7 +32,7 @@ export default function FirstDepositRewardPage() {
             const { data } = await supabase.from('site_settings').select('key, value');
             if (data) {
                 const dynamicRewards = [];
-                for (let i = 1; i <= 5; i++) {
+                for (let i = 1; i <= 10; i++) {
                     const setting = data.find(s => s.key === `reward_tier_${i}`);
                     if (setting?.value && setting.value.includes('/')) {
                         const [amount, receive] = setting.value.split('/').map((v: string) => parseFloat(v));
