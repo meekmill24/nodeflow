@@ -86,13 +86,20 @@ export default function AdminDashboard() {
           .limit(8); 
         if (recent) setRecentTx(recent as any); 
 
-        // Load users for banner targeting
-        const { data: usersData } = await supabase
-          .from('profiles')
-          .select('id, username, email, level_id, role')
-          .neq('role', 'admin')
-          .order('username', { ascending: true });
-        if (usersData) setUsersList(usersData);
+        // Load users for banner targeting via Admin API (bypasses client-side RLS)
+        let allUsers: any[] = [];
+        try {
+          const usersRes = await fetch('/api/admin/users');
+          if (usersRes.ok) {
+            allUsers = await usersRes.json();
+            if (Array.isArray(allUsers)) {
+              const nonAdminUsers = allUsers.filter((u: any) => u.role !== 'admin');
+              setUsersList(nonAdminUsers);
+            }
+          }
+        } catch (uErr) {
+          console.error('Failed to load users for targeting:', uErr);
+        }
 
         // Build last-7-days chart data
         const now = new Date();
@@ -116,13 +123,12 @@ export default function AdminDashboard() {
           deposits.push((dayTx || []).filter(t => t.type === 'deposit').reduce((a, t) => a + t.amount, 0));
           withdrawals.push((dayTx || []).filter(t => t.type === 'withdrawal').reduce((a, t) => a + t.amount, 0));
 
-          const { count } = await supabase
-            .from('profiles')
-            .select('id', { count: 'exact', head: true })
-            .gte('created_at', dayStr + 'T00:00:00')
-            .lte('created_at', dayStr + 'T23:59:59');
+          const count = (allUsers || []).filter((u: any) => {
+            if (!u.created_at) return false;
+            return u.created_at.startsWith(dayStr);
+          }).length;
 
-          usersPerDay.push(count || 0);
+          usersPerDay.push(count);
         }
 
         setChartData({ labels, deposits, withdrawals, users: usersPerDay });
@@ -258,7 +264,19 @@ export default function AdminDashboard() {
               </button>
             )}
             <button
-              onClick={() => setShowAnnouncementEdit(!showAnnouncementEdit)}
+              onClick={async () => {
+                const nextState = !showAnnouncementEdit;
+                setShowAnnouncementEdit(nextState);
+                if (nextState && usersList.length === 0) {
+                  try {
+                    const res = await fetch('/api/admin/users');
+                    if (res.ok) {
+                      const u = await res.json();
+                      if (Array.isArray(u)) setUsersList(u.filter((x: any) => x.role !== 'admin'));
+                    }
+                  } catch {}
+                }
+              }}
               className="px-4 py-2 text-[9px] font-black uppercase tracking-widest text-amber-400 bg-amber-500/10 rounded-xl hover:bg-amber-500/20 transition-all border border-amber-500/20 flex items-center gap-1.5"
             >
               <Megaphone size={12} /> Edit Banner
@@ -285,7 +303,18 @@ export default function AdminDashboard() {
                 </button>
                 <button
                   type="button"
-                  onClick={() => setTargetAudience('specific')}
+                  onClick={async () => {
+                    setTargetAudience('specific');
+                    if (usersList.length === 0) {
+                      try {
+                        const res = await fetch('/api/admin/users');
+                        if (res.ok) {
+                          const u = await res.json();
+                          if (Array.isArray(u)) setUsersList(u.filter((x: any) => x.role !== 'admin'));
+                        }
+                      } catch {}
+                    }
+                  }}
                   className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
                     targetAudience === 'specific'
                       ? 'bg-amber-500 text-black shadow-md'
@@ -331,50 +360,64 @@ export default function AdminDashboard() {
                   className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-amber-500/50 placeholder:text-slate-700"
                 />
 
-                <div className="max-h-48 overflow-y-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 pr-1">
-                  {usersList
-                    .filter(u => 
-                      (u.username || '').toLowerCase().includes(userSearchQuery.toLowerCase()) ||
-                      (u.email || '').toLowerCase().includes(userSearchQuery.toLowerCase())
-                    )
-                    .map(user => {
-                      const isSelected = selectedUserIds.includes(user.id);
-                      return (
-                        <div
-                          key={user.id}
-                          onClick={() => {
-                            if (isSelected) {
-                              setSelectedUserIds(selectedUserIds.filter(id => id !== user.id));
-                            } else {
-                              setSelectedUserIds([...selectedUserIds, user.id]);
-                            }
-                          }}
-                          className={`p-2.5 rounded-xl border cursor-pointer flex items-center justify-between gap-2 transition-all select-none ${
-                            isSelected
-                              ? 'bg-amber-500/10 border-amber-500/40 text-white'
-                              : 'bg-slate-900/50 border-slate-800/80 text-slate-400 hover:border-slate-700'
-                          }`}
-                        >
-                          <div className="flex items-center gap-2 min-w-0">
-                            <div className={`w-6 h-6 rounded-lg flex items-center justify-center text-[10px] font-black shrink-0 ${
-                              isSelected ? 'bg-amber-500 text-black' : 'bg-slate-800 text-slate-300'
+                {usersList.length === 0 ? (
+                  <div className="py-6 text-center text-xs text-slate-500 flex items-center justify-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+                    Loading worker accounts...
+                  </div>
+                ) : usersList.filter(u => 
+                    (u.username || '').toLowerCase().includes(userSearchQuery.toLowerCase()) ||
+                    (u.email || '').toLowerCase().includes(userSearchQuery.toLowerCase())
+                  ).length === 0 ? (
+                  <div className="py-6 text-center text-xs text-slate-500">
+                    No matching workers found for &quot;{userSearchQuery}&quot;
+                  </div>
+                ) : (
+                  <div className="max-h-48 overflow-y-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 pr-1">
+                    {usersList
+                      .filter(u => 
+                        (u.username || '').toLowerCase().includes(userSearchQuery.toLowerCase()) ||
+                        (u.email || '').toLowerCase().includes(userSearchQuery.toLowerCase())
+                      )
+                      .map(user => {
+                        const isSelected = selectedUserIds.includes(user.id);
+                        return (
+                          <div
+                            key={user.id}
+                            onClick={() => {
+                              if (isSelected) {
+                                setSelectedUserIds(selectedUserIds.filter(id => id !== user.id));
+                              } else {
+                                setSelectedUserIds([...selectedUserIds, user.id]);
+                              }
+                            }}
+                            className={`p-2.5 rounded-xl border cursor-pointer flex items-center justify-between gap-2 transition-all select-none ${
+                              isSelected
+                                ? 'bg-amber-500/10 border-amber-500/40 text-white'
+                                : 'bg-slate-900/50 border-slate-800/80 text-slate-400 hover:border-slate-700'
+                            }`}
+                          >
+                            <div className="flex items-center gap-2 min-w-0">
+                              <div className={`w-6 h-6 rounded-lg flex items-center justify-center text-[10px] font-black shrink-0 ${
+                                isSelected ? 'bg-amber-500 text-black' : 'bg-slate-800 text-slate-300'
+                              }`}>
+                                {(user.username || 'U')[0].toUpperCase()}
+                              </div>
+                              <div className="truncate">
+                                <p className="text-xs font-bold text-white truncate">{user.username}</p>
+                                <p className="text-[9px] text-slate-500 truncate">{user.email || 'No email'}</p>
+                              </div>
+                            </div>
+                            <div className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 ${
+                              isSelected ? 'bg-amber-500 border-amber-500 text-black' : 'border-slate-700'
                             }`}>
-                              {(user.username || 'U')[0].toUpperCase()}
-                            </div>
-                            <div className="truncate">
-                              <p className="text-xs font-bold text-white truncate">{user.username}</p>
-                              <p className="text-[9px] text-slate-500 truncate">{user.email || 'No email'}</p>
+                              {isSelected && <CheckCircle2 size={12} strokeWidth={3} />}
                             </div>
                           </div>
-                          <div className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 ${
-                            isSelected ? 'bg-amber-500 border-amber-500 text-black' : 'border-slate-700'
-                          }`}>
-                            {isSelected && <CheckCircle2 size={12} strokeWidth={3} />}
-                          </div>
-                        </div>
-                      );
-                    })}
-                </div>
+                        );
+                      })}
+                  </div>
+                )}
               </div>
             )}
 
