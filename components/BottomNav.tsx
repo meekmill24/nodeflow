@@ -1,16 +1,14 @@
 'use client';
 
-import { Home, Zap, FileText, Headset, User } from 'lucide-react';
+import { Home, Zap, FileText } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useLanguage } from '@/context/LanguageContext';
 
 const tabs = [
     { icon: Home, label: 'home', href: '/home' },
-    { icon: FileText, label: 'record', href: '/record' },
     { icon: Zap, label: 'start', href: '/start', isCenter: true },
-    { icon: Headset, label: 'support', href: '#', isSupport: true },
-    { icon: User, label: 'profile', href: '/profile' },
+    { icon: FileText, label: 'record', href: '/record' },
 ];
 
 export default function BottomNav() {
@@ -22,7 +20,7 @@ export default function BottomNav() {
             {/* ULTRA GLASS DOCKSIDE */}
             <div className="absolute inset-0 bg-[#0B0B1E]/90 backdrop-blur-3xl border-t border-white/5 shadow-[0_-20px_60px_rgba(0,0,0,0.8)]" />
             
-            <div className="relative grid grid-cols-5 w-full h-[4.5rem] sm:h-20 items-center px-1.5 sm:px-2">
+            <div className="relative grid grid-cols-3 w-full h-[4.5rem] sm:h-20 items-center px-2 sm:px-6">
                 {tabs.map((item) => {
                     const { icon: Icon, label, href, isCenter } = item;
                     const isActive = pathname === href;
@@ -85,21 +83,12 @@ export default function BottomNav() {
 
                     return (
                         <div key={label} className="flex items-center justify-center h-full">
-                            {item.isSupport ? (
-                                <button
-                                    onClick={() => (window as any).Tawk_API?.maximize()}
-                                    className="w-full h-full flex items-center justify-center transition-all duration-300"
-                                >
-                                    {Content}
-                                </button>
-                            ) : (
-                                <Link
-                                    href={href}
-                                    className="w-full h-full flex items-center justify-center transition-all duration-300"
-                                >
-                                    {Content}
-                                </Link>
-                            )}
+                            <Link
+                                href={href}
+                                className="w-full h-full flex items-center justify-center transition-all duration-300"
+                            >
+                                {Content}
+                            </Link>
                         </div>
                     );
                 })}
