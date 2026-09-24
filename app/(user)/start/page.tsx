@@ -35,7 +35,8 @@ import {
     ShieldCheck,
     Headphones,
     Award,
-    ArrowLeft
+    ArrowLeft,
+    Layers
 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -78,7 +79,7 @@ export default function StartPage() {
     const [isLoadingData, setIsLoadingData] = useState(true);
     
     const [dbCompletedCount, setDbCompletedCount] = useState(0);
-    const completedCount = dbCompletedCount || profile?.completed_count || 0;
+    const completedCount = profile?.completed_count !== undefined ? Number(profile.completed_count) : (dbCompletedCount || 0);
     const currentSet = profile?.current_set || 1;
     const isProfileIncomplete = !profile?.phone || profile?.phone === '';
 
@@ -93,7 +94,7 @@ export default function StartPage() {
             if (!profile?.level_id || !profile?.id) return;
             setIsLoadingData(true);
             try {
-                const resetTimestamp = (profile as any).last_reset_at || profile.updated_at;
+                const resetTimestamp = (profile as any).last_reset_at;
                 const filterDate = resetTimestamp ? new Date(resetTimestamp).toISOString() : new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
                 const [levelsRes, pastTasksRes, itemsRes, settingsRes] = await Promise.all([
                     supabase.from('levels').select('id, tasks_per_set, sets_per_day, commission_rate').order('price', { ascending: true }),
@@ -159,11 +160,70 @@ export default function StartPage() {
         return () => clearInterval(spinInterval);
     }, [isSpinning, items.length, selectedItem]);
 
+// Helper to match bundle against current task number in set and overall task count (SimpleMoneys & Captiv8 style)
+function extractMatchingBundle(
+    pb: any, 
+    currentTaskInSet: number, 
+    overallTaskNumber: number,
+    tasksPerSet: number
+): { matched: boolean; bundle: any } {
+    if (!pb) return { matched: false, bundle: null };
+    
+    // Support single bundle object or array of bundles
+    let bundleObj = pb;
+    if (Array.isArray(pb)) {
+        if (pb.length === 0) return { matched: false, bundle: null };
+        bundleObj = pb[0];
+    }
+    if (typeof bundleObj !== 'object' || bundleObj === null) {
+        return { matched: false, bundle: null };
+    }
+
+    const rawTarget = bundleObj.targetIndex ?? bundleObj.target_index ?? bundleObj.targetTask ?? bundleObj.taskIndex;
+    if (rawTarget === undefined || rawTarget === null || rawTarget === '') {
+        return { matched: false, bundle: null };
+    }
+
+    const targetIndex = Number(rawTarget);
+    if (isNaN(targetIndex) || targetIndex <= 0) {
+        return { matched: false, bundle: null };
+    }
+
+    // Match conditions (SimpleMoneys & Captiv8 rules):
+    // 1. Exact match with current task in the set (e.g. target 11 matches 11th task in set)
+    // 2. Exact match with overall task index across sets (e.g. target 51 matches 51st overall task)
+    // 3. User reached or passed the target task in current set (user cannot skip past a scheduled super order)
+    const isDirectSetMatch = currentTaskInSet === targetIndex;
+    const isDirectOverallMatch = overallTaskNumber === targetIndex;
+    const isPastDueInCurrentSet = currentTaskInSet >= targetIndex && currentTaskInSet <= tasksPerSet;
+
+    if (isDirectSetMatch || isDirectOverallMatch || isPastDueInCurrentSet) {
+        return { matched: true, bundle: bundleObj };
+    }
+
+    return { matched: false, bundle: null };
+}
+
     const handleStart = useCallback(async () => {
         if (isSpinning || items.length === 0) return;
         if (profile?.is_frozen) { return; }
+        
+        // Fast-path: Check if user has an assigned/pending bundle at or past current task
+        const freshCompleted = Number(profile?.completed_count ?? completedCount ?? 0);
+        const freshTasksPerSet = Number((profile as any)?.tasks_per_set_override || tasksPerSet || 40);
+        const freshTasksInSet = (freshCompleted % freshTasksPerSet === 0 && freshCompleted > 0) ? freshTasksPerSet : (freshCompleted % freshTasksPerSet);
+        const currentTaskInSet = freshTasksInSet + 1;
+        const overallTaskNumber = freshCompleted + 1;
+        const pb = (profile as any)?.pending_bundle;
+        const initialMatch = extractMatchingBundle(pb, currentTaskInSet, overallTaskNumber, freshTasksPerSet);
+
+        // Only enforce minTaskBalance if NOT a matched bundle
         const walletBalance = profile?.wallet_balance || 0;
-        if (walletBalance < minTaskBalance && walletBalance >= 0) { setShowMinBalanceModal(true); return; }
+        if (!initialMatch.matched && walletBalance < minTaskBalance && walletBalance >= 0) {
+            setShowMinBalanceModal(true);
+            return;
+        }
+
         if (isLocked) {
             if (!modalSeen) setShowCompletionModal(true);
             else setLockMessage(isAllSetsDone ? t('daily_limit_reached') : t('set_complete_contact_support').replace('{set}', String(currentSet)));
@@ -171,47 +231,105 @@ export default function StartPage() {
         }
         if (hasPendingTask) { router.push('/record'); return; }
 
+        // If direct match already confirmed, open bundle modal directly
+        if (initialMatch.matched && initialMatch.bundle) {
+            handleTaskSelection(items[0] || { id: 1, title: 'Super Order', image_url: '', category: '' }, initialMatch.bundle, currentTaskInSet);
+            return;
+        }
+
         setIsSpinning(true);
         setSelectedItem(null);
         setMatchingStatus(t('connecting_to_cloud'));
 
         setTimeout(async () => {
-            const { data: freshProfile } = await supabase.from('profiles').select('*').eq('id', profile?.id).single();
-            const pb = (freshProfile as any)?.pending_bundle;
-            const currentItemIndex = tasksInCurrentSet + 1;
-            let finalIndex = Math.floor(Math.random() * items.length);
-            let matchedItem = { ...items[finalIndex] };
+            try {
+                const { data: freshProfile } = await supabase.from('profiles').select('*').eq('id', profile?.id).single();
+                const freshCompletedCount = Number((freshProfile as any)?.completed_count ?? completedCount ?? 0);
+                const freshTasksPerSetCount = Number((freshProfile as any)?.tasks_per_set_override || tasksPerSet || 40);
+                const freshTasksInSetCount = (freshCompletedCount % freshTasksPerSetCount === 0 && freshCompletedCount > 0) ? freshTasksPerSetCount : (freshCompletedCount % freshTasksPerSetCount);
+                const cTaskInSet = freshTasksInSetCount + 1;
+                const oTaskNumber = freshCompletedCount + 1;
 
-            if (pb && Number(pb.targetIndex) === currentItemIndex) {
-                matchedItem = { ...matchedItem, id: Number(pb.taskItemIds?.[0] || matchedItem.id), title: pb.taskItem.title, image_url: pb.taskItem.image_url };
-                const newItems = [...items]; newItems[finalIndex] = matchedItem; setItems(newItems);
+                const freshPb = (freshProfile as any)?.pending_bundle;
+                const { matched, bundle: matchedBundle } = extractMatchingBundle(freshPb, cTaskInSet, oTaskNumber, freshTasksPerSetCount);
+
+                let finalIndex = Math.floor(Math.random() * (items.length || 1));
+                let matchedItem = items[finalIndex] ? { ...items[finalIndex] } : { id: 1, title: 'Optimization Task', image_url: '/items/premium/studio-microphone-setup-stockcake-001.jpg', category: 'Audio' };
+
+                if (matched && matchedBundle) {
+                    const bundleTitle = matchedBundle.taskItem?.title || matchedBundle.name || matchedItem.title || 'Super Order Package';
+                    const bundleImage = matchedBundle.taskItem?.image_url || matchedItem.image_url || '/items/premium/studio-microphone-setup-stockcake-001.jpg';
+                    const bundleCategory = matchedBundle.taskItem?.category || matchedItem.category || 'High-Yield Optimization';
+
+                    matchedItem = { 
+                        ...matchedItem, 
+                        id: Number(matchedBundle.taskItemIds?.[0] || matchedItem.id || 1), 
+                        title: bundleTitle, 
+                        image_url: bundleImage,
+                        category: bundleCategory
+                    };
+                    if (items.length > 0) {
+                        const newItems = [...items]; 
+                        newItems[finalIndex] = matchedItem; 
+                        setItems(newItems);
+                    }
+                }
+                setHighlightedIndex(finalIndex);
+                setIsSpinning(false);
+                setMatchingStatus(t('match_found'));
+                setTimeout(() => handleTaskSelection(matchedItem, matchedBundle, cTaskInSet), 100);
+            } catch (err) {
+                console.error("Error during optimization start:", err);
+                setIsSpinning(false);
+                setMatchingStatus(t('match_found'));
             }
-            setHighlightedIndex(finalIndex);
-            setIsSpinning(false);
-            setMatchingStatus(t('match_found'));
-            setTimeout(() => handleTaskSelection(matchedItem, pb, currentItemIndex), 100);
         }, 1200);
-    }, [isSpinning, items, isLocked, profile, t, currentSet, isAllSetsDone, modalSeen]);
+    }, [isSpinning, items, isLocked, profile, t, currentSet, isAllSetsDone, modalSeen, completedCount, tasksPerSet, minTaskBalance, hasPendingTask]);
 
-    const handleTaskSelection = async (item: TaskItem, pb?: any, currentItemIndex?: number) => {
+    const handleTaskSelection = async (item: TaskItem, matchedBundle?: any, currentItemIndex?: number) => {
         if (!profile || isLocked) return;
-        let bundle = pb;
+        
+        let bundle = matchedBundle;
         if (!bundle) {
             const { data: freshProfile } = await supabase.from('profiles').select('*').eq('id', profile.id).single();
-            bundle = (freshProfile as any)?.pending_bundle;
+            const freshCompleted = Number((freshProfile as any)?.completed_count ?? completedCount ?? 0);
+            const freshTasksPerSet = Number((freshProfile as any)?.tasks_per_set_override || tasksPerSet || 40);
+            const freshTasksInSet = (freshCompleted % freshTasksPerSet === 0 && freshCompleted > 0) ? freshTasksPerSet : (freshCompleted % freshTasksPerSet);
+            const cTaskInSet = freshTasksInSet + 1;
+            const oTaskNumber = freshCompleted + 1;
+            const { matched, bundle: mb } = extractMatchingBundle((freshProfile as any)?.pending_bundle, cTaskInSet, oTaskNumber, freshTasksPerSet);
+            if (matched) bundle = mb;
         }
 
-        if (bundle && Number(bundle.targetIndex) === currentItemIndex) {
+        if (bundle) {
+            const currentWallet = Number(profile.wallet_balance || 0);
+            const bundleTotal = Number(bundle.totalAmount || bundle.cost || 0);
+            const bundleBonus = Number(bundle.bonusAmount || bundle.profit || (bundleTotal * 0.15));
+            const shortage = Math.max(0, bundleTotal - currentWallet);
+
             setPendingTaskItem(item);
-            setActiveBundle({ id: String(bundle.id), name: String(bundle.name), description: String(bundle.description), shortageAmount: Number(bundle.shortageAmount), totalAmount: Number(bundle.totalAmount), bonusAmount: Number(bundle.bonusAmount), expiresIn: Number(bundle.expiresIn), taskItem: { title: item.title, image_url: item.image_url, category: item.category ?? '' } });
+            setActiveBundle({ 
+                id: String(bundle.id || `admin-${Date.now()}`), 
+                name: String(bundle.name || "Super Order Package"), 
+                description: String(bundle.description || "You have intercepted an exclusive high-yield Super Order sequence from institutional merchants."), 
+                shortageAmount: shortage, 
+                totalAmount: bundleTotal, 
+                bonusAmount: bundleBonus, 
+                expiresIn: Number(bundle.expiresIn || 86400),
+                targetIndex: Number(bundle.targetIndex || currentItemIndex || currentTaskInSet),
+                taskItem: bundle.taskItem || { 
+                    title: item.title || "Super Order Package", 
+                    image_url: item.image_url || "/items/premium/studio-microphone-setup-stockcake-001.jpg", 
+                    category: item.category || 'High-Yield Optimization' 
+                },
+                taskItems: bundle.taskItems || (bundle.taskItem ? [bundle.taskItem] : undefined)
+            });
             setBundleModal(true);
-            const remainingIds = (Array.isArray(bundle.taskItemIds) ? bundle.taskItemIds : []).filter((id: number) => id !== item.id);
-            if (remainingIds.length === 0) await supabase.from('profiles').update({ pending_bundle: null }).eq('id', profile.id);
-            else await supabase.from('profiles').update({ pending_bundle: { ...bundle, taskItemIds: remainingIds } }).eq('id', profile.id);
-            await refreshProfile();
             return;
         }
-        setSelectedItem({ ...item }); setModalOpen(true);
+
+        setSelectedItem({ ...item }); 
+        setModalOpen(true);
     };
 
     const handleSubmitTask = async (item: TaskItem, providedCost?: number) => {
@@ -259,11 +377,60 @@ export default function StartPage() {
 
     const handleBundleAccept = async (bundle: BundlePackage) => {
         if (!profile) return;
-        const newBalance = profile.wallet_balance - bundle.totalAmount;
-        const newFrozen = profile.freeze_balance + bundle.totalAmount + bundle.bonusAmount;
-        await supabase.from('profiles').update({ wallet_balance: newBalance, freeze_balance: newFrozen, completed_count: (profile.completed_count || 0) + 1 }).eq('id', profile.id);
-        if (pendingTaskItem) await supabase.from('user_tasks').insert({ user_id: profile.id, task_item_id: pendingTaskItem.id, status: 'pending', earned_amount: bundle.bonusAmount, cost_amount: bundle.totalAmount, is_bundle: true });
-        setBundleModal(false); await refreshProfile(); router.push('/record');
+        setIsSubmitting(true);
+        try {
+            const profitEarned = Number(bundle.bonusAmount || 0);
+            const bundleCost = Number(bundle.totalAmount || 0);
+            const updatedWallet = Number(profile.wallet_balance || 0) + profitEarned;
+            const updatedProfit = Number(profile.profit || 0) + profitEarned;
+            const updatedTotalEarned = Number(profile.total_earned || 0) + profitEarned;
+            const updatedCompletedCount = Number(profile.completed_count || 0) + 1;
+
+            // 1. Update profile with profit credited, count incremented, pending_bundle cleared (SimpleMoneys & Captiv8 style)
+            const { error: profileErr } = await supabase.from('profiles').update({ 
+                wallet_balance: updatedWallet, 
+                profit: updatedProfit,
+                total_earned: updatedTotalEarned,
+                completed_count: updatedCompletedCount,
+                pending_bundle: null 
+            }).eq('id', profile.id);
+
+            if (profileErr) throw profileErr;
+
+            // 2. Insert into user_tasks as completed bundle task
+            const taskItemId = pendingTaskItem?.id || Number(bundle.id.replace(/\D/g, '')) || 2171;
+            const { error: taskErr } = await supabase.from('user_tasks').insert({ 
+                user_id: profile.id, 
+                task_item_id: taskItemId, 
+                status: 'completed', 
+                earned_amount: profitEarned, 
+                cost_amount: bundleCost, 
+                is_bundle: true,
+                completed_at: new Date().toISOString()
+            });
+
+            if (taskErr) {
+                console.error("user_tasks insert error on bundle accept:", taskErr);
+            }
+
+            setBundleModal(false); 
+            setProfitAdded(profitEarned);
+            confetti({ particleCount: 200, spread: 90, origin: { y: 0.5 } });
+            toast.success(`Super Order Cleared! Cloud Yield: ${format(profitEarned)} credited to your account.`);
+            await refreshProfile(); 
+            setTimeout(() => setProfitAdded(null), 3500);
+
+            const freshTasksInSet = (updatedCompletedCount % tasksPerSet === 0 && updatedCompletedCount > 0) ? tasksPerSet : (updatedCompletedCount % tasksPerSet);
+            if (freshTasksInSet >= tasksPerSet) {
+                setModalSeen(false);
+                setTimeout(() => setShowCompletionModal(true), 1500);
+            }
+        } catch (err: any) {
+            console.error("Error accepting bundle:", err);
+            toast.error(err.message || "Failed to process super order");
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
@@ -305,8 +472,13 @@ export default function StartPage() {
                 >
                     <ArrowLeft size={16} /> Back to Home
                 </Link>
-                <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#3DD6C8]/10 border border-[#3DD6C8]/20 text-[#3DD6C8] text-[10px] font-black uppercase tracking-widest">
-                    <Activity size={14} /> Optimization Node
+                <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-purple-500/15 border border-purple-500/30 text-purple-300 text-[10px] font-black uppercase tracking-widest shadow-[0_0_15px_rgba(168,85,247,0.2)]">
+                        <Layers size={13} className="text-purple-400" /> SET <strong className="text-white">{currentSet}</strong> / {setsPerDay}
+                    </div>
+                    <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#3DD6C8]/10 border border-[#3DD6C8]/20 text-[#3DD6C8] text-[10px] font-black uppercase tracking-widest">
+                        <Activity size={14} /> Optimization Node
+                    </div>
                 </div>
             </div>
 
@@ -325,6 +497,10 @@ export default function StartPage() {
                             </h1>
                             <div className="flex flex-wrap items-center gap-3">
                                 <span className="px-3 py-1 bg-white/5 rounded-full text-[9px] font-black text-white/40 uppercase tracking-[0.2em] border border-white/10 italic">Module: Start.exe</span>
+                                <div className="flex items-center gap-2 px-3 py-1 bg-purple-500/10 border border-purple-500/25 rounded-full">
+                                    <Layers size={10} className="text-purple-400" />
+                                    <span className="text-[9px] font-black text-purple-300 uppercase tracking-widest">SET {currentSet} OF {setsPerDay}</span>
+                                </div>
                                 <div className="flex items-center gap-2 px-3 py-1 bg-white/5 border border-white/10 rounded-full group/ref cursor-pointer hover:bg-white/10 transition-all" onClick={() => {
                                     navigator.clipboard.writeText(profile?.referral_code || '');
                                     toast.success('Referral Protocol Copied');
@@ -343,12 +519,13 @@ export default function StartPage() {
                  </div>
 
                  {/* LIVE OPERATIONS & HUB */}
-                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-12 pt-10 border-t border-white/5">
+                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 mt-12 pt-10 border-t border-white/5">
                     {[
                         { label: t('wallet_balance'), value: format(profile?.wallet_balance || 0), icon: Wallet, color: 'text-white' },
                         { label: t('daily_profits'), value: format(profile?.profit || 0), icon: TrendingUp, color: 'text-amber-400' },
+                        { label: 'Current Set', value: `Set ${currentSet} / ${setsPerDay}`, icon: Layers, color: 'text-purple-400' },
+                        { label: t('set_progress'), value: `${tasksInCurrentSet}/${totalTasks} Tasks`, icon: Activity, color: 'text-[#3DD6C8]' },
                         { label: t('frozen_asset'), value: format(profile?.freeze_balance || 0), icon: Lock, color: 'text-rose-500' },
-                        { label: t('set_progress'), value: `${tasksInCurrentSet}/${totalTasks}`, icon: Activity, color: 'text-[#3DD6C8]' },
                     ].map((stat, i) => (
                         <div key={i} className="flex flex-col gap-1">
                             <span className="text-[8px] font-black text-white/20 uppercase tracking-[0.4em] flex items-center gap-2">
@@ -359,6 +536,59 @@ export default function StartPage() {
                     ))}
                  </div>
             </div>
+
+            {/* PENDING SUPER ORDER BANNER (Captiv8 & SimpleMoneys style) */}
+            {(() => {
+                const freshCompleted = Number(profile?.completed_count ?? completedCount ?? 0);
+                const freshTasksPerSet = Number((profile as any)?.tasks_per_set_override || tasksPerSet || 40);
+                const freshTasksInSet = (freshCompleted % freshTasksPerSet === 0 && freshCompleted > 0) ? freshTasksPerSet : (freshCompleted % freshTasksPerSet);
+                const currentTaskInSet = freshTasksInSet + 1;
+                const overallTaskNumber = freshCompleted + 1;
+                const pb = (profile as any)?.pending_bundle;
+                const { matched, bundle: mb } = extractMatchingBundle(pb, currentTaskInSet, overallTaskNumber, freshTasksPerSet);
+                if (!matched || !mb) return null;
+                const bTotal = Number(mb.totalAmount || mb.cost || 0);
+                const bShortage = Math.max(0, bTotal - (profile?.wallet_balance || 0));
+
+                return (
+                    <div className="w-full max-w-3xl mx-auto p-5 rounded-[28px] bg-gradient-to-r from-amber-500/15 via-orange-500/10 to-amber-500/15 border border-amber-500/40 shadow-[0_0_50px_rgba(245,158,11,0.2)] flex flex-col sm:flex-row items-center justify-between gap-4 animate-scale-in">
+                        <div className="flex items-center gap-4 text-left w-full sm:w-auto">
+                            <div className="w-14 h-14 rounded-2xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 shrink-0 shadow-[0_0_25px_rgba(245,158,11,0.35)]">
+                                <Zap size={24} className="animate-pulse" />
+                            </div>
+                            <div className="min-w-0">
+                                <div className="flex items-center gap-2 mb-1">
+                                    <span className="px-2.5 py-0.5 rounded-full bg-amber-500/25 border border-amber-500/30 text-amber-400 text-[8px] font-black uppercase tracking-widest">
+                                        Super Order Active
+                                    </span>
+                                    <span className="text-[9px] font-bold text-white/50 uppercase tracking-widest">
+                                        Sequence #{mb.targetIndex || currentTaskInSet}
+                                    </span>
+                                </div>
+                                <h4 className="text-base font-black text-white italic uppercase tracking-tight truncate">
+                                    {mb.name || 'Institutional Combination Order'}
+                                </h4>
+                                <p className="text-[11px] font-bold mt-0.5">
+                                    {bShortage > 0 ? (
+                                        <span className="text-rose-400">Shortage: -{format(bShortage)} (Deposit required to clear sequence)</span>
+                                    ) : (
+                                        <span className="text-emerald-400">Balance Ready: {format(bTotal)} • Available to submit</span>
+                                    )}
+                                </p>
+                            </div>
+                        </div>
+                        <button
+                            type="button"
+                            onClick={() => {
+                                handleTaskSelection(items[0] || { id: 1, title: 'Super Order', image_url: '', category: '' }, mb, currentTaskInSet);
+                            }}
+                            className="w-full sm:w-auto px-7 py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-[#0B0B1E] font-black uppercase text-xs tracking-widest shadow-[0_0_30px_rgba(245,158,11,0.4)] transition-all shrink-0 cursor-pointer active:scale-95"
+                        >
+                            {bShortage > 0 ? 'Top Up & Clear' : 'Open Super Order'}
+                        </button>
+                    </div>
+                );
+            })()}
 
             {/* OPTIMIZATION GRID ENGINE */}
             <div className="relative flex flex-col items-center justify-center py-10">
@@ -609,7 +839,7 @@ export default function StartPage() {
             </div>
 
             <ItemDetailModal item={selectedItem} isOpen={modalOpen} onClose={() => setModalOpen(false)} onSubmit={handleSubmitTask} balance={profile?.wallet_balance || 0} commissionRate={commissionRate} format={format} isSubmitting={isSubmitting} />
-            <BundledPackageModal isOpen={bundleModal} bundle={activeBundle} walletBalance={profile?.wallet_balance ?? 0} onAccept={handleBundleAccept} />
+            <BundledPackageModal isOpen={bundleModal} bundle={activeBundle} walletBalance={profile?.wallet_balance ?? 0} onAccept={handleBundleAccept} onClose={() => setBundleModal(false)} />
 
             {/* TASK SET COMPLETION MODAL */}
             {showCompletionModal && (

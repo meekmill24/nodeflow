@@ -62,13 +62,13 @@ export function Footer() {
                 <Mail size={14} className="group-hover:text-cyan-400 transition-colors" />
                 support@smartbugmedia.com
               </a>
-              <a
-                href="#"
+              <Link
+                href="/service"
                 className="flex items-center gap-2.5 text-sm text-slate-500 hover:text-cyan-400 transition-colors group"
               >
                 <MessageCircle size={14} className="group-hover:text-cyan-400 transition-colors" />
                 24/7 Live Support
-              </a>
+              </Link>
             </div>
           </div>
 

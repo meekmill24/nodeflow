@@ -261,13 +261,14 @@ export default function LevelsPage() {
                 </div>
 
                 {/* Deposit Tier Bonus Matrix */}
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5">
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3.5">
                     {[
                         { deposit: 500, bonus: 30, tag: 'Tier 1' },
                         { deposit: 1000, bonus: 60, tag: 'Tier 2' },
                         { deposit: 2000, bonus: 200, tag: 'Tier 3' },
                         { deposit: 3000, bonus: 500, tag: 'Tier 4' },
                         { deposit: 5000, bonus: 1000, tag: 'Tier 5' },
+                        { deposit: 10000, bonus: 5000, tag: 'Tier 6' },
                     ].map((tier, idx) => (
                         <div 
                             key={idx}

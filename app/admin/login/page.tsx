@@ -139,7 +139,7 @@ export default function AdminLogin() {
             </form>
 
             <div className="mt-10 pt-8 border-t border-white/5 text-center">
-                <p className="text-[9px] font-black text-slate-700 uppercase tracking-[0.4em]">© 2025 SmartBugMedia. Global Matrix</p>
+                <p className="text-[9px] font-black text-slate-700 uppercase tracking-[0.4em]">© 2026 SmartBugMedia. Global Matrix</p>
             </div>
         </div>
       </div>

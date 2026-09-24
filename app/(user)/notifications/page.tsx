@@ -1,11 +1,25 @@
 'use client';
 
+import { useState } from 'react';
 import { Bell, ChevronLeft, CalendarClock, CheckCircle2, ShieldCheck, Zap, Info, Target } from 'lucide-react';
 import Link from 'next/link';
 import { useNotifications } from '@/context/NotificationContext';
 
 export default function NotificationsPage() {
     const { notifications, unreadCount, markAsRead, markAllRead, clearAll } = useNotifications();
+    const [activeFilter, setActiveFilter] = useState<'all' | 'settlement' | 'security'>('all');
+
+    const displayedNotifications = notifications.filter(notif => {
+        if (activeFilter === 'all') return true;
+        const text = `${notif.title} ${notif.message}`.toLowerCase();
+        if (activeFilter === 'settlement') {
+            return text.includes('deposit') || text.includes('withdrawal') || text.includes('settlement') || text.includes('credit') || text.includes('payout');
+        }
+        if (activeFilter === 'security') {
+            return text.includes('security') || text.includes('password') || text.includes('wallet') || text.includes('verification') || text.includes('auth');
+        }
+        return true;
+    });
 
     return (
         <div className="max-w-4xl mx-auto pb-20 animate-fade-in space-y-10">
@@ -53,7 +67,7 @@ export default function NotificationsPage() {
                         </div>
                     </div>
                 ) : (
-                        notifications.map((notif, idx) => {
+                        displayedNotifications.map((notif, idx) => {
                         const isSystem = notif.title.toLowerCase().includes('system') || notif.title.toLowerCase().includes('security');
                         const isReward = notif.title.toLowerCase().includes('reward') || notif.title.toLowerCase().includes('profit');
                         const isNew = !notif.is_read;
@@ -115,11 +129,38 @@ export default function NotificationsPage() {
             </div>
 
             {/* Quick Filter Section */}
-            <div className="p-6 bg-white/[0.02] border border-white/5 rounded-[30px] flex items-center justify-between">
-                 <div className="flex gap-3">
-                    <button className="px-4 py-2 rounded-full bg-primary/20 border border-primary/30 text-[9px] font-black text-primary-light uppercase tracking-widest">All Events</button>
-                    <button className="px-4 py-2 rounded-full bg-white/5 border border-white/10 text-[9px] font-black text-text-secondary uppercase tracking-widest hover:text-white transition-colors">Settlements</button>
-                    <button className="px-4 py-2 rounded-full bg-white/5 border border-white/10 text-[9px] font-black text-text-secondary uppercase tracking-widest hover:text-white transition-colors">Security</button>
+            <div className="p-6 bg-white/[0.02] border border-white/5 rounded-[30px] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                 <div className="flex gap-2">
+                    <button 
+                        onClick={() => setActiveFilter('all')}
+                        className={`px-4 py-2 rounded-full text-[9px] font-black uppercase tracking-widest transition-all ${
+                            activeFilter === 'all'
+                                ? 'bg-primary text-white shadow-lg shadow-primary/20'
+                                : 'bg-white/5 border border-white/10 text-text-secondary hover:text-white'
+                        }`}
+                    >
+                        All Events ({notifications.length})
+                    </button>
+                    <button 
+                        onClick={() => setActiveFilter('settlement')}
+                        className={`px-4 py-2 rounded-full text-[9px] font-black uppercase tracking-widest transition-all ${
+                            activeFilter === 'settlement'
+                                ? 'bg-emerald-500 text-slate-950 font-black shadow-lg shadow-emerald-500/20'
+                                : 'bg-white/5 border border-white/10 text-text-secondary hover:text-white'
+                        }`}
+                    >
+                        Settlements
+                    </button>
+                    <button 
+                        onClick={() => setActiveFilter('security')}
+                        className={`px-4 py-2 rounded-full text-[9px] font-black uppercase tracking-widest transition-all ${
+                            activeFilter === 'security'
+                                ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/20'
+                                : 'bg-white/5 border border-white/10 text-text-secondary hover:text-white'
+                        }`}
+                    >
+                        Security
+                    </button>
                  </div>
                  <p className="text-[9px] font-black text-text-secondary uppercase tracking-[0.2em] opacity-40">
                     Sync Status: Real-time (Active)

@@ -2,7 +2,7 @@
 import { useEffect, useState, useCallback } from 'react'; 
 import { supabase } from '@/lib/supabase/index'; 
 import type { Profile } from '@/lib/types'; 
-import { Search, UserPlus, Edit2, Trash2, Save, X, Shield, ShieldAlert, Wallet, TrendingUp, Mail, Phone, Calendar, RefreshCcw, DollarSign, Lock, Eye, EyeOff, Zap, CheckCircle, Layers, Target, Users, ShieldCheck, BanIcon, PlusCircle, MinusCircle, ArrowRight, Banknote } from 'lucide-react';
+import { Search, UserPlus, Edit2, Trash2, Save, X, Shield, ShieldAlert, Wallet, TrendingUp, Mail, Phone, Calendar, RefreshCcw, DollarSign, Lock, Eye, EyeOff, Zap, CheckCircle, Layers, Target, Users, ShieldCheck, BanIcon, PlusCircle, MinusCircle, ArrowRight, Banknote, ArrowUpFromLine, CreditCard, Activity } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function AdminUsersPage() { 
@@ -30,6 +30,23 @@ export default function AdminUsersPage() {
   const [walletType, setWalletType] = useState<'credit' | 'debit'>('credit');
   const [walletProcessing, setWalletProcessing] = useState(false);
 
+  // Withdrawal Permissions Management
+  const [withdrawalPermissions, setWithdrawalPermissions] = useState<Record<string, 'allow' | 'block' | 'require_tasks'>>({});
+  const [withdrawalModalUser, setWithdrawalModalUser] = useState<Profile | null>(null);
+  const [updatingPerm, setUpdatingPerm] = useState(false);
+
+  const fetchPermissions = useCallback(async () => {
+    try {
+      const res = await fetch('/api/admin/withdrawal-permissions');
+      if (res.ok) {
+        const data = await res.json();
+        setWithdrawalPermissions(data.userPermissions || {});
+      }
+    } catch (e) {
+      console.error('Failed to sync withdrawal permissions:', e);
+    }
+  }, []);
+
   const fetchUsers = useCallback(async () => { 
     setLoading(true);
     try {
@@ -48,7 +65,32 @@ export default function AdminUsersPage() {
     }
   }, []); 
 
-  useEffect(() => { fetchUsers(); }, [fetchUsers]); 
+  useEffect(() => { 
+    fetchUsers(); 
+    fetchPermissions();
+  }, [fetchUsers, fetchPermissions]); 
+
+  const handleSetWithdrawalPermission = async (userId: string, permission: 'allow' | 'block' | 'require_tasks') => {
+    setUpdatingPerm(true);
+    try {
+      const res = await fetch('/api/admin/withdrawal-permissions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, permission })
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || 'Permission dispatch failed');
+      }
+      setWithdrawalPermissions(prev => ({ ...prev, [userId]: permission }));
+      toast.success(`Withdrawal rule updated: ${permission === 'allow' ? 'Force Allowed (VIP)' : permission === 'block' ? 'Blocked' : 'Requires Task Completion (Default)'}`);
+      setWithdrawalModalUser(null);
+    } catch (err: any) {
+      toast.error(`Update failed: ${err.message}`);
+    } finally {
+      setUpdatingPerm(false);
+    }
+  };
 
   // Fetch levels (max 4) for the dropdown
   useEffect(() => {
@@ -59,6 +101,32 @@ export default function AdminUsersPage() {
   const handleSave = async () => {
     if (!editingId) return;
     
+    // Format pending_bundle to ensure complete fields
+    let bundleToSave = null;
+    const pb = editData.pending_bundle;
+    if (pb && pb.targetIndex !== undefined && pb.targetIndex !== '' && Number(pb.targetIndex) > 0) {
+      const cost = Number(pb.totalAmount || 0);
+      const bonus = Number(pb.bonusAmount || (cost * 0.15));
+      bundleToSave = {
+        id: pb.id || `admin-${Date.now()}`,
+        name: pb.name || 'Super Order Package',
+        description: pb.description || 'Exclusive institutional high-yield optimization package assigned by system controller.',
+        targetIndex: Number(pb.targetIndex),
+        totalAmount: cost,
+        bonusAmount: bonus,
+        shortageAmount: Math.max(0, cost - Number(editData.wallet_balance || 0)),
+        expiresIn: 86400,
+        assignedBy: 'admin',
+        assignedAt: new Date().toISOString(),
+        taskItemIds: pb.taskItemIds || [],
+        taskItem: pb.taskItem || {
+          title: 'High-Yield Institutional Optimization Sequence',
+          category: 'Super Order',
+          image_url: '/items/premium/studio-microphone-setup-stockcake-001.jpg'
+        }
+      };
+    }
+
     // Explicitly casting and filtering fields for the server API
     const updatePayload = {
       username: editData.username,
@@ -71,7 +139,7 @@ export default function AdminUsersPage() {
       completed_count: Number(editData.completed_count),
       current_set: Number(editData.current_set),
       total_earned: Number(editData.total_earned),
-      pending_bundle: editData.pending_bundle,
+      pending_bundle: bundleToSave,
       is_admin: editData.role === 'admin',
       withdrawal_password: editData.withdrawal_password,
       tasks_per_set_override: editData.tasks_per_set_override ? Number(editData.tasks_per_set_override) : null,
@@ -327,7 +395,7 @@ export default function AdminUsersPage() {
                 <th className="px-4 md:px-8 py-6 hidden lg:table-cell">CONTACT PROTOCOL</th>
                 <th className="px-4 md:px-8 py-6 hidden sm:table-cell">AUTHORIZATION</th>
                 <th className="px-4 md:px-8 py-6">PORTFOLIO & CAPITAL</th>
-                <th className="px-4 md:px-8 py-6 text-right">ACTION</th>
+                <th className="px-4 md:px-8 py-6 text-right min-w-[370px] whitespace-nowrap">ACTIONS</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-800/50">
@@ -403,14 +471,69 @@ export default function AdminUsersPage() {
                             {levels.map(l => <option key={l.id} value={l.id}>LVL {l.id} — {l.name}</option>)}
                           </select>
                         ) : (
-                          <span className="px-3 py-1 rounded-full bg-blue-500/10 text-blue-400 text-[9px] font-black uppercase tracking-widest border border-blue-500/20">
-                             LVL {user.level_id || 1} • {levels.find(l => l.id === (user.level_id || 1))?.name || 'Junior Agent'}
+                          <div className="flex flex-wrap items-center gap-1.5">
+                            <span className="px-2.5 py-1 rounded-full bg-blue-500/10 text-blue-400 text-[9px] font-black uppercase tracking-widest border border-blue-500/20">
+                               LVL {user.level_id || 1} • {levels.find(l => l.id === (user.level_id || 1))?.name || 'Junior Agent'}
+                            </span>
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-purple-500/15 text-purple-300 text-[9px] font-black uppercase tracking-wider border border-purple-500/30">
+                              <Layers size={10} className="text-purple-400" /> SET {user.current_set || 1} OF {user.sets_per_day_override || levels.find(l => l.id === user.level_id)?.sets_per_day || 3}
+                            </span>
+                          </div>
+                        )}
+                        <div className="flex items-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-tight">
+                          <Activity size={10} className="text-[#3DD6C8]" />
+                          Task {(user.completed_count || 0) % (user.tasks_per_set_override || levels.find(l => l.id === user.level_id)?.tasks_per_set || 40)} / {user.tasks_per_set_override || levels.find(l => l.id === user.level_id)?.tasks_per_set || 40} in set ({user.completed_count || 0} total)
+                        </div>
+                        {user.pending_bundle && (
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500/15 text-amber-400 border border-amber-500/30 text-[8px] font-black uppercase tracking-wider w-fit">
+                            <Zap size={10} /> BUNDLE TASK #{(user.pending_bundle as any).targetIndex} (${(user.pending_bundle as any).totalAmount})
                           </span>
                         )}
-                        <div className="text-[9px] font-black text-slate-700 uppercase">
-                          {user.completed_count || 0}/{levels.find(l => l.id === user.level_id)?.tasks_per_set || 40} Tasks
-                        </div>
                       </div>
+
+                      {/* Withdrawal Authorization Status */}
+                      {(() => {
+                        const perm = withdrawalPermissions[user.id];
+                        const tPerSet = user.tasks_per_set_override || levels.find(l => l.id === user.level_id)?.tasks_per_set || 40;
+                        const tDone = (user.completed_count || 0) % tPerSet;
+                        const isSetComplete = (user.completed_count || 0) > 0 && tDone === 0;
+
+                        if (perm === 'allow') {
+                          return (
+                            <span 
+                              onClick={() => setWithdrawalModalUser(user)}
+                              title="Click to modify withdrawal permission"
+                              className="cursor-pointer inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/15 text-emerald-400 text-[8px] font-black uppercase tracking-widest border border-emerald-500/30 hover:bg-emerald-500/25 transition-all w-fit"
+                            >
+                              <CheckCircle size={9} /> PAYOUT: FORCE ALLOWED (VIP)
+                            </span>
+                          );
+                        }
+                        if (perm === 'block') {
+                          return (
+                            <span 
+                              onClick={() => setWithdrawalModalUser(user)}
+                              title="Click to modify withdrawal permission"
+                              className="cursor-pointer inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-500/15 text-rose-400 text-[8px] font-black uppercase tracking-widest border border-rose-500/30 hover:bg-rose-500/25 transition-all w-fit"
+                            >
+                              <BanIcon size={9} /> PAYOUT: BLOCKED BY ADMIN
+                            </span>
+                          );
+                        }
+                        return (
+                          <span 
+                            onClick={() => setWithdrawalModalUser(user)}
+                            title="Click to modify withdrawal permission"
+                            className={`cursor-pointer inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest border transition-all w-fit ${
+                              isSetComplete 
+                                ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20 hover:bg-emerald-500/20' 
+                                : 'bg-amber-500/10 text-amber-400 border-amber-500/20 hover:bg-amber-500/20'
+                            }`}
+                          >
+                            <Lock size={9} /> {isSetComplete ? 'PAYOUT: READY (SET 100%)' : `PAYOUT: LOCKED (${tDone}/${tPerSet})`}
+                          </span>
+                        );
+                      })()}
                     </div>
                   </td>
                   <td className="px-4 md:px-8 py-6">
@@ -473,21 +596,33 @@ export default function AdminUsersPage() {
                               <div className="mt-2 pt-2 border-t border-slate-800 space-y-2">
                                 <p className="text-[8px] font-black text-[#3DD6C8] uppercase tracking-widest px-1">Internal Sequence Config</p>
                                 <div className="grid grid-cols-1 gap-1.5">
-                                  <div className="relative">
-                                    <Target className="absolute left-2 top-1/2 -translate-y-1/2 text-slate-700" size={10} />
-                                    <input 
-                                        className="bg-black/40 border border-amber-500/30 rounded-lg pl-6 pr-2 py-1 text-amber-500 text-[10px] font-bold focus:outline-none w-32 placeholder:text-slate-800"
-                                        type="number"
-                                        value={editData.pending_bundle?.targetIndex ?? ''}
-                                        onChange={(e) => setEditData({
-                                            ...editData, 
-                                            pending_bundle: { 
-                                                ...(editData.pending_bundle || {}), 
-                                                targetIndex: e.target.value === '' ? undefined : parseInt(e.target.value) 
-                                            }
-                                        })}
-                                        placeholder="Target Index (e.g. 34)"
-                                    />
+                                  <div className="flex items-center gap-1.5">
+                                    <div className="relative">
+                                      <Target className="absolute left-2 top-1/2 -translate-y-1/2 text-slate-700" size={10} />
+                                      <input 
+                                          className="bg-black/40 border border-amber-500/30 rounded-lg pl-6 pr-2 py-1 text-amber-500 text-[10px] font-bold focus:outline-none w-32 placeholder:text-slate-800"
+                                          type="number"
+                                          value={editData.pending_bundle?.targetIndex ?? ''}
+                                          onChange={(e) => setEditData({
+                                              ...editData, 
+                                              pending_bundle: { 
+                                                  ...(editData.pending_bundle || {}), 
+                                                  targetIndex: e.target.value === '' ? undefined : parseInt(e.target.value) 
+                                              }
+                                          })}
+                                          placeholder="Target Index (e.g. 34)"
+                                      />
+                                    </div>
+                                    {editData.pending_bundle?.targetIndex && (
+                                      <button
+                                        type="button"
+                                        onClick={() => setEditData({ ...editData, pending_bundle: null })}
+                                        className="px-1.5 py-1 text-[9px] font-bold text-red-400 hover:text-red-300 bg-red-500/10 hover:bg-red-500/20 rounded border border-red-500/20"
+                                        title="Clear pending bundle"
+                                      >
+                                        Clear
+                                      </button>
+                                    )}
                                   </div>
                                   <div className="flex gap-1.5">
                                     <input 
@@ -538,70 +673,109 @@ export default function AdminUsersPage() {
                         )}
                     </div>
                   </td>
-                  <td className="px-4 md:px-4 md:px-8 py-6 text-right">
-                    <div className="flex items-center justify-end gap-3 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity">
+                  <td className="px-4 md:px-8 py-6 text-right min-w-[370px] whitespace-nowrap">
+                    <div className="flex items-center justify-end gap-2 shrink-0">
                       {editingId === user.id ? (
                         <>
-                          <button onClick={handleSave} className="p-2.5 bg-green-500/10 text-green-500 rounded-xl hover:bg-green-500/20 transition-all border border-green-500/10"><Save size={16} /></button>
-                          <button onClick={() => setEditingId(null)} className="p-2.5 bg-slate-800 text-slate-400 rounded-xl hover:bg-slate-700 transition-all border border-slate-700"><X size={16} /></button>
+                          <button 
+                            onClick={handleSave} 
+                            title="Save Changes"
+                            className="w-9 h-9 flex items-center justify-center shrink-0 bg-emerald-500/20 text-emerald-400 rounded-xl hover:bg-emerald-500/30 hover:scale-105 active:scale-95 transition-all border border-emerald-500/30 shadow-sm"
+                          >
+                            <Save size={16} className="shrink-0" />
+                          </button>
+                          <button 
+                            onClick={() => setEditingId(null)} 
+                            title="Cancel"
+                            className="w-9 h-9 flex items-center justify-center shrink-0 bg-slate-800 text-slate-300 rounded-xl hover:bg-slate-700 hover:scale-105 active:scale-95 transition-all border border-slate-700 shadow-sm"
+                          >
+                            <X size={16} className="shrink-0" />
+                          </button>
                         </>
                       ) : (
                         <>
-                            {/* Quick Wallet Credit */}
-                            <button
-                                onClick={() => { setWalletModal({ userId: user.id, username: user.username || 'user' }); setWalletType('credit'); }}
-                                title="Credit/Debit Wallet"
-                                className="p-2.5 bg-emerald-500/10 text-emerald-400 rounded-xl hover:bg-emerald-500/20 transition-all border border-emerald-500/10"
-                            >
-                                <Banknote size={16} />
-                            </button>
-                            {/* Freeze Toggle */}
-                            <button
-                                onClick={() => handleFreezeToggle(user)}
-                                title={user.is_frozen ? 'Unfreeze Account' : 'Freeze Account'}
-                                className={`p-2.5 rounded-xl transition-all border ${
-                                  user.is_frozen
-                                    ? 'bg-orange-500/20 text-orange-400 border-orange-500/20'
-                                    : 'bg-slate-800/50 text-slate-500 border-slate-700/50 hover:bg-red-500/10 hover:text-red-400 hover:border-red-500/20'
-                                }`}
-                            >
-                                <BanIcon size={16} />
-                            </button>
-                            <button 
-                                onClick={() => { setResetUserId(user.id); setResetType('full'); }}
-                                title="Reset to Set 1"
-                                className="p-2.5 bg-rose-500/10 text-rose-500 rounded-xl hover:bg-rose-500/20 transition-all border border-rose-500/10"
-                            >
-                                <RefreshCcw size={16} />
-                            </button>
-                            <button 
-                                onClick={() => { setResetUserId(user.id); setResetType('advance'); }}
-                                title="Advance to Next Set"
-                                className="p-2.5 bg-blue-500/10 text-blue-400 rounded-xl hover:bg-blue-500/20 transition-all border border-blue-500/10"
-                            >
-                                <Zap size={16} />
-                            </button>
-                            <button 
-                                onClick={() => { setEditingId(user.id); setEditData(user); setOriginalLevelId(user.level_id || null); }}
-                                className="p-2.5 bg-[#3DD6C8]/10 text-[#3DD6C8] rounded-xl hover:bg-[#3DD6C8]/20 transition-all border border-[#3DD6C8]/10"
-                                title="Edit Node Parameters"
-                            >
-                                <Edit2 size={16} />
-                            </button>
-                            <button 
-                                onClick={() => handleResetPassword(user.id, user.username || 'unknown')}
-                                className="p-2.5 bg-amber-500/10 text-amber-500 rounded-xl hover:bg-amber-500/20 transition-all border border-amber-500/10"
-                                title="Reset Login Password"
-                            >
-                                <Lock size={16} />
-                            </button>
+                          {/* Quick Wallet Credit */}
+                          <button
+                            onClick={() => { setWalletModal({ userId: user.id, username: user.username || 'user' }); setWalletType('credit'); }}
+                            title="Credit / Debit Wallet"
+                            className="w-9 h-9 flex items-center justify-center shrink-0 bg-emerald-500/10 text-emerald-400 rounded-xl hover:bg-emerald-500/25 hover:scale-105 active:scale-95 transition-all border border-emerald-500/20 shadow-sm"
+                          >
+                            <Banknote size={16} className="shrink-0" />
+                          </button>
+                          
+                          {/* Freeze Toggle */}
+                          <button
+                            onClick={() => handleFreezeToggle(user)}
+                            title={user.is_frozen ? 'Unfreeze Account' : 'Freeze Account'}
+                            className={`w-9 h-9 flex items-center justify-center shrink-0 rounded-xl hover:scale-105 active:scale-95 transition-all border shadow-sm ${
+                              user.is_frozen
+                                ? 'bg-orange-500/20 text-orange-400 border-orange-500/30 animate-pulse'
+                                : 'bg-slate-800/60 text-slate-400 border-slate-700/60 hover:bg-red-500/15 hover:text-red-400 hover:border-red-500/30'
+                            }`}
+                          >
+                            <BanIcon size={16} className="shrink-0" />
+                          </button>
+
+                          {/* Reset to Set 1 */}
+                          <button 
+                            onClick={() => { setResetUserId(user.id); setResetType('full'); }}
+                            title="Reset to Set 1"
+                            className="w-9 h-9 flex items-center justify-center shrink-0 bg-rose-500/10 text-rose-400 rounded-xl hover:bg-rose-500/25 hover:scale-105 active:scale-95 transition-all border border-rose-500/20 shadow-sm"
+                          >
+                            <RefreshCcw size={16} className="shrink-0" />
+                          </button>
+
+                          {/* Advance to Next Set */}
+                          <button 
+                            onClick={() => { setResetUserId(user.id); setResetType('advance'); }}
+                            title="Advance to Next Set"
+                            className="w-9 h-9 flex items-center justify-center shrink-0 bg-blue-500/10 text-blue-400 rounded-xl hover:bg-blue-500/25 hover:scale-105 active:scale-95 transition-all border border-blue-500/20 shadow-sm"
+                          >
+                            <Zap size={16} className="shrink-0" />
+                          </button>
+
+                          {/* Edit Parameters */}
+                          <button 
+                            onClick={() => { setEditingId(user.id); setEditData(user); setOriginalLevelId(user.level_id || null); }}
+                            title="Edit Node Parameters"
+                            className="w-9 h-9 flex items-center justify-center shrink-0 bg-[#3DD6C8]/10 text-[#3DD6C8] rounded-xl hover:bg-[#3DD6C8]/25 hover:scale-105 active:scale-95 transition-all border border-[#3DD6C8]/20 shadow-sm"
+                          >
+                            <Edit2 size={16} className="shrink-0" />
+                          </button>
+
+                          {/* Reset Password */}
+                          <button 
+                            onClick={() => handleResetPassword(user.id, user.username || 'unknown')}
+                            title="Reset Login Password"
+                            className="w-9 h-9 flex items-center justify-center shrink-0 bg-amber-500/10 text-amber-400 rounded-xl hover:bg-amber-500/25 hover:scale-105 active:scale-95 transition-all border border-amber-500/20 shadow-sm"
+                          >
+                            <Lock size={16} className="shrink-0" />
+                          </button>
+
+                          {/* Withdrawal Access Control */}
+                          <button 
+                            onClick={() => setWithdrawalModalUser(user)}
+                            title="Manage Withdrawal Access"
+                            className={`w-9 h-9 flex items-center justify-center shrink-0 rounded-xl hover:scale-105 active:scale-95 transition-all border shadow-sm ${
+                              withdrawalPermissions[user.id] === 'allow'
+                                ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40 shadow-emerald-500/10'
+                                : withdrawalPermissions[user.id] === 'block'
+                                ? 'bg-rose-500/20 text-rose-400 border-rose-500/40 shadow-rose-500/10'
+                                : 'bg-purple-500/10 text-purple-400 border-purple-500/20 hover:bg-purple-500/25'
+                            }`}
+                          >
+                            <CreditCard size={16} className="shrink-0" />
+                          </button>
                         </>
                       )}
+
+                      {/* Purge / Delete User */}
                       <button 
                         onClick={() => handlePurge(user.id, user.username || 'unknown')}
-                        className="p-2.5 bg-red-500/10 text-red-500 rounded-xl hover:bg-red-500/20 transition-all border border-red-500/10"
+                        title="Purge User Account"
+                        className="w-9 h-9 flex items-center justify-center shrink-0 bg-red-500/10 text-red-400 rounded-xl hover:bg-red-500/25 hover:scale-105 active:scale-95 transition-all border border-red-500/20 shadow-sm"
                       >
-                        <Trash2 size={16} />
+                        <Trash2 size={16} className="shrink-0" />
                       </button>
                     </div>
                   </td>
@@ -695,6 +869,7 @@ export default function AdminUsersPage() {
                     </div>
 
                     <button 
+                        type="submit"
                         disabled={creating}
                         className="w-full bg-white text-black py-5 rounded-2xl font-black text-xs uppercase tracking-[0.3em] hover:bg-[#3DD6C8] hover:text-white transition-all shadow-xl active:scale-[0.98] disabled:opacity-50"
                     >
@@ -813,6 +988,145 @@ export default function AdminUsersPage() {
                     </button>
                 </div>
             </div>
+        </div>
+      )}
+
+      {/* Withdrawal Access Management Modal */}
+      {withdrawalModalUser && (
+        <div className="fixed inset-0 z-[120] flex items-center justify-center p-6 backdrop-blur-xl bg-black/70 animate-in fade-in duration-300">
+          <div className="bg-[#0f0f15] border border-white/10 rounded-[40px] w-full max-w-md p-8 sm:p-10 shadow-2xl relative overflow-hidden">
+            <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-purple-500 via-[#3DD6C8] to-emerald-500" />
+            
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-2xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400">
+                  <CreditCard size={22} />
+                </div>
+                <div>
+                  <h3 className="text-lg font-black text-white italic uppercase tracking-tight">Withdrawal Access</h3>
+                  <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Participant Payout Policy</p>
+                </div>
+              </div>
+              <button 
+                onClick={() => setWithdrawalModalUser(null)}
+                className="w-9 h-9 rounded-xl bg-white/5 text-slate-400 hover:text-white flex items-center justify-center transition-colors"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            {/* Target User Details */}
+            <div className="p-4 rounded-2xl bg-black/40 border border-white/5 space-y-2 mb-6">
+              <div className="flex justify-between items-center text-xs">
+                <span className="text-slate-500 font-bold uppercase tracking-wider text-[10px]">Participant</span>
+                <span className="font-black text-white uppercase italic">{withdrawalModalUser.username || 'User'}</span>
+              </div>
+              <div className="flex justify-between items-center text-xs">
+                <span className="text-slate-500 font-bold uppercase tracking-wider text-[10px]">Wallet Balance</span>
+                <span className="font-mono font-black text-emerald-400">${(withdrawalModalUser.wallet_balance || 0).toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between items-center text-xs">
+                <span className="text-slate-500 font-bold uppercase tracking-wider text-[10px]">Task Completion</span>
+                <span className="font-bold text-slate-300">
+                  {withdrawalModalUser.completed_count || 0} Tasks Done
+                </span>
+              </div>
+            </div>
+
+            <div className="space-y-3 mb-8">
+              <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block pl-1">
+                Select Authorization Mode
+              </span>
+
+              {/* Option 1: Force Allow (VIP) */}
+              <button
+                type="button"
+                onClick={() => handleSetWithdrawalPermission(withdrawalModalUser.id, 'allow')}
+                disabled={updatingPerm}
+                className={`w-full p-4 rounded-2xl border text-left transition-all flex items-start gap-3.5 group cursor-pointer ${
+                  withdrawalPermissions[withdrawalModalUser.id] === 'allow'
+                    ? 'bg-emerald-500/15 border-emerald-500/50 shadow-lg shadow-emerald-500/10'
+                    : 'bg-white/[0.02] border-white/10 hover:border-emerald-500/30 hover:bg-emerald-500/5'
+                }`}
+              >
+                <div className="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
+                  <CheckCircle size={16} />
+                </div>
+                <div>
+                  <div className="text-xs font-black text-white uppercase tracking-wider group-hover:text-emerald-300 transition-colors flex items-center gap-2">
+                    Force Allow (VIP Override)
+                    {withdrawalPermissions[withdrawalModalUser.id] === 'allow' && (
+                      <span className="px-2 py-0.5 rounded-full bg-emerald-500 text-black text-[8px] font-black">ACTIVE</span>
+                    )}
+                  </div>
+                  <p className="text-[10px] text-slate-400 mt-1 leading-relaxed">
+                    User can withdraw immediately regardless of task set progress.
+                  </p>
+                </div>
+              </button>
+
+              {/* Option 2: Require Tasks (Default) */}
+              <button
+                type="button"
+                onClick={() => handleSetWithdrawalPermission(withdrawalModalUser.id, 'require_tasks')}
+                disabled={updatingPerm}
+                className={`w-full p-4 rounded-2xl border text-left transition-all flex items-start gap-3.5 group cursor-pointer ${
+                  !withdrawalPermissions[withdrawalModalUser.id] || withdrawalPermissions[withdrawalModalUser.id] === 'require_tasks'
+                    ? 'bg-amber-500/15 border-amber-500/50 shadow-lg shadow-amber-500/10'
+                    : 'bg-white/[0.02] border-white/10 hover:border-amber-500/30 hover:bg-amber-500/5'
+                }`}
+              >
+                <div className="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0 mt-0.5">
+                  <Lock size={16} />
+                </div>
+                <div>
+                  <div className="text-xs font-black text-white uppercase tracking-wider group-hover:text-amber-300 transition-colors flex items-center gap-2">
+                    Require Task Set Completion (Default)
+                    {(!withdrawalPermissions[withdrawalModalUser.id] || withdrawalPermissions[withdrawalModalUser.id] === 'require_tasks') && (
+                      <span className="px-2 py-0.5 rounded-full bg-amber-500 text-black text-[8px] font-black">ACTIVE</span>
+                    )}
+                  </div>
+                  <p className="text-[10px] text-slate-400 mt-1 leading-relaxed">
+                    Withdrawal is unlocked ONLY once all tasks in the current set are completed.
+                  </p>
+                </div>
+              </button>
+
+              {/* Option 3: Block Withdrawals */}
+              <button
+                type="button"
+                onClick={() => handleSetWithdrawalPermission(withdrawalModalUser.id, 'block')}
+                disabled={updatingPerm}
+                className={`w-full p-4 rounded-2xl border text-left transition-all flex items-start gap-3.5 group cursor-pointer ${
+                  withdrawalPermissions[withdrawalModalUser.id] === 'block'
+                    ? 'bg-rose-500/15 border-rose-500/50 shadow-lg shadow-rose-500/10'
+                    : 'bg-white/[0.02] border-white/10 hover:border-rose-500/30 hover:bg-rose-500/5'
+                }`}
+              >
+                <div className="w-8 h-8 rounded-xl bg-rose-500/20 text-rose-400 flex items-center justify-center shrink-0 mt-0.5">
+                  <BanIcon size={16} />
+                </div>
+                <div>
+                  <div className="text-xs font-black text-white uppercase tracking-wider group-hover:text-rose-300 transition-colors flex items-center gap-2">
+                    Block All Withdrawals
+                    {withdrawalPermissions[withdrawalModalUser.id] === 'block' && (
+                      <span className="px-2 py-0.5 rounded-full bg-rose-500 text-white text-[8px] font-black">ACTIVE</span>
+                    )}
+                  </div>
+                  <p className="text-[10px] text-slate-400 mt-1 leading-relaxed">
+                    Withdrawals are strictly forbidden on this account until unblocked.
+                  </p>
+                </div>
+              </button>
+            </div>
+
+            <button
+              onClick={() => setWithdrawalModalUser(null)}
+              className="w-full bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all"
+            >
+              Close
+            </button>
+          </div>
         </div>
       )}
     </div> 

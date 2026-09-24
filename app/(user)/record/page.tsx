@@ -162,8 +162,22 @@ export default function RecordPage() {
                             className="bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-xl py-2.5 pl-9 pr-4 text-xs text-text-primary focus:outline-none focus:border-primary/50 w-[200px]"
                         />
                     </div>
-                    <button className="p-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 text-text-secondary hover:text-primary hover:border-primary/30 transition-all">
-                        <Filter size={18} />
+                    <button 
+                        onClick={() => {
+                            const next = dateFilter === 'all' ? 'today' : dateFilter === 'today' ? 'yesterday' : 'all';
+                            setDateFilter(next);
+                        }}
+                        className={`p-2.5 rounded-xl border transition-all flex items-center gap-1.5 ${
+                            dateFilter !== 'all' 
+                                ? 'bg-primary/20 border-primary text-primary-light shadow-sm' 
+                                : 'bg-black/5 dark:bg-white/5 border-black/5 dark:border-white/5 text-text-secondary hover:text-primary hover:border-primary/30'
+                        }`}
+                        title={`Current date scope: ${dateFilter}`}
+                    >
+                        <Filter size={16} />
+                        {dateFilter !== 'all' && (
+                            <span className="text-[9px] font-black uppercase tracking-wider">{dateFilter}</span>
+                        )}
                     </button>
                 </div>
             </div>

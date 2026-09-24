@@ -119,7 +119,7 @@ export default function CustomerServicePage() {
                         </div>
                         <h3 className="text-sm font-black text-white uppercase tracking-widest">Availability</h3>
                         <p className="text-[10px] font-bold text-text-secondary uppercase tracking-[0.15em] leading-relaxed opacity-60">
-                            System maintenance typically occurs between 02:00 - 04:00 AM (UTC). Support channels remain open throughout.
+                            System maintenance typically occurs daily between 02:00 - 04:00 AM (Central Time • CT). Support channels remain open throughout.
                         </p>
                     </div>
                     <div className="pt-8 border-t border-white/5">

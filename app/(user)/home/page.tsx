@@ -36,7 +36,8 @@ import {
     Star,
     Share2,
     Check,
-    BarChart3
+    BarChart3,
+    Layers
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -114,6 +115,10 @@ export default function HomePage() {
                                     <div className="flex items-center gap-2 px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-full">
                                         <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.8)]" />
                                         <span className="text-[9px] font-black text-emerald-400 uppercase tracking-[0.2em]">{t('neural_active')}</span>
+                                    </div>
+                                    <div className="flex items-center gap-1.5 px-3 py-1 bg-purple-500/10 border border-purple-500/25 rounded-full shadow-[0_0_12px_rgba(168,85,247,0.15)]">
+                                        <Layers size={11} className="text-purple-400" />
+                                        <span className="text-[9px] font-black text-purple-300 uppercase tracking-widest">SET {profile?.current_set || 1}</span>
                                     </div>
                                     <span className="text-[9px] font-black text-white/30 uppercase tracking-[0.3em] italic">Verified Account</span>
                                     <div className="flex items-center gap-2 px-3 py-1 bg-white/5 border border-white/10 rounded-full group/ref cursor-pointer hover:bg-white/10 transition-all" onClick={() => {

@@ -53,7 +53,7 @@ export const WelcomeEmail = (username: string) => `
             <td style="background-color: rgba(0,0,0,0.2); padding: 30px 50px; text-align: center;">
               <p style="color: rgba(255,255,255,0.3); font-size: 11px; margin: 0;">
                 If you did not request this activation, please ignore this email.<br>
-                &copy; 2025 SmartBugMedia Global. All rights reserved.
+                &copy; 2026 SmartBugMedia Global. All rights reserved.
               </p>
             </td>
           </tr>

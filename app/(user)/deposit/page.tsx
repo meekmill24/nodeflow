@@ -16,19 +16,21 @@ import {
     Flashlight,
     Upload,
     Image as ImageIcon,
-    X
+    X,
+    Gift
 } from 'lucide-react';
 import Link from 'next/link';
 import { QRCodeSVG } from 'qrcode.react';
 import TransactionReceipt from '@/components/TransactionReceipt';
 
-// Pre-set amounts matching $60 minimum task balance
-const PRESET_AMOUNTS = [60, 100, 300, 500, 1000, 2500, 5000];
+// Pre-set amounts matching $60 minimum task balance through Tier 6 ($10,000 + $5,000 bonus)
+const PRESET_AMOUNTS = [60, 100, 300, 500, 1000, 2500, 5000, 10000];
 
 export default function DepositPage() {
     const { profile } = useAuth();
     const [amount, setAmount] = useState('60');
     const [customAmount, setCustomAmount] = useState('');
+    const [txHash, setTxHash] = useState('');
     type DepositNetwork = 'TRX' | 'BEP20' | 'ERC20' | 'ETH' | 'BTC' | 'USDC' | 'BNB' | 'PAYPALUSD';
     const [network, setNetwork] = useState<DepositNetwork>('TRX');
     const [copied, setCopied] = useState(false);
@@ -89,43 +91,36 @@ export default function DepositPage() {
         setLoading(true);
 
         try {
-            // 1. Upload proof to storage
-            const fileExt = proofFile.name.split('.').pop();
-            const fileName = `${profile.id}-${Math.random()}.${fileExt}`;
-            const filePath = `${fileName}`;
-            
-            setUploading(true);
-            const { error: uploadError } = await supabase.storage
-                .from('deposit_proofs')
-                .upload(filePath, proofFile);
-            setUploading(false);
+            // Submit through server API route using Service Role to bypass Storage RLS policies
+            const formData = new FormData();
+            formData.append('file', proofFile);
+            formData.append('amount', finalAmount);
+            formData.append('network', network);
+            formData.append('address', depositAddress);
+            formData.append('userId', profile.id);
+            if (txHash.trim()) {
+                formData.append('txHash', txHash.trim());
+            }
 
-            if (uploadError) throw uploadError;
+            const res = await fetch('/api/deposit', {
+                method: 'POST',
+                body: formData,
+            });
 
-            const { data: { publicUrl } } = supabase.storage
-                .from('deposit_proofs')
-                .getPublicUrl(filePath);
+            const data = await res.json();
+            if (!res.ok) {
+                throw new Error(data.error || 'Failed to submit deposit');
+            }
 
-            // 2. Create transaction
-            const { data: txData, error: txError } = await supabase.from('transactions').insert({
-                user_id: profile.id,
-                type: 'deposit',
-                amount: parseFloat(finalAmount),
-                description: `Deposit via ${network} ($${finalAmount})`,
-                status: 'pending',
-                proof_url: publicUrl
-            }).select().single();
-
-            if (txError) throw txError;
-            
             const resolvedNetworkName = network === 'TRX' ? 'USDT (TRC-20)' : network === 'BEP20' ? 'USDT (BEP-20)' : network === 'ERC20' ? 'USDT (ERC-20)' : network;
+            const cleanId = data.txId || (data.transaction?.id ? `TXN-${String(data.transaction.id).padStart(6, '0')}` : `TXN-${Math.floor(100000 + Math.random() * 900000)}`);
 
             setSubmittedTx({
-                id: txData?.id || Math.floor(100000 + Math.random() * 900000),
+                id: cleanId,
                 amount: parseFloat(finalAmount),
                 network: resolvedNetworkName,
                 walletAddress: depositAddress,
-                proofUrl: publicUrl,
+                proofUrl: data.proofUrl || proofPreview,
                 date: new Date().toUTCString()
             });
             
@@ -182,7 +177,8 @@ export default function DepositPage() {
                             network === 'ETH' ? "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/eth.png" : 
                             network === 'BTC' ? "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/btc.png" : 
                             network === 'BNB' ? "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/bnb.png" : 
-                            network === 'USDC' || network === 'PAYPALUSD' ? "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/usdc.png" : 
+                            network === 'PAYPALUSD' ? "/pyusd.png" :
+                            network === 'USDC' ? "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/usdc.png" : 
                             "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/usdt.png"
                         } 
                         alt={network} 
@@ -214,7 +210,7 @@ export default function DepositPage() {
                                 { id: 'BTC', label: 'Bitcoin', icon: 'https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/btc.png' },
                                 { id: 'USDC', label: 'USDC', icon: 'https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/usdc.png' },
                                 { id: 'BNB', label: 'BNB Chain', icon: 'https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/bnb.png' },
-                                { id: 'PAYPALUSD', label: 'PayPal USD', icon: 'https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/usdc.png' }
+                                { id: 'PAYPALUSD', label: 'PayPal USD', icon: '/pyusd.png' }
                             ].map(net => (
                                 <button
                                     key={net.id}
@@ -230,6 +226,31 @@ export default function DepositPage() {
                             ))}
                         </div>
                         
+                        {/* Deposit Bonus Tier Callout */}
+                        <Link 
+                            href="/rewards/first-deposit"
+                            className="block p-4 rounded-2xl bg-gradient-to-r from-amber-500/15 via-purple-500/15 to-emerald-500/15 border border-amber-500/30 hover:border-amber-500/50 transition-all group relative overflow-hidden shadow-lg shadow-amber-500/5"
+                        >
+                            <div className="flex items-center justify-between gap-3">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-400 shrink-0">
+                                        <Gift size={20} className="animate-pulse" />
+                                    </div>
+                                    <div>
+                                        <span className="text-[9px] font-black uppercase text-amber-400 tracking-[0.2em] block">
+                                            Tier 6 Bonus Privilege
+                                        </span>
+                                        <p className="text-xs font-black text-white">
+                                            Deposit $10,000 → Get <span className="text-emerald-400 font-extrabold">+$5,000 Bonus Credit</span>
+                                        </p>
+                                    </div>
+                                </div>
+                                <div className="text-[10px] font-black text-amber-400 uppercase tracking-widest flex items-center gap-1 group-hover:translate-x-1 transition-transform shrink-0">
+                                    All Tiers →
+                                </div>
+                            </div>
+                        </Link>
+
                         <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-2 gap-3">
                             {PRESET_AMOUNTS.map((val) => (
                                 <button
@@ -255,7 +276,8 @@ export default function DepositPage() {
                                                     network === 'ETH' ? "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/eth.png" : 
                                                     network === 'BTC' ? "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/btc.png" : 
                                                     network === 'BNB' ? "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/bnb.png" : 
-                                                    network === 'USDC' || network === 'PAYPALUSD' ? "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/usdc.png" : 
+                                                    network === 'PAYPALUSD' ? "/pyusd.png" :
+                                                    network === 'USDC' ? "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/usdc.png" : 
                                                     "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/usdt.png"
                                                 } 
                                                 className="w-4 h-4 object-contain opacity-60" 
@@ -332,6 +354,23 @@ export default function DepositPage() {
                             accept="image/*" 
                             className="hidden" 
                         />
+
+                        {/* Optional Transaction Hash / TXID input */}
+                        <div className="space-y-2 pt-1">
+                            <div className="flex items-center justify-between">
+                                <label className="text-[10px] font-black text-text-secondary uppercase tracking-[0.2em]">
+                                    Transaction Hash / TXID
+                                </label>
+                                <span className="text-[9px] font-mono text-white/40 uppercase">Optional</span>
+                            </div>
+                            <input 
+                                type="text"
+                                value={txHash}
+                                onChange={(e) => setTxHash(e.target.value)}
+                                placeholder="Paste wallet / exchange transfer TXID or hash"
+                                className="w-full bg-white/5 border border-white/10 rounded-2xl py-3 px-4 text-xs font-mono text-white placeholder:text-white/20 focus:border-[#3DD6C8]/50 outline-none transition-all"
+                            />
+                        </div>
                     </div>
                 </div>
 

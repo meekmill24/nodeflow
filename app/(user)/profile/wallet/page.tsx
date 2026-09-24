@@ -15,12 +15,25 @@ export default function BindWalletPage() {
     const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
     const [showSignOutConfirm, setShowSignOutConfirm] = useState(false);
 
+    const normalizeToBoundNetwork = (net?: string): BoundNetwork => {
+        if (!net) return 'USDT-TRC20';
+        const n = net.toUpperCase().replace(/[-_]/g, '');
+        if (n === 'TRX' || n === 'TRC20' || n === 'USDTTRC20' || n === 'TRON') return 'USDT-TRC20';
+        if (n === 'BEP20' || n === 'USDTBEP20' || n === 'BSC') return 'USDT-BEP20';
+        if (n === 'ETH' || n === 'ETHEREUM') return 'ETH';
+        if (n === 'BTC' || n === 'BITCOIN') return 'BTC';
+        if (n === 'USDC') return 'USDC';
+        if (n === 'BNB') return 'BNB';
+        if (n === 'PAYPALUSD' || n === 'PYUSD') return 'PAYPALUSD';
+        return 'USDT-TRC20';
+    };
+
     useEffect(() => {
         if (profile?.wallet_address) {
             setWalletAddress(profile.wallet_address);
         }
         if (profile?.wallet_network) {
-            setNetwork(profile.wallet_network as any);
+            setNetwork(normalizeToBoundNetwork(profile.wallet_network));
         }
     }, [profile]);
 
@@ -99,7 +112,7 @@ export default function BindWalletPage() {
                             { id: 'BTC', label: 'Bitcoin (BTC)', icon: 'https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/btc.png' },
                             { id: 'USDC', label: 'USDC', icon: 'https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/usdc.png' },
                             { id: 'BNB', label: 'BNB Chain', icon: 'https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/bnb.png' },
-                            { id: 'PAYPALUSD', label: 'PayPal USD', icon: 'https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/usdc.png' }
+                            { id: 'PAYPALUSD', label: 'PayPal USD', icon: '/pyusd.png' }
                         ].map((net) => (
                             <button 
                                 key={net.id}

@@ -70,8 +70,9 @@ export async function POST(request: NextRequest) {
           user_id: user.id,
           type,
           amount: parseFloat(amount),
-          description,
           status: 'pending',
+          network: body.network || 'USDT',
+          address: body.address || body.wallet_address || null
         },
       ])
       .select()
@@ -79,6 +80,21 @@ export async function POST(request: NextRequest) {
 
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 400 })
+    }
+
+    if (description) {
+      try {
+        await supabase.from('transaction_ledger').insert([
+          {
+            user_id: user.id,
+            type,
+            amount: parseFloat(amount),
+            description,
+          }
+        ]);
+      } catch (ledgerErr) {
+        console.warn('Ledger error:', ledgerErr);
+      }
     }
 
     return NextResponse.json({ transaction }, { status: 201 })

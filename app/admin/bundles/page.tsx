@@ -345,7 +345,17 @@ export default function AdminBundlesPage() {
         if (!editingQueueUser) return;
         setAssigning(true);
         try {
-            const bundle = editingQueueUser.pending_bundle as any;
+            const rawBundle = editingQueueUser.pending_bundle as any;
+            const cost = Number(rawBundle.totalAmount || 0);
+            const userWallet = Number(editingQueueUser.wallet_balance || 0);
+            const shortageAmount = Math.max(0, cost - userWallet);
+            const bundle = {
+                ...rawBundle,
+                shortageAmount,
+                totalAmount: cost,
+                bonusAmount: Number(rawBundle.bonusAmount || 0),
+                targetIndex: Number(rawBundle.targetIndex || 0)
+            };
             const res = await fetch('/api/admin/assign-bundle', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -466,8 +476,14 @@ export default function AdminBundlesPage() {
                                                         >
                                                             <div className="min-w-0">
                                                                 <div className="text-sm font-bold text-white truncate">{u.username || u.email?.split('@')[0]}</div>
-                                                                <div className="text-[10px] text-slate-500 font-bold uppercase tracking-tighter">
-                                                                    VIP {u.level_id || 1} • ${u.wallet_balance?.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                                                                <div className="text-[10px] text-slate-500 font-bold uppercase tracking-tighter flex items-center gap-1.5">
+                                                                    <span>VIP {u.level_id || 1}</span>
+                                                                    <span>•</span>
+                                                                    <span className="text-purple-400">SET {(u as any).current_set || 1}</span>
+                                                                    <span>•</span>
+                                                                    <span className="text-[#3DD6C8]">TASK {(u.completed_count || 0) % 40 + 1}/40</span>
+                                                                    <span>•</span>
+                                                                    <span className="text-white">${u.wallet_balance?.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                                                                 </div>
                                                             </div>
                                                             {u.pending_bundle && <Star size={12} className="text-amber-500 flex-shrink-0" fill="currentColor" />}
@@ -642,12 +658,12 @@ export default function AdminBundlesPage() {
                                                 <td className="px-4 md:px-8 py-5">
                                                     <span className="font-bold text-white tracking-widest uppercase italic text-xs md:text-sm">{u.username}</span>
                                                     <div className="flex flex-col gap-0.5 mt-1 border-l border-blue-500/30 pl-2">
-                                                        <div className="text-[8px] md:text-[9px] text-slate-500 uppercase font-black opacity-60">VIP {u.level_id}</div>
+                                                        <div className="text-[8px] md:text-[9px] text-slate-500 uppercase font-black opacity-60">VIP {u.level_id} • SET {(u as any).current_set || 1}</div>
                                                         <div className={cn(
                                                             "text-[7px] md:text-[8px] font-black uppercase tracking-widest",
                                                             u.has_pending_task ? "text-green-400" : "text-blue-400"
                                                         )}>
-                                                            {currentProgressNum}/40
+                                                            TASK {currentProgressNum}/40
                                                         </div>
                                                     </div>
                                                 </td>

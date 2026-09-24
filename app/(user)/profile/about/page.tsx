@@ -77,7 +77,7 @@ export default function AboutPage() {
             </div>
 
             <div className="text-center py-4 text-xs text-text-secondary/50 border-t border-text-primary/5">
-                <p>© 2025 All Rights Reserved | SmartBugMedia. v1.0.0</p>
+                <p>© 2026 All Rights Reserved | SmartBugMedia. v1.0.0</p>
             </div>
         </div>
     );

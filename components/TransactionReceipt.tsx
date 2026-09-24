@@ -67,7 +67,7 @@ export default function TransactionReceipt({
 • Type: ${isWithdrawal ? 'Withdrawal Request' : 'Deposit Submission'}
 • Amount: $${amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT
 • Network: ${network}
-${walletAddress ? `• ${isWithdrawal ? 'Destination Wallet' : 'Deposit Wallet'}: ${walletAddress}\n` : ''}• Date: ${formattedDate}
+${walletAddress ? `• ${isWithdrawal ? 'Destination Wallet' : 'Receiver Address (Platform Deposit Vault)'}: ${walletAddress}\n` : ''}• Date: ${formattedDate}
 • Status: Pending CS Verification
 
 Please verify and process my transaction. Thank you.`;
@@ -206,26 +206,41 @@ Please verify and process my transaction. Thank you.`;
                         <span className="font-mono font-bold text-[#3DD6C8] uppercase">{network}</span>
                     </div>
 
-                    {/* Wallet Address (Destination for withdrawal, deposit address for deposit) */}
+                    {/* Wallet Address (Destination for withdrawal, receiver address for deposit) */}
                     {walletAddress && (
-                        <div className="flex flex-col gap-1 py-1">
+                        <div className={`flex flex-col gap-2 p-3.5 rounded-2xl border transition-all ${
+                            isWithdrawal 
+                                ? 'bg-rose-500/5 border-rose-500/20' 
+                                : 'bg-emerald-500/5 border-emerald-500/20 shadow-[0_0_20px_rgba(16,185,129,0.06)]'
+                        }`}>
                             <div className="flex items-center justify-between">
-                                <span className="text-[10px] font-black text-white/40 uppercase tracking-widest">
-                                    {isWithdrawal ? 'Destination Wallet Address' : 'Assigned Deposit Address'}
+                                <div className="flex items-center gap-1.5">
+                                    <ShieldCheck size={13} className={isWithdrawal ? 'text-rose-400' : 'text-emerald-400'} />
+                                    <span className="text-[10px] font-black uppercase tracking-wider text-white/80">
+                                        {isWithdrawal ? 'Destination Beneficiary Wallet' : 'Receiver Address (Official Deposit Vault)'}
+                                    </span>
+                                </div>
+                                <span className={`text-[8px] font-black font-mono uppercase px-2 py-0.5 rounded-full border ${
+                                    isWithdrawal 
+                                        ? 'bg-rose-500/10 text-rose-400 border-rose-500/20' 
+                                        : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                                }`}>
+                                    {isWithdrawal ? 'Target Node' : 'Verified Receiver'}
                                 </span>
-                                <span className="text-[9px] text-[#3DD6C8] font-bold uppercase">Encrypted</span>
                             </div>
-                            <div className="p-2.5 rounded-xl bg-black/40 border border-white/5 font-mono text-[11px] text-white/80 break-all select-all flex items-center justify-between gap-2">
-                                <span>{walletAddress}</span>
+                            <div className="p-2.5 rounded-xl bg-black/50 border border-white/5 font-mono text-[11px] text-white break-all select-all flex items-center justify-between gap-2">
+                                <span className="tracking-tight">{walletAddress}</span>
                                 <button
                                     type="button"
                                     onClick={() => {
                                         navigator.clipboard.writeText(walletAddress);
-                                        toast.success('Wallet address copied!');
+                                        toast.success(`${isWithdrawal ? 'Destination' : 'Receiver'} address copied!`);
                                     }}
-                                    className="p-1 rounded bg-white/5 hover:bg-white/10 shrink-0 text-white/60 hover:text-white transition-all"
+                                    className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 shrink-0 text-white/70 hover:text-white transition-all flex items-center gap-1 text-[9px] font-mono"
+                                    title="Copy Address"
                                 >
-                                    <Copy size={11} />
+                                    <Copy size={12} />
+                                    <span className="hidden sm:inline">Copy</span>
                                 </button>
                             </div>
                         </div>

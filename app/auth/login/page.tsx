@@ -217,7 +217,7 @@ export default function Page() {
           </Card>
           
           <div className="text-center">
-             <p className="text-[8px] text-zinc-600 font-black uppercase tracking-[0.4em]">© 2025 SmartBugMedia. Platform • v1.0.0</p>
+             <p className="text-[8px] text-zinc-600 font-black uppercase tracking-[0.4em]">© 2026 SmartBugMedia. Platform • v1.0.0</p>
           </div>
         </div>
       </div>

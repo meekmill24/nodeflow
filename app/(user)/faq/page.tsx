@@ -41,7 +41,7 @@ const FAQS = [
         qas: [
             {
                 q: "What are the platform operating hours?",
-                a: "The SmartBugMedia platform operates daily from 09:00 AM – 09:00 PM for product maintenance tasks, withdrawal processing, and customer support."
+                a: "The SmartBugMedia platform operates daily from 09:00 AM – 09:00 PM Central Time (CT) for product maintenance tasks, withdrawal processing, and customer support. System maintenance runs daily from 02:00 – 04:00 AM Central Time (CT)."
             },
             {
                 q: "How are promotional gift packages assigned?",
@@ -164,12 +164,25 @@ export default function FAQPage() {
                     Our technical support agents are available 12 hours a day to assist with nodal activations and wealth extraction.
                 </p>
                 <div className="flex flex-wrap justify-center gap-4 pt-4">
-                    <button className="px-8 py-3.5 bg-accent text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-accent/20 hover:brightness-110">
+                    <button 
+                        onClick={() => {
+                            const tawk = (window as any).Tawk_API;
+                            if (tawk && typeof tawk.maximize === 'function') {
+                                tawk.maximize();
+                            } else {
+                                window.location.href = '/service';
+                            }
+                        }}
+                        className="px-8 py-3.5 bg-accent text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-accent/20 hover:brightness-110 active:scale-95 transition-all"
+                    >
                         Live Web Support
                     </button>
-                    <button className="px-8 py-3.5 bg-white/5 border border-white/10 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-white/10">
-                        Telegram Matrix
-                    </button>
+                    <Link 
+                        href="/service"
+                        className="px-8 py-3.5 bg-white/5 border border-white/10 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-white/10 active:scale-95 transition-all inline-flex items-center justify-center"
+                    >
+                        VIP Concierge Desk
+                    </Link>
                 </div>
             </div>
 

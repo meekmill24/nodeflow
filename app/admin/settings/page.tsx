@@ -352,6 +352,7 @@ export default function AdminSettingsPage() {
                     { key: 'reward_tier_4', label: 'Reward Tier 4 (Req/Bonus)', icon: Gift, suffix: 'USD', placeholder: '3000/600' },
                     { key: 'reward_tier_5', label: 'Reward Tier 5 (Req/Bonus)', icon: Gift, suffix: 'USD', placeholder: '5000/1000' },
                     { key: 'reward_tier_6', label: 'Reward Tier 6 (Req/Bonus)', icon: Gift, suffix: 'USD', placeholder: '10000/5000' },
+                    { key: 'require_task_completion_to_withdraw', label: 'Require Set Completion for Payout', icon: Lock, suffix: 'BOOL', placeholder: 'true' },
                 ].map((cfg) => {
                     const item = settings.find(s => s.key === cfg.key);
                     return (
@@ -740,14 +741,16 @@ export default function AdminSettingsPage() {
                           <div className="grid grid-cols-2 gap-3">
                             <button
                               type="button"
-                              className="py-3.5 px-4 rounded-xl font-black text-[10px] uppercase tracking-widest shadow-lg transition-transform hover:scale-105"
+                              onClick={() => toast.info('Theme Preview: Start Optimization demonstration button')}
+                              className="py-3.5 px-4 rounded-xl font-black text-[10px] uppercase tracking-widest shadow-lg transition-transform hover:scale-105 active:scale-95"
                               style={{ backgroundColor: primary, color: '#0B0B1E', boxShadow: `0 0 25px ${primary}40` }}
                             >
                               Start Optimization
                             </button>
                             <button
                               type="button"
-                              className="py-3.5 px-4 rounded-xl font-black text-[10px] uppercase tracking-widest border transition-colors hover:bg-white/10"
+                              onClick={() => toast.info('Theme Preview: Withdraw Funds demonstration button')}
+                              className="py-3.5 px-4 rounded-xl font-black text-[10px] uppercase tracking-widest border transition-colors hover:bg-white/10 active:scale-95"
                               style={{ borderColor: `${accent}60`, color: accent }}
                             >
                               Withdraw Funds
