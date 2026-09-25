@@ -315,6 +315,7 @@ function extractMatchingBundle(
                 shortageAmount: shortage, 
                 totalAmount: bundleTotal, 
                 bonusAmount: bundleBonus, 
+                rate: Number(bundle.rate || (bundleTotal > 0 ? (bundleBonus / bundleTotal) * 100 : 0)),
                 expiresIn: Number(bundle.expiresIn || 86400),
                 targetIndex: Number(bundle.targetIndex || currentItemIndex || currentTaskInSet),
                 taskItem: bundle.taskItem || { 

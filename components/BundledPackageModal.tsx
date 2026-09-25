@@ -20,6 +20,7 @@ export interface BundlePackage {
     shortageAmount: number;
     totalAmount: number;
     bonusAmount: number;
+    rate?: number;
     expiresIn: number;
     targetIndex?: number;
     taskItem?: BundleTaskItem;
@@ -47,6 +48,9 @@ export default function BundledPackageModal({
 
     const shortage = Math.max(0, bundle.totalAmount - walletBalance);
     const hasShortage = shortage > 0;
+    const effectiveRate = bundle.rate && bundle.rate > 0
+        ? (bundle.rate > 1 ? bundle.rate : bundle.rate * 100)
+        : (bundle.totalAmount > 0 ? (bundle.bonusAmount / bundle.totalAmount) * 100 : 0);
 
     // Collect all items to display (supports multi-item combo packages like SimpleMoneys / Captiv8)
     const itemsToDisplay: BundleTaskItem[] = 
@@ -158,17 +162,50 @@ export default function BundledPackageModal({
                             </div>
                         </div>
 
-                        {/* Financial Ledger Breakdown */}
-                        <div className="space-y-2.5">
-                            {/* Order Total */}
-                            <div className="p-3.5 rounded-2xl bg-white/[0.04] border border-white/5 flex items-center justify-between">
-                                <div className="flex items-center gap-3">
-                                    <div className="p-2 rounded-xl bg-amber-500/10 text-amber-400">
-                                        <TrendingUp size={15} />
-                                    </div>
-                                    <span className="text-[10px] font-black text-white/50 uppercase tracking-[0.2em]">Order Value</span>
+                        {/* Financial Ledger Breakdown & Formula */}
+                        <div className="space-y-3">
+                            {/* 3-Column KPI Grid: Value | Rate | Profit */}
+                            <div className="grid grid-cols-3 gap-0.5 p-4 rounded-2xl bg-black/60 border border-amber-500/20 shadow-[inset_0_4px_25px_rgba(0,0,0,0.7)]">
+                                <div className="flex flex-col items-center">
+                                    <span className="text-[8px] font-black text-white/40 uppercase tracking-[0.2em] mb-1.5">Order Value</span>
+                                    <span className="text-sm font-black text-white tracking-tight italic tabular-nums">{format(bundle.totalAmount)}</span>
+                                    <span className="text-[7px] font-bold text-white/30 uppercase mt-1">PRINCIPAL</span>
                                 </div>
-                                <span className="text-base font-black text-white italic tabular-nums">{format(bundle.totalAmount)}</span>
+                                <div className="flex flex-col items-center border-x border-white/10 px-2">
+                                    <span className="text-[8px] font-black text-amber-400 uppercase tracking-[0.2em] mb-1.5">Rate</span>
+                                    <span className="text-sm font-black text-amber-400 tracking-tight italic tabular-nums">{effectiveRate.toFixed(2)}%</span>
+                                    <span className="text-[7px] font-black text-amber-400/70 uppercase mt-1">REBATE</span>
+                                </div>
+                                <div className="flex flex-col items-center">
+                                    <span className="text-[8px] font-black text-emerald-400 uppercase tracking-[0.2em] mb-1.5">Total Profit</span>
+                                    <span className="text-sm font-black text-emerald-400 tracking-tight italic tabular-nums">+{format(bundle.bonusAmount)}</span>
+                                    <span className="text-[7px] font-bold text-emerald-400/60 uppercase mt-1">NET YIELD</span>
+                                </div>
+                            </div>
+
+                            {/* Explicit Formula & Profit Explanation Card (SimpleMoneys & Captiv8 style) */}
+                            <div className="p-4 rounded-2xl bg-gradient-to-br from-amber-500/10 via-white/[0.02] to-emerald-500/10 border border-amber-500/30 space-y-2.5">
+                                <div className="flex items-center justify-between">
+                                    <span className="text-[9px] font-black text-amber-400 uppercase tracking-[0.25em] flex items-center gap-1.5">
+                                        <Sparkles size={11} /> Profit Calculation
+                                    </span>
+                                    <span className="text-[8px] font-bold text-white/40 uppercase tracking-widest">
+                                        Formula: Value × Rate = Profit
+                                    </span>
+                                </div>
+
+                                {/* Value × Rate = Profit Equation */}
+                                <div className="p-3 rounded-xl bg-black/60 border border-white/10 flex items-center justify-center gap-2 sm:gap-3 font-mono text-xs sm:text-sm font-black">
+                                    <span className="text-white">{format(bundle.totalAmount)}</span>
+                                    <span className="text-amber-400 font-bold">×</span>
+                                    <span className="text-amber-400 font-bold">{effectiveRate.toFixed(2)}%</span>
+                                    <span className="text-white/40">=</span>
+                                    <span className="text-emerald-400 font-bold">+{format(bundle.bonusAmount)}</span>
+                                </div>
+
+                                <p className="text-[10px] text-white/70 leading-relaxed font-medium">
+                                    <strong className="text-white">Explanation:</strong> Order Value of <strong className="text-white">{format(bundle.totalAmount)}</strong> multiplied by the <strong className="text-amber-400">{effectiveRate.toFixed(2)}%</strong> reward rate yields <strong className="text-emerald-400">+{format(bundle.bonusAmount)}</strong> in profit. Upon completion, both the order principal and your profit yield will settle into your available balance.
+                                </p>
                             </div>
 
                             {/* Wallet Balance */}
@@ -201,17 +238,6 @@ export default function BundledPackageModal({
                                     </p>
                                 </div>
                             )}
-
-                            {/* Profit Yield */}
-                            <div className="p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-between shadow-[0_0_20px_rgba(16,185,129,0.1)]">
-                                <div className="flex items-center gap-3">
-                                    <div className="p-2 rounded-xl bg-emerald-500/20 text-emerald-400">
-                                        <CheckCircle size={15} />
-                                    </div>
-                                    <span className="text-[10px] font-black text-emerald-400 uppercase tracking-[0.2em]">Commission Yield</span>
-                                </div>
-                                <span className="text-base font-black text-emerald-400 italic tabular-nums">+{format(bundle.bonusAmount)}</span>
-                            </div>
                         </div>
 
                         {/* Action Buttons */}
