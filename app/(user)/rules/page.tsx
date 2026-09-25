@@ -68,9 +68,9 @@ export default function RulesPage() {
                                 <div>
                                     <h4 className="text-primary-light mb-2 text-xs font-black">5. Product Packages and Platform Rewards</h4>
                                     <p className="opacity-80">
-                                        5.1 Platform tasks may include Standard Product Listings and Special Product Packages (Super Orders). Super orders may contain multiple product listings bundled together and may generate higher reward multipliers.
-                                        5.2 Users may receive a 0.4% rebate for completing standard product maintenance tasks.
-                                        5.3 Special package listings may generate rebates of up to 2.4% or higher, depending on the product campaign.
+                                        5.1 Platform tasks may include Standard Product Listings and Special Product Packages (Super Orders). Super orders contain multiple product listings bundled together and generate substantial reward multipliers.
+                                        5.2 Users receive their tier standard rebate (e.g. 0.4%–0.6%) for completing standard product maintenance tasks.
+                                        5.3 Special package listings (Super Orders) generate rebates between 6x and 50x the standard task rate for all levels (e.g., 2.4% minimum up to 20.0%–30.0% maximum depending on user tier).
                                     </p>
                                 </div>
                                 <div>

@@ -300,8 +300,13 @@ export default function BundledPackageModal({
                                 </div>
                                 <div className="flex flex-col items-center border-x border-white/10 px-2">
                                     <span className="text-[8px] font-black text-amber-400 uppercase tracking-[0.2em] mb-1.5">Rate</span>
-                                    <span className="text-sm font-black text-amber-400 tracking-tight italic tabular-nums">{effectiveRate.toFixed(2)}%</span>
-                                    <span className="text-[7px] font-black text-amber-400/70 uppercase mt-1">REBATE</span>
+                                    <div className="flex items-baseline gap-1">
+                                        <span className="text-sm font-black text-amber-400 tracking-tight italic tabular-nums">{effectiveRate.toFixed(2)}%</span>
+                                        {Math.round(effectiveRate / 0.4) >= 6 && (
+                                            <span className="text-[9px] font-bold text-amber-300/90">({Math.round(effectiveRate / 0.4)}x)</span>
+                                        )}
+                                    </div>
+                                    <span className="text-[7px] font-black text-amber-400/70 uppercase mt-1">REBATE (6x–50x)</span>
                                 </div>
                                 <div className="flex flex-col items-center">
                                     <span className="text-[8px] font-black text-emerald-400 uppercase tracking-[0.2em] mb-1.5">Total Profit</span>
@@ -317,7 +322,7 @@ export default function BundledPackageModal({
                                         <Sparkles size={11} /> Profit Calculation
                                     </span>
                                     <span className="text-[8px] font-bold text-white/40 uppercase tracking-widest">
-                                        Formula: Value × Rate = Profit
+                                        Formula: Value × Rate = Profit (6x–50x Multiplier)
                                     </span>
                                 </div>
 

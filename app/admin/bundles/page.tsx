@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useMemo, useCallback } from 'react';
 import { supabase } from '@/lib/supabase/index';
-import { Plus, Pencil, Trash2, Save, X, Package, Users, Zap, AlertTriangle, CheckCircle, Loader2, Image as ImageIcon, ChevronDown, RefreshCcw, TrendingUp, Star, Layers, Percent } from 'lucide-react'; 
+import { Plus, Pencil, Trash2, Save, X, Package, Users, Zap, AlertTriangle, CheckCircle, Loader2, Image as ImageIcon, ChevronDown, RefreshCcw, TrendingUp, Star, Layers, Percent, Sparkles } from 'lucide-react'; 
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 
@@ -45,14 +45,14 @@ interface TaskItem {
 const emptyBundle = { name: '', description: '', target_index: 35, shortage_amount: 0, total_amount: 100, bonus_amount: 20, rate: 0.20, is_active: true };
 
 const BONUS_PRESETS = [
-    { label: '30%', value: 'pct_30' },
-    { label: '50%', value: 'pct_50' },
-    { label: '100%', value: 'pct_100' },
-    { label: '150%', value: 'pct_150' },
-    { label: '200%', value: 'pct_200' },
-    { label: '$50 FIX', value: 'fix_50' },
-    { label: '$100 FIX', value: 'fix_100' },
-    { label: '$500 FIX', value: 'fix_500' },
+    { label: '6x (Min)', value: 'mult_6', multiplier: 6 },
+    { label: '10x', value: 'mult_10', multiplier: 10 },
+    { label: '15x', value: 'mult_15', multiplier: 15 },
+    { label: '20x', value: 'mult_20', multiplier: 20 },
+    { label: '30x', value: 'mult_30', multiplier: 30 },
+    { label: '40x', value: 'mult_40', multiplier: 40 },
+    { label: '50x (Max)', value: 'mult_50', multiplier: 50 },
+    { label: 'CUSTOM MULT', value: 'custom_mult' },
     { label: 'CUSTOM %', value: 'custom_pct' },
     { label: 'CUSTOM $', value: 'custom' },
 ];
@@ -83,8 +83,10 @@ export default function AdminBundlesPage() {
     const [selectedTaskIds, setSelectedTaskIds] = useState<number[]>([]);
     const [customItem1Price, setCustomItem1Price] = useState<string>('');
     const [customItem2Price, setCustomItem2Price] = useState<string>('');
-    const [bonusPreset, setBonusPreset] = useState('pct_30');
+    const [bonusPreset, setBonusPreset] = useState('mult_50');
+    const [customMultiplier, setCustomMultiplier] = useState<string>('50');
     const [customBonus, setCustomBonus] = useState<string | number>('');
+    const [levels, setLevels] = useState<any[]>([]);
 
     const [userSearchQuery, setUserSearchQuery] = useState('');
     const [productSearchQuery, setProductSearchQuery] = useState('');
@@ -177,7 +179,14 @@ export default function AdminBundlesPage() {
         }
     }, []);
 
-    useEffect(() => { fetchBundles(); fetchUsers(); fetchTaskItems(); }, [fetchBundles, fetchUsers, fetchTaskItems]);
+    useEffect(() => { 
+        fetchBundles(); 
+        fetchUsers(); 
+        fetchTaskItems(); 
+        supabase.from('levels').select('*').order('price', { ascending: true }).then(({ data }) => {
+            if (data) setLevels(data);
+        });
+    }, [fetchBundles, fetchUsers, fetchTaskItems]);
 
     // Derived Stats
     const stats = useMemo(() => ({
@@ -250,20 +259,29 @@ export default function AdminBundlesPage() {
     const selectedUser = users.find(u => u.id === selectedUserId);
     const selectedTasks = taskItems.filter(t => selectedTaskIds.includes(t.id));
 
+    const userLevel = levels.find(l => l.id === selectedUser?.level_id);
+    const baseRate = Number(userLevel?.commission_rate) || 0.004;
+
     const computeBonus = (productAmount: number): number => {
-        const bonusPresetValue = bonusPreset;
-        if (bonusPresetValue === 'pct_30') return parseFloat((productAmount * 0.30).toFixed(2));
-        if (bonusPresetValue === 'pct_50') return parseFloat((productAmount * 0.50).toFixed(2));
-        if (bonusPresetValue === 'pct_100') return parseFloat((productAmount * 1.00).toFixed(2));
-        if (bonusPresetValue === 'pct_150') return parseFloat((productAmount * 1.50).toFixed(2));
-        if (bonusPresetValue === 'pct_200') return parseFloat((productAmount * 2.00).toFixed(2));
-        if (bonusPresetValue === 'fix_50') return 50;
-        if (bonusPresetValue === 'fix_100') return 100;
-        if (bonusPresetValue === 'fix_500') return 500;
-        if (bonusPresetValue === 'custom_pct') {
+        if (bonusPreset === 'mult_6') return parseFloat((productAmount * (baseRate * 6)).toFixed(2));
+        if (bonusPreset === 'mult_10') return parseFloat((productAmount * (baseRate * 10)).toFixed(2));
+        if (bonusPreset === 'mult_15') return parseFloat((productAmount * (baseRate * 15)).toFixed(2));
+        if (bonusPreset === 'mult_20') return parseFloat((productAmount * (baseRate * 20)).toFixed(2));
+        if (bonusPreset === 'mult_30') return parseFloat((productAmount * (baseRate * 30)).toFixed(2));
+        if (bonusPreset === 'mult_40') return parseFloat((productAmount * (baseRate * 40)).toFixed(2));
+        if (bonusPreset === 'mult_50') return parseFloat((productAmount * (baseRate * 50)).toFixed(2));
+
+        if (bonusPreset === 'custom_mult') {
+            const mult = typeof customMultiplier === 'number' ? customMultiplier : parseFloat(customMultiplier) || 20;
+            const clamped = Math.min(50, Math.max(6, mult));
+            return parseFloat((productAmount * (baseRate * clamped)).toFixed(2));
+        }
+
+        if (bonusPreset === 'custom_pct') {
             const r = typeof assignForm.rate === 'number' ? assignForm.rate : parseFloat(assignForm.rate as string) || 0;
             return parseFloat((productAmount * (r / 100)).toFixed(2));
         }
+
         return typeof customBonus === 'number' ? customBonus : parseFloat(customBonus as string) || 0;
     };
 
@@ -719,6 +737,24 @@ export default function AdminBundlesPage() {
                                     ))}
                                 </div>
 
+                                {bonusPreset === 'custom_mult' && (
+                                    <div className="mt-3 animate-in slide-in-from-top-2 duration-300">
+                                        <div className="relative group">
+                                            <Sparkles className="absolute left-3 top-1/2 -translate-y-1/2 text-[#3DD6C8]" size={12} />
+                                            <input 
+                                                type="number"
+                                                min="6"
+                                                max="50"
+                                                className="w-full bg-slate-950/90 border border-[#3DD6C8]/30 rounded-xl pl-10 pr-4 py-3 text-white text-[11px] font-black italic focus:border-[#3DD6C8]/60 focus:ring-4 focus:ring-[#3DD6C8]/10 transition-all outline-none"
+                                                placeholder="Enter multiplier (6 to 50)..."
+                                                value={customMultiplier}
+                                                onChange={e => setCustomMultiplier(e.target.value)}
+                                            />
+                                            <div className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-black text-[#3DD6C8]/40 uppercase tracking-widest">Multiplier (6x–50x)</div>
+                                        </div>
+                                    </div>
+                                )}
+
                                 {bonusPreset === 'custom_pct' && (
                                     <div className="mt-3 animate-in slide-in-from-top-2 duration-300">
                                         <div className="relative group">
@@ -750,6 +786,21 @@ export default function AdminBundlesPage() {
                                         </div>
                                     </div>
                                 )}
+
+                                {/* Multiplier rule note & live rate info */}
+                                <div className="mt-2.5 p-3 rounded-xl bg-black/40 border border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-[10px]">
+                                    <div className="flex items-center gap-2">
+                                        <span className="px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 font-black uppercase text-[8px] tracking-wider">
+                                            SimpleMoneys Rule: 6x to 50x Task Rate
+                                        </span>
+                                        <span className="text-slate-400 font-bold">
+                                            Base Rate: {(baseRate * 100).toFixed(2)}%
+                                        </span>
+                                    </div>
+                                    <div className="font-mono font-black text-[#3DD6C8]">
+                                        Rebate: {((computeBonus(parseFloat(assignForm.productAmount as string) || 100) / (parseFloat(assignForm.productAmount as string) || 100)) * 100).toFixed(2)}%
+                                    </div>
+                                </div>
                             </div>
 
                             {/* Impact Summary */}
@@ -762,6 +813,12 @@ export default function AdminBundlesPage() {
                                     <div className="flex justify-between text-[10px] font-bold uppercase tracking-widest text-slate-500">
                                         <span>Agent Profit</span>
                                         <span className="text-green-500">${computeBonus(parseFloat(assignForm.productAmount as string)).toFixed(2)}</span>
+                                    </div>
+                                    <div className="flex justify-between text-[10px] font-bold uppercase tracking-widest text-slate-500">
+                                        <span>Rebate Yield Rate</span>
+                                        <span className="text-[#3DD6C8] font-mono">
+                                            {((computeBonus(parseFloat(assignForm.productAmount as string)) / parseFloat(assignForm.productAmount as string)) * 100).toFixed(2)}% ({Math.round(((computeBonus(parseFloat(assignForm.productAmount as string)) / parseFloat(assignForm.productAmount as string)) / baseRate))}x Multiplier)
+                                        </span>
                                     </div>
                                 </div>
                             )}
