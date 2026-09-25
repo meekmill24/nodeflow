@@ -1,6 +1,7 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { usePathname } from 'next/navigation';
 import { supabase } from '@/lib/supabase/index';
 import { useAuth } from '@/context/AuthContext';
 import { Bell, Megaphone, Check, X, ShieldAlert, Info } from 'lucide-react';
@@ -39,14 +40,25 @@ const NotificationContext = createContext<NotificationContextType>({
 export const useNotifications = () => useContext(NotificationContext);
 
 export function NotificationProvider({ children }: { children: React.ReactNode }) {
-    const { profile } = useAuth();
+    const { user, profile, loading: authLoading } = useAuth();
+    const pathname = usePathname();
     const [notifications, setNotifications] = useState<Notification[]>([]);
     const [toast, setToast] = useState<Notification | null>(null);
     const [broadcastModal, setBroadcastModal] = useState<Notification | null>(null);
     const [loading, setLoading] = useState(false);
 
+    // Completely prevent popups and notifications for unauthenticated users or public auth pages
+    const isPublicAuthPage = pathname === '/' || pathname?.startsWith('/auth');
+    const isUserLoggedIn = Boolean(user && profile?.id && !authLoading);
+    const shouldDisplayPopups = isUserLoggedIn && !isPublicAuthPage;
+
     const fetchNotifications = useCallback(async () => {
-        if (!profile?.id) return;
+        if (!isUserLoggedIn || !profile?.id) {
+            setNotifications([]);
+            setBroadcastModal(null);
+            setToast(null);
+            return;
+        }
         setLoading(true);
         try {
             const { data, error } = await supabase
@@ -67,19 +79,27 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
                 if (typeof window !== 'undefined' && !sessionStorage.getItem(dismissedKey)) {
                     setBroadcastModal(unreadBroadcast);
                 }
+            } else {
+                setBroadcastModal(null);
             }
         } catch (err) {
             console.error('Failed to fetch notifications:', err);
         } finally {
             setLoading(false);
         }
-    }, [profile?.id]);
+    }, [isUserLoggedIn, profile?.id]);
 
     useEffect(() => {
+        if (!isUserLoggedIn || !profile?.id) {
+            setNotifications([]);
+            setBroadcastModal(null);
+            setToast(null);
+            return;
+        }
+
         fetchNotifications();
         
         // Subscribe to new notifications
-        if (!profile?.id) return;
         const channel = supabase
             .channel(`notifications-${profile.id}`)
             .on('postgres_changes', { 
@@ -99,7 +119,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
         return () => {
             supabase.removeChannel(channel);
         };
-    }, [profile?.id, fetchNotifications]);
+    }, [isUserLoggedIn, profile?.id, fetchNotifications]);
 
     // Auto-dismiss toast
     useEffect(() => {
@@ -182,7 +202,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
             {children}
             
             {/* Real-time Toast Banner */}
-            {toast && (
+            {shouldDisplayPopups && toast && (
                 <div className="fixed top-20 right-4 z-[100] w-full max-w-sm animate-slide-in">
                     <div className={`p-4 rounded-2xl shadow-2xl border backdrop-blur-xl flex items-start gap-4 ${
                         toast.type === 'success' ? 'bg-success/20 border-success text-success' :
@@ -206,7 +226,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
             )}
 
             {/* Global Broadcast Popup Modal */}
-            {broadcastModal && (
+            {shouldDisplayPopups && broadcastModal && (
                 <div className="fixed inset-0 z-[10002] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-fade-in">
                     <div className="bg-[#0B0B1E] border border-[#3DD6C8]/40 w-full max-w-lg rounded-[36px] p-8 md:p-10 shadow-[0_30px_120px_rgba(0,0,0,0.95)] relative overflow-hidden text-center space-y-6 animate-scale-in">
                         {/* Neon accent top bar */}
