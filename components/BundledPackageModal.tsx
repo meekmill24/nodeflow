@@ -68,12 +68,29 @@ export default function BundledPackageModal({
 
     // Compute individual values, rates, and profits for each item in the super order
     const itemCount = rawItems.length;
+    const hasEqualPrices = itemCount === 2 && 
+        typeof rawItems[0].price === 'number' && 
+        typeof rawItems[1].price === 'number' && 
+        rawItems[0].price === rawItems[1].price;
+
     const calculatedItems = rawItems.map((item, idx) => {
         let itemPrice: number;
-        if (typeof item.price === 'number' && item.price > 0) {
+        if (typeof item.price === 'number' && item.price > 0 && !hasEqualPrices) {
             itemPrice = item.price;
         } else if (itemCount === 1) {
             itemPrice = bundle.totalAmount;
+        } else if (itemCount === 2) {
+            // Realistic asymmetric split (45% / 55%) so Item 1 and Item 2 have distinct values
+            const isIntegerTotal = Number.isInteger(bundle.totalAmount);
+            if (idx === 0) {
+                const rawPrice = bundle.totalAmount * 0.45;
+                itemPrice = isIntegerTotal ? Math.round(rawPrice) : parseFloat(rawPrice.toFixed(2));
+            } else {
+                const firstPrice = isIntegerTotal 
+                    ? Math.round(bundle.totalAmount * 0.45) 
+                    : parseFloat((bundle.totalAmount * 0.45).toFixed(2));
+                itemPrice = Math.max(0, parseFloat((bundle.totalAmount - firstPrice).toFixed(2)));
+            }
         } else if (idx === itemCount - 1) {
             const prevSum = parseFloat((bundle.totalAmount / itemCount).toFixed(2)) * (itemCount - 1);
             itemPrice = Math.max(0, parseFloat((bundle.totalAmount - prevSum).toFixed(2)));
@@ -84,10 +101,25 @@ export default function BundledPackageModal({
         const itemRate = typeof item.rate === 'number' && item.rate > 0 ? item.rate : effectiveRate;
 
         let itemProfit: number;
-        if (typeof item.profit === 'number' && item.profit > 0) {
+        if (typeof item.profit === 'number' && item.profit > 0 && !hasEqualPrices) {
             itemProfit = item.profit;
         } else if (itemCount === 1) {
             itemProfit = bundle.bonusAmount;
+        } else if (itemCount === 2) {
+            const isIntegerBonus = Number.isInteger(bundle.bonusAmount);
+            if (idx === 0) {
+                const rawProfit = bundle.bonusAmount * (itemPrice / bundle.totalAmount);
+                itemProfit = isIntegerBonus ? Math.round(rawProfit) : parseFloat(rawProfit.toFixed(2));
+            } else {
+                const isIntegerTotal = Number.isInteger(bundle.totalAmount);
+                const firstPrice = isIntegerTotal 
+                    ? Math.round(bundle.totalAmount * 0.45) 
+                    : parseFloat((bundle.totalAmount * 0.45).toFixed(2));
+                const firstProfit = isIntegerBonus 
+                    ? Math.round(bundle.bonusAmount * (firstPrice / bundle.totalAmount)) 
+                    : parseFloat((bundle.bonusAmount * (firstPrice / bundle.totalAmount)).toFixed(2));
+                itemProfit = Math.max(0, parseFloat((bundle.bonusAmount - firstProfit).toFixed(2)));
+            }
         } else if (idx === itemCount - 1) {
             const prevProfitSum = parseFloat((bundle.bonusAmount / itemCount).toFixed(2)) * (itemCount - 1);
             itemProfit = Math.max(0, parseFloat((bundle.bonusAmount - prevProfitSum).toFixed(2)));

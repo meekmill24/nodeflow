@@ -81,6 +81,8 @@ export default function AdminBundlesPage() {
 
     const [taskItems, setTaskItems] = useState<TaskItem[]>([]);
     const [selectedTaskIds, setSelectedTaskIds] = useState<number[]>([]);
+    const [customItem1Price, setCustomItem1Price] = useState<string>('');
+    const [customItem2Price, setCustomItem2Price] = useState<string>('');
     const [bonusPreset, setBonusPreset] = useState('pct_30');
     const [customBonus, setCustomBonus] = useState<string | number>('');
 
@@ -280,12 +282,29 @@ export default function AdminBundlesPage() {
             const count = selectedTasks.length || 1;
             const calculatedRate = productAmount > 0 ? parseFloat(((bonusAmount / productAmount) * 100).toFixed(2)) : 0;
             const taskItemsWithPrices = selectedTasks.map((t, idx) => {
-                const itemPrice = idx === count - 1 
-                    ? parseFloat((productAmount - (parseFloat((productAmount / count).toFixed(2)) * (count - 1))).toFixed(2))
-                    : parseFloat((productAmount / count).toFixed(2));
-                const itemProfit = idx === count - 1
-                    ? parseFloat((bonusAmount - (parseFloat((bonusAmount / count).toFixed(2)) * (count - 1))).toFixed(2))
-                    : parseFloat((bonusAmount / count).toFixed(2));
+                let itemPrice: number;
+                let itemProfit: number;
+
+                if (count === 2) {
+                    const isInt = Number.isInteger(productAmount);
+                    const defaultP1 = isInt ? Math.round(productAmount * 0.45) : parseFloat((productAmount * 0.45).toFixed(2));
+                    const p1 = customItem1Price !== '' ? (parseFloat(customItem1Price) || defaultP1) : defaultP1;
+                    const p2 = Math.max(0, parseFloat((productAmount - p1).toFixed(2)));
+                    itemPrice = idx === 0 ? p1 : p2;
+
+                    const isIntBonus = Number.isInteger(bonusAmount);
+                    const b1 = isIntBonus ? Math.round(bonusAmount * (p1 / productAmount)) : parseFloat((bonusAmount * (p1 / productAmount)).toFixed(2));
+                    const b2 = Math.max(0, parseFloat((bonusAmount - b1).toFixed(2)));
+                    itemProfit = idx === 0 ? b1 : b2;
+                } else {
+                    itemPrice = idx === count - 1 
+                        ? parseFloat((productAmount - (parseFloat((productAmount / count).toFixed(2)) * (count - 1))).toFixed(2))
+                        : parseFloat((productAmount / count).toFixed(2));
+                    itemProfit = idx === count - 1
+                        ? parseFloat((bonusAmount - (parseFloat((bonusAmount / count).toFixed(2)) * (count - 1))).toFixed(2))
+                        : parseFloat((bonusAmount / count).toFixed(2));
+                }
+
                 return {
                     title: t.title,
                     image_url: t.image_url,
@@ -335,6 +354,8 @@ export default function AdminBundlesPage() {
             toast.success(`Bundle assigned!`);
             setSelectedUserId('');
             setSelectedTaskIds([]);
+            setCustomItem1Price('');
+            setCustomItem2Price('');
             setAssignForm({ name: 'Special Bundle Package', description: '', productAmount: '', rate: '', targetIndex: 35 });
             fetchUsers();
         } catch (err) {
@@ -564,6 +585,114 @@ export default function AdminBundlesPage() {
                                     />
                                 </div>
                             </div>
+
+                            {/* Item Value Distribution (SimpleMoneys & Captiv8 style asymmetric pricing) */}
+                            {selectedTaskIds.length === 2 && parseFloat(assignForm.productAmount as string) > 0 && (
+                                <div className="p-4 bg-slate-950/70 border border-amber-500/20 rounded-2xl space-y-3 animate-in fade-in duration-300">
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-[10px] font-black text-amber-400 uppercase tracking-widest flex items-center gap-1.5">
+                                            <Layers size={12} /> Item Price Distribution
+                                        </span>
+                                        <span className="text-[9px] text-slate-400 font-mono">
+                                            Total: ${assignForm.productAmount}
+                                        </span>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <div className="space-y-1">
+                                            <label className="text-[9px] font-bold text-slate-400 uppercase truncate block">
+                                                Item 1 ({selectedTasks[0]?.title?.slice(0, 16) || 'Item 1'})
+                                            </label>
+                                            <div className="relative">
+                                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-500">$</span>
+                                                <input
+                                                    type="number"
+                                                    className="w-full bg-slate-900 border border-slate-800 rounded-xl pl-6 pr-3 py-2 text-xs font-mono font-bold text-white focus:outline-none focus:border-amber-400"
+                                                    placeholder="Item 1 $"
+                                                    value={customItem1Price !== '' ? customItem1Price : (
+                                                        Number.isInteger(parseFloat(assignForm.productAmount as string)) 
+                                                            ? Math.round(parseFloat(assignForm.productAmount as string) * 0.45) 
+                                                            : (parseFloat(assignForm.productAmount as string) * 0.45).toFixed(2)
+                                                    )}
+                                                    onChange={e => {
+                                                        const val = e.target.value;
+                                                        setCustomItem1Price(val);
+                                                        const total = parseFloat(assignForm.productAmount as string) || 0;
+                                                        if (val !== '' && total > 0) {
+                                                            const p1 = parseFloat(val) || 0;
+                                                            setCustomItem2Price(Math.max(0, parseFloat((total - p1).toFixed(2))).toString());
+                                                        }
+                                                    }}
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="space-y-1">
+                                            <label className="text-[9px] font-bold text-slate-400 uppercase truncate block">
+                                                Item 2 ({selectedTasks[1]?.title?.slice(0, 16) || 'Item 2'})
+                                            </label>
+                                            <div className="relative">
+                                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-500">$</span>
+                                                <input
+                                                    type="number"
+                                                    className="w-full bg-slate-900 border border-slate-800 rounded-xl pl-6 pr-3 py-2 text-xs font-mono font-bold text-white focus:outline-none focus:border-amber-400"
+                                                    placeholder="Item 2 $"
+                                                    value={customItem2Price !== '' ? customItem2Price : (
+                                                        Number.isInteger(parseFloat(assignForm.productAmount as string)) 
+                                                            ? parseFloat(assignForm.productAmount as string) - Math.round(parseFloat(assignForm.productAmount as string) * 0.45)
+                                                            : (parseFloat(assignForm.productAmount as string) - parseFloat((parseFloat(assignForm.productAmount as string) * 0.45).toFixed(2))).toFixed(2)
+                                                    )}
+                                                    onChange={e => {
+                                                        const val = e.target.value;
+                                                        setCustomItem2Price(val);
+                                                        const total = parseFloat(assignForm.productAmount as string) || 0;
+                                                        if (val !== '' && total > 0) {
+                                                            const p2 = parseFloat(val) || 0;
+                                                            setCustomItem1Price(Math.max(0, parseFloat((total - p2).toFixed(2))).toString());
+                                                        }
+                                                    }}
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="flex gap-2">
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                const total = parseFloat(assignForm.productAmount as string) || 0;
+                                                const p1 = Number.isInteger(total) ? Math.round(total * 0.45) : parseFloat((total * 0.45).toFixed(2));
+                                                setCustomItem1Price(p1.toString());
+                                                setCustomItem2Price((total - p1).toFixed(Number.isInteger(total) ? 0 : 2));
+                                            }}
+                                            className="px-2.5 py-1 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 text-[9px] font-bold uppercase tracking-wider"
+                                        >
+                                            45% / 55%
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                const total = parseFloat(assignForm.productAmount as string) || 0;
+                                                const p1 = Number.isInteger(total) ? Math.round(total * 0.40) : parseFloat((total * 0.40).toFixed(2));
+                                                setCustomItem1Price(p1.toString());
+                                                setCustomItem2Price((total - p1).toFixed(Number.isInteger(total) ? 0 : 2));
+                                            }}
+                                            className="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-white/70 text-[9px] font-bold uppercase tracking-wider"
+                                        >
+                                            40% / 60%
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                const total = parseFloat(assignForm.productAmount as string) || 0;
+                                                const p1 = Number.isInteger(total) ? Math.round(total * 0.35) : parseFloat((total * 0.35).toFixed(2));
+                                                setCustomItem1Price(p1.toString());
+                                                setCustomItem2Price((total - p1).toFixed(Number.isInteger(total) ? 0 : 2));
+                                            }}
+                                            className="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-white/70 text-[9px] font-bold uppercase tracking-wider"
+                                        >
+                                            35% / 65%
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
 
                             <div className="space-y-2">
                                 <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-1">Commission Override</label>
