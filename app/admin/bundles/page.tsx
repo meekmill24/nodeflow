@@ -285,6 +285,8 @@ export default function AdminBundlesPage() {
                 let itemPrice: number;
                 let itemProfit: number;
 
+                let itemRate: number;
+
                 if (count === 2) {
                     const isInt = Number.isInteger(productAmount);
                     const defaultP1 = isInt ? Math.round(productAmount * 0.45) : parseFloat((productAmount * 0.45).toFixed(2));
@@ -292,10 +294,16 @@ export default function AdminBundlesPage() {
                     const p2 = Math.max(0, parseFloat((productAmount - p1).toFixed(2)));
                     itemPrice = idx === 0 ? p1 : p2;
 
-                    const isIntBonus = Number.isInteger(bonusAmount);
-                    const b1 = isIntBonus ? Math.round(bonusAmount * (p1 / productAmount)) : parseFloat((bonusAmount * (p1 / productAmount)).toFixed(2));
+                    // Randomize distinct rate for Item 1 (between 78% and 86% of calculatedRate)
+                    const seed = Math.round(p1 + productAmount);
+                    const varianceFactor = 0.78 + ((seed % 10) * 0.01);
+                    const r1 = parseFloat((calculatedRate * varianceFactor).toFixed(1));
+                    const b1 = parseFloat((p1 * (r1 / 100)).toFixed(2));
                     const b2 = Math.max(0, parseFloat((bonusAmount - b1).toFixed(2)));
+                    const r2 = p2 > 0 ? parseFloat(((b2 / p2) * 100).toFixed(1)) : calculatedRate;
+
                     itemProfit = idx === 0 ? b1 : b2;
+                    itemRate = idx === 0 ? r1 : r2;
                 } else {
                     itemPrice = idx === count - 1 
                         ? parseFloat((productAmount - (parseFloat((productAmount / count).toFixed(2)) * (count - 1))).toFixed(2))
@@ -303,6 +311,7 @@ export default function AdminBundlesPage() {
                     itemProfit = idx === count - 1
                         ? parseFloat((bonusAmount - (parseFloat((bonusAmount / count).toFixed(2)) * (count - 1))).toFixed(2))
                         : parseFloat((bonusAmount / count).toFixed(2));
+                    itemRate = calculatedRate;
                 }
 
                 return {
@@ -311,7 +320,7 @@ export default function AdminBundlesPage() {
                     category: t.category,
                     price: itemPrice,
                     profit: itemProfit,
-                    rate: calculatedRate
+                    rate: itemRate
                 };
             });
 

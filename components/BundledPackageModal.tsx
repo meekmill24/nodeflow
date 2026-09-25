@@ -72,68 +72,84 @@ export default function BundledPackageModal({
         typeof rawItems[0].price === 'number' && 
         typeof rawItems[1].price === 'number' && 
         rawItems[0].price === rawItems[1].price;
+    const hasEqualRates = itemCount === 2 && 
+        typeof rawItems[0].rate === 'number' && 
+        typeof rawItems[1].rate === 'number' && 
+        rawItems[0].rate === rawItems[1].rate;
 
-    const calculatedItems = rawItems.map((item, idx) => {
-        let itemPrice: number;
-        if (typeof item.price === 'number' && item.price > 0 && !hasEqualPrices) {
-            itemPrice = item.price;
-        } else if (itemCount === 1) {
-            itemPrice = bundle.totalAmount;
-        } else if (itemCount === 2) {
-            // Realistic asymmetric split (45% / 55%) so Item 1 and Item 2 have distinct values
+    // Stable pseudo-random variance ratio based on bundle identity
+    const seed = (bundle.id || '').split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) + Math.round(bundle.totalAmount);
+    const varianceFactor = 0.78 + ((seed % 10) * 0.01); // Between 0.78 and 0.87
+
+    // Step 1: Compute prices
+    let computedPrices: number[] = [];
+    if (itemCount === 1) {
+        computedPrices = [bundle.totalAmount];
+    } else if (itemCount === 2) {
+        let p1: number;
+        if (typeof rawItems[0].price === 'number' && rawItems[0].price > 0 && !hasEqualPrices) {
+            p1 = rawItems[0].price;
+        } else {
             const isIntegerTotal = Number.isInteger(bundle.totalAmount);
-            if (idx === 0) {
-                const rawPrice = bundle.totalAmount * 0.45;
-                itemPrice = isIntegerTotal ? Math.round(rawPrice) : parseFloat(rawPrice.toFixed(2));
-            } else {
-                const firstPrice = isIntegerTotal 
-                    ? Math.round(bundle.totalAmount * 0.45) 
-                    : parseFloat((bundle.totalAmount * 0.45).toFixed(2));
-                itemPrice = Math.max(0, parseFloat((bundle.totalAmount - firstPrice).toFixed(2)));
-            }
-        } else if (idx === itemCount - 1) {
-            const prevSum = parseFloat((bundle.totalAmount / itemCount).toFixed(2)) * (itemCount - 1);
-            itemPrice = Math.max(0, parseFloat((bundle.totalAmount - prevSum).toFixed(2)));
-        } else {
-            itemPrice = parseFloat((bundle.totalAmount / itemCount).toFixed(2));
+            const rawP1 = bundle.totalAmount * 0.45;
+            p1 = isIntegerTotal ? Math.round(rawP1) : parseFloat(rawP1.toFixed(2));
         }
-
-        const itemRate = typeof item.rate === 'number' && item.rate > 0 ? item.rate : effectiveRate;
-
-        let itemProfit: number;
-        if (typeof item.profit === 'number' && item.profit > 0 && !hasEqualPrices) {
-            itemProfit = item.profit;
-        } else if (itemCount === 1) {
-            itemProfit = bundle.bonusAmount;
-        } else if (itemCount === 2) {
-            const isIntegerBonus = Number.isInteger(bundle.bonusAmount);
-            if (idx === 0) {
-                const rawProfit = bundle.bonusAmount * (itemPrice / bundle.totalAmount);
-                itemProfit = isIntegerBonus ? Math.round(rawProfit) : parseFloat(rawProfit.toFixed(2));
-            } else {
-                const isIntegerTotal = Number.isInteger(bundle.totalAmount);
-                const firstPrice = isIntegerTotal 
-                    ? Math.round(bundle.totalAmount * 0.45) 
-                    : parseFloat((bundle.totalAmount * 0.45).toFixed(2));
-                const firstProfit = isIntegerBonus 
-                    ? Math.round(bundle.bonusAmount * (firstPrice / bundle.totalAmount)) 
-                    : parseFloat((bundle.bonusAmount * (firstPrice / bundle.totalAmount)).toFixed(2));
-                itemProfit = Math.max(0, parseFloat((bundle.bonusAmount - firstProfit).toFixed(2)));
+        const p2 = Math.max(0, parseFloat((bundle.totalAmount - p1).toFixed(2)));
+        computedPrices = [p1, p2];
+    } else {
+        computedPrices = rawItems.map((it, idx) => {
+            if (idx === itemCount - 1) {
+                const prev = parseFloat((bundle.totalAmount / itemCount).toFixed(2)) * (itemCount - 1);
+                return Math.max(0, parseFloat((bundle.totalAmount - prev).toFixed(2)));
             }
-        } else if (idx === itemCount - 1) {
-            const prevProfitSum = parseFloat((bundle.bonusAmount / itemCount).toFixed(2)) * (itemCount - 1);
-            itemProfit = Math.max(0, parseFloat((bundle.bonusAmount - prevProfitSum).toFixed(2)));
-        } else {
-            itemProfit = parseFloat((bundle.bonusAmount / itemCount).toFixed(2));
-        }
+            return parseFloat((bundle.totalAmount / itemCount).toFixed(2));
+        });
+    }
 
-        return {
-            ...item,
-            price: itemPrice,
-            rate: itemRate,
-            profit: itemProfit,
-        };
-    });
+    // Step 2: Compute randomized distinct rates and exact profits
+    let computedRates: number[] = [];
+    let computedProfits: number[] = [];
+
+    if (itemCount === 1) {
+        computedRates = [effectiveRate];
+        computedProfits = [bundle.bonusAmount];
+    } else if (itemCount === 2) {
+        const p1 = computedPrices[0];
+        const p2 = computedPrices[1];
+
+        if (typeof rawItems[0].rate === 'number' && rawItems[0].rate > 0 && 
+            typeof rawItems[1].rate === 'number' && rawItems[1].rate > 0 && 
+            !hasEqualRates && !hasEqualPrices &&
+            typeof rawItems[0].profit === 'number' && typeof rawItems[1].profit === 'number') {
+            computedRates = [rawItems[0].rate, rawItems[1].rate];
+            computedProfits = [rawItems[0].profit, rawItems[1].profit];
+        } else {
+            // Randomize distinct rate for Item 1 (varied from effectiveRate)
+            const r1 = parseFloat((effectiveRate * varianceFactor).toFixed(1));
+            const profit1 = parseFloat((p1 * (r1 / 100)).toFixed(2));
+            const profit2 = Math.max(0, parseFloat((bundle.bonusAmount - profit1).toFixed(2)));
+            const r2 = p2 > 0 ? parseFloat(((profit2 / p2) * 100).toFixed(1)) : effectiveRate;
+
+            computedRates = [r1, r2];
+            computedProfits = [profit1, profit2];
+        }
+    } else {
+        computedRates = rawItems.map(() => effectiveRate);
+        computedProfits = rawItems.map((_, idx) => {
+            if (idx === itemCount - 1) {
+                const prev = parseFloat((bundle.bonusAmount / itemCount).toFixed(2)) * (itemCount - 1);
+                return Math.max(0, parseFloat((bundle.bonusAmount - prev).toFixed(2)));
+            }
+            return parseFloat((bundle.bonusAmount / itemCount).toFixed(2));
+        });
+    }
+
+    const calculatedItems = rawItems.map((item, idx) => ({
+        ...item,
+        price: computedPrices[idx] ?? item.price ?? 0,
+        rate: computedRates[idx] ?? effectiveRate,
+        profit: computedProfits[idx] ?? item.profit ?? 0,
+    }));
 
     return (
         <Portal>
@@ -308,10 +324,10 @@ export default function BundledPackageModal({
                                 {/* Multi-Item Formula Breakdown Equation */}
                                 {calculatedItems.length >= 2 ? (
                                     <div className="space-y-1.5">
-                                        <div className="p-2.5 rounded-xl bg-black/60 border border-white/10 flex items-center justify-center gap-1.5 font-mono text-[11px] sm:text-xs font-black">
-                                            <span className="text-white/80">({format(calculatedItems[0].price)} + {format(calculatedItems[1].price)})</span>
-                                            <span className="text-amber-400 font-bold">×</span>
-                                            <span className="text-amber-400 font-bold">{effectiveRate.toFixed(1)}%</span>
+                                        <div className="p-2.5 rounded-xl bg-black/60 border border-white/10 flex items-center justify-center gap-1 font-mono text-[10px] sm:text-xs font-black">
+                                            <span className="text-white/80">({format(calculatedItems[0].price)} × {calculatedItems[0].rate.toFixed(1)}%)</span>
+                                            <span className="text-amber-400 font-bold">+</span>
+                                            <span className="text-white/80">({format(calculatedItems[1].price)} × {calculatedItems[1].rate.toFixed(1)}%)</span>
                                             <span className="text-white/40">=</span>
                                             <span className="text-emerald-400 font-bold">+{format(bundle.bonusAmount)}</span>
                                         </div>
@@ -329,7 +345,7 @@ export default function BundledPackageModal({
                                 <p className="text-[10px] text-white/70 leading-relaxed font-medium">
                                     <strong className="text-white">Explanation:</strong> {calculatedItems.length >= 2 ? (
                                         <>
-                                            Item 1 (<strong className="text-white">{format(calculatedItems[0].price)}</strong>) and Item 2 (<strong className="text-white">{format(calculatedItems[1].price)}</strong>) add up to a combined Order Value of <strong className="text-white">{format(bundle.totalAmount)}</strong>. Multiplied by the <strong className="text-amber-400">{effectiveRate.toFixed(2)}%</strong> reward rate, your total profit yield is <strong className="text-emerald-400">+{format(bundle.bonusAmount)}</strong> (+{format(calculatedItems[0].profit)} + +{format(calculatedItems[1].profit)}). Upon sequence clearance, both the full order principal and total profit yield will credit directly into your available balance.
+                                            Item 1 (<strong className="text-white">{format(calculatedItems[0].price)}</strong> at <strong className="text-amber-400">{calculatedItems[0].rate.toFixed(1)}%</strong> = <strong className="text-emerald-400">+{format(calculatedItems[0].profit)}</strong>) and Item 2 (<strong className="text-white">{format(calculatedItems[1].price)}</strong> at <strong className="text-amber-400">{calculatedItems[1].rate.toFixed(1)}%</strong> = <strong className="text-emerald-400">+{format(calculatedItems[1].profit)}</strong>) combine to give a Total Order Value of <strong className="text-white">{format(bundle.totalAmount)}</strong> and a total profit yield of <strong className="text-emerald-400">+{format(bundle.bonusAmount)}</strong>. Upon sequence clearance, both the full order principal and total profit yield will credit directly into your available balance.
                                         </>
                                     ) : (
                                         <>
@@ -374,21 +390,12 @@ export default function BundledPackageModal({
                         {/* Action Buttons */}
                         <div className="pt-2 space-y-2.5">
                             {hasShortage ? (
-                                <>
-                                    <Link
-                                        href={`/deposit?amount=${Math.ceil(shortage)}`}
-                                        className="w-full py-4 rounded-2xl bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 text-white font-black uppercase tracking-[0.2em] text-xs flex items-center justify-center gap-2.5 shadow-[0_0_35px_rgba(245,158,11,0.4)] hover:scale-[1.02] active:scale-[0.98] transition-all"
-                                    >
-                                        Deposit {format(shortage)} to Continue <ArrowRight size={16} />
-                                    </Link>
-                                    <button
-                                        type="button"
-                                        onClick={onClose}
-                                        className="w-full py-3 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 text-white/50 hover:text-white font-black uppercase tracking-widest text-[10px] transition-all cursor-pointer"
-                                    >
-                                        Save Sequence & Return Later
-                                    </button>
-                                </>
+                                <Link
+                                    href={`/deposit?amount=${Math.ceil(shortage)}`}
+                                    className="w-full py-4 rounded-2xl bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 text-white font-black uppercase tracking-[0.2em] text-xs flex items-center justify-center gap-2.5 shadow-[0_0_35px_rgba(245,158,11,0.4)] hover:scale-[1.02] active:scale-[0.98] transition-all"
+                                >
+                                    Deposit {format(shortage)} to Continue <ArrowRight size={16} />
+                                </Link>
                             ) : (
                                 <>
                                     <button
