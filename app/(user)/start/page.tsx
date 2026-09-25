@@ -389,47 +389,37 @@ function extractMatchingBundle(
         setIsSubmitting(true);
         try {
             const profitEarned = Number(bundle.bonusAmount || 0);
-            const bundleCost = Number(bundle.totalAmount || 0);
-            const updatedWallet = Number(profile.wallet_balance || 0) + profitEarned;
-            const updatedProfit = Number(profile.profit || 0) + profitEarned;
-            const updatedTotalEarned = Number(profile.total_earned || 0) + profitEarned;
-            const updatedCompletedCount = Number(profile.completed_count || 0) + 1;
 
-            // 1. Update profile with profit credited, count incremented, pending_bundle cleared (SimpleMoneys & Captiv8 style)
-            const { error: profileErr } = await supabase.from('profiles').update({ 
-                wallet_balance: updatedWallet, 
-                profit: updatedProfit,
-                total_earned: updatedTotalEarned,
-                completed_count: updatedCompletedCount,
-                pending_bundle: null 
-            }).eq('id', profile.id);
-
-            if (profileErr) throw profileErr;
-
-            // 2. Insert into user_tasks as completed bundle task
-            const taskItemId = pendingTaskItem?.id || Number(bundle.id.replace(/\D/g, '')) || 2171;
-            const { error: taskErr } = await supabase.from('user_tasks').insert({ 
-                user_id: profile.id, 
-                task_item_id: taskItemId, 
-                status: 'completed', 
-                earned_amount: profitEarned, 
-                cost_amount: bundleCost, 
-                is_bundle: true,
-                completed_at: new Date().toISOString()
+            // Call server endpoint with service role to securely credit profit, increment count, and clear pending_bundle
+            const res = await fetch('/api/bundle/complete', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    userId: profile.id,
+                    bundleId: bundle.id,
+                    bonusAmount: bundle.bonusAmount,
+                    totalAmount: bundle.totalAmount
+                })
             });
 
-            if (taskErr) {
-                console.error("user_tasks insert error on bundle accept:", taskErr);
+            const data = await res.json();
+            if (!res.ok || data.error) {
+                throw new Error(data.error || 'Failed to settle super order');
             }
 
+            // Immediately clear local bundle state so it disappears instantly
+            (profile as any).pending_bundle = null;
+            setActiveBundle(null);
             setBundleModal(false); 
             setProfitAdded(profitEarned);
             confetti({ particleCount: 200, spread: 90, origin: { y: 0.5 } });
             toast.success(`Super Order Cleared! Cloud Yield: ${format(profitEarned)} credited to your account.`);
+
             await refreshProfile(); 
             setTimeout(() => setProfitAdded(null), 3500);
 
-            const freshTasksInSet = (updatedCompletedCount % tasksPerSet === 0 && updatedCompletedCount > 0) ? tasksPerSet : (updatedCompletedCount % tasksPerSet);
+            const updatedCount = data.completed_count || ((profile.completed_count || 0) + 1);
+            const freshTasksInSet = (updatedCount % tasksPerSet === 0 && updatedCount > 0) ? tasksPerSet : (updatedCount % tasksPerSet);
             if (freshTasksInSet >= tasksPerSet) {
                 setModalSeen(false);
                 setTimeout(() => setShowCompletionModal(true), 1500);

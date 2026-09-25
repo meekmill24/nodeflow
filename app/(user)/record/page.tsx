@@ -211,24 +211,7 @@ export default function RecordPage() {
         setIsSubmitting(true);
         try {
             const profitEarned = Number(bundle.bonusAmount || 0);
-            const bundleCost = Number(bundle.totalAmount || 0);
-            const updatedWallet = Number(profile.wallet_balance || 0) + profitEarned;
-            const updatedProfit = Number(profile.profit || 0) + profitEarned;
-            const updatedTotalEarned = Number(profile.total_earned || 0) + profitEarned;
-            const updatedCompletedCount = Number(profile.completed_count || 0) + 1;
 
-            // 1. Update profile with profit credited, count incremented, pending_bundle cleared
-            const { error: profileErr } = await supabase.from('profiles').update({
-                wallet_balance: updatedWallet,
-                profit: updatedProfit,
-                total_earned: updatedTotalEarned,
-                completed_count: updatedCompletedCount,
-                pending_bundle: null
-            }).eq('id', profile.id);
-
-            if (profileErr) throw profileErr;
-
-            // 2. Mark existing pending task in user_tasks as completed, or insert new completed task
             let targetTaskId = associatedTaskId;
             if (!targetTaskId) {
                 const pendingInState = tasks.find(t => t.status === 'pending' && t.is_bundle);
@@ -237,30 +220,42 @@ export default function RecordPage() {
                 }
             }
 
-            if (targetTaskId) {
-                await supabase.from('user_tasks').update({
-                    status: 'completed',
-                    earned_amount: profitEarned,
-                    cost_amount: bundleCost,
-                    completed_at: new Date().toISOString()
-                }).eq('id', targetTaskId);
-            } else {
-                const taskItemId = Number(bundle.id.replace(/\D/g, '')) || 2171;
-                await supabase.from('user_tasks').insert({
-                    user_id: profile.id,
-                    task_item_id: taskItemId,
-                    status: 'completed',
-                    earned_amount: profitEarned,
-                    cost_amount: bundleCost,
-                    is_bundle: true,
-                    completed_at: new Date().toISOString()
-                });
+            // Call server endpoint with service role to securely credit profit, increment count, and clear pending_bundle
+            const res = await fetch('/api/bundle/complete', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    userId: profile.id,
+                    bundleId: bundle.id,
+                    bonusAmount: bundle.bonusAmount,
+                    totalAmount: bundle.totalAmount,
+                    taskId: targetTaskId
+                })
+            });
+
+            const data = await res.json();
+            if (!res.ok || data.error) {
+                throw new Error(data.error || 'Failed to settle super order');
             }
 
-            setBundleModalOpen(false);
+            // Immediately clear local bundle state so it disappears instantly
+            (profile as any).pending_bundle = null;
             setActiveBundle(null);
+            setBundleModalOpen(false);
             setAssociatedTaskId(null);
             setProfitAdded(profitEarned);
+
+            // Optimistically update tasks in local state so the pending bundle row disappears instantly
+            setTasks(prev => prev.map(t => {
+                if (targetTaskId && t.id === targetTaskId) {
+                    return { ...t, status: 'completed', earned_amount: profitEarned, cost_amount: Number(bundle.totalAmount || 0), completed_at: new Date().toISOString() };
+                }
+                if (t.is_bundle && t.status === 'pending') {
+                    return { ...t, status: 'completed', earned_amount: profitEarned, cost_amount: Number(bundle.totalAmount || 0), completed_at: new Date().toISOString() };
+                }
+                return t;
+            }));
+
             confetti({ particleCount: 200, spread: 90, origin: { y: 0.5 } });
             toast.success(`Super Order Cleared! Profit: ${format(profitEarned)} credited to your account.`);
 
