@@ -741,7 +741,7 @@ export default function AdminSettingsPage() {
                           <div className="grid grid-cols-2 gap-3">
                             <button
                               type="button"
-                              onClick={() => toast.info('Theme Preview: Start Optimization demonstration button')}
+                              onClick={() => toast('Theme Preview: Start Optimization demonstration button')}
                               className="py-3.5 px-4 rounded-xl font-black text-[10px] uppercase tracking-widest shadow-lg transition-transform hover:scale-105 active:scale-95"
                               style={{ backgroundColor: primary, color: '#0B0B1E', boxShadow: `0 0 25px ${primary}40` }}
                             >
@@ -749,7 +749,7 @@ export default function AdminSettingsPage() {
                             </button>
                             <button
                               type="button"
-                              onClick={() => toast.info('Theme Preview: Withdraw Funds demonstration button')}
+                              onClick={() => toast('Theme Preview: Withdraw Funds demonstration button')}
                               className="py-3.5 px-4 rounded-xl font-black text-[10px] uppercase tracking-widest border transition-colors hover:bg-white/10 active:scale-95"
                               style={{ borderColor: `${accent}60`, color: accent }}
                             >

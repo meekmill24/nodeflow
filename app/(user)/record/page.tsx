@@ -8,10 +8,31 @@ import { useAuth } from '@/context/AuthContext';
 import { useLanguage } from '@/context/LanguageContext';
 import { useCurrency } from '@/context/CurrencyContext';
 import type { UserTask, TaskItem } from '@/lib/types';
-import { Clock, CheckCircle, XCircle, Search, Filter, ChevronRight, Zap, Headset, Loader2, TrendingUp, ArrowLeft } from 'lucide-react';
+import { Clock, CheckCircle, XCircle, Search, Filter, ChevronRight, Zap, Headset, Loader2, TrendingUp, ArrowLeft, Sparkles, AlertCircle, ArrowRight, Wallet, Layers } from 'lucide-react';
 import Portal from '@/components/Portal';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import BundledPackageModal, { BundlePackage } from '@/components/BundledPackageModal';
+import confetti from 'canvas-confetti';
+import { toast } from 'sonner';
+
+function parsePendingBundle(pb: any): any | null {
+    if (!pb) return null;
+    let obj = pb;
+    if (typeof pb === 'string') {
+        try {
+            obj = JSON.parse(pb);
+        } catch {
+            return null;
+        }
+    }
+    if (Array.isArray(obj)) {
+        if (obj.length === 0) return null;
+        obj = obj[0];
+    }
+    if (typeof obj !== 'object' || obj === null) return null;
+    return obj;
+}
 
 export default function RecordPage() {
     const router = useRouter();
@@ -27,6 +48,9 @@ export default function RecordPage() {
     const [profitAdded, setProfitAdded] = useState<number | null>(null);
     const [showBundleSuccessToast, setShowBundleSuccessToast] = useState(false);
     const [submittingTaskId, setSubmittingTaskId] = useState<number | null>(null);
+    const [bundleModalOpen, setBundleModalOpen] = useState(false);
+    const [activeBundle, setActiveBundle] = useState<BundlePackage | null>(null);
+    const [associatedTaskId, setAssociatedTaskId] = useState<number | null>(null);
 
     const fetchTasks = async () => {
         if (!profile) return;
@@ -78,6 +102,178 @@ export default function RecordPage() {
         } finally {
             setIsSubmitting(false);
             setSubmittingTaskId(null);
+        }
+    };
+
+    // Pending bundle detection & derivation (SimpleMoneys & Captiv8 style)
+    const parsedPb = parsePendingBundle((profile as any)?.pending_bundle);
+    const pendingTaskInDb = tasks.find(t => t.is_bundle && t.status === 'pending');
+
+    let currentPendingBundle: BundlePackage | null = null;
+    if (parsedPb) {
+        const currentWallet = Number(profile?.wallet_balance || 0);
+        const bundleTotal = Number(parsedPb.totalAmount || parsedPb.cost || (pendingTaskInDb?.cost_amount ?? 0));
+        const bundleBonus = Number(parsedPb.bonusAmount || parsedPb.profit || (pendingTaskInDb?.earned_amount ?? (bundleTotal * 0.15)));
+        const shortage = Math.max(0, bundleTotal - currentWallet);
+
+        currentPendingBundle = {
+            id: String(parsedPb.id || pendingTaskInDb?.id || `pending-bundle-${profile?.id}`),
+            name: String(parsedPb.name || "Super Order Package"),
+            description: String(parsedPb.description || "Exclusive high-yield institutional Super Order sequence ready for settlement."),
+            shortageAmount: shortage,
+            totalAmount: bundleTotal,
+            bonusAmount: bundleBonus,
+            rate: Number(parsedPb.rate || (bundleTotal > 0 ? (bundleBonus / bundleTotal) * 100 : 0)),
+            expiresIn: Number(parsedPb.expiresIn || 86400),
+            targetIndex: Number(parsedPb.targetIndex || 0),
+            taskItem: parsedPb.taskItem || (pendingTaskInDb?.task_item ? {
+                title: pendingTaskInDb.task_item.title,
+                image_url: pendingTaskInDb.task_item.image_url,
+                category: pendingTaskInDb.task_item.category
+            } : undefined),
+            taskItems: parsedPb.taskItems || (parsedPb.taskItem ? [parsedPb.taskItem] : (pendingTaskInDb?.task_item ? [{
+                title: pendingTaskInDb.task_item.title,
+                image_url: pendingTaskInDb.task_item.image_url,
+                category: pendingTaskInDb.task_item.category
+            }] : undefined))
+        };
+    } else if (pendingTaskInDb) {
+        const currentWallet = Number(profile?.wallet_balance || 0);
+        const bundleTotal = Number(pendingTaskInDb.cost_amount || 0);
+        const bundleBonus = Number(pendingTaskInDb.earned_amount || (bundleTotal * 0.15));
+        const shortage = Math.max(0, bundleTotal - currentWallet);
+
+        currentPendingBundle = {
+            id: String(pendingTaskInDb.id),
+            name: pendingTaskInDb.task_item?.title || "Super Order Package",
+            description: "Exclusive high-yield institutional Super Order sequence ready for settlement.",
+            shortageAmount: shortage,
+            totalAmount: bundleTotal,
+            bonusAmount: bundleBonus,
+            rate: bundleTotal > 0 ? (bundleBonus / bundleTotal) * 100 : 20,
+            expiresIn: 86400,
+            taskItem: pendingTaskInDb.task_item ? {
+                title: pendingTaskInDb.task_item.title,
+                image_url: pendingTaskInDb.task_item.image_url,
+                category: pendingTaskInDb.task_item.category
+            } : undefined,
+            taskItems: pendingTaskInDb.task_item ? [{
+                title: pendingTaskInDb.task_item.title,
+                image_url: pendingTaskInDb.task_item.image_url,
+                category: pendingTaskInDb.task_item.category
+            }] : undefined
+        };
+    }
+
+    const handleOpenSuperOrder = (taskRow?: any) => {
+        if (taskRow?.id) {
+            setAssociatedTaskId(taskRow.id);
+        } else if (pendingTaskInDb?.id) {
+            setAssociatedTaskId(pendingTaskInDb.id);
+        } else {
+            setAssociatedTaskId(null);
+        }
+
+        if (taskRow && !parsedPb) {
+            const currentWallet = Number(profile?.wallet_balance || 0);
+            const bundleTotal = Number(taskRow.cost_amount || 0);
+            const bundleBonus = Number(taskRow.earned_amount || (bundleTotal * 0.15));
+            const shortage = Math.max(0, bundleTotal - currentWallet);
+
+            setActiveBundle({
+                id: String(taskRow.id),
+                name: taskRow.task_item?.title || "Super Order Package",
+                description: "Exclusive high-yield institutional Super Order sequence ready for settlement.",
+                shortageAmount: shortage,
+                totalAmount: bundleTotal,
+                bonusAmount: bundleBonus,
+                rate: bundleTotal > 0 ? (bundleBonus / bundleTotal) * 100 : 20,
+                expiresIn: 86400,
+                taskItem: taskRow.task_item ? {
+                    title: taskRow.task_item.title,
+                    image_url: taskRow.task_item.image_url,
+                    category: taskRow.task_item.category
+                } : undefined,
+                taskItems: taskRow.task_item ? [{
+                    title: taskRow.task_item.title,
+                    image_url: taskRow.task_item.image_url,
+                    category: taskRow.task_item.category
+                }] : undefined
+            });
+        } else if (currentPendingBundle) {
+            setActiveBundle(currentPendingBundle);
+        }
+        setBundleModalOpen(true);
+    };
+
+    const handleBundleAccept = async (bundle: BundlePackage) => {
+        if (!profile) return;
+        setIsSubmitting(true);
+        try {
+            const profitEarned = Number(bundle.bonusAmount || 0);
+            const bundleCost = Number(bundle.totalAmount || 0);
+            const updatedWallet = Number(profile.wallet_balance || 0) + profitEarned;
+            const updatedProfit = Number(profile.profit || 0) + profitEarned;
+            const updatedTotalEarned = Number(profile.total_earned || 0) + profitEarned;
+            const updatedCompletedCount = Number(profile.completed_count || 0) + 1;
+
+            // 1. Update profile with profit credited, count incremented, pending_bundle cleared
+            const { error: profileErr } = await supabase.from('profiles').update({
+                wallet_balance: updatedWallet,
+                profit: updatedProfit,
+                total_earned: updatedTotalEarned,
+                completed_count: updatedCompletedCount,
+                pending_bundle: null
+            }).eq('id', profile.id);
+
+            if (profileErr) throw profileErr;
+
+            // 2. Mark existing pending task in user_tasks as completed, or insert new completed task
+            let targetTaskId = associatedTaskId;
+            if (!targetTaskId) {
+                const pendingInState = tasks.find(t => t.status === 'pending' && t.is_bundle);
+                if (pendingInState) {
+                    targetTaskId = pendingInState.id;
+                }
+            }
+
+            if (targetTaskId) {
+                await supabase.from('user_tasks').update({
+                    status: 'completed',
+                    earned_amount: profitEarned,
+                    cost_amount: bundleCost,
+                    completed_at: new Date().toISOString()
+                }).eq('id', targetTaskId);
+            } else {
+                const taskItemId = Number(bundle.id.replace(/\D/g, '')) || 2171;
+                await supabase.from('user_tasks').insert({
+                    user_id: profile.id,
+                    task_item_id: taskItemId,
+                    status: 'completed',
+                    earned_amount: profitEarned,
+                    cost_amount: bundleCost,
+                    is_bundle: true,
+                    completed_at: new Date().toISOString()
+                });
+            }
+
+            setBundleModalOpen(false);
+            setActiveBundle(null);
+            setAssociatedTaskId(null);
+            setProfitAdded(profitEarned);
+            confetti({ particleCount: 200, spread: 90, origin: { y: 0.5 } });
+            toast.success(`Super Order Cleared! Profit: ${format(profitEarned)} credited to your account.`);
+
+            await Promise.all([
+                refreshProfile(),
+                fetchTasks()
+            ]);
+            setTimeout(() => setProfitAdded(null), 3500);
+        } catch (err: any) {
+            console.error("Error accepting bundle:", err);
+            toast.error(err.message || "Failed to process super order");
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -214,6 +410,106 @@ export default function RecordPage() {
                 </div>
             </div>
 
+            {/* PENDING SUPER ORDER BANNER (SimpleMoneys & Captiv8 Style) */}
+            {(filter === 'all' || filter === 'pending') && currentPendingBundle && (
+                <div className="relative overflow-hidden rounded-2xl border-2 border-amber-500/40 bg-gradient-to-br from-amber-500/15 via-[#0d0d1e]/90 to-amber-900/10 p-5 md:p-6 shadow-[0_0_30px_rgba(245,158,11,0.15)] backdrop-blur-xl animate-fade-in">
+                    {/* Glow accent */}
+                    <div className="absolute -top-16 -right-16 w-48 h-48 bg-amber-500/20 rounded-full blur-3xl pointer-events-none" />
+                    <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-5">
+                        {/* Left info */}
+                        <div className="flex items-start gap-4">
+                            <div className="relative shrink-0">
+                                <div className="w-14 h-14 md:w-16 md:h-16 rounded-2xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 shadow-[0_0_20px_rgba(245,158,11,0.3)]">
+                                    <Sparkles size={28} className="animate-pulse" />
+                                </div>
+                                <span className="absolute -bottom-1 -right-1 flex h-4 w-4">
+                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                                    <span className="relative inline-flex rounded-full h-4 w-4 bg-amber-500 border-2 border-[#0d0d1e]"></span>
+                                </span>
+                            </div>
+                            <div className="space-y-1">
+                                <div className="flex flex-wrap items-center gap-2">
+                                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-500/20 text-amber-400 border border-amber-500/30">
+                                        SPECIAL TASK • SUPER ORDER
+                                    </span>
+                                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-purple-500/20 text-purple-300 border border-purple-500/30">
+                                        HIGH-YIELD COMBO
+                                    </span>
+                                </div>
+                                <h3 className="text-lg md:text-xl font-black text-white tracking-tight uppercase">
+                                    {currentPendingBundle.name || "Super Order Package"}
+                                </h3>
+                                <p className="text-xs text-white/70 max-w-xl font-medium leading-relaxed">
+                                    {currentPendingBundle.description || "You have an assigned institutional Super Order sequence ready for settlement."}
+                                </p>
+                            </div>
+                        </div>
+
+                        {/* Metrics & Actions */}
+                        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 lg:gap-6 border-t lg:border-t-0 lg:border-l border-white/10 pt-4 lg:pt-0 lg:pl-6">
+                            <div className="grid grid-cols-2 sm:flex sm:items-center gap-4">
+                                <div className="flex flex-col">
+                                    <span className="text-[10px] font-black uppercase tracking-widest text-white/40">Order Value</span>
+                                    <span className="text-sm md:text-base font-black text-white">
+                                        {format(currentPendingBundle.totalAmount)}
+                                    </span>
+                                </div>
+                                <div className="flex flex-col">
+                                    <span className="text-[10px] font-black uppercase tracking-widest text-amber-400/80">Profit Yield</span>
+                                    <span className="text-sm md:text-base font-black text-emerald-400 drop-shadow-[0_0_8px_rgba(52,211,153,0.3)]">
+                                        +{format(currentPendingBundle.bonusAmount)}
+                                    </span>
+                                </div>
+                            </div>
+
+                            {/* Submit / Action Buttons */}
+                            <div className="flex items-center gap-2">
+                                {currentPendingBundle.shortageAmount > 0 || (profile && profile.wallet_balance < currentPendingBundle.totalAmount) ? (
+                                    <>
+                                        <Link
+                                            href="/deposit"
+                                            className="flex-1 sm:flex-initial px-5 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-black text-xs uppercase tracking-wider transition-all shadow-[0_0_20px_rgba(245,158,11,0.3)] hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2"
+                                        >
+                                            <Wallet size={15} /> Deposit
+                                        </Link>
+                                        <button
+                                            onClick={() => handleOpenSuperOrder()}
+                                            className="px-4 py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white font-black text-xs uppercase tracking-wider border border-white/10 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                                        >
+                                            Details <ChevronRight size={14} />
+                                        </button>
+                                    </>
+                                ) : (
+                                    <button
+                                        onClick={() => handleOpenSuperOrder()}
+                                        disabled={isSubmitting}
+                                        className="flex-1 sm:flex-initial px-6 py-3 rounded-xl bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-500 text-black font-black text-xs uppercase tracking-wider transition-all shadow-[0_0_25px_rgba(245,158,11,0.5)] hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2 group animate-pulse cursor-pointer"
+                                    >
+                                        <Sparkles size={16} className="text-black group-hover:rotate-12 transition-transform" />
+                                        Submit Super Order
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Shortage warning if balance insufficient */}
+                    {(currentPendingBundle.shortageAmount > 0 || (profile && profile.wallet_balance < currentPendingBundle.totalAmount)) && (
+                        <div className="mt-4 pt-3 border-t border-amber-500/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs font-semibold text-amber-300/90">
+                            <div className="flex items-center gap-2">
+                                <AlertCircle size={15} className="text-amber-400 shrink-0" />
+                                <span>
+                                    Account deficit: <strong className="text-amber-200">{format(Math.max(currentPendingBundle.shortageAmount, currentPendingBundle.totalAmount - (profile?.wallet_balance || 0)))}</strong> required to complete order.
+                                </span>
+                            </div>
+                            <Link href="/service" className="text-[11px] underline uppercase tracking-wider text-amber-400 hover:text-amber-200">
+                                Need assistance? Contact Manager
+                            </Link>
+                        </div>
+                    )}
+                </div>
+            )}
+
             <div className="glass-card overflow-hidden border border-white/5 bg-surface/50">
                 {/* Desktop Header */}
                 <div className="hidden md:grid grid-cols-5 bg-black/10 dark:bg-white/5 border-b border-white/5 text-[10px] font-black text-text-secondary uppercase tracking-[0.2em]">
@@ -297,10 +593,12 @@ export default function RecordPage() {
                                     {task.is_bundle && task.status === 'pending' && (
                                         <div className="flex flex-col border-l md:border-l-0 md:border-t border-white/10 pl-4 md:pl-0 md:pt-1.5">
                                             <span className="text-[9px] text-amber-500/80 uppercase tracking-widest font-black">
-                                                {profile && profile.wallet_balance < 0 ? 'Deficit' : 'Hold Status'}
+                                                {profile && (profile.wallet_balance < (task.cost_amount || 0) || profile.wallet_balance < 0) ? 'Deficit' : 'Hold Status'}
                                             </span>
-                                            <span className={`text-[11px] font-black ${profile && profile.wallet_balance < 0 ? 'text-danger' : 'text-amber-500'}`}>
-                                                {profile && profile.wallet_balance < 0 ? `-${format(Math.abs(profile.wallet_balance))}` : format(profile?.wallet_balance || 0)}
+                                            <span className={`text-[11px] font-black ${profile && (profile.wallet_balance < (task.cost_amount || 0) || profile.wallet_balance < 0) ? 'text-danger' : 'text-amber-500'}`}>
+                                                {profile && profile.wallet_balance < (task.cost_amount || 0)
+                                                    ? `-${format(Math.max(0, (task.cost_amount || 0) - profile.wallet_balance))}`
+                                                    : format(profile?.wallet_balance || 0)}
                                             </span>
                                         </div>
                                     )}
@@ -332,29 +630,57 @@ export default function RecordPage() {
                                         {statusBadge(task.status)}
                                     </div>
                                     {task.status === 'pending' && (
-                                        profile && profile.wallet_balance < 0 ? (
-                                            <button
-                                                onClick={() => router.push('/service')}
-                                                className="w-full md:w-auto px-6 py-3 md:py-2 rounded-xl bg-amber-500 text-white text-[10px] font-black uppercase tracking-widest shadow-xl shadow-amber-500/30 transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2 group"
-                                            >
-                                                <Headset size={14} className="group-hover:rotate-12 transition-transform" />
-                                                Contact Manager
-                                            </button>
+                                        task.is_bundle ? (
+                                            (profile && (profile.wallet_balance < (task.cost_amount || 0) || profile.wallet_balance < 0)) ? (
+                                                <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
+                                                    <button
+                                                        onClick={() => router.push('/deposit')}
+                                                        className="w-full md:w-auto px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-black text-[10px] font-black uppercase tracking-widest shadow-xl shadow-amber-500/30 transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer"
+                                                    >
+                                                        <Wallet size={13} /> Deposit
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleOpenSuperOrder(task)}
+                                                        className="w-full md:w-auto px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-[10px] font-black uppercase tracking-widest border border-white/20 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                                                    >
+                                                        <Sparkles size={13} className="text-amber-400" /> Details
+                                                    </button>
+                                                </div>
+                                            ) : (
+                                                <button
+                                                    onClick={() => handleOpenSuperOrder(task)}
+                                                    disabled={isSubmitting}
+                                                    className="w-full md:w-auto px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-500 text-black text-[10px] font-black uppercase tracking-widest shadow-xl shadow-amber-500/40 hover:shadow-amber-500/60 transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer font-black animate-pulse"
+                                                >
+                                                    <Sparkles size={14} className="text-black" />
+                                                    Submit Super Order
+                                                </button>
+                                            )
                                         ) : (
-                                            <button
-                                                onClick={() => handleSubmitPending(task.task_item_id)}
-                                                disabled={isSubmitting}
-                                                className={`w-full md:w-auto px-6 py-3 md:py-2 rounded-xl bg-primary text-white text-[10px] font-black uppercase tracking-widest shadow-xl shadow-primary/30 transition-all flex items-center justify-center gap-2 group
-                                                    ${isSubmitting && submittingTaskId === task.task_item_id ? 'opacity-50 cursor-wait' : 'hover:scale-[1.02] active:scale-95 cursor-pointer'}
-                                                `}
-                                            >
-                                                {isSubmitting && submittingTaskId === task.task_item_id ? (
-                                                    <Loader2 size={14} className="animate-spin" />
-                                                ) : (
-                                                    <Zap size={14} className="group-hover:animate-pulse" />
-                                                )}
-                                                {isSubmitting && submittingTaskId === task.task_item_id ? t('submitting') : t('submit_order')}
-                                            </button>
+                                            profile && profile.wallet_balance < 0 ? (
+                                                <button
+                                                    onClick={() => router.push('/service')}
+                                                    className="w-full md:w-auto px-6 py-3 md:py-2 rounded-xl bg-amber-500 text-white text-[10px] font-black uppercase tracking-widest shadow-xl shadow-amber-500/30 transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2 group"
+                                                >
+                                                    <Headset size={14} className="group-hover:rotate-12 transition-transform" />
+                                                    Contact Manager
+                                                </button>
+                                            ) : (
+                                                <button
+                                                    onClick={() => handleSubmitPending(task.task_item_id)}
+                                                    disabled={isSubmitting}
+                                                    className={`w-full md:w-auto px-6 py-3 md:py-2 rounded-xl bg-primary text-white text-[10px] font-black uppercase tracking-widest shadow-xl shadow-primary/30 transition-all flex items-center justify-center gap-2 group
+                                                        ${isSubmitting && submittingTaskId === task.task_item_id ? 'opacity-50 cursor-wait' : 'hover:scale-[1.02] active:scale-95 cursor-pointer'}
+                                                    `}
+                                                >
+                                                    {isSubmitting && submittingTaskId === task.task_item_id ? (
+                                                        <Loader2 size={14} className="animate-spin" />
+                                                    ) : (
+                                                        <Zap size={14} className="group-hover:animate-pulse" />
+                                                    )}
+                                                    {isSubmitting && submittingTaskId === task.task_item_id ? t('submitting') : t('submit_order')}
+                                                </button>
+                                            )
                                         )
                                     )}
                                 </div>
@@ -411,6 +737,19 @@ export default function RecordPage() {
                     </div>
                 </Portal>
             )}
+
+            {/* Bundled Package Modal */}
+            <BundledPackageModal
+                isOpen={bundleModalOpen}
+                bundle={activeBundle}
+                walletBalance={profile?.wallet_balance || 0}
+                onAccept={handleBundleAccept}
+                onClose={() => {
+                    setBundleModalOpen(false);
+                    setActiveBundle(null);
+                    setAssociatedTaskId(null);
+                }}
+            />
         </div>
     );
 }

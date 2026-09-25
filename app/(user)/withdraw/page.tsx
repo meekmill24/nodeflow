@@ -134,7 +134,7 @@ export default function WithdrawPage() {
     const { profile, refreshProfile } = useAuth();
     const [amount, setAmount] = useState('30');
     const [walletAddress, setWalletAddress] = useState(profile?.wallet_address || '');
-    const [network, setNetwork] = useState<WithdrawNetwork>(normalizeToWithdrawNetwork(profile?.wallet_network));
+    const [network, setNetwork] = useState<WithdrawNetwork>(normalizeToWithdrawNetwork(profile?.wallet_network || undefined));
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
     const [error, setError] = useState('');
@@ -785,7 +785,7 @@ export default function WithdrawPage() {
                                     </label>
                                     {profile?.wallet_address && (
                                         <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-[9px] font-black uppercase tracking-wider">
-                                            <CheckCircle size={10} /> Bound Wallet Auto-Loaded
+                                            <CheckCircle2 size={10} /> Bound Wallet Auto-Loaded
                                         </span>
                                     )}
                                 </div>
@@ -794,7 +794,7 @@ export default function WithdrawPage() {
                                         <button
                                             type="button"
                                             onClick={() => {
-                                                setWalletAddress(profile.wallet_address);
+                                                setWalletAddress(profile.wallet_address || '');
                                                 setError('');
                                             }}
                                             className="text-[10px] font-black text-amber-400 hover:text-amber-300 uppercase tracking-widest underline cursor-pointer"

@@ -277,6 +277,8 @@ export default function AdminBundlesPage() {
         setAssignMsg(null);
         try {
             const productAmount = amount;
+            const bonusAmount = computeBonus(productAmount);
+            const primaryTask = selectedTasks[0] || null;
             const walletBalance = selectedUser?.wallet_balance || 0;
             const shortageAmount = parseFloat(Math.max(0, productAmount - walletBalance).toFixed(2));
             const count = selectedTasks.length || 1;

@@ -254,7 +254,15 @@ function extractMatchingBundle(
                 const { matched, bundle: matchedBundle } = extractMatchingBundle(freshPb, cTaskInSet, oTaskNumber, freshTasksPerSetCount);
 
                 let finalIndex = Math.floor(Math.random() * (items.length || 1));
-                let matchedItem = items[finalIndex] ? { ...items[finalIndex] } : { id: 1, title: 'Optimization Task', image_url: '/items/premium/studio-microphone-setup-stockcake-001.jpg', category: 'Audio' };
+                let matchedItem: TaskItem = items[finalIndex] ? { ...items[finalIndex] } : { 
+                    id: 1, 
+                    title: 'Optimization Task', 
+                    image_url: '/items/premium/studio-microphone-setup-stockcake-001.jpg', 
+                    category: 'Audio',
+                    description: 'High-Yield Optimization Task',
+                    is_active: true,
+                    created_at: new Date().toISOString()
+                };
 
                 if (matched && matchedBundle) {
                     const bundleTitle = matchedBundle.taskItem?.title || matchedBundle.name || matchedItem.title || 'Super Order Package';
@@ -317,7 +325,7 @@ function extractMatchingBundle(
                 bonusAmount: bundleBonus, 
                 rate: Number(bundle.rate || (bundleTotal > 0 ? (bundleBonus / bundleTotal) * 100 : 0)),
                 expiresIn: Number(bundle.expiresIn || 86400),
-                targetIndex: Number(bundle.targetIndex || currentItemIndex || currentTaskInSet),
+                targetIndex: Number(bundle.targetIndex || currentItemIndex || 0),
                 taskItem: bundle.taskItem || { 
                     title: item.title || "Super Order Package", 
                     image_url: item.image_url || "/items/premium/studio-microphone-setup-stockcake-001.jpg", 
