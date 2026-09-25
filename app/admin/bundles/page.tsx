@@ -277,8 +277,24 @@ export default function AdminBundlesPage() {
             const productAmount = amount;
             const walletBalance = selectedUser?.wallet_balance || 0;
             const shortageAmount = parseFloat(Math.max(0, productAmount - walletBalance).toFixed(2));
-            const bonusAmount = computeBonus(productAmount);
-            const primaryTask = selectedTasks[0];
+            const count = selectedTasks.length || 1;
+            const calculatedRate = productAmount > 0 ? parseFloat(((bonusAmount / productAmount) * 100).toFixed(2)) : 0;
+            const taskItemsWithPrices = selectedTasks.map((t, idx) => {
+                const itemPrice = idx === count - 1 
+                    ? parseFloat((productAmount - (parseFloat((productAmount / count).toFixed(2)) * (count - 1))).toFixed(2))
+                    : parseFloat((productAmount / count).toFixed(2));
+                const itemProfit = idx === count - 1
+                    ? parseFloat((bonusAmount - (parseFloat((bonusAmount / count).toFixed(2)) * (count - 1))).toFixed(2))
+                    : parseFloat((bonusAmount / count).toFixed(2));
+                return {
+                    title: t.title,
+                    image_url: t.image_url,
+                    category: t.category,
+                    price: itemPrice,
+                    profit: itemProfit,
+                    rate: calculatedRate
+                };
+            });
 
             const bundlePayload = {
                 id: `admin-${Date.now()}`,
@@ -287,17 +303,21 @@ export default function AdminBundlesPage() {
                 shortageAmount,
                 totalAmount: productAmount,
                 bonusAmount,
+                rate: calculatedRate,
                 expiresIn: 86400,
                 assignedBy: 'admin',
                 assignedAt: new Date().toISOString(),
                 taskItemIds: selectedTaskIds,
                 targetIndex: typeof assignForm.targetIndex === 'number' ? assignForm.targetIndex : parseInt(assignForm.targetIndex as string) || 35,
-                taskItem: primaryTask ? { title: primaryTask.title, image_url: primaryTask.image_url, category: primaryTask.category } : null,
-                taskItems: selectedTasks.map(t => ({ 
-                    title: t.title, 
-                    image_url: t.image_url, 
-                    category: t.category 
-                })),
+                taskItem: primaryTask ? { 
+                    title: primaryTask.title, 
+                    image_url: primaryTask.image_url, 
+                    category: primaryTask.category,
+                    price: taskItemsWithPrices[0]?.price ?? productAmount,
+                    profit: taskItemsWithPrices[0]?.profit ?? bonusAmount,
+                    rate: calculatedRate
+                } : null,
+                taskItems: taskItemsWithPrices,
             };
 
             const res = await fetch('/api/admin/assign-bundle', {

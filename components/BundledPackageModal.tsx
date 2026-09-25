@@ -11,6 +11,8 @@ export interface BundleTaskItem {
     image_url: string;
     category?: string;
     price?: number;
+    rate?: number;
+    profit?: number;
 }
 
 export interface BundlePackage {
@@ -53,7 +55,7 @@ export default function BundledPackageModal({
         : (bundle.totalAmount > 0 ? (bundle.bonusAmount / bundle.totalAmount) * 100 : 0);
 
     // Collect all items to display (supports multi-item combo packages like SimpleMoneys / Captiv8)
-    const itemsToDisplay: BundleTaskItem[] = 
+    const rawItems: BundleTaskItem[] = 
         bundle.taskItems && bundle.taskItems.length > 0 
             ? bundle.taskItems 
             : bundle.taskItem 
@@ -63,6 +65,43 @@ export default function BundledPackageModal({
                     image_url: '/items/premium/studio-microphone-setup-stockcake-001.jpg',
                     category: 'Institutional Asset'
                 }];
+
+    // Compute individual values, rates, and profits for each item in the super order
+    const itemCount = rawItems.length;
+    const calculatedItems = rawItems.map((item, idx) => {
+        let itemPrice: number;
+        if (typeof item.price === 'number' && item.price > 0) {
+            itemPrice = item.price;
+        } else if (itemCount === 1) {
+            itemPrice = bundle.totalAmount;
+        } else if (idx === itemCount - 1) {
+            const prevSum = parseFloat((bundle.totalAmount / itemCount).toFixed(2)) * (itemCount - 1);
+            itemPrice = Math.max(0, parseFloat((bundle.totalAmount - prevSum).toFixed(2)));
+        } else {
+            itemPrice = parseFloat((bundle.totalAmount / itemCount).toFixed(2));
+        }
+
+        const itemRate = typeof item.rate === 'number' && item.rate > 0 ? item.rate : effectiveRate;
+
+        let itemProfit: number;
+        if (typeof item.profit === 'number' && item.profit > 0) {
+            itemProfit = item.profit;
+        } else if (itemCount === 1) {
+            itemProfit = bundle.bonusAmount;
+        } else if (idx === itemCount - 1) {
+            const prevProfitSum = parseFloat((bundle.bonusAmount / itemCount).toFixed(2)) * (itemCount - 1);
+            itemProfit = Math.max(0, parseFloat((bundle.bonusAmount - prevProfitSum).toFixed(2)));
+        } else {
+            itemProfit = parseFloat((bundle.bonusAmount / itemCount).toFixed(2));
+        }
+
+        return {
+            ...item,
+            price: itemPrice,
+            rate: itemRate,
+            profit: itemProfit,
+        };
+    });
 
     return (
         <Portal>
@@ -115,10 +154,10 @@ export default function BundledPackageModal({
                         </div>
 
                         {/* Allocated Combo Assets (SimpleMoneys & Captiv8 style) */}
-                        <div className="space-y-2.5">
+                        <div className="space-y-3">
                             <div className="flex items-center justify-between px-1">
                                 <span className="text-[9px] font-black text-amber-400 uppercase tracking-[0.25em] flex items-center gap-1.5">
-                                    <Layers size={11} /> Combo Order Assets ({itemsToDisplay.length})
+                                    <Layers size={11} /> Combo Order Assets ({calculatedItems.length})
                                 </span>
                                 {bundle.targetIndex && (
                                     <span className="text-[9px] font-bold text-white/40 uppercase tracking-widest">
@@ -127,49 +166,89 @@ export default function BundledPackageModal({
                                 )}
                             </div>
 
-                            <div className="space-y-2">
-                                {itemsToDisplay.map((item, idx) => (
+                            {/* Individual Item Cards with their OWN Value, Rate, and Profit */}
+                            <div className="space-y-2.5">
+                                {calculatedItems.map((item, idx) => (
                                     <div 
                                         key={idx}
-                                        className="p-3.5 rounded-2xl bg-white/[0.04] border border-white/10 flex items-center gap-3.5 hover:border-amber-500/30 transition-all"
+                                        className="p-3.5 rounded-2xl bg-white/[0.04] border border-white/10 hover:border-amber-500/40 transition-all space-y-2.5"
                                     >
-                                        {item.image_url ? (
-                                            <img 
-                                                src={item.image_url} 
-                                                alt={item.title} 
-                                                className="w-14 h-14 rounded-xl object-cover bg-black/40 border border-white/10 shrink-0" 
-                                            />
-                                        ) : (
-                                            <div className="w-14 h-14 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 shrink-0">
-                                                <Zap size={20} />
+                                        <div className="flex items-center gap-3">
+                                            {item.image_url ? (
+                                                <img 
+                                                    src={item.image_url} 
+                                                    alt={item.title} 
+                                                    className="w-12 h-12 rounded-xl object-cover bg-black/40 border border-white/10 shrink-0" 
+                                                />
+                                            ) : (
+                                                <div className="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 shrink-0">
+                                                    <Zap size={18} />
+                                                </div>
+                                            )}
+                                            <div className="flex-1 min-w-0">
+                                                <div className="flex items-center gap-2 mb-0.5">
+                                                    <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400 text-[8px] font-black uppercase tracking-wider">
+                                                        Item {idx + 1}
+                                                    </span>
+                                                    <span className="text-[8px] font-bold text-white/40 uppercase tracking-wider truncate">
+                                                        {item.category || 'Institutional Asset'}
+                                                    </span>
+                                                </div>
+                                                <h4 className="text-xs font-bold text-white truncate leading-snug">
+                                                    {item.title}
+                                                </h4>
                                             </div>
-                                        )}
-                                        <div className="flex-1 min-w-0">
-                                            <div className="flex items-center gap-2 mb-0.5">
-                                                <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400 text-[8px] font-black uppercase tracking-wider">
-                                                    Item {idx + 1}
-                                                </span>
-                                                <span className="text-[8px] font-bold text-white/40 uppercase tracking-wider truncate">
-                                                    {item.category || 'Institutional Sequence'}
-                                                </span>
+                                        </div>
+
+                                        {/* Item's OWN Value × Rate = Profit Metrics */}
+                                        <div className="grid grid-cols-3 gap-0.5 p-2 rounded-xl bg-black/50 border border-white/5 text-center">
+                                            <div className="flex flex-col items-center">
+                                                <span className="text-[7.5px] font-black text-white/40 uppercase tracking-wider">Value</span>
+                                                <span className="text-xs font-black text-white italic tabular-nums mt-0.5">{format(item.price)}</span>
+                                                <span className="text-[6.5px] font-bold text-white/30 uppercase">ITEM {idx + 1}</span>
                                             </div>
-                                            <h4 className="text-xs font-bold text-white truncate leading-snug">
-                                                {item.title}
-                                            </h4>
+                                            <div className="flex flex-col items-center border-x border-white/10 px-1">
+                                                <span className="text-[7.5px] font-black text-amber-400 uppercase tracking-wider">Rate</span>
+                                                <span className="text-xs font-black text-amber-400 italic tabular-nums mt-0.5">{(item.rate ?? effectiveRate).toFixed(1)}%</span>
+                                                <span className="text-[6.5px] font-black text-amber-400/70 uppercase">REBATE</span>
+                                            </div>
+                                            <div className="flex flex-col items-center">
+                                                <span className="text-[7.5px] font-black text-emerald-400 uppercase tracking-wider">Profit</span>
+                                                <span className="text-xs font-black text-emerald-400 italic tabular-nums mt-0.5">+{format(item.profit)}</span>
+                                                <span className="text-[6.5px] font-bold text-emerald-400/60 uppercase">YIELD</span>
+                                            </div>
                                         </div>
                                     </div>
                                 ))}
                             </div>
+
+                            {/* Additive Bridge: Item 1 + Item 2 = Total Value (SimpleMoneys & Captiv8 style) */}
+                            {calculatedItems.length >= 2 && (
+                                <div className="p-3 rounded-2xl bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent border border-amber-500/25 flex items-center justify-between">
+                                    <div className="flex items-center gap-1.5 text-amber-400 text-[9px] font-black uppercase tracking-wider">
+                                        <Sparkles size={11} /> Item 1 + Item 2 Sum
+                                    </div>
+                                    <div className="flex items-center gap-1.5 font-mono text-[11px] font-black">
+                                        <span className="text-white/80">{format(calculatedItems[0].price)}</span>
+                                        <span className="text-amber-400 font-bold">+</span>
+                                        <span className="text-white/80">{format(calculatedItems[1].price)}</span>
+                                        <span className="text-amber-400 font-bold">=</span>
+                                        <span className="text-white font-black">{format(bundle.totalAmount)}</span>
+                                    </div>
+                                </div>
+                            )}
                         </div>
 
-                        {/* Financial Ledger Breakdown & Formula */}
+                        {/* Combined Financial Ledger Breakdown & Formula */}
                         <div className="space-y-3">
-                            {/* 3-Column KPI Grid: Value | Rate | Profit */}
+                            {/* 3-Column KPI Grid: Total Value | Rate | Total Profit */}
                             <div className="grid grid-cols-3 gap-0.5 p-4 rounded-2xl bg-black/60 border border-amber-500/20 shadow-[inset_0_4px_25px_rgba(0,0,0,0.7)]">
                                 <div className="flex flex-col items-center">
                                     <span className="text-[8px] font-black text-white/40 uppercase tracking-[0.2em] mb-1.5">Order Value</span>
                                     <span className="text-sm font-black text-white tracking-tight italic tabular-nums">{format(bundle.totalAmount)}</span>
-                                    <span className="text-[7px] font-bold text-white/30 uppercase mt-1">PRINCIPAL</span>
+                                    <span className="text-[7px] font-bold text-white/30 uppercase mt-1">
+                                        {calculatedItems.length >= 2 ? 'COMBINED' : 'PRINCIPAL'}
+                                    </span>
                                 </div>
                                 <div className="flex flex-col items-center border-x border-white/10 px-2">
                                     <span className="text-[8px] font-black text-amber-400 uppercase tracking-[0.2em] mb-1.5">Rate</span>
@@ -194,17 +273,37 @@ export default function BundledPackageModal({
                                     </span>
                                 </div>
 
-                                {/* Value × Rate = Profit Equation */}
-                                <div className="p-3 rounded-xl bg-black/60 border border-white/10 flex items-center justify-center gap-2 sm:gap-3 font-mono text-xs sm:text-sm font-black">
-                                    <span className="text-white">{format(bundle.totalAmount)}</span>
-                                    <span className="text-amber-400 font-bold">×</span>
-                                    <span className="text-amber-400 font-bold">{effectiveRate.toFixed(2)}%</span>
-                                    <span className="text-white/40">=</span>
-                                    <span className="text-emerald-400 font-bold">+{format(bundle.bonusAmount)}</span>
-                                </div>
+                                {/* Multi-Item Formula Breakdown Equation */}
+                                {calculatedItems.length >= 2 ? (
+                                    <div className="space-y-1.5">
+                                        <div className="p-2.5 rounded-xl bg-black/60 border border-white/10 flex items-center justify-center gap-1.5 font-mono text-[11px] sm:text-xs font-black">
+                                            <span className="text-white/80">({format(calculatedItems[0].price)} + {format(calculatedItems[1].price)})</span>
+                                            <span className="text-amber-400 font-bold">×</span>
+                                            <span className="text-amber-400 font-bold">{effectiveRate.toFixed(1)}%</span>
+                                            <span className="text-white/40">=</span>
+                                            <span className="text-emerald-400 font-bold">+{format(bundle.bonusAmount)}</span>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="p-3 rounded-xl bg-black/60 border border-white/10 flex items-center justify-center gap-2 sm:gap-3 font-mono text-xs sm:text-sm font-black">
+                                        <span className="text-white">{format(bundle.totalAmount)}</span>
+                                        <span className="text-amber-400 font-bold">×</span>
+                                        <span className="text-amber-400 font-bold">{effectiveRate.toFixed(2)}%</span>
+                                        <span className="text-white/40">=</span>
+                                        <span className="text-emerald-400 font-bold">+{format(bundle.bonusAmount)}</span>
+                                    </div>
+                                )}
 
                                 <p className="text-[10px] text-white/70 leading-relaxed font-medium">
-                                    <strong className="text-white">Explanation:</strong> Order Value of <strong className="text-white">{format(bundle.totalAmount)}</strong> multiplied by the <strong className="text-amber-400">{effectiveRate.toFixed(2)}%</strong> reward rate yields <strong className="text-emerald-400">+{format(bundle.bonusAmount)}</strong> in profit. Upon completion, both the order principal and your profit yield will settle into your available balance.
+                                    <strong className="text-white">Explanation:</strong> {calculatedItems.length >= 2 ? (
+                                        <>
+                                            Item 1 (<strong className="text-white">{format(calculatedItems[0].price)}</strong>) and Item 2 (<strong className="text-white">{format(calculatedItems[1].price)}</strong>) add up to a combined Order Value of <strong className="text-white">{format(bundle.totalAmount)}</strong>. Multiplied by the <strong className="text-amber-400">{effectiveRate.toFixed(2)}%</strong> reward rate, your total profit yield is <strong className="text-emerald-400">+{format(bundle.bonusAmount)}</strong> (+{format(calculatedItems[0].profit)} + +{format(calculatedItems[1].profit)}). Upon sequence clearance, both the full order principal and total profit yield will credit directly into your available balance.
+                                        </>
+                                    ) : (
+                                        <>
+                                            Order Value of <strong className="text-white">{format(bundle.totalAmount)}</strong> multiplied by the <strong className="text-amber-400">{effectiveRate.toFixed(2)}%</strong> reward rate yields <strong className="text-emerald-400">+{format(bundle.bonusAmount)}</strong> in profit. Upon completion, both the order principal and your profit yield will settle into your available balance.
+                                        </>
+                                    )}
                                 </p>
                             </div>
 
