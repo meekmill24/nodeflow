@@ -23,6 +23,10 @@ import {
     Database,
     Zap,
     AlertCircle,
+    ChevronLeft,
+    ChevronRight,
+    ChevronsLeft,
+    ChevronsRight,
     Layers as LayersIcon
 } from 'lucide-react';
 import { toast } from 'sonner';
@@ -52,6 +56,8 @@ function ImagePreview({ url, alt, size = 'md' }: { url: string; alt: string; siz
                 <img
                     src={url}
                     alt={alt}
+                    loading="lazy"
+                    decoding="async"
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                     onError={() => setErrored(true)}
                 />
@@ -86,6 +92,13 @@ export default function AdminTasksPage() {
     const [filterSet, setFilterSet] = useState<number | 'all'>('all');
     const [setsToGenerate, setSetsToGenerate] = useState(1);
     const [confirmModal, setConfirmModal] = useState<{show: boolean, title: string, message: string, onConfirm: () => void} | null>(null);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [pageSize, setPageSize] = useState<number | 'all'>(24);
+
+    // Reset pagination to page 1 whenever search, level, set, sort, or page size changes
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [filterLevel, filterSet, searchQuery, sortOrder, pageSize]);
 
     const fetchItems = async () => {
         setLoading(true);
@@ -385,6 +398,145 @@ export default function AdminTasksPage() {
         finalItems = filteredItems.slice(start, end);
     }
 
+    const totalItems = finalItems.length;
+    const effectivePageSize = pageSize === 'all' ? (totalItems || 1) : pageSize;
+    const totalPages = Math.max(1, Math.ceil(totalItems / effectivePageSize));
+    const safeCurrentPage = Math.min(Math.max(1, currentPage), totalPages);
+
+    const paginatedItems = pageSize === 'all'
+        ? finalItems
+        : finalItems.slice((safeCurrentPage - 1) * effectivePageSize, safeCurrentPage * effectivePageSize);
+
+    const startIdx = totalItems === 0 ? 0 : (safeCurrentPage - 1) * effectivePageSize + 1;
+    const endIdx = pageSize === 'all' ? totalItems : Math.min(safeCurrentPage * effectivePageSize, totalItems);
+
+    const renderPaginationBar = (position: 'top' | 'bottom') => {
+        if (totalItems === 0 || loading) return null;
+
+        // Generate visible page numbers
+        const pageNumbers: (number | string)[] = [];
+        if (totalPages <= 7) {
+            for (let i = 1; i <= totalPages; i++) pageNumbers.push(i);
+        } else {
+            pageNumbers.push(1);
+            if (safeCurrentPage > 3) pageNumbers.push('...');
+            const start = Math.max(2, safeCurrentPage - 1);
+            const end = Math.min(totalPages - 1, safeCurrentPage + 1);
+            for (let i = start; i <= end; i++) pageNumbers.push(i);
+            if (safeCurrentPage < totalPages - 2) pageNumbers.push('...');
+            pageNumbers.push(totalPages);
+        }
+
+        const handlePageChange = (p: number) => {
+            setCurrentPage(p);
+            if (position === 'bottom') {
+                window.scrollTo({ top: 380, behavior: 'smooth' });
+            }
+        };
+
+        return (
+            <div className={`flex flex-col lg:flex-row items-center justify-between gap-4 p-4 md:px-8 bg-slate-900/40 border border-white/5 rounded-[28px] backdrop-blur-md shadow-xl ${position === 'top' ? 'mb-6' : 'mt-8'}`}>
+                {/* Status Counter */}
+                <div className="flex items-center gap-3">
+                    <span className="text-[11px] font-black uppercase tracking-widest text-slate-400">
+                        Showing <span className="text-[#3DD6C8] font-bold">{startIdx}–{endIdx}</span> of <span className="text-white font-bold">{totalItems}</span> Units
+                    </span>
+                    {pageSize !== 'all' && (
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 bg-white/5 border border-white/5 px-2.5 py-1 rounded-xl">
+                            Page {safeCurrentPage} of {totalPages}
+                        </span>
+                    )}
+                </div>
+
+                {/* Page Navigation & Size Selection */}
+                <div className="flex flex-wrap items-center gap-4">
+                    {/* Per Page Size Pills */}
+                    <div className="flex items-center bg-slate-950 border border-white/10 rounded-2xl p-1 gap-1">
+                        <span className="text-[9px] font-black uppercase tracking-widest text-slate-600 px-2">Show:</span>
+                        {([24, 48, 96, 'all'] as const).map((size) => (
+                            <button
+                                key={size}
+                                onClick={() => {
+                                    setPageSize(size);
+                                    setCurrentPage(1);
+                                }}
+                                className={`px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all ${
+                                    pageSize === size
+                                        ? 'bg-[#3DD6C8] text-slate-950 font-bold shadow-md shadow-[#3DD6C8]/20'
+                                        : 'text-slate-400 hover:text-white hover:bg-white/5'
+                                }`}
+                            >
+                                {size === 'all' ? 'All' : size}
+                            </button>
+                        ))}
+                    </div>
+
+                    {/* Pagination buttons */}
+                    {pageSize !== 'all' && totalPages > 1 && (
+                        <div className="flex items-center gap-1.5">
+                            <button
+                                onClick={() => handlePageChange(1)}
+                                disabled={safeCurrentPage <= 1}
+                                className="w-9 h-9 rounded-xl bg-slate-950 border border-white/10 text-slate-400 hover:text-white hover:border-[#3DD6C8]/40 disabled:opacity-30 disabled:pointer-events-none flex items-center justify-center transition-all"
+                                title="First Page"
+                            >
+                                <ChevronsLeft size={16} />
+                            </button>
+                            <button
+                                onClick={() => handlePageChange(Math.max(1, safeCurrentPage - 1))}
+                                disabled={safeCurrentPage <= 1}
+                                className="w-9 h-9 rounded-xl bg-slate-950 border border-white/10 text-slate-400 hover:text-white hover:border-[#3DD6C8]/40 disabled:opacity-30 disabled:pointer-events-none flex items-center justify-center transition-all"
+                                title="Previous Page"
+                            >
+                                <ChevronLeft size={16} />
+                            </button>
+
+                            <div className="flex items-center gap-1">
+                                {pageNumbers.map((num, idx) => {
+                                    if (num === '...') {
+                                        return <span key={`ellipsis-${position}-${idx}`} className="px-1 text-slate-600 font-bold text-xs">...</span>;
+                                    }
+                                    const pageNum = num as number;
+                                    const isActive = pageNum === safeCurrentPage;
+                                    return (
+                                        <button
+                                            key={`page-${position}-${pageNum}`}
+                                            onClick={() => handlePageChange(pageNum)}
+                                            className={`w-9 h-9 rounded-xl text-[11px] font-black transition-all ${
+                                                isActive
+                                                    ? 'bg-[#3DD6C8] text-slate-950 shadow-md shadow-[#3DD6C8]/20'
+                                                    : 'bg-slate-950 border border-white/10 text-slate-400 hover:text-white hover:border-white/20'
+                                            }`}
+                                        >
+                                            {pageNum}
+                                        </button>
+                                    );
+                                })}
+                            </div>
+
+                            <button
+                                onClick={() => handlePageChange(Math.min(totalPages, safeCurrentPage + 1))}
+                                disabled={safeCurrentPage >= totalPages}
+                                className="w-9 h-9 rounded-xl bg-slate-950 border border-white/10 text-slate-400 hover:text-white hover:border-[#3DD6C8]/40 disabled:opacity-30 disabled:pointer-events-none flex items-center justify-center transition-all"
+                                title="Next Page"
+                            >
+                                <ChevronRight size={16} />
+                            </button>
+                            <button
+                                onClick={() => handlePageChange(totalPages)}
+                                disabled={safeCurrentPage >= totalPages}
+                                className="w-9 h-9 rounded-xl bg-slate-950 border border-white/10 text-slate-400 hover:text-white hover:border-[#3DD6C8]/40 disabled:opacity-30 disabled:pointer-events-none flex items-center justify-center transition-all"
+                                title="Last Page"
+                            >
+                                <ChevronsRight size={16} />
+                            </button>
+                        </div>
+                    )}
+                </div>
+            </div>
+        );
+    };
+
     return (
         <div className="space-y-8 animate-in fade-in duration-500 pb-20">
             {/* Admin Header Stats */}
@@ -411,7 +563,9 @@ export default function AdminTasksPage() {
                     </div>
                     <div className="flex items-baseline gap-2">
                         <h3 className="text-3xl font-black text-white italic">{finalItems.length}</h3>
-                        <span className="text-xs text-slate-600 font-bold uppercase italic">viewing</span>
+                        <span className="text-xs text-slate-600 font-bold uppercase italic">
+                            {pageSize !== 'all' && totalPages > 1 ? `(${paginatedItems.length} on p.${safeCurrentPage})` : 'viewing'}
+                        </span>
                     </div>
                 </div>
 
@@ -654,6 +808,9 @@ export default function AdminTasksPage() {
                 </div>
             )}
 
+            {/* Top Pagination Controls */}
+            {renderPaginationBar('top')}
+
             {/* Catalog Visualization Matrix */}
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-10">
                 {loading ? (
@@ -664,7 +821,7 @@ export default function AdminTasksPage() {
                         <span className="font-black uppercase tracking-[0.4em] text-slate-500 text-sm animate-pulse">Synchronizing Nodes...</span>
                     </div>
                 ) : (
-                    finalItems.map(item => (
+                    paginatedItems.map(item => (
                         <div 
                             key={item.id} 
                             className={`group relative flex flex-col bg-slate-900/20 rounded-[48px] border border-white/5 overflow-hidden transition-all duration-700 h-full ${
@@ -676,6 +833,8 @@ export default function AdminTasksPage() {
                                 <div className="aspect-[16/10] rounded-[36px] overflow-hidden relative bg-black/40 border border-white/5 ring-4 ring-black/20 group-hover:ring-[#3DD6C8]/5 transition-all duration-700 shadow-2xl">
                                     <img 
                                         src={item.image_url || generateFallbackUrl(item.title || '')} 
+                                        loading="lazy"
+                                        decoding="async"
                                         className="w-full h-full object-cover transition-all duration-1000 group-hover:scale-110 group-hover:rotate-1" 
                                         alt={item.title} 
                                     />
@@ -757,6 +916,10 @@ export default function AdminTasksPage() {
                     </div>
                 )}
             </div>
+
+            {/* Bottom Pagination Controls */}
+            {renderPaginationBar('bottom')}
+
             {/* Modify Identity (Edit) Overlay */}
             {editingId && (
                 <div className="fixed inset-0 z-[150] flex items-center justify-center p-6 backdrop-blur-3xl bg-black/60 animate-in fade-in duration-300">
