@@ -1,6 +1,6 @@
 'use client';
  
-import { HeadphonesIcon, MessageSquare, Mail, Phone, Clock, ChevronRight, Zap, Target, Activity, ShieldCheck, Send } from 'lucide-react';
+import { HeadphonesIcon, MessageSquare, Mail, Phone, Clock, ChevronRight, Zap, Target, Activity, ShieldCheck, Send, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { useSiteSettings } from '@/context/SettingsContext';
 import { useMemo } from 'react';
@@ -67,6 +67,20 @@ export default function CustomerServicePage() {
     }, [settings]);
     return (
         <div className="max-w-4xl mx-auto pb-20 animate-fade-in space-y-10">
+
+            {/* Top Navigation */}
+            <div className="flex items-center justify-between">
+                <Link 
+                    href="/home" 
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 text-white/80 hover:text-white text-xs font-black uppercase tracking-wider transition-all"
+                >
+                    <ArrowLeft size={16} /> Back to Home
+                </Link>
+                <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-black uppercase tracking-widest">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                    24/7 Live Desk
+                </div>
+            </div>
 
             {/* Header */}
             <div className="flex items-center justify-between">
