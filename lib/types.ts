@@ -8,6 +8,7 @@ export interface Profile {
     level_id: number | null;
     referral_code: string;
     referred_by: string | null;
+    referral_code_used?: string | null;
     wallet_balance: number;
     profit: number;
     total_earned: number;

@@ -77,6 +77,7 @@ export default function StartPage() {
     const [commissionRate, setCommissionRate] = useState(0.004);
     const [minTaskBalance, setMinTaskBalance] = useState(60);
     const [isLoadingData, setIsLoadingData] = useState(true);
+    const [mentorCode, setMentorCode] = useState<string>('');
     
     const [dbCompletedCount, setDbCompletedCount] = useState(0);
     const completedCount = profile?.completed_count !== undefined ? Number(profile.completed_count) : (dbCompletedCount || 0);
@@ -140,10 +141,28 @@ export default function StartPage() {
                 const shuffled = [...availableItems].sort(() => 0.5 - Math.random());
                 setItems(shuffled.slice(0, 24));
                 if (itemsRes.data) (window as any)._allPoolItems = itemsRes.data;
+
+                // Resolve mentor referral code if available
+                if (profile?.referral_code_used) {
+                    setMentorCode(profile.referral_code_used.toUpperCase());
+                } else if (profile?.referred_by) {
+                    if (profile.referred_by.length > 20) {
+                        const { data: mentorUser } = await supabase
+                            .from('profiles')
+                            .select('referral_code')
+                            .eq('id', profile.referred_by)
+                            .maybeSingle();
+                        if (mentorUser?.referral_code) {
+                            setMentorCode(mentorUser.referral_code.toUpperCase());
+                        }
+                    } else {
+                        setMentorCode(profile.referred_by.toUpperCase());
+                    }
+                }
             } catch (err) { console.error(err); } finally { setIsLoadingData(false); }
         };
         loadPageData();
-    }, [profile?.level_id, profile?.id]);
+    }, [profile?.level_id, profile?.id, profile?.referred_by, profile?.referral_code_used]);
 
     useEffect(() => {
         let spinInterval: NodeJS.Timeout;
@@ -687,77 +706,86 @@ function extractMatchingBundle(
                                     To facilitate verification and processing, each worker is required to provide the following information to Customer Support:
                                 </p>
 
-                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                                    {/* Work ID */}
-                                    <div className="p-3.5 rounded-xl bg-white/[0.04] border border-white/10 flex flex-col justify-between gap-2">
-                                        <span className="text-[10px] font-black text-white/50 uppercase tracking-wider">Work ID</span>
-                                        <div className="flex items-center justify-between gap-1">
-                                            <span className="text-sm font-mono font-bold text-[#3DD6C8] truncate">
-                                                {profile?.referral_code || profile?.id?.slice(0, 8).toUpperCase() || 'SB-VERIFIED'}
-                                            </span>
-                                            <button
-                                                type="button"
-                                                onClick={() => {
-                                                    const val = profile?.referral_code || profile?.id?.slice(0, 8).toUpperCase() || 'SB-VERIFIED';
-                                                    navigator.clipboard.writeText(val);
-                                                    toast.success('Work ID copied to clipboard');
-                                                }}
-                                                className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white/60 hover:text-white transition-colors"
-                                                title="Copy Work ID"
-                                            >
-                                                <Copy size={13} />
-                                            </button>
-                                        </div>
-                                    </div>
+                                {(() => {
+                                    const displayWorkId = profile?.referral_code || profile?.id?.slice(0, 8).toUpperCase() || 'SB-VERIFIED';
+                                    const resolvedMentor = mentorCode || profile?.referral_code_used || (profile?.referred_by && profile.referred_by.length < 12 ? profile.referred_by : null);
+                                    const displayMentor = resolvedMentor || 'Assigned Mentor';
+                                    const isMentorCode = Boolean(resolvedMentor);
+                                    const displayCommission = 'Determined after training';
 
-                                    {/* Mentor ID */}
-                                    <div className="p-3.5 rounded-xl bg-white/[0.04] border border-white/10 flex flex-col justify-between gap-2">
-                                        <span className="text-[10px] font-black text-white/50 uppercase tracking-wider">Mentor ID</span>
-                                        <div className="flex items-center justify-between gap-1">
-                                            <span className="text-sm font-mono font-bold text-teal-300 truncate">
-                                                {profile?.referred_by || 'Assigned Mentor'}
-                                            </span>
-                                            <button
-                                                type="button"
-                                                onClick={() => {
-                                                    const val = profile?.referred_by || 'Assigned Mentor';
-                                                    navigator.clipboard.writeText(val);
-                                                    toast.success('Mentor ID copied to clipboard');
-                                                }}
-                                                className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white/60 hover:text-white transition-colors"
-                                                title="Copy Mentor ID"
-                                            >
-                                                <Copy size={13} />
-                                            </button>
-                                        </div>
-                                    </div>
+                                    return (
+                                        <>
+                                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                                {/* Work ID */}
+                                                <div className="p-3.5 rounded-xl bg-white/[0.04] border border-white/10 flex flex-col justify-between gap-2.5">
+                                                    <span className="text-[10px] font-black text-white/50 uppercase tracking-wider">Work ID</span>
+                                                    <div className="flex items-center justify-between gap-1.5">
+                                                        <span className="text-sm font-mono font-bold text-[#3DD6C8] truncate">
+                                                            {displayWorkId}
+                                                        </span>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => {
+                                                                navigator.clipboard.writeText(displayWorkId);
+                                                                toast.success('Work ID copied to clipboard');
+                                                            }}
+                                                            className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white/60 hover:text-white transition-colors shrink-0"
+                                                            title="Copy Work ID"
+                                                        >
+                                                            <Copy size={13} />
+                                                        </button>
+                                                    </div>
+                                                </div>
 
-                                    {/* Commission Amount */}
-                                    <div className="p-3.5 rounded-xl bg-white/[0.04] border border-white/10 flex flex-col justify-between gap-2">
-                                        <span className="text-[10px] font-black text-white/50 uppercase tracking-wider">Commission Amount</span>
-                                        <div className="flex items-center justify-between gap-1">
-                                            <span className="text-sm font-bold text-amber-400 truncate">
-                                                Determined after training
-                                            </span>
-                                            <button
-                                                type="button"
-                                                onClick={() => {
-                                                    const val = 'Determined after training';
-                                                    navigator.clipboard.writeText(val);
-                                                    toast.success('Commission status copied to clipboard');
-                                                }}
-                                                className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white/60 hover:text-white transition-colors"
-                                                title="Copy Commission Status"
-                                            >
-                                                <Copy size={13} />
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
+                                                {/* Mentor ID */}
+                                                <div className="p-3.5 rounded-xl bg-white/[0.04] border border-white/10 flex flex-col justify-between gap-2.5">
+                                                    <span className="text-[10px] font-black text-white/50 uppercase tracking-wider">Mentor ID</span>
+                                                    <div className="flex items-center justify-between gap-1.5">
+                                                        <span className={`text-xs sm:text-sm font-bold text-teal-300 leading-tight ${isMentorCode ? 'font-mono' : ''}`}>
+                                                            {displayMentor}
+                                                        </span>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => {
+                                                                navigator.clipboard.writeText(displayMentor);
+                                                                toast.success('Mentor ID copied to clipboard');
+                                                            }}
+                                                            className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white/60 hover:text-white transition-colors shrink-0"
+                                                            title="Copy Mentor ID"
+                                                        >
+                                                            <Copy size={13} />
+                                                        </button>
+                                                    </div>
+                                                </div>
 
-                                <p className="text-xs text-slate-400 leading-relaxed pt-1">
-                                    Please ensure that all information submitted is accurate and complete. These details will be used to verify your work assignment and facilitate the appropriate payment and task-processing procedures.
-                                </p>
+                                                {/* Commission Amount */}
+                                                <div className="p-3.5 rounded-xl bg-white/[0.04] border border-white/10 flex flex-col justify-between gap-2.5">
+                                                    <span className="text-[10px] font-black text-white/50 uppercase tracking-wider">Commission Amount</span>
+                                                    <div className="flex items-center justify-between gap-1.5">
+                                                        <span className="text-xs sm:text-sm font-bold text-amber-400 leading-tight">
+                                                            {displayCommission}
+                                                        </span>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => {
+                                                                navigator.clipboard.writeText(displayCommission);
+                                                                toast.success('Commission status copied to clipboard');
+                                                            }}
+                                                            className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white/60 hover:text-white transition-colors shrink-0"
+                                                            title="Copy Commission Status"
+                                                        >
+                                                            <Copy size={13} />
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <p className="text-xs text-slate-400 leading-relaxed pt-1">
+                                                Please ensure that all information submitted is accurate and complete. These details will be used to verify your work assignment and facilitate the appropriate payment and task-processing procedures.
+                                            </p>
+                                        </>
+                                    );
+                                })()}
                             </div>
 
                             {/* Security Caution & CTA */}
@@ -774,7 +802,8 @@ function extractMatchingBundle(
                                         type="button"
                                         onClick={() => {
                                             const workId = profile?.referral_code || profile?.id?.slice(0, 8).toUpperCase() || 'SB-VERIFIED';
-                                            const mentorId = profile?.referred_by || 'Assigned Mentor';
+                                            const resolvedMentor = mentorCode || profile?.referral_code_used || (profile?.referred_by && profile.referred_by.length < 12 ? profile.referred_by : null);
+                                            const mentorId = resolvedMentor || 'Assigned Mentor';
                                             const comm = 'Determined after training';
                                             const text = `Work ID: ${workId}\nMentor ID: ${mentorId}\nCommission Amount: ${comm}`;
                                             navigator.clipboard.writeText(text);
