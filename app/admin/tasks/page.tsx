@@ -102,18 +102,33 @@ export default function AdminTasksPage() {
 
     const fetchItems = async () => {
         setLoading(true);
-        const { data, error } = await supabase
-            .from('task_items')
-            .select('*')
-            .order('id', { ascending: true })
-            .limit(5000);
-            
-        if (data) setItems(data);
-        if (error) {
-            console.error('Error fetching items:', error.message || error, error);
-            toast.error('Identity Error: Could not synchronize catalog node.');
+        try {
+            let allItems: any[] = [];
+            let from = 0;
+            const batchSize = 1000;
+            while (true) {
+                const { data, error } = await supabase
+                    .from('task_items')
+                    .select('*')
+                    .order('id', { ascending: true })
+                    .range(from, from + batchSize - 1);
+
+                if (error) {
+                    console.error('Error fetching items:', error.message || error, error);
+                    toast.error('Identity Error: Could not synchronize catalog node.');
+                    break;
+                }
+                if (!data || data.length === 0) break;
+                allItems = allItems.concat(data);
+                if (data.length < batchSize) break;
+                from += batchSize;
+            }
+            setItems(allItems);
+        } catch (err: any) {
+            console.error('Fetch error:', err);
+        } finally {
+            setLoading(false);
         }
-        setLoading(false);
     };
 
     const fetchLevels = async () => {
