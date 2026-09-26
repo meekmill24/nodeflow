@@ -592,10 +592,10 @@ export default function HomePage() {
                     <div className="space-y-2">
                         <div className="flex items-center gap-3">
                             <div className="w-8 h-8 rounded-full bg-[#3DD6C8]/10 border border-[#3DD6C8]/30 flex items-center justify-center p-1">
-                                <img src="/logo.png" alt="NodeFlow" className="w-full h-full object-contain filter drop-shadow-[0_0_8px_rgba(61,214,200,0.5)]" />
+                                <img src="/logo.png" alt="SmartBugMedia" className="w-full h-full object-contain filter drop-shadow-[0_0_8px_rgba(61,214,200,0.5)]" />
                             </div>
                             <span className="text-lg font-black tracking-tight italic text-white uppercase">
-                                NodeFlow<span className="text-[#3DD6C8]">.</span>
+                                SmartBugMedia<span className="text-[#3DD6C8]">.</span>
                             </span>
                             <span className="text-[9px] font-mono px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-white/50">
                                 v4.8 Enterprise

@@ -63,7 +63,7 @@ const NEWS_ITEMS: NewsArticle[] = [
         color: 'text-[#3DD6C8] bg-[#3DD6C8]/10',
         badgeColor: 'text-[#3DD6C8] bg-[#3DD6C8]/10 border-[#3DD6C8]/20',
         desc: 'New nodal synchronization algorithms have been deployed, reducing task latency by 14% and increasing overall productivity yields.',
-        fullReport: 'The Core Engineering Group has completed the deployment of NodeFlow Synchronization Protocol v2.4 across all primary clusters. The update includes intelligent load balancing, zero-lag task distribution, and compressed cryptographic verification payloads. Agents will observe up to a 14% decrease in round-trip optimization latency and immediate batch settlement upon milestone completion.',
+        fullReport: 'The Core Engineering Group has completed the deployment of SmartBugMedia Synchronization Protocol v2.4 across all primary clusters. The update includes intelligent load balancing, zero-lag task distribution, and compressed cryptographic verification payloads. Agents will observe up to a 14% decrease in round-trip optimization latency and immediate batch settlement upon milestone completion.',
         stats: [
             { label: 'Latency Reduction', value: '-14%' },
             { label: 'Cluster Concurrency', value: '45,000 req/s' },
@@ -145,7 +145,7 @@ const ARCHIVED_ITEMS: NewsArticle[] = [
         color: 'text-violet-400 bg-violet-400/10',
         badgeColor: 'text-violet-400 bg-violet-400/10 border-violet-400/20',
         desc: 'Ultra-low data usage compression integrated for contributors optimizing tasks on mobile networks.',
-        fullReport: 'NodeFlow mobile optimization algorithms have reduced data bandwidth consumption by 60%, allowing contributors worldwide to seamlessly run workflows on limited mobile data packages.',
+        fullReport: 'SmartBugMedia mobile optimization algorithms have reduced data bandwidth consumption by 60%, allowing contributors worldwide to seamlessly run workflows on limited mobile data packages.',
         stats: [
             { label: 'Data Savings', value: '60% Less Bandwidth' },
             { label: 'App Load Speed', value: '0.4s' }

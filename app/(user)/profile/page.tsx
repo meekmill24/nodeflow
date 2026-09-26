@@ -216,7 +216,7 @@ export default function ProfilePage() {
                     </div>
                     <div className="flex flex-col items-start">
                         <span className="text-xl font-black text-white italic uppercase tracking-tighter font-black">Deactivate Identity</span>
-                        <span className="text-[9px] font-black text-rose-500/60 uppercase tracking-[0.3em] italic leading-none">Shutdown Signal Node Flow</span>
+                        <span className="text-[9px] font-black text-rose-500/60 uppercase tracking-[0.3em] italic leading-none">Disconnect Session • SmartBugMedia</span>
                     </div>
                 </div>
                 <div className="w-12 h-12 rounded-full border border-rose-500/30 flex items-center justify-center text-rose-500 group-hover:translate-x-2 transition-transform">
