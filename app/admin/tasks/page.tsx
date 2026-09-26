@@ -836,90 +836,227 @@ export default function AdminTasksPage() {
                         <span className="font-black uppercase tracking-[0.4em] text-slate-500 text-sm animate-pulse">Synchronizing Nodes...</span>
                     </div>
                 ) : (
-                    paginatedItems.map(item => (
-                        <div 
-                            key={item.id} 
-                            className={`group relative flex flex-col bg-slate-900/20 rounded-[48px] border border-white/5 overflow-hidden transition-all duration-700 h-full ${
-                                !item.is_active ? 'grayscale opacity-30 px-2' : 'hover:border-[#3DD6C8]/40 hover:bg-slate-900/40 hover:-translate-y-3 hover:shadow-[0_40px_80px_-20px_rgba(61,214,200,0.15)] focus-within:ring-2 focus-within:ring-[#3DD6C8]/20'
-                            }`}
-                        >
-                            {/* Card Header: Image Node */}
-                            <div className="p-4">
-                                <div className="aspect-[16/10] rounded-[36px] overflow-hidden relative bg-black/40 border border-white/5 ring-4 ring-black/20 group-hover:ring-[#3DD6C8]/5 transition-all duration-700 shadow-2xl">
-                                    <img 
-                                        src={item.image_url || generateFallbackUrl(item.title || '')} 
-                                        loading="lazy"
-                                        decoding="async"
-                                        className="w-full h-full object-cover transition-all duration-1000 group-hover:scale-110 group-hover:rotate-1" 
-                                        alt={item.title} 
-                                    />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity" />
-                                    
-                                    {/* Shard Badge */}
-                                    <div className="absolute top-5 right-5 flex gap-2">
-                                        <div className="px-5 py-2.5 bg-black/60 backdrop-blur-xl rounded-2xl text-[10px] font-black uppercase tracking-widest text-[#3DD6C8] border border-[#3DD6C8]/20 shadow-xl group-hover:bg-[#3DD6C8] group-hover:text-black transition-all duration-500">
-                                            VIP {item.level_id}
+                    paginatedItems.map(item => {
+                        const isEditing = editingId === item.id;
+
+                        if (isEditing) {
+                            return (
+                                <div 
+                                    key={item.id} 
+                                    className="group relative flex flex-col bg-slate-900/95 rounded-[44px] border border-[#3DD6C8]/50 shadow-[0_20px_60px_rgba(61,214,200,0.25)] ring-2 ring-[#3DD6C8]/40 p-6 transition-all duration-300 animate-in zoom-in-95 h-full z-20"
+                                >
+                                    {/* Header */}
+                                    <div className="flex items-center justify-between mb-4 pb-3 border-b border-white/5">
+                                        <div>
+                                            <div className="flex items-center gap-2">
+                                                <div className="w-2 h-2 rounded-full bg-[#3DD6C8] animate-pulse" />
+                                                <span className="text-[10px] font-black uppercase tracking-widest text-[#3DD6C8]">
+                                                    Edit Unit #{item.id}
+                                                </span>
+                                            </div>
+                                            <span className="text-[9px] font-semibold text-slate-500 uppercase tracking-wider">
+                                                In-Place Editor
+                                            </span>
+                                        </div>
+                                        <button 
+                                            type="button"
+                                            onClick={() => setEditingId(null)}
+                                            className="w-8 h-8 rounded-xl bg-white/5 text-slate-400 hover:text-white hover:bg-white/10 flex items-center justify-center transition-all active:scale-95"
+                                            title="Cancel edit"
+                                        >
+                                            <X size={16} />
+                                        </button>
+                                    </div>
+
+                                    {/* Image Preview & URL */}
+                                    <div className="space-y-2 mb-4">
+                                        <ImagePreview url={editData.image_url || ''} alt={editData.title || ''} size="sm" />
+                                        <div className="flex gap-2">
+                                            <input 
+                                                type="text"
+                                                placeholder="Image URL..."
+                                                className="flex-1 bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-xs text-white font-mono focus:outline-none focus:border-[#3DD6C8] transition-all"
+                                                value={editData.image_url || ''}
+                                                onChange={e => setEditData({ ...editData, image_url: e.target.value })}
+                                            />
+                                            <button 
+                                                type="button"
+                                                onClick={() => setEditData({ ...editData, image_url: generateFallbackUrl(editData.title || `item-${editingId}`) })}
+                                                className="w-9 h-9 rounded-xl bg-white/5 border border-white/10 text-white flex items-center justify-center hover:bg-white/10 transition-all flex-shrink-0"
+                                                title="Regenerate random fallback"
+                                            >
+                                                <RefreshCw size={14} />
+                                            </button>
                                         </div>
                                     </div>
-                                    
-                                    {/* Action Shortcuts (Overlay) */}
-                                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 translate-y-10 group-hover:translate-y-0 transition-all duration-500 pointer-events-none group-hover:pointer-events-auto">
-                                        <div className="flex bg-black/80 backdrop-blur-2xl p-2.5 rounded-3xl border border-white/10 shadow-2xl ring-1 ring-[#3DD6C8]/10">
-                                            <button 
-                                                onClick={() => { setEditingId(item.id); setEditData(item); }}
-                                                className="w-12 h-12 flex items-center justify-center text-white hover:text-[#3DD6C8] hover:bg-white/5 rounded-2xl transition-all"
-                                                title="Edit Node"
-                                            >
-                                                <Edit2 size={18} />
-                                            </button>
-                                            <div className="w-px h-6 bg-white/10 self-center mx-1" />
-                                            <button 
-                                                onClick={() => toggleActive(item.id, item.is_active)}
-                                                className={`w-12 h-12 flex items-center justify-center rounded-2xl transition-all ${
-                                                    item.is_active ? 'text-[#3DD6C8] hover:bg-[#3DD6C8]/10' : 'text-slate-500 hover:bg-slate-500/10'
-                                                }`}
-                                                title={item.is_active ? "Suspend Shard" : "Activate Shard"}
-                                            >
-                                                {item.is_active ? <Eye size={18} /> : <EyeOff size={18} />}
-                                            </button>
+
+                                    {/* Title */}
+                                    <div className="space-y-1 mb-3">
+                                        <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Asset Title</label>
+                                        <input 
+                                            type="text"
+                                            className="w-full bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-xs text-white font-bold focus:outline-none focus:border-[#3DD6C8] transition-all"
+                                            value={editData.title || ''}
+                                            onChange={e => setEditData({ ...editData, title: e.target.value })}
+                                        />
+                                    </div>
+
+                                    {/* Category & VIP Level */}
+                                    <div className="grid grid-cols-2 gap-2 mb-3">
+                                        <div className="space-y-1">
+                                            <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Category</label>
+                                            <div className="relative">
+                                                <select 
+                                                    className="w-full bg-slate-950 border border-white/10 rounded-xl px-2.5 py-2 text-[11px] text-white font-bold appearance-none hover:border-[#3DD6C8]/40 transition-all cursor-pointer"
+                                                    value={editData.category || 'general'}
+                                                    onChange={e => setEditData({ ...editData, category: e.target.value })}
+                                                >
+                                                    {['electrical', 'furniture', 'gym', 'fashion', 'automotive', 'general'].map(c => (
+                                                        <option key={c} value={c}>{c.toUpperCase()}</option>
+                                                    ))}
+                                                </select>
+                                                <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none" size={12} />
+                                            </div>
+                                        </div>
+                                        <div className="space-y-1">
+                                            <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest">VIP Tier</label>
+                                            <div className="relative">
+                                                <select 
+                                                    className="w-full bg-slate-950 border border-white/10 rounded-xl px-2.5 py-2 text-[11px] text-white font-bold appearance-none hover:border-[#3DD6C8]/40 transition-all cursor-pointer"
+                                                    value={editData.level_id ?? 1}
+                                                    onChange={e => setEditData({ ...editData, level_id: parseInt(e.target.value) })}
+                                                >
+                                                    {levels.map(l => (
+                                                        <option key={l.id} value={l.id}>VIP {l.id}</option>
+                                                    ))}
+                                                </select>
+                                                <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none" size={12} />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Description */}
+                                    <div className="space-y-1 mb-4 flex-1">
+                                        <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Description</label>
+                                        <textarea 
+                                            className="w-full bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-[11px] text-slate-300 h-20 resize-none focus:outline-none focus:border-[#3DD6C8] transition-all"
+                                            value={editData.description || ''}
+                                            onChange={e => setEditData({ ...editData, description: e.target.value })}
+                                        />
+                                    </div>
+
+                                    {/* Action Buttons */}
+                                    <div className="flex items-center gap-2 mt-auto pt-2">
+                                        <button 
+                                            type="button"
+                                            onClick={() => setEditingId(null)}
+                                            className="flex-1 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white text-[10px] font-black uppercase tracking-wider transition-all border border-white/5 active:scale-95"
+                                        >
+                                            Abort
+                                        </button>
+                                        <button 
+                                            type="button"
+                                            onClick={handleSave}
+                                            disabled={saving}
+                                            className="flex-[2] py-2.5 rounded-xl bg-[#3DD6C8] hover:bg-white text-slate-950 text-[10px] font-black uppercase tracking-wider shadow-lg shadow-[#3DD6C8]/20 transition-all active:scale-95 flex items-center justify-center gap-1.5"
+                                        >
+                                            {saving ? (
+                                                <RefreshCw size={12} className="animate-spin" />
+                                            ) : (
+                                                <Save size={12} />
+                                            )}
+                                            {saving ? 'Saving...' : 'Commit'}
+                                        </button>
+                                    </div>
+                                </div>
+                            );
+                        }
+
+                        return (
+                            <div 
+                                key={item.id} 
+                                className={`group relative flex flex-col bg-slate-900/20 rounded-[48px] border border-white/5 overflow-hidden transition-all duration-700 h-full ${
+                                    !item.is_active ? 'grayscale opacity-30 px-2' : 'hover:border-[#3DD6C8]/40 hover:bg-slate-900/40 hover:-translate-y-3 hover:shadow-[0_40px_80px_-20px_rgba(61,214,200,0.15)] focus-within:ring-2 focus-within:ring-[#3DD6C8]/20'
+                                }`}
+                            >
+                                {/* Card Header: Image Node */}
+                                <div className="p-4">
+                                    <div className="aspect-[16/10] rounded-[36px] overflow-hidden relative bg-black/40 border border-white/5 ring-4 ring-black/20 group-hover:ring-[#3DD6C8]/5 transition-all duration-700 shadow-2xl">
+                                        <img 
+                                            src={item.image_url || generateFallbackUrl(item.title || '')} 
+                                            loading="lazy"
+                                            decoding="async"
+                                            className="w-full h-full object-cover transition-all duration-1000 group-hover:scale-110 group-hover:rotate-1" 
+                                            alt={item.title} 
+                                        />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity" />
+                                        
+                                        {/* Shard Badge */}
+                                        <div className="absolute top-5 right-5 flex gap-2">
+                                            <div className="px-5 py-2.5 bg-black/60 backdrop-blur-xl rounded-2xl text-[10px] font-black uppercase tracking-widest text-[#3DD6C8] border border-[#3DD6C8]/20 shadow-xl group-hover:bg-[#3DD6C8] group-hover:text-black transition-all duration-500">
+                                                VIP {item.level_id}
+                                            </div>
+                                        </div>
+                                        
+                                        {/* Action Shortcuts (Overlay) */}
+                                        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 translate-y-10 group-hover:translate-y-0 transition-all duration-500 pointer-events-none group-hover:pointer-events-auto">
+                                            <div className="flex bg-black/80 backdrop-blur-2xl p-2.5 rounded-3xl border border-white/10 shadow-2xl ring-1 ring-[#3DD6C8]/10">
+                                                <button 
+                                                    onClick={() => { setEditingId(item.id); setEditData(item); }}
+                                                    className="w-12 h-12 flex items-center justify-center text-white hover:text-[#3DD6C8] hover:bg-white/5 rounded-2xl transition-all"
+                                                    title="Edit Node In-Place"
+                                                >
+                                                    <Edit2 size={18} />
+                                                </button>
+                                                <div className="w-px h-6 bg-white/10 self-center mx-1" />
+                                                <button 
+                                                    onClick={() => toggleActive(item.id, item.is_active)}
+                                                    className={`w-12 h-12 flex items-center justify-center rounded-2xl transition-all ${
+                                                        item.is_active ? 'text-[#3DD6C8] hover:bg-[#3DD6C8]/10' : 'text-slate-500 hover:bg-slate-500/10'
+                                                    }`}
+                                                    title={item.is_active ? "Suspend Shard" : "Activate Shard"}
+                                                >
+                                                    {item.is_active ? <Eye size={18} /> : <EyeOff size={18} />}
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            
-                            {/* Card Body: Identity Metadata */}
-                            <div className="p-8 pb-10 flex-1 flex flex-col">
-                                <div className="flex items-center gap-2 mb-4">
-                                     <div className={`w-1.5 h-1.5 rounded-full ${item.is_active ? 'bg-[#3DD6C8]' : 'bg-red-500'} animate-pulse`} />
-                                     <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 opacity-60">
-                                         {item.category || 'Generic'} // Unit ID: {item.id}
-                                     </span>
-                                </div>
-                                <h4 className="text-xl font-black text-white leading-tight italic tracking-tight mb-4 group-hover:text-[#3DD6C8] transition-colors duration-500 line-clamp-2">
-                                    {item.title}
-                                </h4>
-                                <p className="text-[11px] text-slate-400 font-medium leading-relaxed opacity-60 line-clamp-3 mb-8">
-                                    {item.description}
-                                </p>
                                 
-                                <div className="mt-auto flex items-center gap-4">
-                                    <button 
-                                        onClick={() => { setEditingId(item.id); setEditData(item); }}
-                                        className="flex-1 py-4 bg-white/5 hover:bg-white/10 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all border border-white/5 active:scale-95"
-                                    >
-                                        Modify Identity
-                                    </button>
-                                    <button 
-                                        onClick={() => handleDelete(item.id)}
-                                        className="w-14 h-14 flex items-center justify-center rounded-2xl bg-red-500/5 border border-red-500/10 text-red-500/40 hover:text-red-500 hover:bg-red-500/10 transition-all hover:border-red-500/20 shadow-2xl active:scale-95"
-                                        title="Terminte Shard"
-                                    >
-                                        <Trash2 size={20} />
-                                    </button>
+                                {/* Card Body: Identity Metadata */}
+                                <div className="p-8 pb-10 flex-1 flex flex-col">
+                                    <div className="flex items-center gap-2 mb-4">
+                                         <div className={`w-1.5 h-1.5 rounded-full ${item.is_active ? 'bg-[#3DD6C8]' : 'bg-red-500'} animate-pulse`} />
+                                         <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 opacity-60">
+                                             {item.category || 'Generic'} // Unit ID: {item.id}
+                                         </span>
+                                    </div>
+                                    <h4 className="text-xl font-black text-white leading-tight italic tracking-tight mb-4 group-hover:text-[#3DD6C8] transition-colors duration-500 line-clamp-2">
+                                        {item.title}
+                                    </h4>
+                                    <p className="text-[11px] text-slate-400 font-medium leading-relaxed opacity-60 line-clamp-3 mb-8">
+                                        {item.description}
+                                    </p>
+                                    
+                                    <div className="mt-auto flex items-center gap-4">
+                                        <button 
+                                            onClick={() => { setEditingId(item.id); setEditData(item); }}
+                                            className="flex-1 py-4 bg-white/5 hover:bg-white/10 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all border border-white/5 active:scale-95"
+                                        >
+                                            Modify Identity
+                                        </button>
+                                        <button 
+                                            onClick={() => handleDelete(item.id)}
+                                            className="w-14 h-14 flex items-center justify-center rounded-2xl bg-red-500/5 border border-red-500/10 text-red-500/40 hover:text-red-500 hover:bg-red-500/10 transition-all hover:border-red-500/20 shadow-2xl active:scale-95"
+                                            title="Terminte Shard"
+                                        >
+                                            <Trash2 size={20} />
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    ))
+                        );
+                    })
                 )}
                 {!loading && finalItems.length === 0 && (
                     <div className="col-span-full py-40 text-center flex flex-col items-center justify-center p-10 bg-slate-900/10 border border-dashed border-white/5 rounded-[48px]">
@@ -934,102 +1071,6 @@ export default function AdminTasksPage() {
 
             {/* Bottom Pagination Controls */}
             {renderPaginationBar('bottom')}
-
-            {/* Modify Identity (Edit) Overlay */}
-            {editingId && (
-                <div 
-                    onClick={(e) => { if (e.target === e.currentTarget) setEditingId(null); }}
-                    className="fixed inset-0 z-[150] flex items-center justify-center p-4 md:p-6 backdrop-blur-3xl bg-black/70 animate-in fade-in duration-300"
-                >
-                    <div className="bg-slate-900/90 border border-[#3DD6C8]/30 p-6 md:p-10 rounded-[36px] md:rounded-[48px] backdrop-blur-3xl w-full max-w-5xl max-h-[90vh] overflow-y-auto relative group shadow-[0_50px_150px_rgba(0,0,0,0.9)] animate-in zoom-in-95 duration-200">
-                        <div className="sticky top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#3DD6C8]/50 to-transparent -mt-6 -mx-6 md:-mt-10 md:-mx-10 mb-6" />
-                        
-                        <div className="flex items-center justify-between mb-10">
-                            <div className="space-y-1">
-                                <h3 className="text-2xl font-black text-white italic tracking-tighter uppercase leading-none">Modify Identity</h3>
-                                <p className="text-[10px] font-black text-[#3DD6C8] uppercase tracking-widest">Recalibrating Node ID: {editingId}</p>
-                            </div>
-                            <button onClick={() => setEditingId(null)} className="w-12 h-12 rounded-2xl bg-slate-950 border border-white/5 text-slate-500 hover:text-white hover:border-white/20 transition-all flex items-center justify-center active:scale-95">
-                                <X size={20} />
-                            </button>
-                        </div>
-
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-                            <div className="space-y-6">
-                                <div className="space-y-2">
-                                    <label className="text-[11px] font-black text-slate-500 uppercase tracking-widest ml-1">Asset Identity</label>
-                                    <input 
-                                        className="w-full bg-slate-950 border border-white/10 rounded-2xl px-6 py-4 text-white focus:outline-none focus:ring-2 focus:ring-[#3DD6C8]/20 focus:border-[#3DD6C8] transition-all font-bold" 
-                                        value={editData.title}
-                                        onChange={e => setEditData({ ...editData, title: e.target.value })}
-                                    />
-                                </div>
-
-                                <div className="grid grid-cols-2 gap-6">
-                                    <div className="space-y-2">
-                                        <label className="text-[11px] font-black text-slate-500 uppercase tracking-widest ml-1">Classification</label>
-                                        <div className="relative">
-                                            <select className="w-full bg-slate-950 border border-white/10 rounded-2xl px-6 py-4 text-white hover:border-[#3DD6C8]/30 transition-all cursor-pointer font-bold appearance-none" value={editData.category} onChange={e => setEditData({ ...editData, category: e.target.value })}>
-                                                {['electrical', 'furniture', 'gym', 'fashion', 'automotive', 'general'].map(c => <option key={c} value={c}>{c.toUpperCase()}</option>)}
-                                            </select>
-                                            <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none" size={16} />
-                                        </div>
-                                    </div>
-                                    <div className="space-y-2 relative">
-                                        <label className="text-[11px] font-black text-slate-500 uppercase tracking-widest ml-1">VIP Tier</label>
-                                        <div className="relative">
-                                            <select className="w-full bg-slate-950 border border-white/10 rounded-2xl px-6 py-4 text-white hover:border-[#3DD6C8]/30 transition-all cursor-pointer font-bold appearance-none" value={editData.level_id ?? ''} onChange={e => setEditData({ ...editData, level_id: parseInt(e.target.value) })}>
-                                                {levels.map(l => <option key={l.id} value={l.id}>VIP LEVEL {l.id} - ${l.price}</option>)}
-                                            </select>
-                                            <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none" size={16} />
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="space-y-2">
-                                    <label className="text-[11px] font-black text-slate-500 uppercase tracking-widest ml-1">Asset Description</label>
-                                    <textarea 
-                                        className="w-full bg-slate-950 border border-white/10 rounded-2xl px-6 py-4 text-white focus:outline-none focus:ring-2 focus:ring-[#3DD6C8]/20 focus:border-[#3DD6C8] transition-all h-32 resize-none" 
-                                        value={editData.description}
-                                        onChange={e => setEditData({ ...editData, description: e.target.value })}
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="space-y-6">
-                                <div className="space-y-2">
-                                    <label className="text-[11px] font-black text-slate-500 uppercase tracking-widest ml-1">Image URL</label>
-                                    <div className="flex gap-2">
-                                        <input 
-                                            className="flex-1 bg-slate-950 border border-white/10 rounded-2xl px-6 py-4 text-white font-mono" 
-                                            value={editData.image_url}
-                                            onChange={e => setEditData({ ...editData, image_url: e.target.value })}
-                                        />
-                                        <button 
-                                            type="button"
-                                            onClick={() => setEditData({ ...editData, image_url: generateFallbackUrl(editData.title || `item-${editingId}`) })}
-                                            className="w-[60px] h-[60px] rounded-2xl bg-white/5 border border-white/10 text-white flex items-center justify-center hover:bg-white/10 transition-all"
-                                        >
-                                            <RefreshCw size={20} />
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <ImagePreview url={editData.image_url || ''} alt={editData.title || ''} size="lg" />
-
-                                <div className="flex gap-4">
-                                    <button onClick={() => setEditingId(null)} className="flex-1 h-16 bg-slate-800 text-white rounded-2xl font-black uppercase tracking-widest hover:bg-slate-700 transition-all">
-                                        Abort
-                                    </button>
-                                    <button onClick={handleSave} disabled={saving} className="flex-[2] h-16 bg-[#3DD6C8] text-[#0F0F23] rounded-2xl font-black uppercase tracking-widest shadow-xl shadow-[#3DD6C8]/20 hover:scale-[1.02] active:scale-95 transition-all">
-                                        Commit Changes
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
 
             {/* Interaction Confirmation Matrix */}
             {confirmModal && (
