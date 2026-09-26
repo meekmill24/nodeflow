@@ -6,6 +6,7 @@ import { supabase } from '@/lib/supabase/index';
 import { useAuth } from '@/context/AuthContext';
 import { useLanguage } from '@/context/LanguageContext';
 import { useCurrency } from '@/context/CurrencyContext';
+import { LiveActivityMap } from '@/components/landing/LiveActivityMap';
 import { 
     ArrowUpRight, 
     ArrowDownLeft, 
@@ -454,6 +455,213 @@ export default function HomePage() {
                             </div>
                         </div>
                     ))}
+                </div>
+            </div>
+
+            {/* 1. LIVE GLOBAL ACTIVITY MAP */}
+            <div className="pt-8">
+                <LiveActivityMap />
+            </div>
+
+            {/* 2. INSTITUTIONAL COMMERCE ALLIANCE & LIQUIDITY PROVIDERS */}
+            <div className="space-y-6 pt-6">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-2">
+                    <div>
+                        <div className="flex items-center gap-2 mb-1">
+                            <span className="w-1.5 h-1.5 rounded-full bg-[#3DD6C8] animate-pulse shadow-[0_0_8px_rgba(61,214,200,0.8)]" />
+                            <span className="text-[10px] font-black text-[#3DD6C8] uppercase tracking-[0.3em]">Institutional Commerce Alliance</span>
+                        </div>
+                        <h3 className="text-2xl font-black text-white uppercase italic tracking-tight">
+                            Verified Merchant <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#3DD6C8] to-emerald-400">Order Routing</span>
+                        </h3>
+                    </div>
+                    <div className="flex items-center gap-2 px-4 py-2 rounded-2xl bg-white/5 border border-white/10 self-start sm:self-auto">
+                        <ShieldCheck size={14} className="text-emerald-400" />
+                        <span className="text-[10px] font-black text-white/80 uppercase tracking-widest">Tier-1 Enterprise Liquidity</span>
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    {[
+                        { name: 'Amazon Global', cat: 'Tier-1 Commerce', desc: 'Enterprise Retail Engine', icon: 'AMZ', tag: 'Direct Route', color: 'from-amber-500/10 to-orange-500/5', border: 'hover:border-amber-500/30' },
+                        { name: 'Shopify Plus', cat: 'Merchant Cloud', desc: 'High-Volume Gateway', icon: 'SHOP', tag: 'Active Settle', color: 'from-emerald-500/10 to-teal-500/5', border: 'hover:border-emerald-500/30' },
+                        { name: 'Walmart Hub', cat: 'Retail Protocol', desc: 'Omni-Channel Liquidity', icon: 'WMT', tag: 'Fast-Track', color: 'from-blue-500/10 to-cyan-500/5', border: 'hover:border-blue-500/30' },
+                        { name: 'Rakuten Corp', cat: 'Affiliate Network', desc: 'Cashback Rebate Node', icon: 'RAK', tag: 'Multi-Asset', color: 'from-rose-500/10 to-pink-500/5', border: 'hover:border-rose-500/30' },
+                        { name: 'eBay Enterprise', cat: 'Marketplace Node', desc: 'Global Inventory Pool', icon: 'EBAY', tag: 'Verified Yield', color: 'from-yellow-500/10 to-amber-500/5', border: 'hover:border-yellow-500/30' },
+                        { name: 'TikTok Shop', cat: 'Creator Commerce', desc: 'Viral Product Routing', icon: 'TTS', tag: 'High Velocity', color: 'from-cyan-500/10 to-blue-500/5', border: 'hover:border-cyan-500/30' },
+                        { name: 'Mercado Libre', cat: 'LATAM Alliance', desc: 'Cross-Border Cluster', icon: 'MELI', tag: 'Zero-Lag', color: 'from-indigo-500/10 to-purple-500/5', border: 'hover:border-indigo-500/30' },
+                        { name: 'Target Supply', cat: 'Direct Sourcing', desc: 'Automated Clearance', icon: 'TGT', tag: 'Institutional', color: 'from-red-500/10 to-rose-500/5', border: 'hover:border-red-500/30' },
+                    ].map((brand, i) => (
+                        <div 
+                            key={i} 
+                            className={`p-5 rounded-[28px] bg-gradient-to-br ${brand.color} bg-[#0B0B1E] border border-white/5 ${brand.border} transition-all duration-500 flex flex-col justify-between gap-4 group hover:-translate-y-1 shadow-lg`}
+                        >
+                            <div className="flex items-center justify-between">
+                                <span className="px-2 py-0.5 rounded-lg bg-white/5 border border-white/10 text-[8px] font-black text-white/60 tracking-wider uppercase font-mono">
+                                    {brand.icon}
+                                </span>
+                                <span className="text-[8px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20 uppercase tracking-widest flex items-center gap-1">
+                                    <span className="w-1 h-1 rounded-full bg-emerald-400 animate-pulse" />
+                                    {brand.tag}
+                                </span>
+                            </div>
+                            <div>
+                                <h4 className="text-sm font-black text-white uppercase tracking-tight group-hover:text-[#3DD6C8] transition-colors">{brand.name}</h4>
+                                <p className="text-[9px] font-bold text-white/40 uppercase tracking-widest mt-0.5">{brand.cat}</p>
+                                <p className="text-[9px] text-slate-500 font-medium mt-1 leading-snug">{brand.desc}</p>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            {/* 3. INSTITUTIONAL SECURITY & MULTI-SIG COMPLIANCE */}
+            <div className="relative overflow-hidden rounded-[40px] bg-gradient-to-b from-[#0f111a] to-[#08090f] border border-white/5 p-8 md:p-12 shadow-2xl">
+                <div className="absolute top-0 right-0 w-96 h-96 bg-[#3DD6C8]/5 blur-[100px] rounded-full pointer-events-none" />
+                
+                <div className="relative z-10 space-y-8">
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div className="space-y-1">
+                            <div className="flex items-center gap-2">
+                                <ShieldCheck size={16} className="text-emerald-400" />
+                                <span className="text-[10px] font-black text-emerald-400 uppercase tracking-[0.3em]">Operational Security Standard</span>
+                            </div>
+                            <h3 className="text-2xl sm:text-3xl font-black text-white italic uppercase tracking-tight">
+                                Institutional Trust & <span className="text-[#3DD6C8]">Asset Protection</span>
+                            </h3>
+                        </div>
+                        <Link 
+                            href="/compliance" 
+                            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white text-xs font-black uppercase tracking-wider transition-all self-start md:self-auto"
+                        >
+                            Audit Reports <ArrowRight size={14} />
+                        </Link>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                        {[
+                            {
+                                title: 'SOC-2 Type II Certified',
+                                desc: 'Continuous 24/7 telemetry monitoring across all cloud execution nodes and data centers.',
+                                icon: Cpu,
+                                color: 'text-cyan-400',
+                                badge: 'Verified Protocol'
+                            },
+                            {
+                                title: 'Cold Storage Multi-Sig',
+                                desc: '100% of user balances and merchant rebates are secured in segregated multi-signature vaults.',
+                                icon: Wallet,
+                                color: 'text-amber-400',
+                                badge: '1:1 Reserve Backing'
+                            },
+                            {
+                                title: '256-Bit SSL Encryption',
+                                desc: 'End-to-end cryptographic hashing on every task rating, commission settlement, and deposit.',
+                                icon: Lock,
+                                color: 'text-emerald-400',
+                                badge: 'Military-Grade'
+                            },
+                            {
+                                title: '24/7 Specialist Support',
+                                desc: 'Dedicated operational managers and live resolution desk online for sequence calibrations.',
+                                icon: Headset,
+                                color: 'text-purple-400',
+                                badge: 'Active Desk'
+                            },
+                        ].map((sec, idx) => (
+                            <div key={idx} className="p-6 rounded-[28px] bg-white/[0.02] border border-white/5 space-y-3 hover:border-white/10 transition-colors">
+                                <div className="flex items-center justify-between">
+                                    <div className={`p-2.5 rounded-xl bg-white/5 ${sec.color}`}>
+                                        <sec.icon size={20} />
+                                    </div>
+                                    <span className="text-[8px] font-black uppercase tracking-widest text-white/40 font-mono">
+                                        {sec.badge}
+                                    </span>
+                                </div>
+                                <h4 className="text-sm font-black text-white uppercase tracking-tight">{sec.title}</h4>
+                                <p className="text-[10px] text-slate-400 font-medium leading-relaxed">{sec.desc}</p>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </div>
+
+            {/* 4. MEMBER DASHBOARD FOOTER */}
+            <div className="pt-4 border-t border-white/5 space-y-8">
+                <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+                    <div className="space-y-2">
+                        <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-full bg-[#3DD6C8]/10 border border-[#3DD6C8]/30 flex items-center justify-center p-1">
+                                <img src="/logo.png" alt="NodeFlow" className="w-full h-full object-contain filter drop-shadow-[0_0_8px_rgba(61,214,200,0.5)]" />
+                            </div>
+                            <span className="text-lg font-black tracking-tight italic text-white uppercase">
+                                NodeFlow<span className="text-[#3DD6C8]">.</span>
+                            </span>
+                            <span className="text-[9px] font-mono px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-white/50">
+                                v4.8 Enterprise
+                            </span>
+                        </div>
+                        <p className="text-[10px] text-slate-500 max-w-md font-medium leading-relaxed">
+                            SmartBugMedia Institutional Digital Optimization Protocol. Powering daily global commerce routing, product ratings, and verifiable affiliate liquidity.
+                        </p>
+                    </div>
+
+                    <div className="flex items-center gap-3 flex-wrap">
+                        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[9px] font-black uppercase tracking-widest">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                            All 14 Operational Nodes Online
+                        </div>
+                        <Link 
+                            href="/service"
+                            className="flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-[#3DD6C8]/10 hover:bg-[#3DD6C8]/20 border border-[#3DD6C8]/30 text-[#3DD6C8] text-[9px] font-black uppercase tracking-widest transition-all"
+                        >
+                            <Headset size={12} /> Contact Desk
+                        </Link>
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 pt-4 border-t border-white/5 text-[10px]">
+                    <div className="space-y-2">
+                        <span className="font-black text-white uppercase tracking-widest text-[9px]">Optimization Hub</span>
+                        <ul className="space-y-1.5 text-slate-400 font-bold uppercase tracking-wider text-[9px]">
+                            <li><Link href="/start" className="hover:text-[#3DD6C8] transition-colors">Start Optimization</Link></li>
+                            <li><Link href="/record" className="hover:text-[#3DD6C8] transition-colors">Record History</Link></li>
+                            <li><Link href="/levels" className="hover:text-[#3DD6C8] transition-colors">VIP Tier Matrix</Link></li>
+                            <li><Link href="/salary" className="hover:text-[#3DD6C8] transition-colors">Salary Structure</Link></li>
+                        </ul>
+                    </div>
+                    <div className="space-y-2">
+                        <span className="font-black text-white uppercase tracking-widest text-[9px]">Financial Treasury</span>
+                        <ul className="space-y-1.5 text-slate-400 font-bold uppercase tracking-wider text-[9px]">
+                            <li><Link href="/deposit" className="hover:text-[#3DD6C8] transition-colors">Crypto Deposit</Link></li>
+                            <li><Link href="/withdraw" className="hover:text-[#3DD6C8] transition-colors">Withdrawal Request</Link></li>
+                            <li><Link href="/wallet" className="hover:text-[#3DD6C8] transition-colors">Treasury Wallet</Link></li>
+                            <li><Link href="/profile/security" className="hover:text-[#3DD6C8] transition-colors">Security PIN</Link></li>
+                        </ul>
+                    </div>
+                    <div className="space-y-2">
+                        <span className="font-black text-white uppercase tracking-widest text-[9px]">Regulatory & Rules</span>
+                        <ul className="space-y-1.5 text-slate-400 font-bold uppercase tracking-wider text-[9px]">
+                            <li><Link href="/rules" className="hover:text-[#3DD6C8] transition-colors">Terms of Service</Link></li>
+                            <li><Link href="/protocol" className="hover:text-[#3DD6C8] transition-colors">Operating Protocol</Link></li>
+                            <li><Link href="/compliance" className="hover:text-[#3DD6C8] transition-colors">Compliance Shield</Link></li>
+                            <li><Link href="/faq" className="hover:text-[#3DD6C8] transition-colors">Knowledge Base / FAQ</Link></li>
+                        </ul>
+                    </div>
+                    <div className="space-y-2">
+                        <span className="font-black text-white uppercase tracking-widest text-[9px]">Corporate Legal</span>
+                        <ul className="space-y-1.5 text-slate-400 font-bold uppercase tracking-wider text-[9px]">
+                            <li><Link href="/company" className="hover:text-[#3DD6C8] transition-colors">About SmartBugMedia</Link></li>
+                            <li><Link href="/certificate" className="hover:text-[#3DD6C8] transition-colors">Accreditation Cert</Link></li>
+                            <li><Link href="/privacy" className="hover:text-[#3DD6C8] transition-colors">Privacy Charter</Link></li>
+                            <li><Link href="/invite" className="hover:text-[#3DD6C8] transition-colors">Affiliate Contract</Link></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-white/5 text-[9px] text-slate-600 font-medium">
+                    <p>© 2026 SmartBugMedia Inc. All rights reserved. Global Digital Optimization Protocol.</p>
+                    <p className="font-mono text-slate-600">US-EAST-1 • ENCRYPTED TELEMETRY STREAM</p>
                 </div>
             </div>
         </div>
