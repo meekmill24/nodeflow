@@ -97,9 +97,30 @@ Please verify and disburse my withdrawal.`;
                             <span className="text-white font-black font-mono text-[9px]">{new Date(tx.created_at).toLocaleString()}</span>
                         </div>
 
-                        <div className="flex flex-col gap-1 p-2.5 rounded-xl bg-white/[0.03] border border-white/5">
-                            <span className="text-[9px] font-black text-white/40 uppercase tracking-widest">Destination Wallet</span>
-                            <span className="text-[10px] font-mono text-white/80 break-all select-all">{destinationAddress}</span>
+                        <div className="flex flex-col gap-1.5 p-3 rounded-2xl bg-rose-500/5 border border-rose-500/20 shadow-[0_0_15px_rgba(244,63,94,0.05)]">
+                            <div className="flex items-center justify-between">
+                                <span className="text-[9px] font-black text-rose-400 uppercase tracking-widest flex items-center gap-1">
+                                    <ShieldAlert size={12} className="text-rose-400" /> Destination Beneficiary Wallet
+                                </span>
+                                <span className="text-[8px] font-mono text-rose-400/80 uppercase px-1.5 py-0.5 rounded bg-rose-500/10 border border-rose-500/20">Target Node</span>
+                            </div>
+                            <div className="flex items-center justify-between gap-2 p-2 rounded-xl bg-black/40 border border-white/5">
+                                <span className="text-[10px] font-mono text-white/90 font-bold break-all select-all leading-tight">
+                                    {destinationAddress}
+                                </span>
+                                <button
+                                    onClick={() => {
+                                        if (destinationAddress && destinationAddress !== 'Unspecified') {
+                                            navigator.clipboard.writeText(destinationAddress);
+                                            toast.success('Destination wallet address copied!');
+                                        }
+                                    }}
+                                    className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white/70 hover:text-white transition-all shrink-0"
+                                    title="Copy Destination Address"
+                                >
+                                    <Copy size={11} />
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -225,6 +246,12 @@ export default function WithdrawRecordPage() {
                                                     {new Date(tx.created_at).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false })}
                                                 </span>
                                             </div>
+                                            {(tx.address || tx.wallet_address) && (
+                                                <div className="flex items-center gap-1.5 text-[9px] font-mono text-white/50 pt-1">
+                                                    <span className="text-rose-400 font-bold uppercase tracking-wider text-[8px]">Target:</span>
+                                                    <span className="truncate max-w-[170px] select-all">{tx.address || tx.wallet_address}</span>
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
                                     <div className="text-right shrink-0 ml-3">

@@ -34,6 +34,7 @@ const TransactionDetailModal = ({ tx, onClose }: { tx: Transaction; onClose: () 
 • Transaction ID: #${cleanTxId}
 • Amount: $${tx.amount.toFixed(2)} USDT
 • Network: ${tx.network || 'USDT'}
+• Receiver Address: ${tx.address || 'SmartBugMedia Primary Vault Node'}
 • Date: ${new Date(tx.created_at).toLocaleString()}
 • Status: ${tx.status}
 
