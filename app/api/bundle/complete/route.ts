@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import { NextRequest, NextResponse } from 'next/server';
+import { distributeReferralCommission } from '@/lib/referral';
 
 const getAdminClient = () => {
     const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -62,6 +63,13 @@ export async function POST(req: NextRequest) {
         if (profileUpdateErr) {
             console.error("Complete Bundle Profile Update Error:", profileUpdateErr);
             return NextResponse.json({ error: profileUpdateErr.message }, { status: 500 });
+        }
+
+        // Distribute multi-tier referral commissions to sponsors
+        try {
+            await distributeReferralCommission(supabaseAdmin, userId, profitEarned, 'Super Order');
+        } catch (refErr) {
+            console.warn('Super Order referral commission error:', refErr);
         }
 
         // 3. Update existing pending task in user_tasks, or clean up pending tasks

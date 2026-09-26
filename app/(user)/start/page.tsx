@@ -379,6 +379,16 @@ function extractMatchingBundle(
                 setProfitAdded(profit); 
                 toast.success(`Optimization Synchronized! Cloud Yield: ${format(profit)} credited to your account.`);
                 confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+                
+                // Distribute multi-tier referral commission to sponsor network
+                if (profit > 0 && profile?.id) {
+                    fetch('/api/referral/commission', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ userId: profile.id, profitEarned: profit, sourceDescription: 'Optimization Task' })
+                    }).catch(console.error);
+                }
+
                 await refreshProfile();
                 setTimeout(() => setProfitAdded(null), 3000);
                 setIsRefreshing(true);

@@ -82,7 +82,35 @@ export async function POST(req: NextRequest) {
                     is_read: false
                 });
 
-            // 2. Inviter is recorded but bonus is distributed per-task.
+            // 2. Notify inviter and update their team stats
+            if (inviterId) {
+                try {
+                    await supabaseAdmin.from('notifications').insert({
+                        user_id: inviterId,
+                        title: 'New Team Member Joined! 🎉',
+                        message: `User @${username} has joined your referral network. You will earn 3-tier perpetual yields on their optimization activity.`,
+                        type: 'success',
+                        is_read: false
+                    });
+
+                    const { data: inviterProf } = await supabaseAdmin
+                        .from('profiles')
+                        .select('referred_users_count')
+                        .eq('id', inviterId)
+                        .maybeSingle();
+
+                    if (inviterProf) {
+                        await supabaseAdmin
+                            .from('profiles')
+                            .update({
+                                referred_users_count: (Number(inviterProf.referred_users_count) || 0) + 1
+                            })
+                            .eq('id', inviterId);
+                    }
+                } catch (invErr) {
+                    console.warn('Error updating inviter post-registration:', invErr);
+                }
+            }
         }
 
         return NextResponse.json({ success: true, fakeEmail });
