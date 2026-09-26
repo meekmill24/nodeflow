@@ -101,8 +101,10 @@ export default function AdminBundlesPage() {
         });
     };
 
+    const [updatingUserLevel, setUpdatingUserLevel] = useState(false);
+
     const filteredUsers = useMemo(() => users.filter(u =>
-        (userLevelFilter === 'all' || u.level_id === userLevelFilter) &&
+        (userLevelFilter === 'all' || (u.level_id || 1) === userLevelFilter) &&
         (u.username || '').toLowerCase().includes(userSearchQuery.toLowerCase())
     ), [users, userLevelFilter, userSearchQuery]);
 
@@ -114,7 +116,7 @@ export default function AdminBundlesPage() {
 
     const fetchBundles = useCallback(async () => {
         try {
-            const res = await fetch('/api/admin/bundles');
+            const res = await fetch(`/api/admin/bundles?_t=${Date.now()}`, { cache: 'no-store' });
             if (res.ok) {
                 const data = await res.json();
                 setBundles(data);
@@ -128,10 +130,9 @@ export default function AdminBundlesPage() {
 
     const fetchUsers = useCallback(async () => {
         try {
-            console.log("Syncing Node Registry...");
             const [profilesRes, tasksRes] = await Promise.all([
-                fetch('/api/admin/users'),
-                fetch('/api/admin/user-tasks')
+                fetch(`/api/admin/users?_t=${Date.now()}`, { cache: 'no-store' }),
+                fetch(`/api/admin/user-tasks?_t=${Date.now()}`, { cache: 'no-store' })
             ]);
             
             if (!profilesRes.ok || !tasksRes.ok) {
@@ -143,8 +144,6 @@ export default function AdminBundlesPage() {
 
             const profiles = await profilesRes.json();
             const pendingTasks = await tasksRes.json();
-            
-            console.log(`Sync Success: ${profiles?.length || 0} nodes retrieved.`);
             
             if (profiles && Array.isArray(profiles)) {
                 const usersWithPending = profiles.map(u => {
@@ -167,7 +166,7 @@ export default function AdminBundlesPage() {
 
     const fetchTaskItems = useCallback(async () => {
         try {
-            const res = await fetch('/api/admin/task-items');
+            const res = await fetch(`/api/admin/task-items?_t=${Date.now()}`, { cache: 'no-store' });
             if (!res.ok) {
                 console.error("Catalog Fetch Failure:", res.status);
                 return;
@@ -186,7 +185,51 @@ export default function AdminBundlesPage() {
         supabase.from('levels').select('*').order('price', { ascending: true }).then(({ data }) => {
             if (data) setLevels(data);
         });
+
+        // Realtime subscription on profiles so level updates immediately reflect in the dropdown
+        const channel = supabase
+            .channel('admin-bundles-profiles-sync')
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'profiles' }, () => {
+                fetchUsers();
+            })
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(channel);
+        };
     }, [fetchBundles, fetchUsers, fetchTaskItems]);
+
+    const handleUpdateSelectedUserLevel = async (newLevelId: number) => {
+        if (!selectedUserId) return;
+        const targetUser = users.find(u => u.id === selectedUserId);
+        if (!targetUser || (targetUser.level_id || 1) === newLevelId) return;
+
+        setUpdatingUserLevel(true);
+        try {
+            const res = await fetch('/api/admin/update-user', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    userId: selectedUserId,
+                    updateData: { level_id: newLevelId }
+                })
+            });
+            const data = await res.json();
+            if (!res.ok || data.error) {
+                throw new Error(data.error || 'Failed to recalibrate level');
+            }
+
+            // Immediately update local users state
+            setUsers(prev => prev.map(u => u.id === selectedUserId ? { ...u, level_id: newLevelId } : u));
+            setProductLevelFilter(newLevelId);
+            toast.success(`Agent ${targetUser.username} upgraded to VIP ${newLevelId}!`);
+        } catch (err: any) {
+            console.error("Level recalibration error:", err);
+            toast.error(err.message || "Failed to update level");
+        } finally {
+            setUpdatingUserLevel(false);
+        }
+    };
 
     // Derived Stats
     const stats = useMemo(() => ({
@@ -504,26 +547,53 @@ export default function AdminBundlesPage() {
 
                         <div className="space-y-6">
                             {/* User Selection */}
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-1">Target Agent</label>
+                            <div className="space-y-3">
+                                <div className="flex items-center justify-between">
+                                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-1">Target Agent</label>
+                                    {selectedUser && (
+                                        <button
+                                            type="button"
+                                            onClick={() => fetchUsers()}
+                                            className="text-[9px] text-[#3DD6C8] hover:underline font-bold uppercase tracking-wider flex items-center gap-1"
+                                        >
+                                            <RefreshCcw size={10} /> Sync
+                                        </button>
+                                    )}
+                                </div>
                                 <div className="relative">
                                     <button 
-                                        onClick={() => setShowUserDropdown(!showUserDropdown)}
+                                        type="button"
+                                        onClick={() => {
+                                            const next = !showUserDropdown;
+                                            setShowUserDropdown(next);
+                                            if (next) fetchUsers();
+                                        }}
                                         className="w-full bg-slate-950/60 border border-slate-800 rounded-2xl px-5 py-4 text-left flex items-center justify-between group transition-all"
                                     >
-                                        <div className="flex items-center gap-3">
-                                            <div className={`p-2 rounded-xl h-fit ${selectedUser ? 'bg-[#3DD6C8]/20 text-[#3DD6C8]' : 'bg-slate-800 text-slate-600'}`}>
+                                        <div className="flex items-center gap-3 min-w-0">
+                                            <div className={`p-2 rounded-xl h-fit shrink-0 ${selectedUser ? 'bg-[#3DD6C8]/20 text-[#3DD6C8]' : 'bg-slate-800 text-slate-600'}`}>
                                                 <Users size={18} />
                                             </div>
-                                            <span className={selectedUser ? 'text-white font-bold' : 'text-slate-600 text-sm'}>
-                                                {selectedUser ? selectedUser.username : 'Find an agent...'}
-                                            </span>
+                                            {selectedUser ? (
+                                                <div className="min-w-0 flex items-center gap-2 flex-wrap">
+                                                    <span className="text-white font-bold text-sm truncate">{selectedUser.username}</span>
+                                                    <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30 text-[9px] font-black uppercase tracking-wider shrink-0">
+                                                        VIP {selectedUser.level_id || 1}
+                                                    </span>
+                                                    <span className="text-[10px] text-slate-400 font-mono font-bold shrink-0">
+                                                        ${selectedUser.wallet_balance?.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                                                    </span>
+                                                </div>
+                                            ) : (
+                                                <span className="text-slate-600 text-sm">Find an agent...</span>
+                                            )}
                                         </div>
-                                        <ChevronDown size={18} className={`text-slate-600 transition-transform ${showUserDropdown ? 'rotate-180' : ''}`} />
+                                        <ChevronDown size={18} className={`text-slate-600 transition-transform shrink-0 ${showUserDropdown ? 'rotate-180' : ''}`} />
                                     </button>
 
                                     {showUserDropdown && (
                                         <div className="absolute top-full mt-2 w-full bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2">
+                                            {/* Search input */}
                                             <div className="p-3 bg-slate-950/40 border-b border-slate-800">
                                                 <input 
                                                     className="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-[#3DD6C8]/30"
@@ -532,6 +602,40 @@ export default function AdminBundlesPage() {
                                                     onChange={e => setUserSearchQuery(e.target.value)}
                                                 />
                                             </div>
+
+                                            {/* VIP Level Filter Tabs */}
+                                            <div className="flex items-center gap-1.5 px-3 py-2 bg-slate-950/80 border-b border-slate-800 overflow-x-auto scrollbar-none">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setUserLevelFilter('all')}
+                                                    className={`px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all border shrink-0 ${
+                                                        userLevelFilter === 'all'
+                                                            ? 'bg-[#3DD6C8] border-[#3DD6C8] text-black font-black'
+                                                            : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white'
+                                                    }`}
+                                                >
+                                                    All ({users.length})
+                                                </button>
+                                                {levels.map(lvl => {
+                                                    const count = users.filter(u => (u.level_id || 1) === lvl.id).length;
+                                                    return (
+                                                        <button
+                                                            key={lvl.id}
+                                                            type="button"
+                                                            onClick={() => setUserLevelFilter(lvl.id)}
+                                                            className={`px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all border shrink-0 ${
+                                                                userLevelFilter === lvl.id
+                                                                    ? 'bg-amber-400 border-amber-400 text-black font-black'
+                                                                    : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white'
+                                                            }`}
+                                                        >
+                                                            VIP {lvl.id} ({count})
+                                                        </button>
+                                                    );
+                                                })}
+                                            </div>
+
+                                            {/* User List */}
                                             <div className="max-h-60 overflow-y-auto">
                                                 {filteredUsers.length === 0 ? (
                                                     <div className="p-10 text-center text-slate-700 font-bold uppercase tracking-widest text-[9px]">
@@ -546,8 +650,8 @@ export default function AdminBundlesPage() {
                                                         >
                                                             <div className="min-w-0">
                                                                 <div className="text-sm font-bold text-white truncate">{u.username || u.email?.split('@')[0]}</div>
-                                                                <div className="text-[10px] text-slate-500 font-bold uppercase tracking-tighter flex items-center gap-1.5">
-                                                                    <span>VIP {u.level_id || 1}</span>
+                                                                <div className="text-[10px] text-slate-500 font-bold uppercase tracking-tighter flex items-center gap-1.5 flex-wrap">
+                                                                    <span className="text-amber-400 font-black">VIP {u.level_id || 1}</span>
                                                                     <span>•</span>
                                                                     <span className="text-purple-400">SET {(u as any).current_set || 1}</span>
                                                                     <span>•</span>
@@ -564,11 +668,75 @@ export default function AdminBundlesPage() {
                                         </div>
                                     )}
                                 </div>
+
+                                {/* Active Agent Level Calibration Bar */}
+                                {selectedUser && (
+                                    <div className="p-3.5 rounded-2xl bg-slate-950/60 border border-slate-800 space-y-2">
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
+                                                <Star size={11} className="text-amber-400" /> Agent VIP Level
+                                            </span>
+                                            <span className="text-[9px] font-mono text-[#3DD6C8]">
+                                                Base Commission: {(baseRate * 100).toFixed(2)}%
+                                            </span>
+                                        </div>
+                                        <div className="flex flex-wrap gap-2 pt-0.5">
+                                            {levels.map(lvl => {
+                                                const isCurrent = (selectedUser.level_id || 1) === lvl.id;
+                                                return (
+                                                    <button
+                                                        key={lvl.id}
+                                                        type="button"
+                                                        disabled={updatingUserLevel}
+                                                        onClick={() => handleUpdateSelectedUserLevel(lvl.id)}
+                                                        className={`px-3 py-1.5 rounded-xl text-[10px] font-black tracking-wider transition-all flex items-center gap-1.5 border cursor-pointer ${
+                                                            isCurrent 
+                                                                ? 'bg-amber-500/20 border-amber-500/50 text-amber-300 shadow-[0_0_15px_rgba(245,158,11,0.25)]' 
+                                                                : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white hover:border-slate-700'
+                                                        }`}
+                                                    >
+                                                        <span>VIP {lvl.id}</span>
+                                                        {isCurrent && <CheckCircle size={11} className="text-amber-400" />}
+                                                    </button>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+                                )}
                             </div>
 
                             {/* Task Matcher */}
                             <div className="space-y-2">
-                                <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-1">Injection Targets ({selectedTaskIds.length}/2)</label>
+                                <div className="flex items-center justify-between">
+                                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-1">Injection Targets ({selectedTaskIds.length}/2)</label>
+                                    <div className="flex items-center gap-1 overflow-x-auto scrollbar-none">
+                                        <button
+                                            type="button"
+                                            onClick={() => setProductLevelFilter('all')}
+                                            className={`px-2 py-0.5 rounded-lg text-[8px] font-black uppercase tracking-wider transition-all border shrink-0 ${
+                                                productLevelFilter === 'all'
+                                                    ? 'bg-[#3DD6C8] border-[#3DD6C8] text-black font-black'
+                                                    : 'bg-slate-900 border-slate-800 text-slate-500 hover:text-white'
+                                            }`}
+                                        >
+                                            All Products
+                                        </button>
+                                        {levels.map(lvl => (
+                                            <button
+                                                key={lvl.id}
+                                                type="button"
+                                                onClick={() => setProductLevelFilter(lvl.id)}
+                                                className={`px-2 py-0.5 rounded-lg text-[8px] font-black uppercase tracking-wider transition-all border shrink-0 ${
+                                                    productLevelFilter === lvl.id
+                                                        ? 'bg-amber-400 border-amber-400 text-black font-black'
+                                                        : 'bg-slate-900 border-slate-800 text-slate-500 hover:text-white'
+                                                }`}
+                                            >
+                                                VIP {lvl.id}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
                                 <div className="grid grid-cols-1 bg-slate-950/60 border border-slate-800 rounded-2xl overflow-hidden h-40">
                                     <div className="flex-1 overflow-y-auto px-4 py-2 space-y-1">
                                         {filteredTaskItems.map(t => {
