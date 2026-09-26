@@ -937,9 +937,12 @@ export default function AdminTasksPage() {
 
             {/* Modify Identity (Edit) Overlay */}
             {editingId && (
-                <div className="fixed inset-0 z-[150] flex items-center justify-center p-6 backdrop-blur-3xl bg-black/60 animate-in fade-in duration-300">
-                    <div className="bg-slate-900/60 border border-[#3DD6C8]/20 p-10 rounded-[48px] backdrop-blur-3xl w-full max-w-5xl relative overflow-hidden group shadow-[0_50px_150px_rgba(0,0,0,0.8)]">
-                        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#3DD6C8]/50 to-transparent" />
+                <div 
+                    onClick={(e) => { if (e.target === e.currentTarget) setEditingId(null); }}
+                    className="fixed inset-0 z-[150] flex items-center justify-center p-4 md:p-6 backdrop-blur-3xl bg-black/70 animate-in fade-in duration-300"
+                >
+                    <div className="bg-slate-900/90 border border-[#3DD6C8]/30 p-6 md:p-10 rounded-[36px] md:rounded-[48px] backdrop-blur-3xl w-full max-w-5xl max-h-[90vh] overflow-y-auto relative group shadow-[0_50px_150px_rgba(0,0,0,0.9)] animate-in zoom-in-95 duration-200">
+                        <div className="sticky top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#3DD6C8]/50 to-transparent -mt-6 -mx-6 md:-mt-10 md:-mx-10 mb-6" />
                         
                         <div className="flex items-center justify-between mb-10">
                             <div className="space-y-1">
