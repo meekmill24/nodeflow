@@ -27,6 +27,7 @@ import {
     ChevronRight,
     ChevronsLeft,
     ChevronsRight,
+    Upload,
     Layers as LayersIcon
 } from 'lucide-react';
 import { toast } from 'sonner';
@@ -94,6 +95,52 @@ export default function AdminTasksPage() {
     const [confirmModal, setConfirmModal] = useState<{show: boolean, title: string, message: string, onConfirm: () => void} | null>(null);
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState<number | 'all'>(24);
+    const [uploadingImage, setUploadingImage] = useState(false);
+
+    const handleFileUpload = async (file: File, target: 'new' | 'edit') => {
+        if (!file) return;
+
+        if (!file.type.startsWith('image/')) {
+            toast.error('Invalid file format. Please select an image (PNG, JPG, WEBP, GIF)');
+            return;
+        }
+
+        if (file.size > 10 * 1024 * 1024) {
+            toast.error('Image file exceeds 10MB limit');
+            return;
+        }
+
+        setUploadingImage(true);
+        const toastId = toast.loading('Uploading asset to cloud storage...');
+        try {
+            const formData = new FormData();
+            formData.append('file', file);
+
+            const res = await fetch('/api/admin/upload-product-image', {
+                method: 'POST',
+                body: formData,
+            });
+
+            const data = await res.json();
+            if (!res.ok || data.error) {
+                throw new Error(data.error || 'Upload failed');
+            }
+
+            if (target === 'new') {
+                setNewItem(prev => ({ ...prev, image_url: data.url }));
+                setPreviewUrl(data.url);
+            } else {
+                setEditData(prev => ({ ...prev, image_url: data.url }));
+            }
+
+            toast.success('Asset uploaded successfully!', { id: toastId });
+        } catch (err: any) {
+            console.error('Upload error:', err);
+            toast.error(err.message || 'Failed to upload image', { id: toastId });
+        } finally {
+            setUploadingImage(false);
+        }
+    };
 
     // Reset pagination to page 1 whenever search, level, set, sort, or page size changes
     useEffect(() => {
@@ -796,17 +843,43 @@ export default function AdminTasksPage() {
 
                         <div className="space-y-6">
                             <div className="space-y-2">
-                                <label className="text-[11px] font-black text-slate-500 uppercase tracking-widest ml-1">Image URL</label>
+                                <div className="flex items-center justify-between">
+                                    <label className="text-[11px] font-black text-slate-500 uppercase tracking-widest ml-1">Asset Image</label>
+                                    <span className="text-[9px] font-bold text-slate-500 uppercase tracking-wider">Upload File or URL</span>
+                                </div>
                                 <div className="flex gap-2">
                                     <input 
-                                        className="flex-1 bg-slate-950 border border-white/10 rounded-2xl px-6 py-4 text-white font-mono" 
+                                        className="flex-1 bg-slate-950 border border-white/10 rounded-2xl px-6 py-4 text-white font-mono text-xs focus:outline-none focus:border-[#3DD6C8] transition-all" 
+                                        placeholder="https://... or upload image"
                                         value={newItem.image_url}
                                         onChange={e => { setNewItem({ ...newItem, image_url: e.target.value }); setPreviewUrl(e.target.value); }}
                                     />
+                                    
+                                    {/* Upload Button with hidden file input */}
+                                    <input 
+                                        type="file" 
+                                        id="new-item-image-file" 
+                                        className="hidden" 
+                                        accept="image/png,image/jpeg,image/jpg,image/webp,image/gif"
+                                        onChange={e => {
+                                            if (e.target.files?.[0]) {
+                                                handleFileUpload(e.target.files[0], 'new');
+                                            }
+                                        }}
+                                    />
+                                    <label 
+                                        htmlFor="new-item-image-file"
+                                        className={`w-[60px] h-[60px] rounded-2xl bg-[#3DD6C8]/10 border border-[#3DD6C8]/30 text-[#3DD6C8] hover:bg-[#3DD6C8] hover:text-black flex items-center justify-center cursor-pointer transition-all active:scale-95 flex-shrink-0 ${uploadingImage ? 'opacity-50 pointer-events-none' : ''}`}
+                                        title="Upload Image File"
+                                    >
+                                        {uploadingImage ? <RefreshCw size={20} className="animate-spin" /> : <Upload size={20} />}
+                                    </label>
+
                                     <button 
                                         type="button"
                                         onClick={() => { const url = generateFallbackUrl(newItem.title || `item-${Date.now()}`); setNewItem({ ...newItem, image_url: url }); setPreviewUrl(url); }}
-                                        className="w-[60px] h-[60px] rounded-2xl bg-white/5 border border-white/10 text-white flex items-center justify-center"
+                                        className="w-[60px] h-[60px] rounded-2xl bg-white/5 border border-white/10 text-white flex items-center justify-center hover:bg-white/10 transition-all flex-shrink-0"
+                                        title="Generate Random Fallback"
                                     >
                                         <RefreshCw size={20} />
                                     </button>
@@ -874,11 +947,32 @@ export default function AdminTasksPage() {
                                         <div className="flex gap-2">
                                             <input 
                                                 type="text"
-                                                placeholder="Image URL..."
+                                                placeholder="Image URL or upload..."
                                                 className="flex-1 bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-xs text-white font-mono focus:outline-none focus:border-[#3DD6C8] transition-all"
                                                 value={editData.image_url || ''}
                                                 onChange={e => setEditData({ ...editData, image_url: e.target.value })}
                                             />
+                                            
+                                            {/* File Upload Button for In-Place Editor */}
+                                            <input 
+                                                type="file" 
+                                                id={`edit-item-file-${item.id}`} 
+                                                className="hidden" 
+                                                accept="image/png,image/jpeg,image/jpg,image/webp,image/gif"
+                                                onChange={e => {
+                                                    if (e.target.files?.[0]) {
+                                                        handleFileUpload(e.target.files[0], 'edit');
+                                                    }
+                                                }}
+                                            />
+                                            <label 
+                                                htmlFor={`edit-item-file-${item.id}`}
+                                                className={`w-9 h-9 rounded-xl bg-[#3DD6C8]/10 border border-[#3DD6C8]/30 text-[#3DD6C8] hover:bg-[#3DD6C8] hover:text-black flex items-center justify-center cursor-pointer transition-all active:scale-95 flex-shrink-0 ${uploadingImage ? 'opacity-50 pointer-events-none' : ''}`}
+                                                title="Upload Custom Image"
+                                            >
+                                                {uploadingImage ? <RefreshCw size={14} className="animate-spin" /> : <Upload size={14} />}
+                                            </label>
+
                                             <button 
                                                 type="button"
                                                 onClick={() => setEditData({ ...editData, image_url: generateFallbackUrl(editData.title || `item-${editingId}`) })}
