@@ -73,7 +73,8 @@ export default function PWAInstallPrompt() {
         const handleBeforeInstallPrompt = (e: BeforeInstallPromptEvent) => {
             e.preventDefault();
             setDeferredPrompt(e);
-            if (!sessionStorage.getItem('pwa_prompt_dismissed')) {
+            // Only auto-open modal for mobile/tablet users, never on PC/Desktop
+            if (isMobileDevice && !sessionStorage.getItem('pwa_prompt_dismissed')) {
                 setIsOpen(true);
             }
         };

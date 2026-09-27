@@ -167,7 +167,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                         </button>
                     </div>
 
-                    {/* Install PWA Button */}
+                    {/* Install PWA Button (Mobile & Tablet drawer only) */}
                     <button
                         onClick={() => {
                             if (typeof window !== 'undefined') {
@@ -175,7 +175,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                             }
                             if (onClose) onClose();
                         }}
-                        className="w-full mb-4 py-2.5 px-3 rounded-2xl bg-gradient-to-r from-[#3DD6C8]/15 to-transparent border border-[#3DD6C8]/30 hover:border-[#3DD6C8]/60 flex items-center justify-between group/pwa transition-all"
+                        className="w-full mb-4 py-2.5 px-3 rounded-2xl bg-gradient-to-r from-[#3DD6C8]/15 to-transparent border border-[#3DD6C8]/30 hover:border-[#3DD6C8]/60 flex items-center justify-between group/pwa transition-all lg:hidden"
                     >
                         <div className="flex items-center gap-2.5">
                             <div className="w-7 h-7 rounded-lg bg-[#3DD6C8]/20 text-[#3DD6C8] flex items-center justify-center group-hover/pwa:scale-110 transition-transform">
