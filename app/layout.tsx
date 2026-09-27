@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { Montserrat } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
@@ -15,11 +15,31 @@ import { NotificationProvider } from '@/context/NotificationContext'
 import { Toaster } from 'sonner'
 import TawkMessenger from '@/components/TawkMessenger'
 import DraggableChat from '@/components/DraggableChat'
+import PWAInstallPrompt from '@/components/PWAInstallPrompt'
+
+export const viewport: Viewport = {
+  themeColor: '#0B0B1E',
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: 'cover',
+}
 
 export const metadata: Metadata = {
   title: 'SmartBugMedia. | Precision Optimization & Amplified Returns',
   description: 'SmartBugMedia. — The intelligent marketplace optimization platform for high-performance distributed task management.',
   generator: 'SmartBugMedia.',
+  manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: 'SmartBug',
+  },
+  icons: {
+    icon: '/icon-192.png',
+    apple: '/apple-touch-icon.png',
+  },
 }
 
 export default function RootLayout({
@@ -42,6 +62,7 @@ export default function RootLayout({
                     
                     <TawkMessenger />
                     <DraggableChat />
+                    <PWAInstallPrompt />
                   </NotificationProvider>
                 </ThemeProvider>
               </LanguageProvider>

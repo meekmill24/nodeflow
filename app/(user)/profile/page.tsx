@@ -27,7 +27,8 @@ import {
     Zap,
     Network,
     Activity,
-    Lock
+    Lock,
+    Download
 } from 'lucide-react';
 import Link from 'next/link';
 import { useState, useRef } from 'react';
@@ -201,6 +202,26 @@ export default function ProfilePage() {
                                 <ChevronRight size={18} className="text-white/20 group-hover:translate-x-1 group-hover:text-white transition-all" />
                             </Link>
                         ))}
+                        <button 
+                            type="button"
+                            onClick={() => {
+                                if (typeof window !== 'undefined') {
+                                    window.dispatchEvent(new CustomEvent('open-pwa-install'));
+                                }
+                            }}
+                            className="w-full flex items-center justify-between p-6 hover:bg-white/[0.03] transition-all group text-left"
+                        >
+                            <div className="flex items-center gap-4">
+                                <div className="p-3 rounded-2xl bg-[#3DD6C8]/10 text-[#3DD6C8] group-hover:scale-110 transition-transform">
+                                    <Download size={18} />
+                                </div>
+                                <div className="flex flex-col">
+                                    <span className="text-[11px] font-black text-[#3DD6C8] uppercase tracking-widest">Install SmartBug App</span>
+                                    <span className="text-[8px] font-bold text-white/40 uppercase tracking-wider">Add to Home Screen (PWA)</span>
+                                </div>
+                            </div>
+                            <span className="px-2 py-0.5 rounded-full bg-[#3DD6C8]/20 text-[#3DD6C8] text-[8px] font-black uppercase tracking-wider">Ready</span>
+                        </button>
                     </div>
                 </div>
             </div>

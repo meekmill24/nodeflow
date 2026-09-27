@@ -154,7 +154,7 @@ export default function BundledPackageModal({
     return (
         <Portal>
             <div 
-                className="fixed inset-0 z-[10001] flex items-center justify-center p-4 sm:p-6 bg-black/85 backdrop-blur-xl md:pl-72 overflow-y-auto animate-fade-in"
+                className="fixed inset-0 z-[10001] flex items-center justify-center p-4 sm:p-6 bg-black/85 backdrop-blur-xl lg:pl-72 overflow-y-auto animate-fade-in"
                 onClick={onClose}
             >
                 <div

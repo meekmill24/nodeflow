@@ -19,7 +19,8 @@ import {
     Compass,
     Activity,
     Cpu,
-    TrendingUp
+    TrendingUp,
+    Download
 } from 'lucide-react';
 
 const menuItems = [
@@ -50,13 +51,13 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
         <>
             {isOpen && (
                 <div 
-                    className="fixed inset-0 bg-black/80 backdrop-blur-md z-[60] md:hidden animate-in fade-in duration-500"
+                    className="fixed inset-0 bg-black/80 backdrop-blur-md z-[60] lg:hidden animate-in fade-in duration-500"
                     onClick={onClose}
                 />
             )}
 
             <aside className={`
-                fixed top-0 left-0 h-screen w-72 z-[70] transition-all duration-500 transform md:translate-x-0
+                fixed top-0 left-0 h-screen w-72 z-[70] transition-all duration-500 transform lg:translate-x-0
                 ${isOpen ? 'translate-x-0' : '-translate-x-full'}
                 flex flex-col bg-[#0B0B1E]/95 backdrop-blur-3xl border-r border-white/5 shadow-[30px_0_60px_rgba(0,0,0,0.8)]
             `}>
@@ -75,7 +76,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                             <span className="text-[8px] font-black text-white/30 uppercase tracking-[0.4em] mt-1.5 leading-none">Node Controller</span>
                         </div>
                     </div>
-                    <button onClick={onClose} className="md:hidden p-2 text-white/40 hover:text-white transition-colors"><X size={20} /></button> 
+                    <button onClick={onClose} className="lg:hidden p-2 text-white/40 hover:text-white transition-colors"><X size={20} /></button> 
                 </div>
 
                 <div className="flex-1 overflow-y-auto custom-scrollbar px-6 py-8 space-y-10">
@@ -146,7 +147,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
 
                 {/* Account Identity Shard */}
                 <div className="p-8 mt-auto border-t border-white/5 bg-black/20">
-                    <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center justify-between mb-4">
                         <Link href="/profile" onClick={onClose} className="flex items-center gap-4 group">
                              <div className="w-11 h-11 rounded-full bg-gradient-to-br from-[#3DD6C8]/20 to-transparent border border-[#3DD6C8]/30 flex items-center justify-center relative group-hover:scale-110 transition-all duration-500">
                                 <span className="text-[#3DD6C8] font-black text-sm italic">{profile?.username?.[0].toUpperCase() || 'U'}</span>
@@ -165,6 +166,25 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                             <LogOut size={16} />
                         </button>
                     </div>
+
+                    {/* Install PWA Button */}
+                    <button
+                        onClick={() => {
+                            if (typeof window !== 'undefined') {
+                                window.dispatchEvent(new CustomEvent('open-pwa-install'));
+                            }
+                            if (onClose) onClose();
+                        }}
+                        className="w-full mb-4 py-2.5 px-3 rounded-2xl bg-gradient-to-r from-[#3DD6C8]/15 to-transparent border border-[#3DD6C8]/30 hover:border-[#3DD6C8]/60 flex items-center justify-between group/pwa transition-all"
+                    >
+                        <div className="flex items-center gap-2.5">
+                            <div className="w-7 h-7 rounded-lg bg-[#3DD6C8]/20 text-[#3DD6C8] flex items-center justify-center group-hover/pwa:scale-110 transition-transform">
+                                <Download size={14} />
+                            </div>
+                            <span className="text-[10px] font-black text-white uppercase tracking-wider">Install Mobile App</span>
+                        </div>
+                        <span className="text-[8px] font-black px-2 py-0.5 rounded-full bg-[#3DD6C8]/20 text-[#3DD6C8] uppercase tracking-wider">PWA</span>
+                    </button>
 
                     <div className="grid grid-cols-2 gap-3">
                          <div className="p-3 bg-white/5 border border-white/5 rounded-2xl flex flex-col gap-1 overflow-hidden relative group/asset">

@@ -466,7 +466,7 @@ function extractMatchingBundle(
             {/* FROZEN ACCOUNT OVERLAY */}
             {profile?.is_frozen && (
                 <Portal>
-                    <div className="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-black/90 backdrop-blur-2xl md:pl-72">
+                    <div className="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-black/90 backdrop-blur-2xl lg:pl-72">
                         <div className="bg-[#0f0f12] border border-red-500/20 rounded-[48px] w-full max-w-md p-12 text-center space-y-8 shadow-[0_0_80px_rgba(239,68,68,0.15)] relative overflow-hidden">
                             <div className="absolute inset-0 bg-gradient-to-b from-red-500/5 to-transparent pointer-events-none" />
                             <div className="relative z-10 flex flex-col items-center gap-8">
@@ -882,7 +882,7 @@ function extractMatchingBundle(
             {/* TASK SET COMPLETION MODAL */}
             {showCompletionModal && (
                 <Portal>
-                    <div className="fixed inset-0 z-[10001] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-fade-in md:pl-72 overflow-y-auto">
+                    <div className="fixed inset-0 z-[10001] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-fade-in lg:pl-72 overflow-y-auto">
                         <div 
                             className="bg-[#0B0B1E] border border-[#3DD6C8]/40 w-full max-w-md rounded-[36px] p-6 sm:p-8 shadow-[0_30px_120px_rgba(0,0,0,0.95)] relative overflow-hidden text-center space-y-5 animate-scale-in max-h-[90vh] overflow-y-auto custom-scrollbar -translate-y-16 sm:-translate-y-24 md:-translate-y-28"
                             onClick={(e) => e.stopPropagation()}
@@ -939,7 +939,7 @@ function extractMatchingBundle(
             {showMinBalanceModal && (
                 <Portal>
                     <div 
-                        className="fixed inset-0 z-[10001] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in md:pl-72 overflow-y-auto"
+                        className="fixed inset-0 z-[10001] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in lg:pl-72 overflow-y-auto"
                         onClick={() => setShowMinBalanceModal(false)}
                     >
                         <div 
