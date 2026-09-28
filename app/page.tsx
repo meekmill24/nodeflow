@@ -671,21 +671,21 @@ export default function LandingPage() {
         </div>
 
         {/* ══════════════════════════════════════════
-            PAYMENT METHODS BANNER (Staggered Scroll Reveal)
+            PAYMENT METHODS BANNER (Staggered Scroll Reveal with Delay)
         ══════════════════════════════════════════ */}
         <div className="border-b border-white/5 bg-slate-950/70 py-4 sm:py-6 px-4 sm:px-6 lg:px-12 relative overflow-hidden">
           <div className="max-w-7xl mx-auto">
             <motion.div
               initial="hidden"
               whileInView="visible"
-              viewport={{ once: false, amount: 0.25 }}
+              viewport={{ once: false, amount: 0.3 }}
               variants={{
                 hidden: { opacity: 0 },
                 visible: {
                   opacity: 1,
                   transition: {
-                    staggerChildren: 0.1,
-                    delayChildren: 0.05,
+                    delayChildren: 0.35, // Intentional delay before reveal starts
+                    staggerChildren: 0.18, // Distinct, rhythmic one-by-one reveal
                   },
                 },
               }}
@@ -722,9 +722,9 @@ export default function LandingPage() {
                     variants={{
                       hidden: {
                         opacity: 0,
-                        y: 20,
-                        scale: 0.8,
-                        filter: 'blur(6px)',
+                        y: 24,
+                        scale: 0.75,
+                        filter: 'blur(8px)',
                       },
                       visible: {
                         opacity: 1,
@@ -733,7 +733,7 @@ export default function LandingPage() {
                         filter: 'blur(0px)',
                         transition: {
                           type: 'spring',
-                          stiffness: 280,
+                          stiffness: 220,
                           damping: 18,
                         },
                       },
@@ -754,7 +754,7 @@ export default function LandingPage() {
                   visible: {
                     opacity: 1,
                     x: 0,
-                    transition: { duration: 0.5, delay: 0.6, ease: 'easeOut' },
+                    transition: { duration: 0.5, delay: 1.45, ease: 'easeOut' },
                   },
                 }}
                 className="sm:ml-auto flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-slate-500"
