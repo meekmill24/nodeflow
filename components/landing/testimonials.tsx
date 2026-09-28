@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Star, MapPin, TrendingUp, Clock, ChevronLeft, ChevronRight } from "lucide-react";
+import { Star, MapPin, TrendingUp, Clock, ChevronLeft, ChevronRight, Play, Pause } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 const testimonials = [
   {
@@ -113,10 +114,14 @@ const testimonials = [
 export function Testimonials() {
   const [current, setCurrent] = useState(0);
   const [viewportCount, setViewportCount] = useState(3);
+  const [isPaused, setIsPaused] = useState(false);
+
+  // Maximum starting index for the slice
+  const maxIndex = Math.max(0, testimonials.length - viewportCount);
 
   // Responsive card count based on screen width
-  const prev = () => setCurrent(c => Math.max(0, c - 1));
-  const next = () => setCurrent(c => Math.min(testimonials.length - viewportCount, c + 1));
+  const prev = () => setCurrent(c => (c <= 0 ? maxIndex : c - 1));
+  const next = () => setCurrent(c => (c >= maxIndex ? 0 : c + 1));
 
   // Determine visible cards dynamically based on screen size on mount
   useEffect(() => {
@@ -132,10 +137,27 @@ export function Testimonials() {
     return () => window.removeEventListener('resize', updateCount);
   }, []);
 
+  // Automatic scroll interval (every 3.5s, loops infinitely, pauses on hover or touch)
+  useEffect(() => {
+    if (isPaused || maxIndex <= 0) return;
+
+    const interval = setInterval(() => {
+      setCurrent(c => (c >= maxIndex ? 0 : c + 1));
+    }, 3500);
+
+    return () => clearInterval(interval);
+  }, [isPaused, maxIndex]);
+
   const visible = testimonials.slice(current, current + viewportCount);
 
   return (
-    <section className="py-12 sm:py-32 px-3 sm:px-6 lg:px-12 max-w-7xl mx-auto">
+    <section
+      className="py-12 sm:py-32 px-3 sm:px-6 lg:px-12 max-w-7xl mx-auto"
+      onMouseEnter={() => setIsPaused(true)}
+      onMouseLeave={() => setIsPaused(false)}
+      onTouchStart={() => setIsPaused(true)}
+      onTouchEnd={() => setIsPaused(false)}
+    >
       {/* Section header */}
       <div className="section-header mb-8 sm:mb-20">
         <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-4 sm:gap-6 mb-3 sm:mb-4">
@@ -149,21 +171,29 @@ export function Testimonials() {
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-indigo-500">REAL RESULTS.</span>
             </h2>
           </div>
-          {/* Nav arrows */}
+
+          {/* Controls: Auto-Scroll Indicator + Nav Arrows */}
           <div className="flex items-center gap-2 sm:gap-3">
             <button
+              onClick={() => setIsPaused(!isPaused)}
+              title={isPaused ? "Resume auto-scroll" : "Pause auto-scroll"}
+              className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl border border-white/10 bg-slate-900/60 text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-slate-300 hover:text-white hover:border-white/20 transition-all"
+            >
+              <span className={`w-1.5 h-1.5 rounded-full ${isPaused ? 'bg-amber-400' : 'bg-cyan-400 animate-pulse'}`} />
+              <span>{isPaused ? 'Paused' : 'Auto'}</span>
+            </button>
+
+            <button
               onClick={prev}
-              disabled={current === 0}
               aria-label="Previous testimonial"
-              className="w-8 h-8 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:border-white/20 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+              className="w-8 h-8 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:border-white/20 transition-all active:scale-95"
             >
               <ChevronLeft size={16} />
             </button>
             <button
               onClick={next}
-              disabled={current >= testimonials.length - viewportCount}
               aria-label="Next testimonial"
-              className="w-8 h-8 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:border-white/20 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+              className="w-8 h-8 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:border-white/20 transition-all active:scale-95"
             >
               <ChevronRight size={16} />
             </button>
@@ -175,12 +205,15 @@ export function Testimonials() {
       </div>
 
       {/* Cards — 2 Columns on Mobile, 2 on Tablet, 3 on Desktop */}
-      <div className="grid grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-6">
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-6 overflow-hidden">
         {visible.map((t, i) => (
-          <div
-            key={t.name}
+          <motion.div
+            key={`${t.name}-${current}`}
+            initial={{ opacity: 0, y: 16, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -16, scale: 0.98 }}
+            transition={{ duration: 0.4, ease: "easeOut", delay: i * 0.05 }}
             className="group flex flex-col bg-slate-900/40 backdrop-blur-md border border-white/5 rounded-[18px] sm:rounded-[28px] p-3 sm:p-7 hover:border-white/10 hover:bg-slate-900/60 transition-all duration-300"
-            style={{ animationDelay: `${i * 0.05}s` }}
           >
             {/* Top: Avatar + Name */}
             <div className="flex items-start justify-between mb-3 sm:mb-6">
@@ -206,8 +239,8 @@ export function Testimonials() {
               </div>
               {/* Stars */}
               <div className="flex gap-0.5 shrink-0">
-                {[...Array(t.rating)].map((_, i) => (
-                  <Star key={i} size={10} className="sm:w-3.5 sm:h-3.5 fill-amber-400 text-amber-400" />
+                {[...Array(t.rating)].map((_, idx) => (
+                  <Star key={idx} size={10} className="sm:w-3.5 sm:h-3.5 fill-amber-400 text-amber-400" />
                 ))}
               </div>
             </div>
@@ -243,18 +276,18 @@ export function Testimonials() {
                 {t.tag}
               </span>
             </div>
-          </div>
+          </motion.div>
         ))}
       </div>
 
-      {/* Pagination dots */}
+      {/* Pagination dots with active progress glow */}
       <div className="flex items-center justify-center gap-2 mt-8 sm:mt-10">
-        {Array.from({ length: testimonials.length - viewportCount + 1 }).map((_, i) => (
+        {Array.from({ length: maxIndex + 1 }).map((_, i) => (
           <button
             key={i}
             onClick={() => setCurrent(i)}
             aria-label={`Go to slide ${i + 1}`}
-            className={`h-1.5 rounded-full transition-all ${i === current ? 'w-8 bg-cyan-400' : 'w-2 bg-white/20'}`}
+            className={`h-1.5 rounded-full transition-all duration-300 ${i === current ? 'w-8 bg-cyan-400 shadow-[0_0_10px_rgba(6,182,212,0.8)]' : 'w-2 bg-white/20 hover:bg-white/40'}`}
           />
         ))}
       </div>
