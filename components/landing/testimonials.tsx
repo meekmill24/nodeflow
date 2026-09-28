@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Star, MapPin, TrendingUp, Clock, ChevronLeft, ChevronRight } from "lucide-react";
 
 const testimonials = [
@@ -112,24 +112,41 @@ const testimonials = [
 
 export function Testimonials() {
   const [current, setCurrent] = useState(0);
-  const visibleCount = 3;
+  const [viewportCount, setViewportCount] = useState(3);
 
+  // Responsive card count based on screen width
   const prev = () => setCurrent(c => Math.max(0, c - 1));
-  const next = () => setCurrent(c => Math.min(testimonials.length - visibleCount, c + 1));
+  const next = () => setCurrent(c => Math.min(testimonials.length - viewportCount, c + 1));
 
-  const visible = testimonials.slice(current, current + visibleCount);
+  // Determine visible cards dynamically based on screen size on mount
+  useEffect(() => {
+    const updateCount = () => {
+      if (window.innerWidth < 768) {
+        setViewportCount(1);
+      } else if (window.innerWidth < 1024) {
+        setViewportCount(2);
+      } else {
+        setViewportCount(3);
+      }
+    };
+    updateCount();
+    window.addEventListener('resize', updateCount);
+    return () => window.removeEventListener('resize', updateCount);
+  }, []);
+
+  const visible = testimonials.slice(current, current + viewportCount);
 
   return (
-    <section className="py-32 px-6 lg:px-12 max-w-7xl mx-auto">
+    <section className="py-20 sm:py-32 px-4 sm:px-6 lg:px-12 max-w-7xl mx-auto">
       {/* Section header */}
-      <div className="section-header mb-20">
+      <div className="section-header mb-12 sm:mb-20">
         <div className="flex flex-col lg:flex-row items-start lg:items-end justify-between gap-6 mb-4">
           <div>
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[10px] font-bold uppercase tracking-widest text-emerald-400 mb-6">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[10px] font-bold uppercase tracking-widest text-emerald-400 mb-4 sm:mb-6">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
               Real Members, Real Withdrawals
             </div>
-            <h2 className="text-5xl md:text-6xl font-extrabold tracking-tight leading-[1.1] text-white">
+            <h2 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight leading-[1.1] text-white">
               REAL PEOPLE.<br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-indigo-500">REAL RESULTS.</span>
             </h2>
@@ -139,30 +156,32 @@ export function Testimonials() {
             <button
               onClick={prev}
               disabled={current === 0}
-              className="w-12 h-12 rounded-2xl border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:border-white/20 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+              aria-label="Previous testimonial"
+              className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:border-white/20 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
             >
-              <ChevronLeft size={20} />
+              <ChevronLeft size={18} />
             </button>
             <button
               onClick={next}
-              disabled={current >= testimonials.length - visibleCount}
-              className="w-12 h-12 rounded-2xl border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:border-white/20 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+              disabled={current >= testimonials.length - viewportCount}
+              aria-label="Next testimonial"
+              className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:border-white/20 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
             >
-              <ChevronRight size={20} />
+              <ChevronRight size={18} />
             </button>
           </div>
         </div>
-        <p className="text-slate-400 text-base max-w-xl">
+        <p className="text-slate-400 text-sm sm:text-base max-w-xl">
           These are unedited reviews. Spelling quirks and all. Because real people don't talk in bullet points.
         </p>
       </div>
 
       {/* Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
         {visible.map((t, i) => (
           <div
             key={t.name}
-            className="group flex flex-col bg-slate-900/40 backdrop-blur-md border border-white/5 rounded-[28px] p-7 hover:border-white/10 hover:bg-slate-900/60 transition-all duration-300"
+            className="group flex flex-col bg-slate-900/40 backdrop-blur-md border border-white/5 rounded-[24px] sm:rounded-[28px] p-5 sm:p-7 hover:border-white/10 hover:bg-slate-900/60 transition-all duration-300"
             style={{ animationDelay: `${i * 0.05}s` }}
           >
             {/* Top: Avatar + Name */}
@@ -201,18 +220,18 @@ export function Testimonials() {
             </p>
 
             {/* Stats row */}
-            <div className="grid grid-cols-3 gap-3 mb-5">
-              <div className="bg-white/5 rounded-xl p-3 text-center border border-white/5">
-                <p className="text-emerald-400 font-bold text-base">{t.earnings}</p>
-                <p className="text-slate-500 text-[10px] uppercase tracking-wide mt-0.5">Earned</p>
+            <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-5">
+              <div className="bg-white/5 rounded-xl p-2 sm:p-3 text-center border border-white/5">
+                <p className="text-emerald-400 font-bold text-sm sm:text-base">{t.earnings}</p>
+                <p className="text-slate-500 text-[9px] sm:text-[10px] uppercase tracking-wide mt-0.5">Earned</p>
               </div>
-              <div className="bg-white/5 rounded-xl p-3 text-center border border-white/5">
-                <p className="text-white font-bold text-base">{t.tasks.toLocaleString()}</p>
-                <p className="text-slate-500 text-[10px] uppercase tracking-wide mt-0.5">Tasks</p>
+              <div className="bg-white/5 rounded-xl p-2 sm:p-3 text-center border border-white/5">
+                <p className="text-white font-bold text-sm sm:text-base">{t.tasks.toLocaleString()}</p>
+                <p className="text-slate-500 text-[9px] sm:text-[10px] uppercase tracking-wide mt-0.5">Tasks</p>
               </div>
-              <div className="bg-white/5 rounded-xl p-3 text-center border border-white/5">
-                <p className="text-cyan-400 font-bold text-base truncate text-sm">{t.joined}</p>
-                <p className="text-slate-500 text-[10px] uppercase tracking-wide mt-0.5">Member</p>
+              <div className="bg-white/5 rounded-xl p-2 sm:p-3 text-center border border-white/5">
+                <p className="text-cyan-400 font-bold text-xs sm:text-sm whitespace-nowrap">{t.joined}</p>
+                <p className="text-slate-500 text-[9px] sm:text-[10px] uppercase tracking-wide mt-0.5">Member</p>
               </div>
             </div>
 
@@ -231,11 +250,12 @@ export function Testimonials() {
       </div>
 
       {/* Pagination dots */}
-      <div className="flex items-center justify-center gap-2 mt-10">
-        {Array.from({ length: testimonials.length - visibleCount + 1 }).map((_, i) => (
+      <div className="flex items-center justify-center gap-2 mt-8 sm:mt-10">
+        {Array.from({ length: testimonials.length - viewportCount + 1 }).map((_, i) => (
           <button
             key={i}
             onClick={() => setCurrent(i)}
+            aria-label={`Go to slide ${i + 1}`}
             className={`h-1.5 rounded-full transition-all ${i === current ? 'w-8 bg-cyan-400' : 'w-2 bg-white/20'}`}
           />
         ))}

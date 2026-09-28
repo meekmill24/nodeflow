@@ -476,13 +476,13 @@ export default function LandingPage() {
         {/* ══════════════════════════════════════════
             HERO — Ultra Premium
         ══════════════════════════════════════════ */}
-        <section className="hero-section relative pt-10 pb-24 lg:pt-16 lg:pb-40 px-6 lg:px-12 max-w-7xl mx-auto">
+        <section className="hero-section relative pt-8 pb-20 sm:pt-10 sm:pb-24 lg:pt-16 lg:pb-40 px-4 sm:px-6 lg:px-12 max-w-7xl mx-auto">
           <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-[500px] h-[500px] bg-indigo-500/20 blur-[120px] rounded-full pointer-events-none" />
 
-          <div className="flex flex-col lg:flex-row items-center gap-16 lg:gap-20 relative z-10">
+          <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-20 relative z-10">
             {/* Left — Copy */}
             <div className="flex-1 text-center lg:text-left">
-              <div className="hero-sub inline-flex items-center gap-3 px-5 py-2 rounded-full bg-slate-900/80 backdrop-blur-md border border-white/10 shadow-[0_0_30px_rgba(6,182,212,0.15)] text-[10px] font-bold uppercase tracking-[0.2em] text-cyan-300 mb-8">
+              <div className="hero-sub inline-flex items-center gap-2.5 sm:gap-3 px-4 sm:px-5 py-2 rounded-full bg-slate-900/80 backdrop-blur-md border border-white/10 shadow-[0_0_30px_rgba(6,182,212,0.15)] text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.2em] text-cyan-300 mb-6 sm:mb-8">
                 <span className="relative flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75" />
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-500 shadow-[0_0_10px_rgba(6,182,212,0.8)]" />
@@ -490,58 +490,58 @@ export default function LandingPage() {
                 Institutional Task Matrix v2.5 — Live
               </div>
 
-              <h1 className="text-5xl md:text-7xl lg:text-8xl font-extrabold tracking-tight leading-[1.05] mb-8 drop-shadow-2xl">
+              <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold tracking-tight leading-[1.05] mb-6 sm:mb-8 drop-shadow-2xl">
                 <div className="hero-title-part text-white">STRATEGIC</div>
                 <div className="hero-title-part text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-500 to-indigo-500">DYNAMIC</div>
-                <div className="hero-title-part text-white flex items-center justify-center lg:justify-start gap-3">
+                <div className="hero-title-part text-white flex items-center justify-center lg:justify-start gap-2 sm:gap-3">
                   EARNINGS
-                  <div className="w-4 h-4 md:w-5 md:h-5 bg-cyan-500 rounded-full mt-2 lg:mt-4 shadow-[0_0_20px_rgba(6,182,212,0.8)]" />
+                  <div className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5 bg-cyan-500 rounded-full mt-1 sm:mt-2 lg:mt-4 shadow-[0_0_20px_rgba(6,182,212,0.8)]" />
                 </div>
               </h1>
 
-              <p className="hero-sub max-w-xl mx-auto lg:mx-0 text-slate-300 text-lg font-medium mb-10 leading-relaxed border-l-[3px] border-indigo-500/50 pl-6">
+              <p className="hero-sub max-w-xl mx-auto lg:mx-0 text-slate-300 text-base sm:text-lg font-medium mb-8 sm:mb-10 leading-relaxed border-l-[3px] border-indigo-500/50 pl-4 sm:pl-6 text-left">
                 The definitive institutional distribution matrix. Complete digital marketing workflows for optimized daily returns — withdraw in under 30 minutes.
               </p>
 
-              <div className="hero-cta flex flex-col sm:flex-row items-center gap-5 justify-center lg:justify-start mb-10">
+              <div className="hero-cta flex flex-col sm:flex-row items-center gap-4 sm:gap-5 justify-center lg:justify-start mb-8 sm:mb-10">
                 <Link href="/auth/sign-up" className="w-full sm:w-auto">
-                  <button className="w-full sm:w-auto px-10 py-4 bg-cyan-500 text-slate-950 rounded-2xl font-black text-sm uppercase tracking-widest shadow-[0_0_40px_rgba(6,182,212,0.3)] hover:shadow-[0_0_60px_rgba(6,182,212,0.5)] hover:scale-105 active:scale-95 transition-all duration-300 flex items-center justify-center gap-3">
+                  <button className="w-full sm:w-auto px-8 sm:px-10 py-3.5 sm:py-4 bg-cyan-500 text-slate-950 rounded-2xl font-black text-xs sm:text-sm uppercase tracking-widest shadow-[0_0_40px_rgba(6,182,212,0.3)] hover:shadow-[0_0_60px_rgba(6,182,212,0.5)] hover:scale-105 active:scale-95 transition-all duration-300 flex items-center justify-center gap-3">
                     Start Earning Now <ArrowUpRight size={16} />
                   </button>
                 </Link>
                 <Link href="/home" className="w-full sm:w-auto">
-                  <button className="w-full sm:w-auto px-8 py-4 border border-white/15 rounded-2xl font-bold text-sm text-slate-300 hover:bg-white/5 hover:text-white transition-all flex items-center justify-center gap-3">
+                  <button className="w-full sm:w-auto px-7 sm:px-8 py-3.5 sm:py-4 border border-white/15 rounded-2xl font-bold text-xs sm:text-sm text-slate-300 hover:bg-white/5 hover:text-white transition-all flex items-center justify-center gap-3">
                     <Play size={14} fill="currentColor" /> View Dashboard
                   </button>
                 </Link>
               </div>
 
               {/* Social proof row */}
-              <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-6 text-sm">
+              <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 sm:gap-6 text-sm">
                 <div className="flex items-center gap-3">
                   <div className="flex -space-x-3">
                     {[1, 2, 3, 4, 5].map(i => (
-                      <div key={i} className="w-9 h-9 rounded-full border-2 border-[#020617] bg-slate-800 overflow-hidden shadow-lg">
+                      <div key={i} className="w-8 h-8 sm:w-9 sm:h-9 rounded-full border-2 border-[#020617] bg-slate-800 overflow-hidden shadow-lg">
                         <img src={`https://i.pravatar.cc/100?u=ag${i}`} alt="agent" className="w-full h-full object-cover" />
                       </div>
                     ))}
                   </div>
                   <div className="text-left">
-                    <p className="text-white font-bold text-sm">124K+ Active Agents</p>
-                    <p className="text-slate-500 text-xs">across 40+ countries</p>
+                    <p className="text-white font-bold text-xs sm:text-sm">124K+ Active Agents</p>
+                    <p className="text-slate-500 text-[11px] sm:text-xs">across 40+ countries</p>
                   </div>
                 </div>
                 <div className="h-8 w-px bg-white/10 hidden sm:block" />
                 <div className="text-left">
-                  <p className="text-white font-bold text-sm">$920M+ Deployed</p>
-                  <p className="text-slate-500 text-xs">in active liquidity</p>
+                  <p className="text-white font-bold text-xs sm:text-sm">$920M+ Deployed</p>
+                  <p className="text-slate-500 text-[11px] sm:text-xs">in active liquidity</p>
                 </div>
               </div>
             </div>
 
             {/* Right — Dashboard Preview */}
-            <div className="flex-1 relative w-full max-w-xl mt-12 lg:mt-0">
-              <div className="relative rounded-[32px] border border-white/15 border-b-white/5 bg-slate-900/60 backdrop-blur-2xl overflow-hidden shadow-[0_30px_100px_rgba(0,0,0,0.7)] p-6">
+            <div className="flex-1 relative w-full md:max-w-2xl lg:max-w-xl mt-6 lg:mt-0">
+              <div className="relative rounded-[28px] sm:rounded-[32px] border border-white/15 border-b-white/5 bg-slate-900/60 backdrop-blur-2xl overflow-hidden shadow-[0_30px_100px_rgba(0,0,0,0.7)] p-4 sm:p-6">
                 {/* Window chrome */}
                 <div className="flex items-center gap-2 mb-5">
                   <div className="w-3 h-3 rounded-full bg-rose-500" />
@@ -612,13 +612,13 @@ export default function LandingPage() {
               </div>
 
               {/* Floating badge */}
-              <div className="absolute -bottom-5 -left-5 bg-slate-900 border border-emerald-500/30 rounded-2xl px-4 py-3 shadow-[0_10px_30px_rgba(0,0,0,0.5)] flex items-center gap-3">
+              <div className="absolute -bottom-3 left-3 sm:-bottom-5 sm:-left-5 bg-slate-900 border border-emerald-500/30 rounded-2xl px-3.5 py-2.5 sm:px-4 sm:py-3 shadow-[0_10px_30px_rgba(0,0,0,0.5)] flex items-center gap-3 z-20">
                 <div className="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400">
                   <CheckCircle2 size={16} />
                 </div>
                 <div>
                   <p className="text-[10px] text-emerald-400 font-black uppercase tracking-wider">Payout Sent</p>
-                  <p className="text-white font-bold text-sm">+$340.00 USDT</p>
+                  <p className="text-white font-bold text-xs sm:text-sm">+$340.00 USDT</p>
                 </div>
               </div>
             </div>
@@ -651,12 +651,12 @@ export default function LandingPage() {
         {/* ══════════════════════════════════════════
             PAYMENT METHODS BANNER
         ══════════════════════════════════════════ */}
-        <div className="border-b border-white/5 bg-slate-950/70 py-6 px-6 lg:px-12">
+        <div className="border-b border-white/5 bg-slate-950/70 py-4 sm:py-6 px-4 sm:px-6 lg:px-12">
           <div className="max-w-7xl mx-auto">
-            <div className="flex flex-col sm:flex-row items-center gap-6">
+            <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
               <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 whitespace-nowrap shrink-0">We Accept</p>
               <div className="w-px h-6 bg-white/10 hidden sm:block shrink-0" />
-              <div className="flex flex-wrap items-center justify-center sm:justify-start gap-3">
+              <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2.5 sm:gap-3">
                 {[
                   { label: 'USDT', color: 'text-emerald-400 border-emerald-500/30 bg-emerald-500/10', icon: '₮' },
                   { label: 'USDC', color: 'text-blue-400 border-blue-500/30 bg-blue-500/10', icon: '$' },
@@ -665,7 +665,7 @@ export default function LandingPage() {
                   { label: 'BNB', color: 'text-yellow-400 border-yellow-500/30 bg-yellow-500/10', icon: 'B' },
                   { label: 'PayPal USD (PYUSD)', color: 'text-sky-400 border-sky-500/30 bg-sky-500/10', icon: 'P$' },
                 ].map((m) => (
-                  <div key={m.label} className={`flex items-center gap-2 px-3.5 py-2 rounded-xl border text-[11px] font-black uppercase tracking-widest ${m.color} transition-all hover:scale-105`}>
+                  <div key={m.label} className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-xl border text-[10px] sm:text-[11px] font-black uppercase tracking-widest ${m.color} transition-all hover:scale-105`}>
                     <span className="text-base leading-none">{m.icon}</span>
                     {m.label}
                   </div>
@@ -682,7 +682,7 @@ export default function LandingPage() {
         {/* ══════════════════════════════════════════
             PLATFORM STATS — Animated counters
         ══════════════════════════════════════════ */}
-        <section id="stats-counters" className="px-6 lg:px-12 py-20 max-w-7xl mx-auto">
+        <section id="stats-counters" className="px-4 sm:px-6 lg:px-12 py-16 sm:py-20 max-w-7xl mx-auto">
           <div className="section-header text-center mb-14">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[10px] font-bold uppercase tracking-widest text-emerald-400 mb-6">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
@@ -696,21 +696,21 @@ export default function LandingPage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
             {[
               { prefix: '', value: counterValues.agents.toLocaleString(), suffix: '+', label: 'Active Agents', sublabel: 'across 40+ countries', color: 'from-blue-500/20 to-cyan-500/20', border: 'hover:border-blue-500/30', dot: 'bg-blue-400' },
               { prefix: '$', value: counterValues.liquidity.toLocaleString(), suffix: 'M+', label: 'Liquidity Deployed', sublabel: 'in active liquidity pools', color: 'from-emerald-500/20 to-teal-500/20', border: 'hover:border-emerald-500/30', dot: 'bg-emerald-400' },
               { prefix: '+', value: counterValues.yield.toFixed(1), suffix: '%', label: 'Daily Yield Rate', sublabel: 'maximum return potential', color: 'from-violet-500/20 to-indigo-500/20', border: 'hover:border-violet-500/30', dot: 'bg-violet-400' },
               { prefix: '< ', value: counterValues.payout.toString(), suffix: ' Min', label: 'Payout Speed', sublabel: 'guaranteed execution limit', color: 'from-amber-500/20 to-orange-500/20', border: 'hover:border-amber-500/30', dot: 'bg-amber-400' },
             ].map((item, i) => (
-              <div key={i} className={`group relative rounded-[28px] bg-gradient-to-br ${item.color} border border-white/5 p-7 overflow-hidden transition-all hover:scale-[1.03] ${item.border}`}>
+              <div key={i} className={`group relative rounded-[20px] sm:rounded-[28px] bg-gradient-to-br ${item.color} border border-white/5 p-4 sm:p-7 overflow-hidden transition-all hover:scale-[1.03] ${item.border}`}>
                 <div className="absolute inset-0 opacity-[0.03] bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:20px_20px] pointer-events-none" />
-                <div className={`w-2 h-2 rounded-full ${item.dot} mb-5 shadow-lg`} />
-                <div className="text-4xl lg:text-5xl font-black italic tracking-tighter text-white tabular-nums">
-                  <span className="text-2xl font-normal text-slate-400">{item.prefix}</span>{item.value}<span className="text-2xl">{item.suffix}</span>
+                <div className={`w-2 h-2 rounded-full ${item.dot} mb-3 sm:mb-5 shadow-lg`} />
+                <div className="text-2xl sm:text-4xl lg:text-5xl font-black italic tracking-tighter text-white tabular-nums">
+                  <span className="text-base sm:text-2xl font-normal text-slate-400">{item.prefix}</span>{item.value}<span className="text-base sm:text-2xl">{item.suffix}</span>
                 </div>
-                <p className="text-sm font-black uppercase tracking-widest text-white mt-2">{item.label}</p>
-                <p className="text-xs text-slate-400 mt-1">{item.sublabel}</p>
+                <p className="text-xs sm:text-sm font-black uppercase tracking-wider text-white mt-1 sm:mt-2 leading-tight">{item.label}</p>
+                <p className="text-[10px] sm:text-xs text-slate-400 mt-0.5 sm:mt-1 leading-snug">{item.sublabel}</p>
               </div>
             ))}
           </div>
@@ -731,17 +731,17 @@ export default function LandingPage() {
         {/* ══════════════════════════════════════════
             WHY CHOOSE — Bento Grid
         ══════════════════════════════════════════ */}
-        <section className="px-6 lg:px-12 py-24 max-w-7xl mx-auto border-t border-white/5">
-          <div className="section-header text-center mb-16">
+        <section className="px-4 sm:px-6 lg:px-12 py-16 sm:py-24 max-w-7xl mx-auto border-t border-white/5">
+          <div className="section-header text-center mb-12 sm:mb-16">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-[10px] font-bold uppercase tracking-widest text-cyan-400 mb-6">
               <span className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
               Built Different
             </div>
-            <h2 className="text-5xl md:text-6xl font-extrabold tracking-tight leading-[1.05] mb-4 text-white">
+            <h2 className="text-3xl sm:text-5xl md:text-6xl font-extrabold tracking-tight leading-[1.05] mb-4 text-white">
               Why people choose<br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-indigo-500">SmartBugMedia</span>
             </h2>
-            <p className="text-slate-400 text-base max-w-2xl mx-auto">
+            <p className="text-slate-400 text-sm sm:text-base max-w-2xl mx-auto">
               We&apos;re not the first platform out there. But there&apos;s a reason people stay.
             </p>
           </div>
@@ -751,20 +751,20 @@ export default function LandingPage() {
               <div
                 key={i}
                 className={cn(
-                  'group relative p-7 rounded-[28px] bg-slate-900/40 border border-white/5 transition-all duration-300 flex flex-col',
+                  'group relative p-5 sm:p-7 rounded-[24px] sm:rounded-[28px] bg-slate-900/40 border border-white/5 transition-all duration-300 flex flex-col',
                   card.border,
                   card.size
                 )}
               >
-                <div className={cn('absolute inset-0 rounded-[28px] bg-gradient-to-br opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none', card.accent)} />
+                <div className={cn('absolute inset-0 rounded-[24px] sm:rounded-[28px] bg-gradient-to-br opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none', card.accent)} />
                 <div className="relative z-10 flex flex-col h-full">
                   {card.tag && (
                     <span className={cn('inline-flex self-start items-center px-3 py-1 rounded-full border text-[10px] font-bold uppercase tracking-widest mb-4', card.tagColor)}>
                       {card.tag}
                     </span>
                   )}
-                  <div className="text-4xl mb-4">{card.emoji}</div>
-                  <h3 className={cn('font-black text-white mb-2 tracking-tight', card.featured ? 'text-2xl' : 'text-xl')}>
+                  <div className="text-3xl sm:text-4xl mb-4">{card.emoji}</div>
+                  <h3 className={cn('font-black text-white mb-2 tracking-tight', card.featured ? 'text-xl sm:text-2xl' : 'text-lg sm:text-xl')}>
                     {card.title}
                   </h3>
                   <p className="text-slate-400 text-sm leading-relaxed flex-1">{card.desc}</p>
@@ -777,13 +777,13 @@ export default function LandingPage() {
         {/* ══════════════════════════════════════════
             HOW IT WORKS — 3 Steps
         ══════════════════════════════════════════ */}
-        <section id="ecosystem" className="px-6 lg:px-12 py-28 max-w-7xl mx-auto border-t border-white/5">
-          <div className="section-header text-center mb-20">
+        <section id="ecosystem" className="px-4 sm:px-6 lg:px-12 py-16 sm:py-24 lg:py-28 max-w-7xl mx-auto border-t border-white/5">
+          <div className="section-header text-center mb-12 sm:mb-20">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-[10px] font-bold uppercase tracking-widest text-indigo-400 mb-6">
               <span className="w-1.5 h-1.5 rounded-full bg-indigo-400" />
               Simple System Protocol
             </div>
-            <h2 className="text-5xl md:text-7xl font-black italic tracking-tighter uppercase mb-4">HOW IT WORKS</h2>
+            <h2 className="text-4xl sm:text-5xl md:text-7xl font-black italic tracking-tighter uppercase mb-4">HOW IT WORKS</h2>
             <div className="w-16 h-1 bg-gradient-to-r from-cyan-500 to-indigo-500 mx-auto rounded-full" />
           </div>
 
@@ -824,7 +824,7 @@ export default function LandingPage() {
         {/* ══════════════════════════════════════════
             SANDBOX SIMULATOR
         ══════════════════════════════════════════ */}
-        <section id="sandbox" className="px-6 lg:px-12 py-24 max-w-5xl mx-auto border-t border-white/5 relative">
+        <section id="sandbox" className="px-4 sm:px-6 lg:px-12 py-16 sm:py-24 max-w-5xl mx-auto border-t border-white/5 relative">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-cyan-500/[0.02] blur-[120px] rounded-full pointer-events-none" />
 
           <div className="section-header text-center mb-12 relative z-10">
@@ -840,18 +840,18 @@ export default function LandingPage() {
             </p>
           </div>
 
-          <div className="relative z-10 bg-slate-900/60 backdrop-blur-xl border border-white/10 rounded-[32px] p-6 md:p-10 overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.5)]">
+          <div className="relative z-10 bg-slate-900/60 backdrop-blur-xl border border-white/10 rounded-[24px] sm:rounded-[32px] p-4 sm:p-6 md:p-10 overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.5)]">
             <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-indigo-500/5 to-transparent rounded-full pointer-events-none" />
 
             {/* Console header */}
-            <div className="flex items-center justify-between border-b border-white/5 pb-5 mb-8">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/5 pb-4 sm:pb-5 mb-6 sm:mb-8">
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-rose-500" />
-                <div className="w-3 h-3 rounded-full bg-amber-500" />
-                <div className="w-3 h-3 rounded-full bg-emerald-500" />
-                <span className="ml-3 text-[10px] font-mono tracking-widest text-slate-500 uppercase">AGENT_SANDBOX_SHELL v1.0.4</span>
+                <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-rose-500" />
+                <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-amber-500" />
+                <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-emerald-500" />
+                <span className="ml-2 sm:ml-3 text-[9px] sm:text-[10px] font-mono tracking-widest text-slate-500 uppercase">AGENT_SANDBOX_SHELL v1.0.4</span>
               </div>
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-3 sm:gap-4 justify-between sm:justify-end">
                 <span className="text-[10px] font-bold tracking-widest text-slate-400 uppercase">
                   TASKS: <span className="text-cyan-400">{sandboxTasks}/3</span>
                 </span>
@@ -995,7 +995,7 @@ export default function LandingPage() {
         {/* ══════════════════════════════════════════
             COMPARISON TABLE
         ══════════════════════════════════════════ */}
-        <section className="px-6 lg:px-12 py-28 border-t border-white/5 max-w-7xl mx-auto">
+        <section className="px-4 sm:px-6 lg:px-12 py-16 sm:py-28 border-t border-white/5 max-w-7xl mx-auto">
           <div className="section-header text-center mb-14">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-[10px] font-bold uppercase tracking-widest text-cyan-400 mb-6">
               <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
@@ -1009,8 +1009,13 @@ export default function LandingPage() {
             </p>
           </div>
 
-          <div className="overflow-x-auto rounded-[28px] border border-white/5">
-            <table className="w-full text-sm">
+          {/* Mobile scroll hint */}
+          <div className="md:hidden text-center text-[10px] text-cyan-400/80 font-bold uppercase tracking-wider mb-3 flex items-center justify-center gap-1.5">
+            <span className="animate-pulse">←</span> Scroll to compare all platforms <span className="animate-pulse">→</span>
+          </div>
+
+          <div className="overflow-x-auto rounded-[24px] sm:rounded-[28px] border border-white/5 custom-scrollbar">
+            <table className="w-full min-w-[620px] text-sm">
               <thead>
                 <tr className="border-b border-white/5 bg-slate-900/60">
                   <th className="px-6 py-5 text-left text-[11px] font-black uppercase tracking-widest text-slate-400">Feature</th>
@@ -1065,14 +1070,14 @@ export default function LandingPage() {
         {/* ══════════════════════════════════════════
             REFERRAL SPOTLIGHT
         ══════════════════════════════════════════ */}
-        <section className="px-6 lg:px-12 py-28 bg-slate-950/40 relative border-t border-white/5">
+        <section className="px-4 sm:px-6 lg:px-12 py-16 sm:py-24 lg:py-28 bg-slate-950/40 relative border-t border-white/5">
           <div className="max-w-7xl mx-auto">
             <div className="section-header text-center mb-14">
               <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-violet-500/10 border border-violet-500/20 text-[10px] font-bold uppercase tracking-widest text-violet-400 mb-6">
                 <span className="w-1.5 h-1.5 rounded-full bg-violet-400 animate-pulse" />
                 Top Earners
               </div>
-              <h2 className="text-4xl md:text-5xl font-black italic uppercase tracking-tight text-white mb-3">
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-black italic uppercase tracking-tight text-white mb-3">
                 REFERRAL SPOTLIGHT
               </h2>
               <p className="text-slate-400 text-sm max-w-xl mx-auto">
@@ -1089,7 +1094,7 @@ export default function LandingPage() {
                 { rank: '05', name: 'Sarah J.', location: 'Chicago, IL, USA', agents: 17, totalEarned: '$3,960', monthlyPassive: '$500', tier: 'INTERMEDIATE', avatar: 'S', color: 'from-indigo-500/10 to-blue-500/10', border: 'border-indigo-500/20', badge: 'text-indigo-400 bg-indigo-500/10 border-indigo-500/20' },
                 { rank: '06', name: 'Priya S.', location: 'Seattle, WA, USA', agents: 13, totalEarned: '$2,640', monthlyPassive: '$360', tier: 'JUNIOR AGENT', avatar: 'P', color: 'from-cyan-500/10 to-teal-500/10', border: 'border-cyan-500/20', badge: 'text-cyan-400 bg-cyan-500/10 border-cyan-500/20' },
               ].map((agent, i) => (
-                <div key={i} className={`relative bg-gradient-to-br ${agent.color} rounded-[24px] border ${agent.border} p-6 overflow-hidden hover:scale-[1.02] transition-all`}>
+                <div key={i} className={`relative bg-gradient-to-br ${agent.color} rounded-[24px] border ${agent.border} p-5 sm:p-6 overflow-hidden hover:scale-[1.02] transition-all`}>
                   <div className="absolute top-4 right-4 text-5xl font-black italic text-white/5">{agent.rank}</div>
                   <div className="flex items-center gap-4 mb-5">
                     <div className="w-12 h-12 rounded-full bg-slate-900/80 border border-white/10 flex items-center justify-center text-white font-black text-lg">{agent.avatar}</div>
@@ -1117,11 +1122,11 @@ export default function LandingPage() {
             </div>
 
             {/* CTA Banner */}
-            <div className="text-center p-10 rounded-[28px] bg-gradient-to-r from-violet-500/10 via-indigo-500/10 to-cyan-500/10 border border-violet-500/20">
+            <div className="text-center p-6 sm:p-10 rounded-[24px] sm:rounded-[28px] bg-gradient-to-r from-violet-500/10 via-indigo-500/10 to-cyan-500/10 border border-violet-500/20">
               <p className="text-slate-400 text-sm mb-2">Ready to build your own passive income stream?</p>
-              <p className="text-white font-black text-2xl md:text-3xl italic uppercase tracking-tight mb-6">Your referral link is waiting for you.</p>
+              <p className="text-white font-black text-xl sm:text-2xl md:text-3xl italic uppercase tracking-tight mb-6">Your referral link is waiting for you.</p>
               <Link href="/auth/sign-up">
-                <button className="px-10 py-4 bg-violet-500 text-white rounded-xl font-black text-xs uppercase tracking-widest shadow-lg shadow-violet-500/20 hover:scale-105 active:scale-95 transition-all">
+                <button className="w-full sm:w-auto px-6 sm:px-10 py-3.5 sm:py-4 bg-violet-500 text-white rounded-xl font-black text-xs uppercase tracking-widest shadow-lg shadow-violet-500/20 hover:scale-105 active:scale-95 transition-all">
                   Start Earning Referral Commissions
                 </button>
               </Link>
@@ -1132,13 +1137,13 @@ export default function LandingPage() {
         {/* ══════════════════════════════════════════
             WITHDRAWAL PROOF FEED
         ══════════════════════════════════════════ */}
-        <section className="px-6 lg:px-12 py-20 max-w-7xl mx-auto border-t border-white/5">
+        <section className="px-4 sm:px-6 lg:px-12 py-16 sm:py-20 max-w-7xl mx-auto border-t border-white/5">
           <div className="section-header text-center mb-12">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-[10px] font-bold uppercase tracking-widest text-cyan-400 mb-6">
               <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
               Verified Payouts
             </div>
-            <h2 className="text-4xl md:text-5xl font-black italic uppercase tracking-tight text-white mb-3">WITHDRAWAL PROOF</h2>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black italic uppercase tracking-tight text-white mb-3">WITHDRAWAL PROOF</h2>
             <p className="text-slate-400 text-sm max-w-xl mx-auto">These are real payout receipts from verified SmartBugMedia members — amounts and names are partially blurred for privacy.</p>
           </div>
 
@@ -1200,7 +1205,7 @@ export default function LandingPage() {
         {/* ══════════════════════════════════════════
             TIER GRID — Member Plans
         ══════════════════════════════════════════ */}
-        <section id="tiers" className="px-6 lg:px-12 py-28 bg-slate-950/40 relative border-t border-white/5">
+        <section id="tiers" className="px-4 sm:px-6 lg:px-12 py-16 sm:py-24 lg:py-28 bg-slate-950/40 relative border-t border-white/5">
           <div className="absolute inset-0 bg-[url('/dots.svg')] opacity-[0.04]" />
           <div className="max-w-7xl mx-auto relative z-10">
             <div className="section-header flex flex-col lg:flex-row lg:items-end justify-between gap-8 mb-16">
@@ -1409,37 +1414,37 @@ export default function LandingPage() {
         {/* ══════════════════════════════════════════
             SECURITY — Quantum Shield
         ══════════════════════════════════════════ */}
-        <section id="security" className="px-6 lg:px-12 py-32 max-w-7xl mx-auto overflow-hidden border-t border-white/5">
-          <div className="bg-gradient-to-br from-slate-900 via-slate-900 to-slate-950 rounded-[56px] border border-white/5 p-10 lg:p-20 relative">
+        <section id="security" className="px-4 sm:px-6 lg:px-12 py-16 sm:py-24 lg:py-32 max-w-7xl mx-auto overflow-hidden border-t border-white/5">
+          <div className="bg-gradient-to-br from-slate-900 via-slate-900 to-slate-950 rounded-[32px] sm:rounded-[56px] border border-white/5 p-6 sm:p-10 lg:p-20 relative">
             <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-cyan-600/5 blur-[150px] rounded-full pointer-events-none" />
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
               <div className="relative z-10">
-                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-[10px] font-bold uppercase tracking-widest text-cyan-400 mb-8">
+                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-[10px] font-bold uppercase tracking-widest text-cyan-400 mb-6 sm:mb-8">
                   <span className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
                   Security Infrastructure
                 </div>
-                <h2 className="text-5xl md:text-7xl font-black italic tracking-tighter uppercase leading-[0.85] mb-10">
+                <h2 className="text-4xl sm:text-5xl md:text-7xl font-black italic tracking-tighter uppercase leading-[0.85] mb-6 sm:mb-10">
                   QUANTUM <br />
                   <span className="text-cyan-500">SECURITY</span>
                 </h2>
-                <p className="text-slate-400 text-base font-medium mb-10 leading-relaxed">
+                <p className="text-slate-400 text-sm sm:text-base font-medium mb-8 sm:mb-10 leading-relaxed">
                   SmartBugMedia uses a multi-layered verification consensus to ensure all agent distribution remains synchronized and secure across global gateways.
                 </p>
 
-                <div className="space-y-8">
+                <div className="space-y-6 sm:space-y-8">
                   {[
                     { title: 'Ledger Consensus', desc: 'Immutable distribution logging for 100% transparency.', icon: Layers },
                     { title: 'Multi-Sig Vaults', desc: 'Deep liquidity storage protected by institutional encryption.', icon: Lock },
                     { title: 'Neural Auditing', desc: 'Real-time AI monitoring for task optimization efficiency.', icon: Cpu },
                   ].map((f, i) => (
-                    <div key={i} className="flex gap-5 group">
-                      <div className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0 group-hover:text-cyan-400 group-hover:border-cyan-500/30 transition-all">
-                        <f.icon size={20} />
+                    <div key={i} className="flex gap-4 sm:gap-5 group">
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0 group-hover:text-cyan-400 group-hover:border-cyan-500/30 transition-all">
+                        <f.icon size={18} />
                       </div>
                       <div>
-                        <h5 className="text-base font-black italic uppercase tracking-tight text-white mb-1">{f.title}</h5>
-                        <p className="text-sm font-medium text-slate-500 leading-relaxed">{f.desc}</p>
+                        <h5 className="text-sm sm:text-base font-black italic uppercase tracking-tight text-white mb-1">{f.title}</h5>
+                        <p className="text-xs sm:text-sm font-medium text-slate-500 leading-relaxed">{f.desc}</p>
                       </div>
                     </div>
                   ))}
@@ -1447,20 +1452,20 @@ export default function LandingPage() {
               </div>
 
               <div className="relative flex items-center justify-center">
-                <div className="aspect-square relative w-full max-w-sm rounded-[48px] bg-slate-950 border border-white/10 flex items-center justify-center overflow-hidden">
+                <div className="aspect-square relative w-full max-w-sm rounded-[36px] sm:rounded-[48px] bg-slate-950 border border-white/10 flex items-center justify-center overflow-hidden">
                   <div className="absolute inset-0 opacity-10">
                     <div className="w-full h-full bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:40px_40px]" />
                   </div>
                   <div className="w-4/5 h-4/5 rounded-full border border-dashed border-cyan-500/20 animate-[spin_20s_linear_infinite] flex items-center justify-center">
                     <div className="w-3/4 h-3/4 rounded-full border border-indigo-500/20 animate-[spin_12s_linear_infinite_reverse]" />
                   </div>
-                  <ShieldCheck className="absolute text-cyan-400 drop-shadow-[0_0_30px_rgba(34,211,238,0.5)]" size={100} strokeWidth={1.2} />
+                  <ShieldCheck className="absolute text-cyan-400 drop-shadow-[0_0_30px_rgba(34,211,238,0.5)]" size={80} strokeWidth={1.2} />
 
                   {/* Corner badges */}
                   {['256-bit AES', 'TLS 1.3', 'Zero-Knowledge', 'Multi-Sig'].map((label, i) => {
-                    const positions = ['top-6 left-6', 'top-6 right-6', 'bottom-6 left-6', 'bottom-6 right-6'];
+                    const positions = ['top-4 sm:top-6 left-4 sm:left-6', 'top-4 sm:top-6 right-4 sm:right-6', 'bottom-4 sm:bottom-6 left-4 sm:left-6', 'bottom-4 sm:bottom-6 right-4 sm:right-6'];
                     return (
-                      <div key={i} className={`absolute ${positions[i]} px-2.5 py-1 rounded-lg bg-slate-900/80 border border-white/10 text-[9px] font-black uppercase tracking-wider text-slate-400`}>
+                      <div key={i} className={`absolute ${positions[i]} px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-lg bg-slate-900/80 border border-white/10 text-[8px] sm:text-[9px] font-black uppercase tracking-wider text-slate-400`}>
                         {label}
                       </div>
                     );
@@ -1479,13 +1484,13 @@ export default function LandingPage() {
         {/* ══════════════════════════════════════════
             FAQ
         ══════════════════════════════════════════ */}
-        <section id="faq" className="px-6 lg:px-12 py-28 max-w-4xl mx-auto border-t border-white/5">
-          <div className="section-header text-center mb-14">
+        <section id="faq" className="px-4 sm:px-6 lg:px-12 py-16 sm:py-24 lg:py-28 max-w-4xl mx-auto border-t border-white/5">
+          <div className="section-header text-center mb-12 sm:mb-14">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-[10px] font-bold uppercase tracking-widest text-cyan-400 mb-6">
               <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
               Frequently Asked
             </div>
-            <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight text-white mb-3">Got Questions?</h2>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-white mb-3">Got Questions?</h2>
             <p className="text-slate-400 text-sm max-w-xl mx-auto">
               Everything you need to know about SmartBugMedia — the platform and how to secure your daily yields.
             </p>
@@ -1499,15 +1504,15 @@ export default function LandingPage() {
               >
                 <button
                   onClick={() => setActiveFaq(activeFaq === idx ? null : idx)}
-                  className="w-full px-6 py-5 flex items-center justify-between text-left font-bold text-white text-base focus:outline-none"
+                  className="w-full px-4 sm:px-6 py-4 sm:py-5 flex items-center justify-between text-left font-bold text-white text-sm sm:text-base focus:outline-none"
                 >
                   <span>{faq.q}</span>
-                  <span className={`text-cyan-400 transition-transform duration-300 ml-4 shrink-0 ${activeFaq === idx ? 'rotate-180' : ''}`}>
+                  <span className={`text-cyan-400 transition-transform duration-300 ml-3 sm:ml-4 shrink-0 ${activeFaq === idx ? 'rotate-180' : ''}`}>
                     ▼
                   </span>
                 </button>
-                <div className={`px-6 transition-all duration-300 ease-in-out overflow-hidden ${activeFaq === idx ? 'max-h-64 pb-6 opacity-100' : 'max-h-0 opacity-0'}`}>
-                  <p className="text-slate-400 text-sm leading-relaxed">{faq.a}</p>
+                <div className={`px-4 sm:px-6 transition-all duration-300 ease-in-out overflow-hidden ${activeFaq === idx ? 'max-h-64 pb-5 sm:pb-6 opacity-100' : 'max-h-0 opacity-0'}`}>
+                  <p className="text-slate-400 text-xs sm:text-sm leading-relaxed">{faq.a}</p>
                 </div>
               </div>
             ))}
@@ -1517,12 +1522,12 @@ export default function LandingPage() {
         {/* ══════════════════════════════════════════
             CONNECT HUB — Dual Panel Newsletter & Contact Us
         ══════════════════════════════════════════ */}
-        <section id="connect-hub" className="px-6 lg:px-12 py-24 max-w-7xl mx-auto border-t border-white/5 relative">
+        <section id="connect-hub" className="px-4 sm:px-6 lg:px-12 py-16 sm:py-24 max-w-7xl mx-auto border-t border-white/5 relative">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-indigo-500/[0.015] blur-[150px] rounded-full pointer-events-none" />
           
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch relative z-10">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 items-stretch relative z-10">
             {/* Panel 1: Newsletter */}
-            <div className="relative rounded-[32px] bg-slate-900/60 backdrop-blur-xl border border-white/5 overflow-hidden p-8 md:p-10 flex flex-col justify-between shadow-[0_20px_50px_rgba(0,0,0,0.5)] group hover:border-cyan-500/20 transition-all duration-300">
+            <div className="relative rounded-[24px] sm:rounded-[32px] bg-slate-900/60 backdrop-blur-xl border border-white/5 overflow-hidden p-5 sm:p-8 md:p-10 flex flex-col justify-between shadow-[0_20px_50px_rgba(0,0,0,0.5)] group hover:border-cyan-500/20 transition-all duration-300">
               <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/[0.02] blur-3xl rounded-full pointer-events-none" />
               
               <div className="relative z-10 flex-1 flex flex-col">
@@ -1783,33 +1788,33 @@ export default function LandingPage() {
         {/* ══════════════════════════════════════════
             FINAL CTA — White block
         ══════════════════════════════════════════ */}
-        <section className="px-6 lg:px-12 pb-28 max-w-7xl mx-auto">
-          <div className="relative rounded-[64px] bg-white p-14 lg:p-28 text-center text-slate-950 overflow-hidden">
+        <section className="px-4 sm:px-6 lg:px-12 pb-16 sm:pb-28 max-w-7xl mx-auto">
+          <div className="relative rounded-[32px] sm:rounded-[48px] lg:rounded-[64px] bg-white p-6 sm:p-14 lg:p-28 text-center text-slate-950 overflow-hidden">
             {/* Subtle texture */}
             <div className="absolute inset-0 opacity-[0.025] pointer-events-none" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\")" }} />
 
-            <div className="relative z-10 space-y-8">
-              <div className="inline-flex px-5 py-2 rounded-full bg-slate-950/5 border border-slate-950/10 text-[10px] font-black uppercase tracking-[0.4em]">
+            <div className="relative z-10 space-y-6 sm:space-y-8">
+              <div className="inline-flex px-4 sm:px-5 py-1.5 sm:py-2 rounded-full bg-slate-950/5 border border-slate-950/10 text-[9px] sm:text-[10px] font-black uppercase tracking-[0.3em] sm:tracking-[0.4em]">
                 Ready to synchronize?
               </div>
 
-              <h2 className="text-5xl md:text-7xl lg:text-8xl font-extrabold italic tracking-tighter uppercase leading-[0.85]">
+              <h2 className="text-3xl sm:text-5xl md:text-7xl lg:text-8xl font-extrabold italic tracking-tighter uppercase leading-[0.9]">
                 JOIN THE <br />
                 <span className="text-indigo-600">GLOBAL MATRIX</span>
               </h2>
 
-              <p className="max-w-xl mx-auto text-slate-600 text-base md:text-lg font-medium italic">
+              <p className="max-w-xl mx-auto text-slate-600 text-sm sm:text-base md:text-lg font-medium italic">
                 Start your institutional agent journey today. Deploy liquidity, optimize workflows, and harvest verified global returns — starting at just $30.
               </p>
 
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-5 pt-2">
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-5 pt-2">
                 <Link href="/auth/sign-up" className="w-full sm:w-auto">
-                  <button className="w-full sm:w-auto px-14 py-5 bg-slate-950 text-white rounded-3xl font-black text-xs uppercase tracking-[0.3em] shadow-2xl hover:scale-105 hover:shadow-slate-950/30 transition-all">
+                  <button className="w-full sm:w-auto px-8 sm:px-14 py-4 sm:py-5 bg-slate-950 text-white rounded-2xl sm:rounded-3xl font-black text-xs uppercase tracking-[0.2em] sm:tracking-[0.3em] shadow-2xl hover:scale-105 hover:shadow-slate-950/30 transition-all">
                     Get Started — It&apos;s Free
                   </button>
                 </Link>
                 <Link href="/home" className="w-full sm:w-auto">
-                  <button className="w-full sm:w-auto px-10 py-5 bg-slate-950/5 border-2 border-slate-950/10 rounded-3xl font-black text-[11px] uppercase tracking-[0.35em] hover:bg-slate-950 hover:text-white transition-all">
+                  <button className="w-full sm:w-auto px-6 sm:px-10 py-4 sm:py-5 bg-slate-950/5 border-2 border-slate-950/10 rounded-2xl sm:rounded-3xl font-black text-[10px] sm:text-[11px] uppercase tracking-[0.2em] sm:tracking-[0.35em] hover:bg-slate-950 hover:text-white transition-all">
                     View Dashboard
                   </button>
                 </Link>
@@ -1837,7 +1842,7 @@ export default function LandingPage() {
       {/* ══════════════════════════════════════════
           FLOATING LIVE ACTIVITY FEED
       ══════════════════════════════════════════ */}
-      <div className="fixed bottom-6 right-6 z-50 pointer-events-none max-w-xs md:max-w-sm w-full">
+      <div className="fixed bottom-4 inset-x-4 sm:inset-x-auto sm:bottom-6 sm:right-6 z-50 pointer-events-none sm:max-w-xs md:max-w-sm w-auto sm:w-full">
         <AnimatePresence mode="wait">
           {mockNotifications.map((notif, idx) => {
             if (idx !== currentNotification) return null;

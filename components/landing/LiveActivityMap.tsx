@@ -62,38 +62,38 @@ export function LiveActivityMap() {
       >
         {/* Top Control Bar with Night / Light toggle */}
         <div
-          className={`flex items-center justify-between px-6 md:px-10 py-5 border-b backdrop-blur-md transition-colors duration-500 ${
+          className={`flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 px-4 sm:px-6 md:px-10 py-3.5 sm:py-5 border-b backdrop-blur-md transition-colors duration-500 ${
             isNight ? 'border-white/10 bg-white/[0.02]' : 'border-slate-300/60 bg-white/70'
           }`}
         >
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5 sm:gap-3">
             <div
-              className={`w-9 h-9 rounded-xl flex items-center justify-center border transition-colors ${
+              className={`w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center border transition-colors shrink-0 ${
                 isNight
                   ? 'bg-cyan-500/10 border-cyan-500/30 text-cyan-400'
                   : 'bg-emerald-500/10 border-emerald-500/30 text-emerald-600'
               }`}
             >
-              <Globe2 size={18} />
+              <Globe2 size={16} />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className={`text-xs font-black uppercase tracking-wider ${isNight ? 'text-white' : 'text-slate-900'}`}>
+                <span className={`text-[11px] sm:text-xs font-black uppercase tracking-wider ${isNight ? 'text-white' : 'text-slate-900'}`}>
                   Global Telemetry Mesh
                 </span>
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-emerald-500/10 border border-emerald-500/20 text-emerald-500">
+                <span className="inline-flex items-center gap-1 px-1.5 sm:px-2 py-0.5 rounded-full text-[8px] sm:text-[9px] font-black uppercase tracking-wider bg-emerald-500/10 border border-emerald-500/20 text-emerald-500">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                   Live Sync
                 </span>
               </div>
-              <p className={`text-[10px] font-mono tracking-widest uppercase ${isNight ? 'text-slate-500' : 'text-slate-500'}`}>
+              <p className={`text-[9px] sm:text-[10px] font-mono tracking-widest uppercase ${isNight ? 'text-slate-500' : 'text-slate-500'}`}>
                 12 Nodes Broadcasting · US & Global
               </p>
             </div>
           </div>
 
           {/* Night / Light Mode Switcher */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 self-end sm:self-auto">
             <span className={`text-[10px] font-black uppercase tracking-widest hidden sm:inline ${isNight ? 'text-slate-400' : 'text-slate-600'}`}>
               Map View:
             </span>
@@ -105,33 +105,33 @@ export function LiveActivityMap() {
               <button
                 type="button"
                 onClick={() => setMapTheme('night')}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all duration-300 ${
+                className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl text-[9px] sm:text-[10px] font-black uppercase tracking-wider transition-all duration-300 ${
                   isNight
                     ? 'bg-cyan-500 text-slate-950 shadow-md shadow-cyan-500/30'
                     : 'text-slate-500 hover:text-slate-900'
                 }`}
               >
-                <Moon size={12} />
-                Night Mode
+                <Moon size={11} />
+                <span>Night<span className="hidden sm:inline"> Mode</span></span>
               </button>
               <button
                 type="button"
                 onClick={() => setMapTheme('day')}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all duration-300 ${
+                className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl text-[9px] sm:text-[10px] font-black uppercase tracking-wider transition-all duration-300 ${
                   !isNight
                     ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
                     : 'text-slate-400 hover:text-white'
                 }`}
               >
-                <Sun size={12} />
-                Light Mode
+                <Sun size={11} />
+                <span>Light<span className="hidden sm:inline"> Mode</span></span>
               </button>
             </div>
           </div>
         </div>
 
         {/* Real World Map SVG Stage */}
-        <div className="relative w-full p-4 md:p-8" style={{ minHeight: 380, maxHeight: 520 }}>
+        <div className="relative w-full p-2 sm:p-4 md:p-8" style={{ minHeight: 280, maxHeight: 520 }}>
           {/* Subtle Grid overlay */}
           <div
             className="absolute inset-0 pointer-events-none opacity-30"
