@@ -406,48 +406,62 @@ export default function LandingPage() {
         {/* ══════════════════════════════════════════
             NAV — Glassmorphism sticky
         ══════════════════════════════════════════ */}
-        <nav className="sticky top-0 z-50 w-full px-4 sm:px-6 py-3 sm:py-4 lg:px-12 backdrop-blur-xl border-b border-white/5 bg-slate-950/60">
+        <nav className="sticky top-0 z-50 w-full px-3 sm:px-6 py-2.5 sm:py-4 lg:px-12 backdrop-blur-xl border-b border-white/5 bg-slate-950/80">
           <div className="max-w-7xl mx-auto flex items-center justify-between">
-            <Link href="/" className="flex items-center gap-3 group">
-              <div className="w-10 h-10 rounded-full bg-slate-900 border border-white/10 flex items-center justify-center p-1.5 shadow-lg shadow-cyan-500/20 overflow-hidden transition-transform group-hover:scale-110">
-                <Image src="/logo.png" alt="SmartBugMedia Logo" width={24} height={24} />
+            <Link href="/" className="flex items-center gap-2 sm:gap-3 group shrink-0">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-slate-900 border border-white/10 flex items-center justify-center p-1 sm:p-1.5 shadow-lg shadow-cyan-500/20 overflow-hidden transition-transform group-hover:scale-110">
+                <Image src="/logo.png" alt="SmartBugMedia Logo" width={22} height={22} />
               </div>
-              <span className="text-lg sm:text-2xl font-black tracking-tight text-white italic truncate max-w-[48vw] sm:max-w-none">
+              <span className="text-sm sm:text-xl lg:text-2xl font-black tracking-tight text-white italic">
                 SmartBugMedia<span className="text-cyan-500">.</span>
               </span>
             </Link>
 
-            <div className="hidden lg:flex items-center gap-8 text-[11px] font-bold uppercase tracking-[0.2em] text-slate-400">
+            {/* Desktop / Tablet Nav links (in center) */}
+            <div className="hidden md:flex items-center gap-3 lg:gap-8 text-[10px] lg:text-[11px] font-bold uppercase tracking-[0.12em] lg:tracking-[0.2em] text-slate-400">
               {['Protocol', 'Ecosystem', 'Tiers', 'Members', 'FAQ'].map((item) => (
-                <Link key={item} href={`#${item.toLowerCase()}`} className="hover:text-white transition-colors relative group">
+                <Link key={item} href={`#${item.toLowerCase()}`} className="hover:text-white transition-colors relative group py-1">
                   {item}
-                  <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-cyan-500 transition-all group-hover:w-full" />
+                  <span className="absolute -bottom-0.5 left-0 w-0 h-[2px] bg-cyan-500 transition-all group-hover:w-full" />
                 </Link>
               ))}
             </div>
 
-            <div className="flex items-center gap-4">
-              <Link href="/auth/login" className="hidden sm:block">
-                <button className="px-6 py-2.5 rounded-xl border border-white/10 text-[11px] font-bold uppercase tracking-widest hover:bg-white/5 transition-all">
+            {/* Auth Buttons — Both Sign In and Access Hub visible on all screen sizes */}
+            <div className="flex items-center gap-1.5 sm:gap-3 lg:gap-4 shrink-0">
+              <Link href="/auth/login">
+                <button className="px-2.5 sm:px-4 lg:px-6 py-1.5 sm:py-2.5 rounded-lg sm:rounded-xl border border-white/10 text-[9px] sm:text-[11px] font-bold uppercase tracking-wider sm:tracking-widest hover:bg-white/5 transition-all text-slate-300">
                   Sign In
                 </button>
               </Link>
               <Link href="/auth/sign-up">
-                <button className="px-6 py-2.5 rounded-xl bg-cyan-500 text-slate-950 text-[11px] font-black uppercase tracking-widest shadow-lg shadow-cyan-500/20 hover:scale-105 active:scale-95 transition-all">
+                <button className="px-3 sm:px-5 lg:px-6 py-1.5 sm:py-2.5 rounded-lg sm:rounded-xl bg-cyan-500 text-slate-950 text-[9px] sm:text-[11px] font-black uppercase tracking-wider sm:tracking-widest shadow-lg shadow-cyan-500/20 hover:scale-105 active:scale-95 transition-all">
                   Access Hub
                 </button>
               </Link>
-              <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="lg:hidden p-2 text-slate-400 hover:text-white">
-                {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-              </button>
+            </div>
+          </div>
+
+          {/* Mobile Quick-Links Bar — centered floating glass pill matching PC design language */}
+          <div className="flex md:hidden items-center justify-center pt-2 mt-2 border-t border-white/5">
+            <div className="inline-flex items-center justify-between gap-1 px-3 py-1 rounded-full bg-white/[0.04] border border-white/10 text-[8.5px] font-bold uppercase tracking-wider text-slate-300 w-full max-w-sm">
+              {['Protocol', 'Ecosystem', 'Tiers', 'Members', 'FAQ'].map((item) => (
+                <Link
+                  key={item}
+                  href={`#${item.toLowerCase()}`}
+                  className="px-2 py-0.5 rounded-full hover:text-white hover:bg-white/10 transition-colors whitespace-nowrap"
+                >
+                  {item}
+                </Link>
+              ))}
             </div>
           </div>
         </nav>
 
         {/* Mobile Drawer */}
         {isMenuOpen && (
-          <div className="lg:hidden fixed inset-x-0 top-[65px] z-40 bg-slate-950/95 backdrop-blur-xl border-b border-white/5 px-6 py-8">
-            <div className="flex flex-col gap-6">
+          <div className="md:hidden fixed inset-x-0 top-[61px] sm:top-[65px] z-40 bg-slate-950/95 backdrop-blur-xl border-b border-white/10 px-6 py-6 shadow-2xl">
+            <div className="flex flex-col gap-5">
               {['Protocol', 'Ecosystem', 'Tiers', 'Members', 'FAQ'].map((item) => (
                 <Link
                   key={item}
@@ -458,7 +472,7 @@ export default function LandingPage() {
                   {item}
                 </Link>
               ))}
-              <div className="h-px bg-white/5 my-2" />
+              <div className="h-px bg-white/5 my-1" />
               <Link href="/auth/login" onClick={() => setIsMenuOpen(false)}>
                 <button className="w-full px-6 py-3 rounded-xl border border-white/10 text-sm font-bold uppercase tracking-widest hover:bg-white/5 transition-all text-slate-300">
                   Sign In
@@ -474,151 +488,145 @@ export default function LandingPage() {
         )}
 
         {/* ══════════════════════════════════════════
-            HERO — Ultra Premium
+            HERO — Ultra Premium (2 Columns Side-by-Side on Mobile, Tablet & PC)
         ══════════════════════════════════════════ */}
-        <section className="hero-section relative pt-8 pb-20 sm:pt-10 sm:pb-24 lg:pt-16 lg:pb-40 px-4 sm:px-6 lg:px-12 max-w-7xl mx-auto">
+        <section className="hero-section relative pt-4 pb-12 sm:pt-10 sm:pb-24 lg:pt-16 lg:pb-40 px-3 sm:px-6 lg:px-12 max-w-7xl mx-auto">
           <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-[500px] h-[500px] bg-indigo-500/20 blur-[120px] rounded-full pointer-events-none" />
 
-          <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-20 relative z-10">
+          <div className="flex flex-row items-center gap-3 sm:gap-8 lg:gap-16 relative z-10">
             {/* Left — Copy */}
-            <div className="flex-1 text-center lg:text-left">
-              <div className="hero-sub inline-flex items-center gap-2.5 sm:gap-3 px-4 sm:px-5 py-2 rounded-full bg-slate-900/80 backdrop-blur-md border border-white/10 shadow-[0_0_30px_rgba(6,182,212,0.15)] text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.2em] text-cyan-300 mb-6 sm:mb-8">
-                <span className="relative flex h-2 w-2">
+            <div className="flex-1 min-w-0 text-left">
+              <div className="hero-sub inline-flex items-center gap-1.5 sm:gap-3 px-2 sm:px-5 py-0.5 sm:py-2 rounded-full bg-slate-900/80 backdrop-blur-md border border-white/10 shadow-[0_0_30px_rgba(6,182,212,0.15)] text-[7px] sm:text-[9px] md:text-[10px] font-bold uppercase tracking-[0.12em] sm:tracking-[0.2em] text-cyan-300 mb-2 sm:mb-6">
+                <span className="relative flex h-1.5 w-1.5 sm:h-2 sm:w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75" />
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-500 shadow-[0_0_10px_rgba(6,182,212,0.8)]" />
+                  <span className="relative inline-flex rounded-full h-1.5 w-1.5 sm:h-2 sm:w-2 bg-cyan-500 shadow-[0_0_10px_rgba(6,182,212,0.8)]" />
                 </span>
-                Institutional Task Matrix v2.5 — Live
+                Matrix v2.5
               </div>
 
-              <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold tracking-tight leading-[1.05] mb-6 sm:mb-8 drop-shadow-2xl">
+              <h1 className="text-xl sm:text-3xl md:text-5xl lg:text-6xl xl:text-7xl font-extrabold tracking-tight leading-[1.08] mb-2 sm:mb-6 drop-shadow-2xl">
                 <div className="hero-title-part text-white">STRATEGIC</div>
                 <div className="hero-title-part text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-500 to-indigo-500">DYNAMIC</div>
-                <div className="hero-title-part text-white flex items-center justify-center lg:justify-start gap-2 sm:gap-3">
+                <div className="hero-title-part text-white flex items-center justify-start gap-1.5 sm:gap-3">
                   EARNINGS
-                  <div className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5 bg-cyan-500 rounded-full mt-1 sm:mt-2 lg:mt-4 shadow-[0_0_20px_rgba(6,182,212,0.8)]" />
+                  <div className="w-2 h-2 sm:w-3 sm:h-3 md:w-4 md:h-4 bg-cyan-500 rounded-full mt-0.5 sm:mt-1 shadow-[0_0_15px_rgba(6,182,212,0.8)]" />
                 </div>
               </h1>
 
-              <p className="hero-sub max-w-xl mx-auto lg:mx-0 text-slate-300 text-base sm:text-lg font-medium mb-8 sm:mb-10 leading-relaxed border-l-[3px] border-indigo-500/50 pl-4 sm:pl-6 text-left">
-                The definitive institutional distribution matrix. Complete digital marketing workflows for optimized daily returns — withdraw in under 30 minutes.
+              <p className="hero-sub text-slate-300 text-[9px] sm:text-xs md:text-sm font-medium mb-3 sm:mb-8 leading-snug sm:leading-relaxed border-l-2 sm:border-l-[3px] border-indigo-500/50 pl-2 sm:pl-4 line-clamp-3 sm:line-clamp-none">
+                The institutional distribution matrix. Workflows for optimized daily returns — withdraw in under 30 minutes.
               </p>
 
-              <div className="hero-cta flex flex-col sm:flex-row items-center gap-4 sm:gap-5 justify-center lg:justify-start mb-8 sm:mb-10">
-                <Link href="/auth/sign-up" className="w-full sm:w-auto">
-                  <button className="w-full sm:w-auto px-8 sm:px-10 py-3.5 sm:py-4 bg-cyan-500 text-slate-950 rounded-2xl font-black text-xs sm:text-sm uppercase tracking-widest shadow-[0_0_40px_rgba(6,182,212,0.3)] hover:shadow-[0_0_60px_rgba(6,182,212,0.5)] hover:scale-105 active:scale-95 transition-all duration-300 flex items-center justify-center gap-3">
-                    Start Earning Now <ArrowUpRight size={16} />
+              {/* Side-by-Side CTA Buttons across Mobile, Tablet & PC */}
+              <div className="hero-cta flex flex-row items-center gap-2 sm:gap-4 mb-3 sm:mb-8">
+                <Link href="/auth/sign-up" className="flex-1 sm:flex-none">
+                  <button className="w-full px-2.5 sm:px-6 py-2 sm:py-3.5 bg-cyan-500 text-slate-950 rounded-xl sm:rounded-2xl font-black text-[9px] sm:text-xs uppercase tracking-wider sm:tracking-widest shadow-[0_0_30px_rgba(6,182,212,0.3)] hover:scale-105 active:scale-95 transition-all duration-300 flex items-center justify-center gap-1.5 sm:gap-2 whitespace-nowrap">
+                    Start Earning <ArrowUpRight size={12} className="sm:w-4 sm:h-4" />
                   </button>
                 </Link>
-                <Link href="/home" className="w-full sm:w-auto">
-                  <button className="w-full sm:w-auto px-7 sm:px-8 py-3.5 sm:py-4 border border-white/15 rounded-2xl font-bold text-xs sm:text-sm text-slate-300 hover:bg-white/5 hover:text-white transition-all flex items-center justify-center gap-3">
-                    <Play size={14} fill="currentColor" /> View Dashboard
+                <Link href="/home" className="flex-1 sm:flex-none">
+                  <button className="w-full px-2.5 sm:px-5 py-2 sm:py-3.5 border border-white/15 rounded-xl sm:rounded-2xl font-bold text-[9px] sm:text-xs text-slate-300 hover:bg-white/5 hover:text-white transition-all flex items-center justify-center gap-1.5 sm:gap-2 whitespace-nowrap">
+                    <Play size={10} className="sm:w-3 sm:h-3" fill="currentColor" /> Dashboard
                   </button>
                 </Link>
               </div>
 
               {/* Social proof row */}
-              <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 sm:gap-6 text-sm">
-                <div className="flex items-center gap-3">
-                  <div className="flex -space-x-3">
-                    {[1, 2, 3, 4, 5].map(i => (
-                      <div key={i} className="w-8 h-8 sm:w-9 sm:h-9 rounded-full border-2 border-[#020617] bg-slate-800 overflow-hidden shadow-lg">
-                        <img src={`https://i.pravatar.cc/100?u=ag${i}`} alt="agent" className="w-full h-full object-cover" />
-                      </div>
-                    ))}
-                  </div>
-                  <div className="text-left">
-                    <p className="text-white font-bold text-xs sm:text-sm">124K+ Active Agents</p>
-                    <p className="text-slate-500 text-[11px] sm:text-xs">across 40+ countries</p>
-                  </div>
+              <div className="flex items-center gap-2 sm:gap-4 text-[9px] sm:text-xs">
+                <div className="flex -space-x-1.5 sm:-space-x-2 shrink-0">
+                  {[1, 2, 3, 4].map(i => (
+                    <div key={i} className="w-5 h-5 sm:w-7 sm:h-7 rounded-full border border-[#020617] bg-slate-800 overflow-hidden shadow">
+                      <img src={`https://i.pravatar.cc/100?u=ag${i}`} alt="agent" className="w-full h-full object-cover" />
+                    </div>
+                  ))}
                 </div>
-                <div className="h-8 w-px bg-white/10 hidden sm:block" />
-                <div className="text-left">
-                  <p className="text-white font-bold text-xs sm:text-sm">$920M+ Deployed</p>
-                  <p className="text-slate-500 text-[11px] sm:text-xs">in active liquidity</p>
+                <div className="min-w-0">
+                  <p className="text-white font-bold text-[9px] sm:text-xs leading-none truncate">124K+ Agents</p>
+                  <p className="text-slate-500 text-[8px] sm:text-[10px] mt-0.5 truncate">$920M+ Deployed</p>
                 </div>
               </div>
             </div>
 
-            {/* Right — Dashboard Preview */}
-            <div className="flex-1 relative w-full md:max-w-2xl lg:max-w-xl mt-6 lg:mt-0">
-              <div className="relative rounded-[28px] sm:rounded-[32px] border border-white/15 border-b-white/5 bg-slate-900/60 backdrop-blur-2xl overflow-hidden shadow-[0_30px_100px_rgba(0,0,0,0.7)] p-4 sm:p-6">
+            {/* Right — Agent Dashboard Preview (always at right side!) */}
+            <div className="flex-1 min-w-0 relative w-full max-w-[50%] sm:max-w-[48%] md:max-w-md lg:max-w-xl">
+              <div className="relative rounded-2xl sm:rounded-[32px] border border-white/15 border-b-white/5 bg-slate-900/60 backdrop-blur-2xl overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.7)] p-2 sm:p-5 md:p-6">
                 {/* Window chrome */}
-                <div className="flex items-center gap-2 mb-5">
-                  <div className="w-3 h-3 rounded-full bg-rose-500" />
-                  <div className="w-3 h-3 rounded-full bg-amber-500" />
-                  <div className="w-3 h-3 rounded-full bg-emerald-500" />
-                  <span className="ml-3 text-[10px] font-mono tracking-widest text-slate-500 uppercase">agent_dashboard_v2.5</span>
-                  <div className="ml-auto flex items-center gap-1.5 text-[9px] font-bold text-emerald-400 uppercase tracking-widest">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                <div className="flex items-center gap-1 sm:gap-2 mb-2 sm:mb-4">
+                  <div className="w-1.5 h-1.5 sm:w-2.5 sm:h-2.5 rounded-full bg-rose-500" />
+                  <div className="w-1.5 h-1.5 sm:w-2.5 sm:h-2.5 rounded-full bg-amber-500" />
+                  <div className="w-1.5 h-1.5 sm:w-2.5 sm:h-2.5 rounded-full bg-emerald-500" />
+                  <span className="ml-1 sm:ml-2 text-[7px] sm:text-[9px] font-mono tracking-wider text-slate-500 uppercase truncate">dashboard_v2.5</span>
+                  <div className="ml-auto flex items-center gap-1 text-[7px] sm:text-[9px] font-bold text-emerald-400 uppercase">
+                    <span className="w-1 h-1 rounded-full bg-emerald-400 animate-pulse" />
                     LIVE
                   </div>
                 </div>
 
-                <div className="space-y-4">
+                <div className="space-y-1.5 sm:space-y-3">
                   {/* Balance card */}
-                  <div className="float-card p-5 rounded-2xl bg-gradient-to-r from-cyan-600/20 to-indigo-600/20 border border-cyan-500/20 flex items-center justify-between">
+                  <div className="p-2 sm:p-4 rounded-xl sm:rounded-2xl bg-gradient-to-r from-cyan-600/20 to-indigo-600/20 border border-cyan-500/20 flex items-center justify-between">
                     <div>
-                      <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-1">Wallet Balance</p>
-                      <p className="text-3xl font-black text-white tracking-tight">$14,280<span className="text-slate-500 text-lg">.00</span></p>
-                      <p className="text-[11px] text-emerald-400 font-bold mt-1">↑ +$168.00 today</p>
+                      <p className="text-[7px] sm:text-[9px] font-semibold text-slate-400 uppercase tracking-wider mb-0.5">Wallet Balance</p>
+                      <p className="text-sm sm:text-2xl md:text-3xl font-black text-white tracking-tight leading-none">$14,280<span className="text-slate-500 text-[9px] sm:text-sm">.00</span></p>
+                      <p className="text-[8px] sm:text-[10px] text-emerald-400 font-bold mt-0.5">↑ +$168 today</p>
                     </div>
-                    <div className="w-16 h-16 rounded-2xl bg-cyan-500/20 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
-                      <Wallet size={28} />
+                    <div className="w-7 h-7 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-cyan-500/20 border border-cyan-500/30 flex items-center justify-center text-cyan-400 shrink-0">
+                      <Wallet className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
                     </div>
                   </div>
 
-                  {/* Stats row */}
-                  <div className="float-card grid grid-cols-3 gap-3">
+                  {/* Stats row - 3 columns */}
+                  <div className="grid grid-cols-3 gap-1 sm:gap-2">
                     {[
-                      { label: 'Tasks Done', value: '42/50', color: 'text-white' },
-                      { label: 'Today Yield', value: '+$12.50', color: 'text-emerald-400' },
-                      { label: 'Referrals', value: '14 active', color: 'text-cyan-400' },
+                      { label: 'Tasks', value: '42/50', color: 'text-white' },
+                      { label: 'Yield', value: '+$12.50', color: 'text-emerald-400' },
+                      { label: 'Referrals', value: '14 act', color: 'text-cyan-400' },
                     ].map((s, i) => (
-                      <div key={i} className="p-4 rounded-xl bg-slate-950/60 border border-white/5 text-center">
-                        <p className={`text-sm font-black ${s.color}`}>{s.value}</p>
-                        <p className="text-[10px] text-slate-500 mt-1">{s.label}</p>
+                      <div key={i} className="p-1 sm:p-2.5 rounded-lg bg-slate-950/60 border border-white/5 text-center">
+                        <p className={`text-[8px] sm:text-xs font-black ${s.color} truncate`}>{s.value}</p>
+                        <p className="text-[6px] sm:text-[9px] text-slate-500 mt-0.5 truncate">{s.label}</p>
                       </div>
                     ))}
                   </div>
 
                   {/* Agent status */}
-                  <div className="float-card flex items-center justify-between p-4 rounded-xl bg-slate-950/60 border border-white/5">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-violet-500/20 border border-violet-500/20 flex items-center justify-center text-violet-400">
-                        <Activity size={18} />
+                  <div className="flex items-center justify-between p-1.5 sm:p-3 rounded-lg sm:rounded-xl bg-slate-950/60 border border-white/5">
+                    <div className="flex items-center gap-1.5 sm:gap-2.5 min-w-0">
+                      <div className="w-5 h-5 sm:w-8 sm:h-8 rounded-md sm:rounded-lg bg-violet-500/20 border border-violet-500/20 flex items-center justify-center text-violet-400 shrink-0">
+                        <Activity className="w-2.5 h-2.5 sm:w-4 sm:h-4" />
                       </div>
-                      <div>
-                        <p className="text-xs font-bold text-white">AGENT_TIER_3 — SENIOR</p>
-                        <p className="text-[10px] text-slate-500">Optimization cycle active</p>
+                      <div className="truncate">
+                        <p className="text-[7px] sm:text-[10px] font-bold text-white truncate">TIER_3 SENIOR</p>
+                        <p className="text-[6px] sm:text-[8px] text-slate-500 truncate">Optimization active</p>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <p className="text-emerald-400 font-black text-sm">0.8%</p>
-                      <p className="text-[9px] text-slate-600 uppercase tracking-widest">Daily yield</p>
+                    <div className="text-right shrink-0">
+                      <p className="text-emerald-400 font-black text-[9px] sm:text-xs leading-none">0.8%</p>
+                      <p className="text-[6px] sm:text-[8px] text-slate-600 uppercase">Yield</p>
                     </div>
                   </div>
 
                   {/* Progress bar */}
-                  <div className="float-card px-4 py-3 rounded-xl bg-slate-950/60 border border-white/5">
-                    <div className="flex items-center justify-between text-[10px] text-slate-500 mb-2 font-bold uppercase tracking-widest">
-                      <span>Daily Tasks Progress</span>
+                  <div className="px-2 py-1.5 sm:px-3 sm:py-2.5 rounded-lg sm:rounded-xl bg-slate-950/60 border border-white/5">
+                    <div className="flex items-center justify-between text-[7px] sm:text-[9px] text-slate-500 mb-1 font-bold uppercase">
+                      <span>Tasks</span>
                       <span className="text-white">42 / 50</span>
                     </div>
-                    <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
-                      <div className="h-full w-[84%] bg-gradient-to-r from-cyan-500 to-indigo-500 rounded-full shadow-[0_0_8px_rgba(6,182,212,0.5)]" />
+                    <div className="h-1 sm:h-1.5 bg-white/5 rounded-full overflow-hidden">
+                      <div className="h-full w-[84%] bg-gradient-to-r from-cyan-500 to-indigo-500 rounded-full" />
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* Floating badge */}
-              <div className="absolute -bottom-3 left-3 sm:-bottom-5 sm:-left-5 bg-slate-900 border border-emerald-500/30 rounded-2xl px-3.5 py-2.5 sm:px-4 sm:py-3 shadow-[0_10px_30px_rgba(0,0,0,0.5)] flex items-center gap-3 z-20">
-                <div className="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400">
-                  <CheckCircle2 size={16} />
+              <div className="hidden xs:flex sm:flex absolute -bottom-2 -left-2 sm:-bottom-4 sm:-left-4 bg-slate-900 border border-emerald-500/30 rounded-xl px-2 py-1 sm:px-3 sm:py-2 shadow-lg items-center gap-1.5 sm:gap-2 z-20">
+                <div className="w-5 h-5 sm:w-7 sm:h-7 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400">
+                  <CheckCircle2 size={12} />
                 </div>
                 <div>
-                  <p className="text-[10px] text-emerald-400 font-black uppercase tracking-wider">Payout Sent</p>
-                  <p className="text-white font-bold text-xs sm:text-sm">+$340.00 USDT</p>
+                  <p className="text-[7px] sm:text-[9px] text-emerald-400 font-black uppercase">Payout Sent</p>
+                  <p className="text-white font-bold text-[8px] sm:text-xs">+$340 USDT</p>
                 </div>
               </div>
             </div>
@@ -746,28 +754,28 @@ export default function LandingPage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-5">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-2.5 sm:gap-4 lg:gap-5">
             {whyCards.map((card, i) => (
               <div
                 key={i}
                 className={cn(
-                  'group relative p-5 sm:p-7 rounded-[24px] sm:rounded-[28px] bg-slate-900/40 border border-white/5 transition-all duration-300 flex flex-col',
+                  'group relative p-3.5 sm:p-5 lg:p-7 rounded-[18px] sm:rounded-[28px] bg-slate-900/40 border border-white/5 transition-all duration-300 flex flex-col',
                   card.border,
                   card.size
                 )}
               >
-                <div className={cn('absolute inset-0 rounded-[24px] sm:rounded-[28px] bg-gradient-to-br opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none', card.accent)} />
+                <div className={cn('absolute inset-0 rounded-[18px] sm:rounded-[28px] bg-gradient-to-br opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none', card.accent)} />
                 <div className="relative z-10 flex flex-col h-full">
                   {card.tag && (
-                    <span className={cn('inline-flex self-start items-center px-3 py-1 rounded-full border text-[10px] font-bold uppercase tracking-widest mb-4', card.tagColor)}>
+                    <span className={cn('inline-flex self-start items-center px-2 sm:px-3 py-0.5 sm:py-1 rounded-full border text-[8px] sm:text-[10px] font-bold uppercase tracking-wider sm:tracking-widest mb-2 sm:mb-4', card.tagColor)}>
                       {card.tag}
                     </span>
                   )}
-                  <div className="text-3xl sm:text-4xl mb-4">{card.emoji}</div>
-                  <h3 className={cn('font-black text-white mb-2 tracking-tight', card.featured ? 'text-xl sm:text-2xl' : 'text-lg sm:text-xl')}>
+                  <div className="text-2xl sm:text-3xl lg:text-4xl mb-2 sm:mb-4">{card.emoji}</div>
+                  <h3 className={cn('font-black text-white mb-1 sm:mb-2 tracking-tight', card.featured ? 'text-sm sm:text-xl lg:text-2xl' : 'text-xs sm:text-lg lg:text-xl')}>
                     {card.title}
                   </h3>
-                  <p className="text-slate-400 text-sm leading-relaxed flex-1">{card.desc}</p>
+                  <p className="text-slate-400 text-[10px] sm:text-xs lg:text-sm leading-relaxed flex-1">{card.desc}</p>
                 </div>
               </div>
             ))}
@@ -775,46 +783,48 @@ export default function LandingPage() {
         </section>
 
         {/* ══════════════════════════════════════════
-            HOW IT WORKS — 3 Steps
+            HOW IT WORKS — 3 Steps (3 Columns on Mobile, Tablet & PC)
         ══════════════════════════════════════════ */}
-        <section id="ecosystem" className="px-4 sm:px-6 lg:px-12 py-16 sm:py-24 lg:py-28 max-w-7xl mx-auto border-t border-white/5">
-          <div className="section-header text-center mb-12 sm:mb-20">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-[10px] font-bold uppercase tracking-widest text-indigo-400 mb-6">
+        <section id="ecosystem" className="px-3 sm:px-6 lg:px-12 py-12 sm:py-24 lg:py-28 max-w-7xl mx-auto border-t border-white/5">
+          <div className="section-header text-center mb-8 sm:mb-20">
+            <div className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1 sm:py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-indigo-400 mb-3 sm:mb-6">
               <span className="w-1.5 h-1.5 rounded-full bg-indigo-400" />
               Simple System Protocol
             </div>
-            <h2 className="text-4xl sm:text-5xl md:text-7xl font-black italic tracking-tighter uppercase mb-4">HOW IT WORKS</h2>
-            <div className="w-16 h-1 bg-gradient-to-r from-cyan-500 to-indigo-500 mx-auto rounded-full" />
+            <h2 className="text-2xl sm:text-5xl md:text-7xl font-black italic tracking-tighter uppercase mb-2 sm:mb-4">HOW IT WORKS</h2>
+            <div className="w-12 sm:w-16 h-1 bg-gradient-to-r from-cyan-500 to-indigo-500 mx-auto rounded-full" />
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 relative">
+          <div className="grid grid-cols-3 gap-2 sm:gap-5 lg:gap-8 relative">
             {/* Connector line */}
-            <div className="hidden lg:block absolute top-[80px] left-[20%] right-[20%] h-[1px] bg-gradient-to-r from-transparent via-indigo-500/30 to-transparent" />
+            <div className="block absolute top-[28px] sm:top-[44px] md:top-[80px] left-[10%] right-[10%] h-[1px] bg-gradient-to-r from-transparent via-indigo-500/30 to-transparent" />
 
             {operationalSteps.map((step, i) => (
               <div key={i} className="group relative flex flex-col items-center text-center">
                 {/* Icon circle */}
-                <div className="relative mb-8">
+                <div className="relative mb-3 sm:mb-8">
                   <div className={cn(
-                    'w-28 h-28 rounded-[36px] bg-slate-900 border border-white/10 flex items-center justify-center transition-all group-hover:scale-110 group-hover:shadow-[0_0_60px_rgba(6,182,212,0.15)]',
+                    'w-14 h-14 sm:w-20 sm:h-20 md:w-28 md:h-28 rounded-2xl sm:rounded-[36px] bg-slate-900 border border-white/10 flex items-center justify-center transition-all group-hover:scale-110 group-hover:shadow-[0_0_60px_rgba(6,182,212,0.15)]',
                   )}>
                     <step.icon
-                      size={44}
-                      className={step.color === 'blue' ? 'text-blue-400' : step.color === 'cyan' ? 'text-cyan-400' : 'text-violet-400'}
+                      className={cn(
+                        'w-6 h-6 sm:w-8 sm:h-8 md:w-11 md:h-11',
+                        step.color === 'blue' ? 'text-blue-400' : step.color === 'cyan' ? 'text-cyan-400' : 'text-violet-400'
+                      )}
                     />
                   </div>
-                  <span className="absolute -top-3 -right-3 w-10 h-10 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-sm font-black italic text-slate-500 group-hover:text-cyan-400 group-hover:border-cyan-500/30 transition-all">
+                  <span className="absolute -top-1.5 -right-1.5 sm:-top-3 sm:-right-3 w-5 h-5 sm:w-8 sm:h-8 md:w-10 md:h-10 rounded-lg sm:rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-[9px] sm:text-xs md:text-sm font-black italic text-slate-500 group-hover:text-cyan-400 group-hover:border-cyan-500/30 transition-all">
                     {step.id}
                   </span>
                 </div>
 
                 {/* Content */}
                 <div className={cn(
-                  'w-full p-7 rounded-[28px] border border-white/5 bg-gradient-to-b transition-all group-hover:border-white/10',
+                  'w-full p-2.5 sm:p-5 md:p-7 rounded-xl sm:rounded-[28px] border border-white/5 bg-gradient-to-b transition-all group-hover:border-white/10',
                   step.accent,
                 )}>
-                  <h4 className="text-xl font-black italic tracking-tight uppercase mb-3 text-white">{step.title}</h4>
-                  <p className="text-slate-400 text-sm font-medium leading-relaxed">{step.desc}</p>
+                  <h4 className="text-[10px] sm:text-base md:text-xl font-black italic tracking-tight uppercase mb-1 sm:mb-3 text-white leading-tight">{step.title}</h4>
+                  <p className="text-slate-400 text-[8px] sm:text-xs md:text-sm font-medium leading-tight sm:leading-relaxed line-clamp-3 sm:line-clamp-none">{step.desc}</p>
                 </div>
               </div>
             ))}
@@ -861,25 +871,25 @@ export default function LandingPage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
-              {/* Console body */}
-              <div className="md:col-span-2 flex flex-col justify-between bg-slate-950/80 border border-white/5 rounded-2xl p-6 min-h-[240px] relative overflow-hidden">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-2.5 sm:gap-6 items-stretch">
+              {/* Console body — Left Side (2 cols on tablet/PC, 1 col on mobile) */}
+              <div className="col-span-1 md:col-span-2 flex flex-col justify-between bg-slate-950/80 border border-white/5 rounded-xl sm:rounded-2xl p-3 sm:p-6 min-h-[220px] relative overflow-hidden">
                 <div className="absolute inset-0 opacity-[0.02] bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px] pointer-events-none" />
 
-                <div className="space-y-3 font-mono text-xs">
-                  <div className="flex gap-2 text-slate-500"><span>›</span><span>INITIALIZE guest_session_probe...</span></div>
-                  <div className="flex gap-2 text-slate-500"><span>›</span><span>BIND host_network to SmartBugMedia grid...</span></div>
-                  <div className="flex gap-2 text-cyan-400 font-bold animate-pulse">
+                <div className="space-y-2 sm:space-y-3 font-mono text-[10px] sm:text-xs">
+                  <div className="flex gap-1.5 sm:gap-2 text-slate-500 truncate"><span>›</span><span>INITIALIZE guest_session_probe...</span></div>
+                  <div className="flex gap-1.5 sm:gap-2 text-slate-500 truncate"><span>›</span><span>BIND host_network to SmartBugMedia grid...</span></div>
+                  <div className="flex gap-1.5 sm:gap-2 text-cyan-400 font-bold animate-pulse">
                     <span>›</span><span>STATUS: {sandboxState.toUpperCase()}</span>
                   </div>
-                  <div className="flex gap-2 text-slate-300 border-l-2 border-cyan-500/30 pl-3 py-1 my-2">
+                  <div className="flex gap-1.5 sm:gap-2 text-slate-300 border-l-2 border-cyan-500/30 pl-2 sm:pl-3 py-0.5 sm:py-1 my-1 sm:my-2">
                     <span className="text-cyan-400 animate-pulse">■</span>
-                    <span className="italic">{sandboxLog}</span>
+                    <span className="italic truncate">{sandboxLog}</span>
                   </div>
                   {sandboxState === 'running' && (
-                    <div className="space-y-2 mt-4">
-                      <div className="flex justify-between text-[10px] text-slate-500">
-                        <span>OPTIMIZING DATASET BUNDLE...</span>
+                    <div className="space-y-1.5 sm:space-y-2 mt-2 sm:mt-4">
+                      <div className="flex justify-between text-[8px] sm:text-[10px] text-slate-500">
+                        <span>OPTIMIZING BUNDLE...</span>
                         <span>{sandboxProgress}%</span>
                       </div>
                       <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
@@ -892,11 +902,11 @@ export default function LandingPage() {
                   )}
                 </div>
 
-                <div className="mt-6 flex flex-col sm:flex-row items-center gap-4">
+                <div className="mt-3 sm:mt-6 flex flex-row items-center gap-2 sm:gap-4">
                   {sandboxState === 'complete' ? (
                     <button
                       onClick={resetSandbox}
-                      className="w-full sm:w-auto px-6 py-3 rounded-xl border border-white/10 hover:bg-white/5 transition-all text-xs font-bold uppercase tracking-wider text-slate-400"
+                      className="w-full px-3 sm:px-6 py-2 sm:py-3 rounded-lg sm:rounded-xl border border-white/10 hover:bg-white/5 transition-all text-[9px] sm:text-xs font-bold uppercase tracking-wider text-slate-400"
                     >
                       Reset Sandbox
                     </button>
@@ -905,53 +915,53 @@ export default function LandingPage() {
                       onClick={runSandboxTask}
                       disabled={sandboxState === 'running'}
                       className={cn(
-                        'w-full sm:w-auto px-8 py-4 rounded-xl font-black text-xs uppercase tracking-widest shadow-lg transition-all flex items-center justify-center gap-2',
+                        'w-full px-3 sm:px-8 py-2.5 sm:py-4 rounded-lg sm:rounded-xl font-black text-[9px] sm:text-xs uppercase tracking-wider sm:tracking-widest shadow-lg transition-all flex items-center justify-center gap-1.5 sm:gap-2',
                         sandboxState === 'running'
                           ? 'bg-slate-800 text-slate-500 cursor-not-allowed'
                           : 'bg-cyan-500 text-slate-950 shadow-cyan-500/20 hover:scale-105 active:scale-95'
                       )}
                     >
                       {sandboxState === 'running' ? (
-                        <><RefreshCw className="animate-spin" size={14} /> Running Task...</>
+                        <><RefreshCw className="animate-spin" size={12} /> Running...</>
                       ) : (
-                        <><Cpu size={14} />{sandboxTasks === 0 ? 'Initialize Demo Task' : 'Run Next Demo Task'}</>
+                        <><Cpu size={12} />{sandboxTasks === 0 ? 'Demo Task' : 'Next Task'}</>
                       )}
                     </button>
                   )}
                 </div>
               </div>
 
-              {/* Rewards info panel */}
-              <div className="bg-slate-950/40 border border-white/5 rounded-2xl p-6 flex flex-col justify-between relative overflow-hidden">
+              {/* Rewards info panel — Right Side */}
+              <div className="col-span-1 bg-slate-950/40 border border-white/5 rounded-xl sm:rounded-2xl p-3 sm:p-6 flex flex-col justify-between relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/5 blur-2xl rounded-full pointer-events-none" />
                 <div>
-                  <h4 className="text-sm font-bold text-white uppercase tracking-wider mb-2">Task Rewards</h4>
-                  <p className="text-slate-400 text-xs leading-relaxed mb-5">
-                    Each task generates <strong className="text-emerald-400">$0.75 USDT</strong> in demo yield.
+                  <h4 className="text-xs sm:text-sm font-bold text-white uppercase tracking-wider mb-1 sm:mb-2">Task Rewards</h4>
+                  <p className="text-slate-400 text-[9px] sm:text-xs leading-relaxed mb-2.5 sm:mb-5">
+                    Each task generates <strong className="text-emerald-400">$0.75 USDT</strong> demo yield.
                   </p>
-                  <div className="space-y-3">
+                  <div className="space-y-1 sm:space-y-3">
                     {[
-                      { label: 'Task Pool', value: 'DEMO_POOL_ALPHA', valueClass: 'text-white' },
+                      { label: 'Task Pool', value: 'DEMO_ALPHA', valueClass: 'text-white' },
                       { label: 'Per Task', value: '$0.75 USDT', valueClass: 'text-emerald-400' },
                       { label: 'Uptime', value: '100% SECURE', valueClass: 'text-cyan-400' },
                     ].map((row, i) => (
-                      <div key={i} className="flex justify-between items-center py-2 border-b border-white/5">
-                        <span className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">{row.label}</span>
-                        <span className={cn('text-xs font-bold', row.valueClass)}>{row.value}</span>
+                      <div key={i} className="flex justify-between items-center py-1 sm:py-2 border-b border-white/5">
+                        <span className="text-[8px] sm:text-[10px] text-slate-500 uppercase tracking-widest font-bold">{row.label}</span>
+                        <span className={cn('text-[10px] sm:text-xs font-bold', row.valueClass)}>{row.value}</span>
                       </div>
                     ))}
                   </div>
                 </div>
-                <div className="mt-5 pt-4 border-t border-white/5">
+                <div className="mt-2.5 sm:mt-5 pt-2 sm:pt-4 border-t border-white/5">
                   {sandboxState === 'complete' ? (
-                    <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-3 text-center">
-                      <p className="text-[10px] text-emerald-400 font-bold uppercase tracking-wider mb-1">Sandbox Complete</p>
-                      <p className="text-[9px] text-slate-400 leading-snug">Sign up to access real task campaigns.</p>
+                    <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-lg sm:rounded-xl p-2 sm:p-3 text-center">
+                      <p className="text-[9px] sm:text-[10px] text-emerald-400 font-bold uppercase tracking-wider mb-0.5 sm:mb-1">Complete</p>
+                      <p className="text-[8px] sm:text-[9px] text-slate-400 leading-snug">Sign up to earn real yield.</p>
                     </div>
                   ) : (
-                    <div className="flex items-center gap-2 text-[10px] text-slate-500 font-mono">
+                    <div className="flex items-center gap-1.5 sm:gap-2 text-[8px] sm:text-[10px] text-slate-500 font-mono">
                       <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping" />
-                      <span>Ready for agent input...</span>
+                      <span>Ready for input...</span>
                     </div>
                   )}
                 </div>
@@ -1085,7 +1095,7 @@ export default function LandingPage() {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mb-10">
+            <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-5 mb-10">
               {[
                 { rank: '01', name: 'Tyler V.', location: 'Miami, FL, USA', agents: 52, totalEarned: '$14,200', monthlyPassive: '$2,100', tier: 'MASTER AGENT', avatar: 'T', color: 'from-amber-500/20 to-orange-500/20', border: 'border-amber-500/20', badge: 'text-amber-400 bg-amber-500/10 border-amber-500/20' },
                 { rank: '02', name: 'Brandon M.', location: 'Austin, TX, USA', agents: 38, totalEarned: '$9,840', monthlyPassive: '$1,440', tier: 'SENIOR AGENT', avatar: 'B', color: 'from-slate-500/20 to-slate-400/20', border: 'border-slate-500/20', badge: 'text-slate-300 bg-slate-500/10 border-slate-500/20' },
@@ -1094,28 +1104,28 @@ export default function LandingPage() {
                 { rank: '05', name: 'Sarah J.', location: 'Chicago, IL, USA', agents: 17, totalEarned: '$3,960', monthlyPassive: '$500', tier: 'INTERMEDIATE', avatar: 'S', color: 'from-indigo-500/10 to-blue-500/10', border: 'border-indigo-500/20', badge: 'text-indigo-400 bg-indigo-500/10 border-indigo-500/20' },
                 { rank: '06', name: 'Priya S.', location: 'Seattle, WA, USA', agents: 13, totalEarned: '$2,640', monthlyPassive: '$360', tier: 'JUNIOR AGENT', avatar: 'P', color: 'from-cyan-500/10 to-teal-500/10', border: 'border-cyan-500/20', badge: 'text-cyan-400 bg-cyan-500/10 border-cyan-500/20' },
               ].map((agent, i) => (
-                <div key={i} className={`relative bg-gradient-to-br ${agent.color} rounded-[24px] border ${agent.border} p-5 sm:p-6 overflow-hidden hover:scale-[1.02] transition-all`}>
-                  <div className="absolute top-4 right-4 text-5xl font-black italic text-white/5">{agent.rank}</div>
-                  <div className="flex items-center gap-4 mb-5">
-                    <div className="w-12 h-12 rounded-full bg-slate-900/80 border border-white/10 flex items-center justify-center text-white font-black text-lg">{agent.avatar}</div>
-                    <div>
-                      <p className="font-black text-white text-sm">{agent.name}</p>
-                      <p className="text-slate-400 text-xs">{agent.location}</p>
+                <div key={i} className={`relative bg-gradient-to-br ${agent.color} rounded-[18px] sm:rounded-[24px] border ${agent.border} p-3 sm:p-6 overflow-hidden hover:scale-[1.02] transition-all flex flex-col justify-between`}>
+                  <div className="absolute top-2 right-2 sm:top-4 sm:right-4 text-3xl sm:text-5xl font-black italic text-white/5">{agent.rank}</div>
+                  <div className="flex items-center gap-2 sm:gap-4 mb-3 sm:mb-5">
+                    <div className="w-8 h-8 sm:w-12 sm:h-12 rounded-full bg-slate-900/80 border border-white/10 flex items-center justify-center text-white font-black text-sm sm:text-lg shrink-0">{agent.avatar}</div>
+                    <div className="min-w-0">
+                      <p className="font-black text-white text-xs sm:text-sm truncate">{agent.name}</p>
+                      <p className="text-slate-400 text-[10px] sm:text-xs truncate">{agent.location}</p>
                     </div>
                   </div>
-                  <div className="grid grid-cols-2 gap-3 mb-4">
-                    <div className="bg-slate-950/40 rounded-xl p-3">
-                      <p className="text-[9px] font-black uppercase tracking-widest text-slate-500 mb-1">Referrals</p>
-                      <p className="text-lg font-black text-white">{agent.agents}</p>
+                  <div className="grid grid-cols-2 gap-1.5 sm:gap-3 mb-3 sm:mb-4">
+                    <div className="bg-slate-950/40 rounded-lg sm:rounded-xl p-2 sm:p-3">
+                      <p className="text-[8px] sm:text-[9px] font-black uppercase tracking-widest text-slate-500 mb-0.5 sm:mb-1">Referrals</p>
+                      <p className="text-sm sm:text-lg font-black text-white">{agent.agents}</p>
                     </div>
-                    <div className="bg-slate-950/40 rounded-xl p-3">
-                      <p className="text-[9px] font-black uppercase tracking-widest text-slate-500 mb-1">Monthly Passive</p>
-                      <p className="text-lg font-black text-emerald-400">{agent.monthlyPassive}</p>
+                    <div className="bg-slate-950/40 rounded-lg sm:rounded-xl p-2 sm:p-3">
+                      <p className="text-[8px] sm:text-[9px] font-black uppercase tracking-widest text-slate-500 mb-0.5 sm:mb-1">Monthly</p>
+                      <p className="text-sm sm:text-lg font-black text-emerald-400">{agent.monthlyPassive}</p>
                     </div>
                   </div>
-                  <div className="flex items-center justify-between">
-                    <span className={`text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-full border ${agent.badge}`}>{agent.tier}</span>
-                    <span className="text-xs text-slate-500 font-medium">Total: <span className="text-white font-bold">{agent.totalEarned}</span></span>
+                  <div className="flex items-center justify-between gap-1 pt-1 border-t border-white/5">
+                    <span className={`text-[7px] sm:text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full border truncate ${agent.badge}`}>{agent.tier}</span>
+                    <span className="text-[9px] sm:text-xs text-slate-500 font-medium shrink-0"><span className="text-white font-bold">{agent.totalEarned}</span></span>
                   </div>
                 </div>
               ))}
@@ -1135,19 +1145,19 @@ export default function LandingPage() {
         </section>
 
         {/* ══════════════════════════════════════════
-            WITHDRAWAL PROOF FEED
+            WITHDRAWAL PROOF FEED (2 Columns on Mobile)
         ══════════════════════════════════════════ */}
-        <section className="px-4 sm:px-6 lg:px-12 py-16 sm:py-20 max-w-7xl mx-auto border-t border-white/5">
-          <div className="section-header text-center mb-12">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-[10px] font-bold uppercase tracking-widest text-cyan-400 mb-6">
+        <section className="px-3 sm:px-6 lg:px-12 py-12 sm:py-20 max-w-7xl mx-auto border-t border-white/5">
+          <div className="section-header text-center mb-8 sm:mb-12">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-[10px] font-bold uppercase tracking-widest text-cyan-400 mb-4 sm:mb-6">
               <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
               Verified Payouts
             </div>
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black italic uppercase tracking-tight text-white mb-3">WITHDRAWAL PROOF</h2>
-            <p className="text-slate-400 text-sm max-w-xl mx-auto">These are real payout receipts from verified SmartBugMedia members — amounts and names are partially blurred for privacy.</p>
+            <h2 className="text-2xl sm:text-4xl md:text-5xl font-black italic uppercase tracking-tight text-white mb-2 sm:mb-3">WITHDRAWAL PROOF</h2>
+            <p className="text-slate-400 text-xs sm:text-sm max-w-xl mx-auto">Real payout receipts from verified SmartBugMedia members.</p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-4">
             {[
               { name: 'Ty***r V.', location: 'Miami, FL, USA', method: 'USDT', amount: '$1,250.00', date: 'Sep 16, 2026', tier: 'Master Agent', status: 'Approved', color: 'from-amber-500/10 to-orange-500/10', border: 'border-amber-500/20', dot: 'bg-amber-400' },
               { name: 'San***a K.', location: 'Phoenix, AZ, USA', method: 'PayPal USD', amount: '$840.00', date: 'Sep 15, 2026', tier: 'Senior Agent', status: 'Approved', color: 'from-emerald-500/10 to-teal-500/10', border: 'border-emerald-500/20', dot: 'bg-emerald-400' },
@@ -1156,41 +1166,37 @@ export default function LandingPage() {
               { name: 'Sar***h J.', location: 'Chicago, IL, USA', method: 'PayPal USD', amount: '$295.00', date: 'Sep 13, 2026', tier: 'Intermediate', status: 'Approved', color: 'from-violet-500/10 to-purple-500/10', border: 'border-violet-500/20', dot: 'bg-violet-400' },
               { name: 'Pri***a S.', location: 'Seattle, WA, USA', method: 'BNB', amount: '$185.00', date: 'Sep 12, 2026', tier: 'Junior Agent', status: 'Approved', color: 'from-cyan-500/10 to-sky-500/10', border: 'border-cyan-500/20', dot: 'bg-cyan-400' },
             ].map((proof, i) => (
-              <div key={i} className={`relative rounded-[24px] bg-gradient-to-br ${proof.color} border ${proof.border} p-5 hover:scale-[1.02] transition-all overflow-hidden`}>
+              <div key={i} className={`relative rounded-[18px] sm:rounded-[24px] bg-gradient-to-br ${proof.color} border ${proof.border} p-3 sm:p-5 hover:scale-[1.02] transition-all overflow-hidden flex flex-col justify-between`}>
                 {/* Blurred watermark */}
                 <div className="absolute inset-0 flex items-center justify-center opacity-[0.04] pointer-events-none select-none">
-                  <span className="text-6xl font-black italic text-white rotate-[-20deg] whitespace-nowrap">VERIFIED</span>
+                  <span className="text-4xl sm:text-6xl font-black italic text-white rotate-[-20deg] whitespace-nowrap">VERIFIED</span>
                 </div>
 
                 {/* Receipt header */}
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-2">
-                    <span className={`w-2 h-2 rounded-full ${proof.dot}`} />
-                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Payout Receipt</span>
+                <div className="flex items-center justify-between mb-2 sm:mb-4">
+                  <div className="flex items-center gap-1.5 sm:gap-2">
+                    <span className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full ${proof.dot}`} />
+                    <span className="text-[8px] sm:text-[10px] font-black uppercase tracking-wider text-slate-400">Payout</span>
                   </div>
-                  <span className="px-2.5 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/25 text-emerald-400 text-[9px] font-black uppercase tracking-widest">✓ {proof.status}</span>
+                  <span className="px-2 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/25 text-emerald-400 text-[8px] sm:text-[9px] font-black uppercase tracking-wider">✓ {proof.status}</span>
                 </div>
 
                 {/* Amount — hero */}
-                <p className="text-3xl font-black italic text-white mb-1">{proof.amount}</p>
-                <p className="text-xs text-slate-500 mb-4">via <span className="text-slate-300 font-bold">{proof.method}</span></p>
+                <p className="text-lg sm:text-3xl font-black italic text-white mb-0.5">{proof.amount}</p>
+                <p className="text-[10px] sm:text-xs text-slate-500 mb-2 sm:mb-4">via <span className="text-slate-300 font-bold">{proof.method}</span></p>
 
                 {/* Details */}
-                <div className="space-y-2 text-xs">
+                <div className="space-y-1 sm:space-y-2 text-[10px] sm:text-xs">
                   <div className="flex justify-between">
-                    <span className="text-slate-500 uppercase tracking-wide text-[10px] font-bold">Member</span>
-                    <span className="text-white font-bold">{proof.name}</span>
+                    <span className="text-slate-500 uppercase tracking-wide text-[8px] sm:text-[10px] font-bold">Member</span>
+                    <span className="text-white font-bold truncate max-w-[55%] text-right">{proof.name}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-slate-500 uppercase tracking-wide text-[10px] font-bold">Location</span>
-                    <span className="text-slate-300">{proof.location}</span>
+                    <span className="text-slate-500 uppercase tracking-wide text-[8px] sm:text-[10px] font-bold">Tier</span>
+                    <span className="text-slate-300 truncate max-w-[55%] text-right">{proof.tier}</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-slate-500 uppercase tracking-wide text-[10px] font-bold">Tier</span>
-                    <span className="text-slate-300">{proof.tier}</span>
-                  </div>
-                  <div className="flex justify-between pt-2 border-t border-white/5">
-                    <span className="text-slate-500 uppercase tracking-wide text-[10px] font-bold">Date</span>
+                  <div className="flex justify-between pt-1 border-t border-white/5">
+                    <span className="text-slate-500 uppercase tracking-wide text-[8px] sm:text-[10px] font-bold">Date</span>
                     <span className="text-slate-300">{proof.date}</span>
                   </div>
                 </div>
@@ -1199,77 +1205,77 @@ export default function LandingPage() {
           </div>
 
           {/* Disclaimer */}
-          <p className="text-center text-slate-600 text-xs mt-6">* Names and amounts are partially anonymized for member privacy. All payouts verified by SmartBugMedia customer service before processing.</p>
+          <p className="text-center text-slate-600 text-[10px] sm:text-xs mt-4 sm:mt-6">* Names and amounts are partially anonymized for member privacy.</p>
         </section>
 
         {/* ══════════════════════════════════════════
-            TIER GRID — Member Plans
+            TIER GRID — Member Plans (2 Columns on Mobile, 4 on Desktop)
         ══════════════════════════════════════════ */}
-        <section id="tiers" className="px-4 sm:px-6 lg:px-12 py-16 sm:py-24 lg:py-28 bg-slate-950/40 relative border-t border-white/5">
+        <section id="tiers" className="px-3 sm:px-6 lg:px-12 py-12 sm:py-24 lg:py-28 bg-slate-950/40 relative border-t border-white/5">
           <div className="absolute inset-0 bg-[url('/dots.svg')] opacity-[0.04]" />
           <div className="max-w-7xl mx-auto relative z-10">
-            <div className="section-header flex flex-col lg:flex-row lg:items-end justify-between gap-8 mb-16">
+            <div className="section-header flex flex-col md:flex-row md:items-end justify-between gap-4 md:gap-8 mb-8 md:mb-16">
               <div>
-                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-violet-500/10 border border-violet-500/20 text-[10px] font-bold uppercase tracking-widest text-violet-400 mb-5">
+                <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1 sm:py-1.5 rounded-full bg-violet-500/10 border border-violet-500/20 text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-violet-400 mb-3 sm:mb-5">
                   <span className="w-1.5 h-1.5 rounded-full bg-violet-400" />
                   Membership Tiers
                 </div>
-                <h2 className="text-5xl md:text-7xl font-black italic tracking-tighter uppercase mb-3 leading-none">VERIFIED TIERS</h2>
-                <p className="text-cyan-500 text-xs font-black uppercase tracking-[0.4em]">DISTRIBUTION TIERS & YIELD MATRIX</p>
+                <h2 className="text-3xl sm:text-5xl md:text-7xl font-black italic tracking-tighter uppercase mb-2 sm:mb-3 leading-none">VERIFIED TIERS</h2>
+                <p className="text-cyan-500 text-[9px] sm:text-xs font-black uppercase tracking-[0.3em] sm:tracking-[0.4em]">DISTRIBUTION TIERS & YIELD MATRIX</p>
               </div>
-              <p className="max-w-md text-slate-500 text-sm italic font-medium">
-                Select your institutional tier. Higher tier levels offer accelerated distribution cycles and premium audit features.
+              <p className="max-w-md text-slate-500 text-xs sm:text-sm italic font-medium">
+                Select your institutional tier. Higher tier levels offer accelerated distribution cycles.
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-6">
               {tiers.map((tier, i) => (
                 <div
                   key={i}
                   className={cn(
-                    'relative flex flex-col p-8 rounded-[40px] border transition-all hover:scale-[1.02] duration-500',
+                    'relative flex flex-col p-4 sm:p-8 rounded-[24px] sm:rounded-[40px] border transition-all hover:scale-[1.02] duration-500',
                     tier.popular
                       ? 'bg-slate-900 border-indigo-500/40 shadow-2xl shadow-indigo-500/10'
                       : 'bg-slate-950/60 border-white/5 hover:border-white/10'
                   )}
                 >
                   {tier.popular && (
-                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full bg-indigo-500 text-[10px] font-black uppercase tracking-widest text-white shadow-lg shadow-indigo-500/30">
+                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-2.5 sm:px-4 py-0.5 sm:py-1.5 rounded-full bg-indigo-500 text-[8px] sm:text-[10px] font-black uppercase tracking-widest text-white shadow-lg shadow-indigo-500/30 whitespace-nowrap">
                       Most Active
                     </div>
                   )}
 
-                  <h5 className="text-[10px] font-black uppercase tracking-[0.35em] text-slate-400 mb-2">{tier.name}</h5>
-                  <div className="flex items-baseline gap-1 mb-2">
-                    <span className="text-4xl font-black italic tracking-tighter">${tier.price}</span>
-                    <span className="text-slate-500 text-[10px] font-bold uppercase tracking-widest ml-1">deposit</span>
+                  <h5 className="text-[8px] sm:text-[10px] font-black uppercase tracking-[0.25em] sm:tracking-[0.35em] text-slate-400 mb-1 sm:mb-2">{tier.name}</h5>
+                  <div className="flex items-baseline gap-1 mb-1 sm:mb-2">
+                    <span className="text-xl sm:text-4xl font-black italic tracking-tighter">${tier.price}</span>
+                    <span className="text-slate-500 text-[8px] sm:text-[10px] font-bold uppercase tracking-wider ml-0.5">dep</span>
                   </div>
-                  <p className="text-emerald-400 text-xs font-bold mb-6">~{tier.daily}/day at {tier.yield} daily</p>
+                  <p className="text-emerald-400 text-[10px] sm:text-xs font-bold mb-3 sm:mb-6">{tier.yield} daily</p>
 
-                  <div className="space-y-3 mb-8 pb-7 border-b border-white/5">
+                  <div className="space-y-1.5 sm:space-y-3 mb-4 sm:mb-8 pb-3 sm:pb-7 border-b border-white/5">
                     {[
-                      { k: 'Daily Yield', v: tier.yield, vc: 'text-cyan-400' },
-                      { k: 'Daily Limit', v: `${tier.tasks} Tasks`, vc: 'text-white' },
+                      { k: 'Yield', v: tier.yield, vc: 'text-cyan-400' },
+                      { k: 'Limit', v: `${tier.tasks} Tasks`, vc: 'text-white' },
                     ].map(row => (
                       <div key={row.k} className="flex items-center justify-between">
-                        <span className="text-[10px] font-bold uppercase text-slate-500 tracking-widest">{row.k}</span>
-                        <span className={cn('font-black italic text-sm', row.vc)}>{row.v}</span>
+                        <span className="text-[8px] sm:text-[10px] font-bold uppercase text-slate-500 tracking-wider">{row.k}</span>
+                        <span className={cn('font-black italic text-xs sm:text-sm', row.vc)}>{row.v}</span>
                       </div>
                     ))}
                   </div>
 
-                  <div className="space-y-3 mb-10 flex-1">
-                    {tier.features.map(f => (
-                      <div key={f} className="flex items-center gap-2.5 text-slate-400 text-[11px] font-medium">
-                        <CheckCircle2 size={12} className="text-emerald-500/70 shrink-0" />
-                        {f}
+                  <div className="space-y-1.5 sm:space-y-3 mb-4 sm:mb-10 flex-1">
+                    {tier.features.slice(0, 3).map(f => (
+                      <div key={f} className="flex items-center gap-1.5 sm:gap-2.5 text-slate-400 text-[9px] sm:text-[11px] font-medium">
+                        <CheckCircle2 size={10} className="text-emerald-500/70 shrink-0" />
+                        <span className="truncate">{f}</span>
                       </div>
                     ))}
                   </div>
 
                   <Link href="/home">
                     <button className={cn(
-                      'w-full py-4 rounded-[20px] font-black text-[11px] uppercase tracking-[0.25em] transition-all',
+                      'w-full py-2.5 sm:py-4 rounded-xl sm:rounded-[20px] font-black text-[9px] sm:text-[11px] uppercase tracking-[0.15em] sm:tracking-[0.25em] transition-all',
                       tier.popular
                         ? 'bg-cyan-500 text-slate-950 hover:bg-cyan-400 shadow-lg shadow-cyan-500/20'
                         : 'bg-white/5 border border-white/10 hover:bg-white/10'
@@ -1306,16 +1312,16 @@ export default function LandingPage() {
               </p>
             </div>
 
-            {/* Main layout: Steps left, commission card right */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+            {/* Main layout: Steps left, commission card right (2 Columns across Mobile, Tablet & PC) */}
+            <div className="grid grid-cols-2 gap-3 sm:gap-8 lg:gap-12 items-start">
 
               {/* Left — How It Works Steps */}
-              <div className="space-y-5">
+              <div className="space-y-2.5 sm:space-y-5">
                 {[
                   {
                     step: '01',
-                    title: 'Generate Your Link',
-                    desc: 'Activate your unique referral code from your agent dashboard. Shareable instantly across any channel.',
+                    title: 'Generate Link',
+                    desc: 'Activate your unique referral code from your agent dashboard. Shareable instantly.',
                     color: 'from-emerald-500/20 to-cyan-500/20',
                     border: 'border-emerald-500/20',
                     dot: 'bg-emerald-400',
@@ -1323,8 +1329,8 @@ export default function LandingPage() {
                   },
                   {
                     step: '02',
-                    title: 'Your Network Joins',
-                    desc: 'Referred agents sign up and activate any Membership tier. The protocol automatically logs the association.',
+                    title: 'Network Joins',
+                    desc: 'Referred agents sign up and activate any tier. The protocol logs the association.',
                     color: 'from-cyan-500/20 to-blue-500/20',
                     border: 'border-cyan-500/20',
                     dot: 'bg-cyan-400',
@@ -1332,45 +1338,45 @@ export default function LandingPage() {
                   },
                   {
                     step: '03',
-                    title: 'Earn on Every Cycle',
-                    desc: 'Collect a percentage of your referrals\' yield every distribution cycle — automatically deposited to your vault.',
+                    title: 'Earn Every Cycle',
+                    desc: 'Collect a percentage of referral yield every distribution cycle — deposited to your vault.',
                     color: 'from-violet-500/20 to-indigo-500/20',
                     border: 'border-violet-500/20',
                     dot: 'bg-violet-400',
                     num: 'text-violet-400',
                   },
                 ].map((s, i) => (
-                  <div key={i} className={`group flex gap-5 p-6 rounded-[28px] bg-gradient-to-br ${s.color} border ${s.border} backdrop-blur-sm transition-all duration-300 hover:scale-[1.02]`}>
-                    <div className={`text-4xl font-black italic tracking-tighter ${s.num} opacity-40 group-hover:opacity-100 transition-opacity shrink-0 w-12`}>{s.step}</div>
+                  <div key={i} className={`group flex flex-col sm:flex-row gap-2 sm:gap-5 p-3 sm:p-6 rounded-[18px] sm:rounded-[28px] bg-gradient-to-br ${s.color} border ${s.border} backdrop-blur-sm transition-all duration-300 hover:scale-[1.02]`}>
+                    <div className={`text-2xl sm:text-4xl font-black italic tracking-tighter ${s.num} opacity-40 group-hover:opacity-100 transition-opacity shrink-0 w-8 sm:w-12`}>{s.step}</div>
                     <div>
-                      <div className="flex items-center gap-2 mb-1.5">
+                      <div className="flex items-center gap-1.5 sm:gap-2 mb-1 sm:mb-1.5">
                         <span className={`w-1.5 h-1.5 rounded-full ${s.dot}`} />
-                        <h4 className="font-black italic uppercase tracking-tight text-white text-sm">{s.title}</h4>
+                        <h4 className="font-black italic uppercase tracking-tight text-white text-xs sm:text-sm">{s.title}</h4>
                       </div>
-                      <p className="text-slate-400 text-sm font-medium leading-relaxed">{s.desc}</p>
+                      <p className="text-slate-400 text-[10px] sm:text-sm font-medium leading-tight sm:leading-relaxed">{s.desc}</p>
                     </div>
                   </div>
                 ))}
               </div>
 
               {/* Right — Commission tiers + CTA card */}
-              <div className="space-y-5">
+              <div className="space-y-2.5 sm:space-y-5">
                 {/* Commission breakdown */}
-                <div className="rounded-[36px] bg-gradient-to-br from-slate-900 to-slate-950 border border-white/8 p-8">
-                  <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-500 mb-6">Commission Structure</p>
-                  <div className="space-y-4">
+                <div className="rounded-[20px] sm:rounded-[36px] bg-gradient-to-br from-slate-900 to-slate-950 border border-white/8 p-3.5 sm:p-8">
+                  <p className="text-[8px] sm:text-[10px] font-black uppercase tracking-[0.25em] sm:tracking-[0.4em] text-slate-500 mb-3 sm:mb-6">Commission Structure</p>
+                  <div className="space-y-2.5 sm:space-y-4">
                     {[
-                      { tier: 'Tier 1 Referral', pct: '8%', desc: 'Direct referral yield share', color: 'text-emerald-400', bar: 'bg-emerald-400', width: 'w-[80%]' },
-                      { tier: 'Tier 2 Network', pct: '3%', desc: "Your referral's referrals", color: 'text-cyan-400', bar: 'bg-cyan-400', width: 'w-[30%]' },
-                      { tier: 'Milestone Bonus', pct: '+$50', desc: 'Every 5 active referrals', color: 'text-violet-400', bar: 'bg-violet-400', width: 'w-[50%]' },
+                      { tier: 'Tier 1 Referral', pct: '8%', desc: 'Direct yield share', color: 'text-emerald-400', bar: 'bg-emerald-400', width: 'w-[80%]' },
+                      { tier: 'Tier 2 Network', pct: '3%', desc: 'Secondary network', color: 'text-cyan-400', bar: 'bg-cyan-400', width: 'w-[30%]' },
+                      { tier: 'Milestone Bonus', pct: '+$50', desc: 'Per 5 active agents', color: 'text-violet-400', bar: 'bg-violet-400', width: 'w-[50%]' },
                     ].map((c, i) => (
                       <div key={i}>
-                        <div className="flex items-center justify-between mb-1.5">
-                          <div>
-                            <span className="text-white text-xs font-black italic uppercase">{c.tier}</span>
-                            <span className="text-slate-600 text-[10px] font-medium ml-2">— {c.desc}</span>
+                        <div className="flex items-center justify-between mb-1">
+                          <div className="truncate pr-1">
+                            <span className="text-white text-[10px] sm:text-xs font-black italic uppercase">{c.tier}</span>
+                            <span className="hidden sm:inline text-slate-600 text-[10px] font-medium ml-2">— {c.desc}</span>
                           </div>
-                          <span className={`text-base font-black italic ${c.color}`}>{c.pct}</span>
+                          <span className={`text-xs sm:text-base font-black italic shrink-0 ${c.color}`}>{c.pct}</span>
                         </div>
                         <div className="h-1 rounded-full bg-white/5 overflow-hidden">
                           <div className={`h-full rounded-full ${c.bar} ${c.width} opacity-60`} />
@@ -1381,27 +1387,27 @@ export default function LandingPage() {
                 </div>
 
                 {/* Stat pills */}
-                <div className="grid grid-cols-3 gap-3">
+                <div className="grid grid-cols-3 gap-1.5 sm:gap-3">
                   {[
                     { val: '$124K+', label: 'Paid Out', color: 'text-emerald-400' },
-                    { val: '2,800+', label: 'Active Referrers', color: 'text-cyan-400' },
+                    { val: '2,800+', label: 'Referrers', color: 'text-cyan-400' },
                     { val: '∞', label: 'Earning Cap', color: 'text-violet-400' },
                   ].map((p, i) => (
-                    <div key={i} className="text-center p-4 rounded-[20px] bg-slate-950/60 border border-white/5 hover:border-white/10 transition-all">
-                      <div className={`text-xl font-black italic ${p.color}`}>{p.val}</div>
-                      <div className="text-[9px] font-bold uppercase tracking-widest text-slate-600 mt-1">{p.label}</div>
+                    <div key={i} className="text-center p-2 sm:p-4 rounded-xl sm:rounded-[20px] bg-slate-950/60 border border-white/5 hover:border-white/10 transition-all">
+                      <div className={`text-xs sm:text-xl font-black italic ${p.color}`}>{p.val}</div>
+                      <div className="text-[7px] sm:text-[9px] font-bold uppercase tracking-wider text-slate-600 mt-0.5 sm:mt-1 truncate">{p.label}</div>
                     </div>
                   ))}
                 </div>
 
                 {/* CTA */}
-                <div className="rounded-[28px] bg-gradient-to-br from-emerald-500/10 to-cyan-500/10 border border-emerald-500/20 p-6 flex flex-col sm:flex-row items-center gap-4">
-                  <div className="flex-1">
-                    <h4 className="font-black italic uppercase text-white text-sm mb-1">Start Earning Now</h4>
-                    <p className="text-slate-500 text-xs font-medium">Your referral link activates the moment you log in to your dashboard.</p>
+                <div className="rounded-[18px] sm:rounded-[28px] bg-gradient-to-br from-emerald-500/10 to-cyan-500/10 border border-emerald-500/20 p-3 sm:p-6 flex flex-col sm:flex-row items-center gap-2 sm:gap-4">
+                  <div className="flex-1 text-center sm:text-left">
+                    <h4 className="font-black italic uppercase text-white text-xs sm:text-sm mb-0.5 sm:mb-1">Start Earning Now</h4>
+                    <p className="text-slate-500 text-[9px] sm:text-xs font-medium">Referral link activates instantly upon signup.</p>
                   </div>
-                  <Link href="/auth/sign-up">
-                    <button className="shrink-0 px-6 py-3 rounded-[16px] bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-[11px] uppercase tracking-[0.25em] transition-all hover:shadow-lg hover:shadow-emerald-500/30 hover:scale-105 active:scale-95">
+                  <Link href="/auth/sign-up" className="w-full sm:w-auto">
+                    <button className="w-full sm:w-auto shrink-0 px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl sm:rounded-[16px] bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-[9px] sm:text-[11px] uppercase tracking-wider sm:tracking-[0.25em] transition-all hover:shadow-lg hover:shadow-emerald-500/30 hover:scale-105 active:scale-95 whitespace-nowrap">
                       Join &amp; Refer →
                     </button>
                   </Link>
@@ -1418,33 +1424,33 @@ export default function LandingPage() {
           <div className="bg-gradient-to-br from-slate-900 via-slate-900 to-slate-950 rounded-[32px] sm:rounded-[56px] border border-white/5 p-6 sm:p-10 lg:p-20 relative">
             <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-cyan-600/5 blur-[150px] rounded-full pointer-events-none" />
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+            <div className="grid grid-cols-2 gap-3 sm:gap-8 lg:gap-16 items-center">
               <div className="relative z-10">
-                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-[10px] font-bold uppercase tracking-widest text-cyan-400 mb-6 sm:mb-8">
+                <div className="inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-0.5 sm:py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-[8px] sm:text-[10px] font-bold uppercase tracking-widest text-cyan-400 mb-3 sm:mb-8">
                   <span className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
-                  Security Infrastructure
+                  Security Protocol
                 </div>
-                <h2 className="text-4xl sm:text-5xl md:text-7xl font-black italic tracking-tighter uppercase leading-[0.85] mb-6 sm:mb-10">
+                <h2 className="text-xl sm:text-5xl md:text-7xl font-black italic tracking-tighter uppercase leading-[0.9] mb-2 sm:mb-10">
                   QUANTUM <br />
                   <span className="text-cyan-500">SECURITY</span>
                 </h2>
-                <p className="text-slate-400 text-sm sm:text-base font-medium mb-8 sm:mb-10 leading-relaxed">
-                  SmartBugMedia uses a multi-layered verification consensus to ensure all agent distribution remains synchronized and secure across global gateways.
+                <p className="text-slate-400 text-[9px] sm:text-base font-medium mb-3 sm:mb-10 leading-snug sm:leading-relaxed line-clamp-2 sm:line-clamp-none">
+                  SmartBugMedia uses multi-layered verification consensus to ensure all agent distribution remains secure.
                 </p>
 
-                <div className="space-y-6 sm:space-y-8">
+                <div className="space-y-2.5 sm:space-y-8">
                   {[
                     { title: 'Ledger Consensus', desc: 'Immutable distribution logging for 100% transparency.', icon: Layers },
                     { title: 'Multi-Sig Vaults', desc: 'Deep liquidity storage protected by institutional encryption.', icon: Lock },
                     { title: 'Neural Auditing', desc: 'Real-time AI monitoring for task optimization efficiency.', icon: Cpu },
                   ].map((f, i) => (
-                    <div key={i} className="flex gap-4 sm:gap-5 group">
-                      <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0 group-hover:text-cyan-400 group-hover:border-cyan-500/30 transition-all">
-                        <f.icon size={18} />
+                    <div key={i} className="flex gap-2 sm:gap-5 group items-start sm:items-center">
+                      <div className="w-7 h-7 sm:w-12 sm:h-12 rounded-lg sm:rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0 group-hover:text-cyan-400 group-hover:border-cyan-500/30 transition-all">
+                        <f.icon className="w-3.5 h-3.5 sm:w-[18px] sm:h-[18px]" />
                       </div>
-                      <div>
-                        <h5 className="text-sm sm:text-base font-black italic uppercase tracking-tight text-white mb-1">{f.title}</h5>
-                        <p className="text-xs sm:text-sm font-medium text-slate-500 leading-relaxed">{f.desc}</p>
+                      <div className="min-w-0">
+                        <h5 className="text-[10px] sm:text-base font-black italic uppercase tracking-tight text-white mb-0.5 truncate">{f.title}</h5>
+                        <p className="text-[8px] sm:text-sm font-medium text-slate-500 leading-tight sm:leading-relaxed line-clamp-1 sm:line-clamp-none">{f.desc}</p>
                       </div>
                     </div>
                   ))}
@@ -1452,20 +1458,20 @@ export default function LandingPage() {
               </div>
 
               <div className="relative flex items-center justify-center">
-                <div className="aspect-square relative w-full max-w-sm rounded-[36px] sm:rounded-[48px] bg-slate-950 border border-white/10 flex items-center justify-center overflow-hidden">
+                <div className="aspect-square relative w-full max-w-[200px] sm:max-w-sm rounded-[24px] sm:rounded-[48px] bg-slate-950 border border-white/10 flex items-center justify-center overflow-hidden">
                   <div className="absolute inset-0 opacity-10">
-                    <div className="w-full h-full bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:40px_40px]" />
+                    <div className="w-full h-full bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:20px_20px] sm:bg-[size:40px_40px]" />
                   </div>
                   <div className="w-4/5 h-4/5 rounded-full border border-dashed border-cyan-500/20 animate-[spin_20s_linear_infinite] flex items-center justify-center">
                     <div className="w-3/4 h-3/4 rounded-full border border-indigo-500/20 animate-[spin_12s_linear_infinite_reverse]" />
                   </div>
-                  <ShieldCheck className="absolute text-cyan-400 drop-shadow-[0_0_30px_rgba(34,211,238,0.5)]" size={80} strokeWidth={1.2} />
+                  <ShieldCheck className="absolute text-cyan-400 drop-shadow-[0_0_30px_rgba(34,211,238,0.5)] w-10 h-10 sm:w-20 sm:h-20" strokeWidth={1.2} />
 
                   {/* Corner badges */}
                   {['256-bit AES', 'TLS 1.3', 'Zero-Knowledge', 'Multi-Sig'].map((label, i) => {
-                    const positions = ['top-4 sm:top-6 left-4 sm:left-6', 'top-4 sm:top-6 right-4 sm:right-6', 'bottom-4 sm:bottom-6 left-4 sm:left-6', 'bottom-4 sm:bottom-6 right-4 sm:right-6'];
+                    const positions = ['top-2 sm:top-6 left-2 sm:left-6', 'top-2 sm:top-6 right-2 sm:right-6', 'bottom-2 sm:bottom-6 left-2 sm:left-6', 'bottom-2 sm:bottom-6 right-2 sm:right-6'];
                     return (
-                      <div key={i} className={`absolute ${positions[i]} px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-lg bg-slate-900/80 border border-white/10 text-[8px] sm:text-[9px] font-black uppercase tracking-wider text-slate-400`}>
+                      <div key={i} className={`absolute ${positions[i]} px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-md sm:rounded-lg bg-slate-900/80 border border-white/10 text-[6px] sm:text-[9px] font-black uppercase tracking-wider text-slate-400`}>
                         {label}
                       </div>
                     );
@@ -1520,27 +1526,27 @@ export default function LandingPage() {
         </section>
 
         {/* ══════════════════════════════════════════
-            CONNECT HUB — Dual Panel Newsletter & Contact Us
+            CONNECT HUB — Dual Panel Newsletter & Contact Us (2 Columns across Mobile, Tablet & PC)
         ══════════════════════════════════════════ */}
-        <section id="connect-hub" className="px-4 sm:px-6 lg:px-12 py-16 sm:py-24 max-w-7xl mx-auto border-t border-white/5 relative">
+        <section id="connect-hub" className="px-3 sm:px-6 lg:px-12 py-12 sm:py-24 max-w-7xl mx-auto border-t border-white/5 relative">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-indigo-500/[0.015] blur-[150px] rounded-full pointer-events-none" />
           
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 items-stretch relative z-10">
+          <div className="grid grid-cols-2 gap-2.5 sm:gap-6 lg:gap-8 items-stretch relative z-10">
             {/* Panel 1: Newsletter */}
-            <div className="relative rounded-[24px] sm:rounded-[32px] bg-slate-900/60 backdrop-blur-xl border border-white/5 overflow-hidden p-5 sm:p-8 md:p-10 flex flex-col justify-between shadow-[0_20px_50px_rgba(0,0,0,0.5)] group hover:border-cyan-500/20 transition-all duration-300">
+            <div className="relative rounded-[18px] sm:rounded-[32px] bg-slate-900/60 backdrop-blur-xl border border-white/5 overflow-hidden p-3 sm:p-8 md:p-10 flex flex-col justify-between shadow-[0_20px_50px_rgba(0,0,0,0.5)] group hover:border-cyan-500/20 transition-all duration-300">
               <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/[0.02] blur-3xl rounded-full pointer-events-none" />
               
               <div className="relative z-10 flex-1 flex flex-col">
-                <div className="inline-flex self-start items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-[9px] font-bold uppercase tracking-widest text-cyan-400 mb-6">
+                <div className="inline-flex self-start items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-[8px] sm:text-[9px] font-bold uppercase tracking-widest text-cyan-400 mb-2.5 sm:mb-6">
                   <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
                   Exclusive Uplink
                 </div>
 
-                <h3 className="text-2xl md:text-3xl font-black italic uppercase tracking-tight text-white mb-3">
-                  SYNC WITH THE <span className="text-cyan-400">MATRIX</span>
+                <h3 className="text-sm sm:text-2xl md:text-3xl font-black italic uppercase tracking-tight text-white mb-1.5 sm:mb-3">
+                  SYNC WITH <span className="text-cyan-400">MATRIX</span>
                 </h3>
-                <p className="text-slate-400 text-xs md:text-sm leading-relaxed mb-8">
-                  Subscribe to our platform updates, telemetry logs, and exclusive promotions — plus claim a <strong className="text-emerald-400">$5 welcome bonus</strong> on your first deposit.
+                <p className="text-slate-400 text-[9px] sm:text-xs md:text-sm leading-relaxed mb-3 sm:mb-8 line-clamp-3 sm:line-clamp-none">
+                  Subscribe to platform updates &amp; telemetry — claim a <strong className="text-emerald-400">$5 welcome bonus</strong>.
                 </p>
 
                 <div className="flex-1 flex flex-col justify-center">
@@ -1551,16 +1557,16 @@ export default function LandingPage() {
                         initial={{ opacity: 0, scale: 0.95 }}
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.95 }}
-                        className="flex flex-col items-center justify-center text-center p-6 bg-slate-950/40 border border-emerald-500/20 rounded-2xl"
+                        className="flex flex-col items-center justify-center text-center p-3 sm:p-6 bg-slate-950/40 border border-emerald-500/20 rounded-xl sm:rounded-2xl"
                       >
-                        <div className="w-14 h-14 rounded-full bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400 mb-4 shadow-lg shadow-emerald-500/10">
-                          <Check size={28} />
+                        <div className="w-8 h-8 sm:w-14 sm:h-14 rounded-full bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400 mb-2 sm:mb-4 shadow-lg shadow-emerald-500/10">
+                          <Check size={18} />
                         </div>
-                        <p className="text-white font-black text-lg uppercase tracking-tight mb-1">Telemetry Connected!</p>
-                        <p className="text-slate-400 text-xs max-w-xs mb-4">Your $5 welcome credit has been reserved under your session. Activate your account to claim it.</p>
+                        <p className="text-white font-black text-xs sm:text-lg uppercase tracking-tight mb-1">Telemetry Connected!</p>
+                        <p className="text-slate-400 text-[9px] sm:text-xs max-w-xs mb-3">Your $5 welcome credit has been reserved.</p>
                         <Link href="/auth/sign-up" className="w-full">
-                          <button className="w-full py-3 bg-cyan-500 text-slate-950 rounded-xl font-black text-xs uppercase tracking-widest shadow-lg shadow-cyan-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all">
-                            Complete Setup & Claim →
+                          <button className="w-full py-2 sm:py-3 bg-cyan-500 text-slate-950 rounded-lg sm:rounded-xl font-black text-[9px] sm:text-xs uppercase tracking-wider sm:tracking-widest shadow-lg shadow-cyan-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all">
+                            Complete Setup →
                           </button>
                         </Link>
                       </motion.div>
@@ -1568,7 +1574,7 @@ export default function LandingPage() {
                       <motion.form
                         key="form-newsletter"
                         onSubmit={handleNewsletterSubmit}
-                        className="space-y-4"
+                        className="space-y-2 sm:space-y-4"
                       >
                         <div className="relative">
                           <input
@@ -1578,17 +1584,17 @@ export default function LandingPage() {
                               setEmailInput(e.target.value);
                               if (emailError) setEmailError(null);
                             }}
-                            placeholder="Enter your email address..."
+                            placeholder="Enter email address..."
                             disabled={emailLoading}
                             className={cn(
-                              "w-full px-5 py-4 bg-slate-950/60 border rounded-xl text-xs md:text-sm text-white placeholder-slate-500 focus:outline-none transition-all pr-12",
+                              "w-full px-3 sm:px-5 py-2.5 sm:py-4 bg-slate-950/60 border rounded-lg sm:rounded-xl text-[10px] sm:text-xs md:text-sm text-white placeholder-slate-500 focus:outline-none transition-all pr-8 sm:pr-12",
                               emailError ? "border-rose-500/50 focus:border-rose-500" :
                               (emailInput.includes('@') && emailInput.length >= 5) ? "border-emerald-500/40 focus:border-emerald-500" : "border-white/10 focus:border-cyan-500/50"
                             )}
                           />
-                          <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-1.5 pointer-events-none">
-                            {emailError && <AlertCircle className="w-4 h-4 text-rose-500 animate-pulse" />}
-                            {(!emailError && emailInput.includes('@') && emailInput.length >= 5) && <Check className="w-4 h-4 text-emerald-400" />}
+                          <div className="absolute right-2.5 sm:right-4 top-1/2 -translate-y-1/2 flex items-center gap-1 pointer-events-none">
+                            {emailError && <AlertCircle className="w-3.5 h-3.5 text-rose-500 animate-pulse" />}
+                            {(!emailError && emailInput.includes('@') && emailInput.length >= 5) && <Check className="w-3.5 h-3.5 text-emerald-400" />}
                           </div>
                         </div>
 
@@ -1596,7 +1602,7 @@ export default function LandingPage() {
                           <motion.p
                             initial={{ opacity: 0, y: -5 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="text-xs text-rose-500 font-medium pl-1"
+                            className="text-[9px] sm:text-xs text-rose-500 font-medium pl-1"
                           >
                             {emailError}
                           </motion.p>
@@ -1605,12 +1611,12 @@ export default function LandingPage() {
                         <button
                           type="submit"
                           disabled={emailLoading}
-                          className="w-full py-4 bg-cyan-500 text-slate-950 rounded-xl font-black text-xs uppercase tracking-widest shadow-lg shadow-cyan-500/10 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+                          className="w-full py-2.5 sm:py-4 bg-cyan-500 text-slate-950 rounded-lg sm:rounded-xl font-black text-[9px] sm:text-xs uppercase tracking-wider sm:tracking-widest shadow-lg shadow-cyan-500/10 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-1.5 sm:gap-2 whitespace-nowrap"
                         >
                           {emailLoading ? (
-                            <><RefreshCw className="animate-spin w-4 h-4" /> BINDING PORTAL...</>
+                            <><RefreshCw className="animate-spin w-3.5 h-3.5" /> BINDING...</>
                           ) : (
-                            <>Claim $5 Welcome Credit <ArrowUpRight className="w-4 h-4" /></>
+                            <>Claim $5 Credit <ArrowUpRight className="w-3.5 h-3.5" /></>
                           )}
                         </button>
                       </motion.form>
@@ -1619,27 +1625,27 @@ export default function LandingPage() {
                 </div>
               </div>
 
-              <div className="mt-8 pt-6 border-t border-white/5 flex items-center justify-between text-[10px] text-slate-500">
-                <span>Encryption Protocol TLS 1.3</span>
-                <span>Unsubscribe in one-click</span>
+              <div className="mt-4 sm:mt-8 pt-2.5 sm:pt-6 border-t border-white/5 flex items-center justify-between text-[8px] sm:text-[10px] text-slate-500">
+                <span>TLS 1.3</span>
+                <span>One-click exit</span>
               </div>
             </div>
 
             {/* Panel 2: Contact Us */}
-            <div className="relative rounded-[32px] bg-slate-900/60 backdrop-blur-xl border border-white/5 overflow-hidden p-8 md:p-10 flex flex-col justify-between shadow-[0_20px_50px_rgba(0,0,0,0.5)] group hover:border-violet-500/20 transition-all duration-300">
+            <div className="relative rounded-[18px] sm:rounded-[32px] bg-slate-900/60 backdrop-blur-xl border border-white/5 overflow-hidden p-3 sm:p-8 md:p-10 flex flex-col justify-between shadow-[0_20px_50px_rgba(0,0,0,0.5)] group hover:border-violet-500/20 transition-all duration-300">
               <div className="absolute top-0 right-0 w-64 h-64 bg-violet-500/[0.02] blur-3xl rounded-full pointer-events-none" />
 
               <div className="relative z-10 flex-1 flex flex-col">
-                <div className="inline-flex self-start items-center gap-2 px-3 py-1 rounded-full bg-violet-500/10 border border-violet-500/20 text-[9px] font-bold uppercase tracking-widest text-violet-400 mb-6">
+                <div className="inline-flex self-start items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full bg-violet-500/10 border border-violet-500/20 text-[8px] sm:text-[9px] font-bold uppercase tracking-widest text-violet-400 mb-2.5 sm:mb-6">
                   <span className="w-1.5 h-1.5 rounded-full bg-violet-400 animate-pulse" />
                   Support Gateway
                 </div>
 
-                <h3 className="text-2xl md:text-3xl font-black italic uppercase tracking-tight text-white mb-3">
-                  DIRECT <span className="text-violet-400">UPLINK</span> PORTAL
+                <h3 className="text-sm sm:text-2xl md:text-3xl font-black italic uppercase tracking-tight text-white mb-1.5 sm:mb-3">
+                  DIRECT <span className="text-violet-400">UPLINK</span>
                 </h3>
-                <p className="text-slate-400 text-xs md:text-sm leading-relaxed mb-6">
-                  Establish a secure connection with our network operators. Inquiries are generally processed within 15 minutes.
+                <p className="text-slate-400 text-[9px] sm:text-xs md:text-sm leading-relaxed mb-2.5 sm:mb-6 line-clamp-2 sm:line-clamp-none">
+                  Secure connection with operators. Processed in 15 mins.
                 </p>
 
                 <div className="flex-1 flex flex-col justify-center">
@@ -1650,13 +1656,13 @@ export default function LandingPage() {
                         initial={{ opacity: 0, scale: 0.95 }}
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.95 }}
-                        className="flex flex-col items-center justify-center text-center p-6 bg-slate-950/40 border border-emerald-500/20 rounded-2xl h-full min-h-[280px]"
+                        className="flex flex-col items-center justify-center text-center p-3 sm:p-6 bg-slate-950/40 border border-emerald-500/20 rounded-xl sm:rounded-2xl h-full min-h-[200px]"
                       >
-                        <div className="w-14 h-14 rounded-full bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400 mb-4 shadow-lg shadow-emerald-500/10">
-                          <Check size={28} />
+                        <div className="w-8 h-8 sm:w-14 sm:h-14 rounded-full bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400 mb-2 sm:mb-4 shadow-lg shadow-emerald-500/10">
+                          <Check size={18} />
                         </div>
-                        <p className="text-white font-black text-lg uppercase tracking-tight mb-1">Transmission Sent!</p>
-                        <p className="text-slate-400 text-xs max-w-xs">Handshake succeeded. Your message has been logged under telemetry ID <code>#NF-{Math.floor(1000 + Math.random()*9000)}</code>.</p>
+                        <p className="text-white font-black text-xs sm:text-lg uppercase tracking-tight mb-1">Transmission Sent!</p>
+                        <p className="text-slate-400 text-[9px] sm:text-xs max-w-xs">Logged under ID <code>#NF-{Math.floor(1000 + Math.random()*9000)}</code>.</p>
                         <button
                           onClick={() => {
                             setContactSubmitted(false);
@@ -1665,18 +1671,18 @@ export default function LandingPage() {
                             setContactMessage('');
                             setContactTopic('support');
                           }}
-                          className="mt-6 px-6 py-2 border border-white/10 text-[10px] font-bold uppercase tracking-wider text-slate-400 hover:bg-white/5 rounded-lg transition-all"
+                          className="mt-3 sm:mt-6 px-4 py-1.5 border border-white/10 text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-slate-400 hover:bg-white/5 rounded-lg transition-all"
                         >
-                          Send Another Message
+                          Send Another
                         </button>
                       </motion.div>
                     ) : (
                       <motion.form
                         key="form-contact"
                         onSubmit={handleContactSubmit}
-                        className="space-y-3.5"
+                        className="space-y-2 sm:space-y-3.5"
                       >
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div className="grid grid-cols-2 gap-1.5 sm:gap-3">
                           <div className="relative">
                             <input
                               type="text"
@@ -1688,7 +1694,7 @@ export default function LandingPage() {
                               placeholder="Name"
                               disabled={contactLoading}
                               className={cn(
-                                "w-full px-4 py-3 bg-slate-950/60 border rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none transition-all",
+                                "w-full px-2.5 sm:px-4 py-2 sm:py-3 bg-slate-950/60 border rounded-lg sm:rounded-xl text-[10px] sm:text-xs text-white placeholder-slate-500 focus:outline-none transition-all",
                                 contactError && !contactName.trim() ? "border-rose-500/50 focus:border-rose-500" :
                                 contactName.trim().length >= 2 ? "border-emerald-500/40 focus:border-emerald-500" : "border-white/10 focus:border-violet-500/50"
                               )}
@@ -1706,7 +1712,7 @@ export default function LandingPage() {
                               placeholder="Email"
                               disabled={contactLoading}
                               className={cn(
-                                "w-full px-4 py-3 bg-slate-950/60 border rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none transition-all",
+                                "w-full px-2.5 sm:px-4 py-2 sm:py-3 bg-slate-950/60 border rounded-lg sm:rounded-xl text-[10px] sm:text-xs text-white placeholder-slate-500 focus:outline-none transition-all",
                                 contactError && (!contactEmail.includes('@') || contactEmail.length < 5) ? "border-rose-500/50 focus:border-rose-500" :
                                 (contactEmail.includes('@') && contactEmail.length >= 5) ? "border-emerald-500/40 focus:border-emerald-500" : "border-white/10 focus:border-violet-500/50"
                               )}
@@ -1719,14 +1725,14 @@ export default function LandingPage() {
                             value={contactTopic}
                             onChange={e => setContactTopic(e.target.value)}
                             disabled={contactLoading}
-                            className="w-full px-4 py-3 bg-slate-950/80 border border-white/10 rounded-xl text-xs text-slate-300 focus:outline-none focus:border-violet-500/50 transition-all appearance-none cursor-pointer"
+                            className="w-full px-2.5 sm:px-4 py-2 sm:py-3 bg-slate-950/80 border border-white/10 rounded-lg sm:rounded-xl text-[9px] sm:text-xs text-slate-300 focus:outline-none focus:border-violet-500/50 transition-all appearance-none cursor-pointer"
                           >
-                            <option value="support">Technical Account Support</option>
-                            <option value="deposit">Deposit & Payout Inquiries</option>
-                            <option value="referral">Referral Matrix Questions</option>
-                            <option value="business">Institutional Partnership</option>
+                            <option value="support">Technical Support</option>
+                            <option value="deposit">Deposit &amp; Payouts</option>
+                            <option value="referral">Referral Matrix</option>
+                            <option value="business">Partnership</option>
                           </select>
-                          <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-500 text-[10px]">▼</div>
+                          <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-500 text-[8px]">▼</div>
                         </div>
 
                         <div className="relative">
@@ -1736,25 +1742,22 @@ export default function LandingPage() {
                               setContactMessage(e.target.value);
                               if (contactError) setContactError(null);
                             }}
-                            placeholder="Type your message..."
+                            placeholder="Type message..."
                             disabled={contactLoading}
-                            rows={3}
+                            rows={2}
                             className={cn(
-                              "w-full px-4 py-3 bg-slate-950/60 border rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none transition-all resize-none",
+                              "w-full px-2.5 sm:px-4 py-2 sm:py-3 bg-slate-950/60 border rounded-lg sm:rounded-xl text-[10px] sm:text-xs text-white placeholder-slate-500 focus:outline-none transition-all resize-none",
                               contactError && contactMessage.trim().length < 10 ? "border-rose-500/50 focus:border-rose-500" :
                               contactMessage.trim().length >= 10 ? "border-emerald-500/40 focus:border-emerald-500" : "border-white/10 focus:border-violet-500/50"
                             )}
                           />
-                          <div className="absolute bottom-2 right-3 text-[9px] text-slate-600 font-mono">
-                            {contactMessage.length} ch
-                          </div>
                         </div>
 
                         {contactError && (
                           <motion.p
                             initial={{ opacity: 0, y: -5 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="text-xs text-rose-500 font-medium pl-1"
+                            className="text-[9px] sm:text-xs text-rose-500 font-medium pl-1"
                           >
                             {contactError}
                           </motion.p>
@@ -1763,12 +1766,12 @@ export default function LandingPage() {
                         <button
                           type="submit"
                           disabled={contactLoading}
-                          className="w-full py-3.5 bg-violet-600 text-white rounded-xl font-black text-xs uppercase tracking-widest shadow-lg shadow-violet-600/10 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+                          className="w-full py-2.5 sm:py-3.5 bg-violet-600 text-white rounded-lg sm:rounded-xl font-black text-[9px] sm:text-xs uppercase tracking-wider sm:tracking-widest shadow-lg shadow-violet-600/10 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-1.5 sm:gap-2 whitespace-nowrap"
                         >
                           {contactLoading ? (
-                            <><RefreshCw className="animate-spin w-4 h-4" /> TRANSMITTING...</>
+                            <><RefreshCw className="animate-spin w-3.5 h-3.5" /> TRANSMITTING...</>
                           ) : (
-                            <>Transmit Message <Send className="w-4 h-4" /></>
+                            <>Transmit <Send className="w-3.5 h-3.5" /></>
                           )}
                         </button>
                       </motion.form>
@@ -1777,9 +1780,9 @@ export default function LandingPage() {
                 </div>
               </div>
 
-              <div className="mt-8 pt-6 border-t border-white/5 flex items-center justify-between text-[10px] text-slate-500">
-                <span>Secure SSL Gateway</span>
-                <span>Active Operators: Online</span>
+              <div className="mt-4 sm:mt-8 pt-2.5 sm:pt-6 border-t border-white/5 flex items-center justify-between text-[8px] sm:text-[10px] text-slate-500">
+                <span>SSL Gateway</span>
+                <span>Operators Online</span>
               </div>
             </div>
           </div>
@@ -1788,33 +1791,34 @@ export default function LandingPage() {
         {/* ══════════════════════════════════════════
             FINAL CTA — White block
         ══════════════════════════════════════════ */}
-        <section className="px-4 sm:px-6 lg:px-12 pb-16 sm:pb-28 max-w-7xl mx-auto">
-          <div className="relative rounded-[32px] sm:rounded-[48px] lg:rounded-[64px] bg-white p-6 sm:p-14 lg:p-28 text-center text-slate-950 overflow-hidden">
+        <section className="px-3 sm:px-6 lg:px-12 pb-16 sm:pb-28 max-w-7xl mx-auto">
+          <div className="relative rounded-[24px] sm:rounded-[48px] lg:rounded-[64px] bg-white p-5 sm:p-14 lg:p-28 text-center text-slate-950 overflow-hidden">
             {/* Subtle texture */}
             <div className="absolute inset-0 opacity-[0.025] pointer-events-none" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\")" }} />
 
-            <div className="relative z-10 space-y-6 sm:space-y-8">
-              <div className="inline-flex px-4 sm:px-5 py-1.5 sm:py-2 rounded-full bg-slate-950/5 border border-slate-950/10 text-[9px] sm:text-[10px] font-black uppercase tracking-[0.3em] sm:tracking-[0.4em]">
+            <div className="relative z-10 space-y-4 sm:space-y-8">
+              <div className="inline-flex px-3 sm:px-5 py-1 sm:py-2 rounded-full bg-slate-950/5 border border-slate-950/10 text-[8px] sm:text-[10px] font-black uppercase tracking-[0.25em] sm:tracking-[0.4em]">
                 Ready to synchronize?
               </div>
 
-              <h2 className="text-3xl sm:text-5xl md:text-7xl lg:text-8xl font-extrabold italic tracking-tighter uppercase leading-[0.9]">
+              <h2 className="text-2xl sm:text-5xl md:text-7xl lg:text-8xl font-extrabold italic tracking-tighter uppercase leading-[0.9]">
                 JOIN THE <br />
                 <span className="text-indigo-600">GLOBAL MATRIX</span>
               </h2>
 
-              <p className="max-w-xl mx-auto text-slate-600 text-sm sm:text-base md:text-lg font-medium italic">
+              <p className="max-w-xl mx-auto text-slate-600 text-xs sm:text-base md:text-lg font-medium italic">
                 Start your institutional agent journey today. Deploy liquidity, optimize workflows, and harvest verified global returns — starting at just $30.
               </p>
 
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-5 pt-2">
-                <Link href="/auth/sign-up" className="w-full sm:w-auto">
-                  <button className="w-full sm:w-auto px-8 sm:px-14 py-4 sm:py-5 bg-slate-950 text-white rounded-2xl sm:rounded-3xl font-black text-xs uppercase tracking-[0.2em] sm:tracking-[0.3em] shadow-2xl hover:scale-105 hover:shadow-slate-950/30 transition-all">
-                    Get Started — It&apos;s Free
+              {/* Side-by-Side CTA buttons across Mobile, Tablet & PC */}
+              <div className="flex flex-row items-center justify-center gap-2 sm:gap-5 pt-2">
+                <Link href="/auth/sign-up" className="flex-1 sm:flex-none">
+                  <button className="w-full sm:w-auto px-4 sm:px-14 py-3 sm:py-5 bg-slate-950 text-white rounded-xl sm:rounded-3xl font-black text-[9px] sm:text-xs uppercase tracking-wider sm:tracking-[0.3em] shadow-2xl hover:scale-105 hover:shadow-slate-950/30 transition-all whitespace-nowrap">
+                    Get Started — Free
                   </button>
                 </Link>
-                <Link href="/home" className="w-full sm:w-auto">
-                  <button className="w-full sm:w-auto px-6 sm:px-10 py-4 sm:py-5 bg-slate-950/5 border-2 border-slate-950/10 rounded-2xl sm:rounded-3xl font-black text-[10px] sm:text-[11px] uppercase tracking-[0.2em] sm:tracking-[0.35em] hover:bg-slate-950 hover:text-white transition-all">
+                <Link href="/home" className="flex-1 sm:flex-none">
+                  <button className="w-full sm:w-auto px-3 sm:px-10 py-3 sm:py-5 bg-slate-950/5 border-2 border-slate-950/10 rounded-xl sm:rounded-3xl font-black text-[9px] sm:text-[11px] uppercase tracking-wider sm:tracking-[0.35em] hover:bg-slate-950 hover:text-white transition-all whitespace-nowrap">
                     View Dashboard
                   </button>
                 </Link>
