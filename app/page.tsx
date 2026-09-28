@@ -671,33 +671,98 @@ export default function LandingPage() {
         </div>
 
         {/* ══════════════════════════════════════════
-            PAYMENT METHODS BANNER
+            PAYMENT METHODS BANNER (Staggered Scroll Reveal)
         ══════════════════════════════════════════ */}
-        <div className="border-b border-white/5 bg-slate-950/70 py-4 sm:py-6 px-4 sm:px-6 lg:px-12">
+        <div className="border-b border-white/5 bg-slate-950/70 py-4 sm:py-6 px-4 sm:px-6 lg:px-12 relative overflow-hidden">
           <div className="max-w-7xl mx-auto">
-            <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 whitespace-nowrap shrink-0">We Accept</p>
-              <div className="w-px h-6 bg-white/10 hidden sm:block shrink-0" />
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: false, amount: 0.25 }}
+              variants={{
+                hidden: { opacity: 0 },
+                visible: {
+                  opacity: 1,
+                  transition: {
+                    staggerChildren: 0.1,
+                    delayChildren: 0.05,
+                  },
+                },
+              }}
+              className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6"
+            >
+              <motion.div
+                variants={{
+                  hidden: { opacity: 0, x: -16 },
+                  visible: {
+                    opacity: 1,
+                    x: 0,
+                    transition: { duration: 0.4, ease: 'easeOut' },
+                  },
+                }}
+                className="flex items-center gap-4 shrink-0"
+              >
+                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 whitespace-nowrap">
+                  We Accept
+                </p>
+                <div className="w-px h-6 bg-white/10 hidden sm:block" />
+              </motion.div>
+
               <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2.5 sm:gap-3">
                 {[
-                  { label: 'USDT', color: 'text-emerald-400 border-emerald-500/30 bg-emerald-500/10', icon: '₮' },
-                  { label: 'USDC', color: 'text-blue-400 border-blue-500/30 bg-blue-500/10', icon: '$' },
-                  { label: 'Bitcoin', color: 'text-amber-400 border-amber-500/30 bg-amber-500/10', icon: '₿' },
-                  { label: 'Ethereum', color: 'text-indigo-400 border-indigo-500/30 bg-indigo-500/10', icon: 'Ξ' },
-                  { label: 'BNB', color: 'text-yellow-400 border-yellow-500/30 bg-yellow-500/10', icon: 'B' },
-                  { label: 'PayPal USD (PYUSD)', color: 'text-sky-400 border-sky-500/30 bg-sky-500/10', icon: 'P$' },
+                  { label: 'USDT', color: 'text-emerald-400 border-emerald-500/30 bg-emerald-500/10', glow: 'hover:shadow-[0_0_20px_rgba(16,185,129,0.35)]', icon: '₮' },
+                  { label: 'USDC', color: 'text-blue-400 border-blue-500/30 bg-blue-500/10', glow: 'hover:shadow-[0_0_20px_rgba(59,130,246,0.35)]', icon: '$' },
+                  { label: 'Bitcoin', color: 'text-amber-400 border-amber-500/30 bg-amber-500/10', glow: 'hover:shadow-[0_0_20px_rgba(245,158,11,0.35)]', icon: '₿' },
+                  { label: 'Ethereum', color: 'text-indigo-400 border-indigo-500/30 bg-indigo-500/10', glow: 'hover:shadow-[0_0_20px_rgba(99,102,241,0.35)]', icon: 'Ξ' },
+                  { label: 'BNB', color: 'text-yellow-400 border-yellow-500/30 bg-yellow-500/10', glow: 'hover:shadow-[0_0_20px_rgba(234,179,8,0.35)]', icon: 'B' },
+                  { label: 'PayPal USD (PYUSD)', color: 'text-sky-400 border-sky-500/30 bg-sky-500/10', glow: 'hover:shadow-[0_0_20px_rgba(14,165,233,0.35)]', icon: 'P$' },
                 ].map((m) => (
-                  <div key={m.label} className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-xl border text-[10px] sm:text-[11px] font-black uppercase tracking-widest ${m.color} transition-all hover:scale-105`}>
-                    <span className="text-base leading-none">{m.icon}</span>
-                    {m.label}
-                  </div>
+                  <motion.div
+                    key={m.label}
+                    variants={{
+                      hidden: {
+                        opacity: 0,
+                        y: 20,
+                        scale: 0.8,
+                        filter: 'blur(6px)',
+                      },
+                      visible: {
+                        opacity: 1,
+                        y: 0,
+                        scale: 1,
+                        filter: 'blur(0px)',
+                        transition: {
+                          type: 'spring',
+                          stiffness: 280,
+                          damping: 18,
+                        },
+                      },
+                    }}
+                    whileHover={{ scale: 1.08, y: -2 }}
+                    whileTap={{ scale: 0.95 }}
+                    className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-xl border text-[10px] sm:text-[11px] font-black uppercase tracking-widest ${m.color} ${m.glow} cursor-default backdrop-blur-sm transition-shadow duration-300 shadow-sm`}
+                  >
+                    <span className="text-base leading-none select-none">{m.icon}</span>
+                    <span className="tracking-widest">{m.label}</span>
+                  </motion.div>
                 ))}
               </div>
-              <div className="sm:ml-auto flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-slate-500">
+
+              <motion.div
+                variants={{
+                  hidden: { opacity: 0, x: 16 },
+                  visible: {
+                    opacity: 1,
+                    x: 0,
+                    transition: { duration: 0.5, delay: 0.6, ease: 'easeOut' },
+                  },
+                }}
+                className="sm:ml-auto flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-slate-500"
+              >
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                 Instant Processing
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
           </div>
         </div>
 
