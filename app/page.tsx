@@ -427,192 +427,206 @@ export default function LandingPage() {
               ))}
             </div>
 
-            {/* Auth Buttons — Both Sign In and Access Hub visible on all screen sizes */}
-            <div className="flex items-center gap-1.5 sm:gap-3 lg:gap-4 shrink-0">
+            {/* Desktop Auth Buttons */}
+            <div className="hidden md:flex items-center gap-3 lg:gap-4 shrink-0">
               <Link href="/auth/login">
-                <button className="px-2.5 sm:px-4 lg:px-6 py-1.5 sm:py-2.5 rounded-lg sm:rounded-xl border border-white/10 text-[9px] sm:text-[11px] font-bold uppercase tracking-wider sm:tracking-widest hover:bg-white/5 transition-all text-slate-300">
+                <button className="px-4 lg:px-6 py-2 sm:py-2.5 rounded-xl border border-white/10 text-[11px] font-bold uppercase tracking-widest hover:bg-white/5 transition-all text-slate-300">
                   Sign In
                 </button>
               </Link>
               <Link href="/auth/sign-up">
-                <button className="px-3 sm:px-5 lg:px-6 py-1.5 sm:py-2.5 rounded-lg sm:rounded-xl bg-cyan-500 text-slate-950 text-[9px] sm:text-[11px] font-black uppercase tracking-wider sm:tracking-widest shadow-lg shadow-cyan-500/20 hover:scale-105 active:scale-95 transition-all">
+                <button className="px-5 lg:px-6 py-2 sm:py-2.5 rounded-xl bg-cyan-500 text-slate-950 text-[11px] font-black uppercase tracking-widest shadow-lg shadow-cyan-500/20 hover:scale-105 active:scale-95 transition-all">
                   Access Hub
                 </button>
               </Link>
             </div>
-          </div>
 
-          {/* Mobile Quick-Links Bar — centered floating glass pill matching PC design language */}
-          <div className="flex md:hidden items-center justify-center pt-2 mt-2 border-t border-white/5">
-            <div className="inline-flex items-center justify-between gap-1 px-3 py-1 rounded-full bg-white/[0.04] border border-white/10 text-[8.5px] font-bold uppercase tracking-wider text-slate-300 w-full max-w-sm">
-              {['Protocol', 'Ecosystem', 'Tiers', 'Members', 'FAQ'].map((item) => (
-                <Link
-                  key={item}
-                  href={`#${item.toLowerCase()}`}
-                  className="px-2 py-0.5 rounded-full hover:text-white hover:bg-white/10 transition-colors whitespace-nowrap"
-                >
-                  {item}
-                </Link>
-              ))}
+            {/* Mobile Top Right: Access Hub + Menu Icon Button */}
+            <div className="flex md:hidden items-center gap-2 shrink-0">
+              <Link href="/auth/sign-up">
+                <button className="px-3 py-1.5 rounded-lg bg-cyan-500 text-slate-950 text-[10px] font-black uppercase tracking-wider shadow-md shadow-cyan-500/20 active:scale-95 transition-all">
+                  Access Hub
+                </button>
+              </Link>
+
+              {/* Hamburger Menu Icon Button at Top Right */}
+              <button
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                aria-label="Toggle navigation menu"
+                className="w-8 h-8 rounded-lg bg-slate-900 border border-white/10 flex items-center justify-center text-slate-300 hover:text-white hover:bg-white/10 active:scale-95 transition-all"
+              >
+                {isMenuOpen ? <X size={18} className="text-cyan-400" /> : <Menu size={18} className="text-white" />}
+              </button>
             </div>
           </div>
         </nav>
 
         {/* Mobile Drawer */}
-        {isMenuOpen && (
-          <div className="md:hidden fixed inset-x-0 top-[61px] sm:top-[65px] z-40 bg-slate-950/95 backdrop-blur-xl border-b border-white/10 px-6 py-6 shadow-2xl">
-            <div className="flex flex-col gap-5">
-              {['Protocol', 'Ecosystem', 'Tiers', 'Members', 'FAQ'].map((item) => (
-                <Link
-                  key={item}
-                  href={`#${item.toLowerCase()}`}
-                  onClick={() => setIsMenuOpen(false)}
-                  className="text-slate-300 hover:text-white font-bold uppercase tracking-widest text-sm transition-colors"
-                >
-                  {item}
-                </Link>
-              ))}
-              <div className="h-px bg-white/5 my-1" />
-              <Link href="/auth/login" onClick={() => setIsMenuOpen(false)}>
-                <button className="w-full px-6 py-3 rounded-xl border border-white/10 text-sm font-bold uppercase tracking-widest hover:bg-white/5 transition-all text-slate-300">
-                  Sign In
-                </button>
-              </Link>
-              <Link href="/auth/sign-up" onClick={() => setIsMenuOpen(false)}>
-                <button className="w-full px-6 py-3 rounded-xl bg-cyan-500 text-slate-950 text-sm font-black uppercase tracking-widest shadow-lg shadow-cyan-500/20 hover:bg-cyan-400 transition-all">
-                  Access Hub
-                </button>
-              </Link>
-            </div>
-          </div>
-        )}
+        <AnimatePresence>
+          {isMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.2 }}
+              className="md:hidden fixed inset-x-0 top-[57px] z-40 bg-slate-950/95 backdrop-blur-2xl border-b border-white/10 px-6 py-6 shadow-[0_20px_50px_rgba(0,0,0,0.8)]"
+            >
+              <div className="flex flex-col gap-4">
+                {['Protocol', 'Ecosystem', 'Tiers', 'Members', 'FAQ'].map((item) => (
+                  <Link
+                    key={item}
+                    href={`#${item.toLowerCase()}`}
+                    onClick={() => setIsMenuOpen(false)}
+                    className="text-slate-300 hover:text-cyan-400 font-black uppercase tracking-widest text-sm transition-colors py-1 flex items-center justify-between"
+                  >
+                    <span>{item}</span>
+                    <span className="text-slate-600 text-xs">→</span>
+                  </Link>
+                ))}
+                <div className="h-px bg-white/10 my-1" />
+                <div className="grid grid-cols-2 gap-3 pt-1">
+                  <Link href="/auth/login" onClick={() => setIsMenuOpen(false)}>
+                    <button className="w-full py-3 rounded-xl border border-white/10 text-xs font-bold uppercase tracking-widest hover:bg-white/5 transition-all text-slate-300">
+                      Sign In
+                    </button>
+                  </Link>
+                  <Link href="/auth/sign-up" onClick={() => setIsMenuOpen(false)}>
+                    <button className="w-full py-3 rounded-xl bg-cyan-500 text-slate-950 text-xs font-black uppercase tracking-widest shadow-lg shadow-cyan-500/20 hover:bg-cyan-400 transition-all">
+                      Access Hub
+                    </button>
+                  </Link>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* ══════════════════════════════════════════
-            HERO — Ultra Premium (2 Columns Side-by-Side on Mobile, Tablet & PC)
+            HERO — Ultra Premium (Responsive Layout: Stacked on Mobile, 2 Columns on Tablet/PC)
         ══════════════════════════════════════════ */}
-        <section className="hero-section relative pt-4 pb-12 sm:pt-10 sm:pb-24 lg:pt-16 lg:pb-40 px-3 sm:px-6 lg:px-12 max-w-7xl mx-auto">
+        <section className="hero-section relative pt-4 pb-12 sm:pt-10 sm:pb-24 lg:pt-16 lg:pb-40 px-4 sm:px-6 lg:px-12 max-w-7xl mx-auto">
           <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-[500px] h-[500px] bg-indigo-500/20 blur-[120px] rounded-full pointer-events-none" />
 
-          <div className="flex flex-row items-center gap-3 sm:gap-8 lg:gap-16 relative z-10">
-            {/* Left — Copy */}
-            <div className="flex-1 min-w-0 text-left">
-              <div className="hero-sub inline-flex items-center gap-1.5 sm:gap-3 px-2 sm:px-5 py-0.5 sm:py-2 rounded-full bg-slate-900/80 backdrop-blur-md border border-white/10 shadow-[0_0_30px_rgba(6,182,212,0.15)] text-[7px] sm:text-[9px] md:text-[10px] font-bold uppercase tracking-[0.12em] sm:tracking-[0.2em] text-cyan-300 mb-2 sm:mb-6">
-                <span className="relative flex h-1.5 w-1.5 sm:h-2 sm:w-2">
+          <div className="flex flex-col md:flex-row items-center gap-8 md:gap-10 lg:gap-16 relative z-10">
+            {/* Left / Top — Copy */}
+            <div className="w-full md:flex-1 min-w-0 text-center md:text-left">
+              <div className="hero-sub inline-flex items-center gap-2 sm:gap-3 px-3 sm:px-5 py-1 sm:py-2 rounded-full bg-slate-900/80 backdrop-blur-md border border-white/10 shadow-[0_0_30px_rgba(6,182,212,0.15)] text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.15em] sm:tracking-[0.2em] text-cyan-300 mb-3 sm:mb-6">
+                <span className="relative flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75" />
-                  <span className="relative inline-flex rounded-full h-1.5 w-1.5 sm:h-2 sm:w-2 bg-cyan-500 shadow-[0_0_10px_rgba(6,182,212,0.8)]" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-500 shadow-[0_0_10px_rgba(6,182,212,0.8)]" />
                 </span>
                 Matrix v2.5
               </div>
 
-              <h1 className="text-xl sm:text-3xl md:text-5xl lg:text-6xl xl:text-7xl font-extrabold tracking-tight leading-[1.08] mb-2 sm:mb-6 drop-shadow-2xl">
+              <h1 className="text-3xl sm:text-5xl md:text-5xl lg:text-6xl xl:text-7xl font-extrabold tracking-tight leading-[1.08] mb-3 sm:mb-6 drop-shadow-2xl">
                 <div className="hero-title-part text-white">STRATEGIC</div>
                 <div className="hero-title-part text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-500 to-indigo-500">DYNAMIC</div>
-                <div className="hero-title-part text-white flex items-center justify-start gap-1.5 sm:gap-3">
+                <div className="hero-title-part text-white flex items-center justify-center md:justify-start gap-2 sm:gap-3">
                   EARNINGS
-                  <div className="w-2 h-2 sm:w-3 sm:h-3 md:w-4 md:h-4 bg-cyan-500 rounded-full mt-0.5 sm:mt-1 shadow-[0_0_15px_rgba(6,182,212,0.8)]" />
+                  <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 md:w-4 md:h-4 bg-cyan-500 rounded-full mt-1 shadow-[0_0_15px_rgba(6,182,212,0.8)]" />
                 </div>
               </h1>
 
-              <p className="hero-sub text-slate-300 text-[9px] sm:text-xs md:text-sm font-medium mb-3 sm:mb-8 leading-snug sm:leading-relaxed border-l-2 sm:border-l-[3px] border-indigo-500/50 pl-2 sm:pl-4 line-clamp-3 sm:line-clamp-none">
+              <p className="hero-sub text-slate-300 text-xs sm:text-sm md:text-base font-medium mb-5 sm:mb-8 leading-relaxed max-w-xl mx-auto md:mx-0 border-l-0 md:border-l-[3px] md:border-indigo-500/50 md:pl-4">
                 The institutional distribution matrix. Workflows for optimized daily returns — withdraw in under 30 minutes.
               </p>
 
-              {/* Side-by-Side CTA Buttons across Mobile, Tablet & PC */}
-              <div className="hero-cta flex flex-row items-center gap-2 sm:gap-4 mb-3 sm:mb-8">
+              {/* Side-by-Side CTA Buttons */}
+              <div className="hero-cta flex flex-row items-center justify-center md:justify-start gap-3 sm:gap-4 mb-5 sm:mb-8">
                 <Link href="/auth/sign-up" className="flex-1 sm:flex-none">
-                  <button className="w-full px-2.5 sm:px-6 py-2 sm:py-3.5 bg-cyan-500 text-slate-950 rounded-xl sm:rounded-2xl font-black text-[9px] sm:text-xs uppercase tracking-wider sm:tracking-widest shadow-[0_0_30px_rgba(6,182,212,0.3)] hover:scale-105 active:scale-95 transition-all duration-300 flex items-center justify-center gap-1.5 sm:gap-2 whitespace-nowrap">
-                    Start Earning <ArrowUpRight size={12} className="sm:w-4 sm:h-4" />
+                  <button className="w-full sm:w-auto px-5 sm:px-8 py-3 sm:py-4 bg-cyan-500 text-slate-950 rounded-xl sm:rounded-2xl font-black text-xs uppercase tracking-wider sm:tracking-widest shadow-[0_0_30px_rgba(6,182,212,0.3)] hover:scale-105 active:scale-95 transition-all duration-300 flex items-center justify-center gap-2 whitespace-nowrap">
+                    Start Earning <ArrowUpRight size={14} className="sm:w-4 sm:h-4" />
                   </button>
                 </Link>
                 <Link href="/home" className="flex-1 sm:flex-none">
-                  <button className="w-full px-2.5 sm:px-5 py-2 sm:py-3.5 border border-white/15 rounded-xl sm:rounded-2xl font-bold text-[9px] sm:text-xs text-slate-300 hover:bg-white/5 hover:text-white transition-all flex items-center justify-center gap-1.5 sm:gap-2 whitespace-nowrap">
-                    <Play size={10} className="sm:w-3 sm:h-3" fill="currentColor" /> Dashboard
+                  <button className="w-full sm:w-auto px-5 sm:px-6 py-3 sm:py-4 border border-white/15 rounded-xl sm:rounded-2xl font-bold text-xs text-slate-300 hover:bg-white/5 hover:text-white transition-all flex items-center justify-center gap-2 whitespace-nowrap">
+                    <Play size={12} className="sm:w-3 sm:h-3" fill="currentColor" /> Dashboard
                   </button>
                 </Link>
               </div>
 
               {/* Social proof row */}
-              <div className="flex items-center gap-2 sm:gap-4 text-[9px] sm:text-xs">
-                <div className="flex -space-x-1.5 sm:-space-x-2 shrink-0">
+              <div className="flex items-center justify-center md:justify-start gap-3 sm:gap-4 text-xs">
+                <div className="flex -space-x-2 shrink-0">
                   {[1, 2, 3, 4].map(i => (
-                    <div key={i} className="w-5 h-5 sm:w-7 sm:h-7 rounded-full border border-[#020617] bg-slate-800 overflow-hidden shadow">
+                    <div key={i} className="w-6 h-6 sm:w-7 sm:h-7 rounded-full border border-[#020617] bg-slate-800 overflow-hidden shadow">
                       <img src={`https://i.pravatar.cc/100?u=ag${i}`} alt="agent" className="w-full h-full object-cover" />
                     </div>
                   ))}
                 </div>
-                <div className="min-w-0">
-                  <p className="text-white font-bold text-[9px] sm:text-xs leading-none truncate">124K+ Agents</p>
-                  <p className="text-slate-500 text-[8px] sm:text-[10px] mt-0.5 truncate">$920M+ Deployed</p>
+                <div className="text-left">
+                  <p className="text-white font-bold text-xs sm:text-sm leading-none">124K+ Agents</p>
+                  <p className="text-slate-500 text-[10px] mt-0.5">$920M+ Deployed</p>
                 </div>
               </div>
             </div>
 
-            {/* Right — Agent Dashboard Preview (always at right side!) */}
-            <div className="flex-1 min-w-0 relative w-full max-w-[50%] sm:max-w-[48%] md:max-w-md lg:max-w-xl">
-              <div className="relative rounded-2xl sm:rounded-[32px] border border-white/15 border-b-white/5 bg-slate-900/60 backdrop-blur-2xl overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.7)] p-2 sm:p-5 md:p-6">
+            {/* Right / Bottom — Agent Dashboard Preview Card */}
+            <div className="w-full md:flex-1 min-w-0 relative max-w-sm sm:max-w-md lg:max-w-xl mx-auto md:mx-0">
+              <div className="relative rounded-2xl sm:rounded-[32px] border border-white/15 border-b-white/5 bg-slate-900/60 backdrop-blur-2xl overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.7)] p-4 sm:p-5 md:p-6">
                 {/* Window chrome */}
-                <div className="flex items-center gap-1 sm:gap-2 mb-2 sm:mb-4">
-                  <div className="w-1.5 h-1.5 sm:w-2.5 sm:h-2.5 rounded-full bg-rose-500" />
-                  <div className="w-1.5 h-1.5 sm:w-2.5 sm:h-2.5 rounded-full bg-amber-500" />
-                  <div className="w-1.5 h-1.5 sm:w-2.5 sm:h-2.5 rounded-full bg-emerald-500" />
-                  <span className="ml-1 sm:ml-2 text-[7px] sm:text-[9px] font-mono tracking-wider text-slate-500 uppercase truncate">dashboard_v2.5</span>
-                  <div className="ml-auto flex items-center gap-1 text-[7px] sm:text-[9px] font-bold text-emerald-400 uppercase">
-                    <span className="w-1 h-1 rounded-full bg-emerald-400 animate-pulse" />
+                <div className="flex items-center gap-2 mb-3 sm:mb-4">
+                  <div className="w-2.5 h-2.5 rounded-full bg-rose-500" />
+                  <div className="w-2.5 h-2.5 rounded-full bg-amber-500" />
+                  <div className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
+                  <span className="ml-2 text-[9px] font-mono tracking-wider text-slate-500 uppercase truncate">dashboard_v2.5</span>
+                  <div className="ml-auto flex items-center gap-1 text-[9px] font-bold text-emerald-400 uppercase">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                     LIVE
                   </div>
                 </div>
 
-                <div className="space-y-1.5 sm:space-y-3">
+                <div className="space-y-3">
                   {/* Balance card */}
-                  <div className="p-2 sm:p-4 rounded-xl sm:rounded-2xl bg-gradient-to-r from-cyan-600/20 to-indigo-600/20 border border-cyan-500/20 flex items-center justify-between">
+                  <div className="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl bg-gradient-to-r from-cyan-600/20 to-indigo-600/20 border border-cyan-500/20 flex items-center justify-between">
                     <div>
-                      <p className="text-[7px] sm:text-[9px] font-semibold text-slate-400 uppercase tracking-wider mb-0.5">Wallet Balance</p>
-                      <p className="text-sm sm:text-2xl md:text-3xl font-black text-white tracking-tight leading-none">$14,280<span className="text-slate-500 text-[9px] sm:text-sm">.00</span></p>
-                      <p className="text-[8px] sm:text-[10px] text-emerald-400 font-bold mt-0.5">↑ +$168 today</p>
+                      <p className="text-[9px] font-semibold text-slate-400 uppercase tracking-wider mb-0.5">Wallet Balance</p>
+                      <p className="text-xl sm:text-2xl md:text-3xl font-black text-white tracking-tight leading-none">$14,280<span className="text-slate-500 text-sm">.00</span></p>
+                      <p className="text-[10px] text-emerald-400 font-bold mt-1">↑ +$168 today</p>
                     </div>
-                    <div className="w-7 h-7 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-cyan-500/20 border border-cyan-500/30 flex items-center justify-center text-cyan-400 shrink-0">
-                      <Wallet className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-cyan-500/20 border border-cyan-500/30 flex items-center justify-center text-cyan-400 shrink-0">
+                      <Wallet className="w-5 h-5" />
                     </div>
                   </div>
 
                   {/* Stats row - 3 columns */}
-                  <div className="grid grid-cols-3 gap-1 sm:gap-2">
+                  <div className="grid grid-cols-3 gap-2">
                     {[
                       { label: 'Tasks', value: '42/50', color: 'text-white' },
                       { label: 'Yield', value: '+$12.50', color: 'text-emerald-400' },
                       { label: 'Referrals', value: '14 act', color: 'text-cyan-400' },
                     ].map((s, i) => (
-                      <div key={i} className="p-1 sm:p-2.5 rounded-lg bg-slate-950/60 border border-white/5 text-center">
-                        <p className={`text-[8px] sm:text-xs font-black ${s.color} truncate`}>{s.value}</p>
-                        <p className="text-[6px] sm:text-[9px] text-slate-500 mt-0.5 truncate">{s.label}</p>
+                      <div key={i} className="p-2 sm:p-2.5 rounded-lg bg-slate-950/60 border border-white/5 text-center">
+                        <p className={`text-xs font-black ${s.color} truncate`}>{s.value}</p>
+                        <p className="text-[8px] sm:text-[9px] text-slate-500 mt-0.5 truncate">{s.label}</p>
                       </div>
                     ))}
                   </div>
 
                   {/* Agent status */}
-                  <div className="flex items-center justify-between p-1.5 sm:p-3 rounded-lg sm:rounded-xl bg-slate-950/60 border border-white/5">
-                    <div className="flex items-center gap-1.5 sm:gap-2.5 min-w-0">
-                      <div className="w-5 h-5 sm:w-8 sm:h-8 rounded-md sm:rounded-lg bg-violet-500/20 border border-violet-500/20 flex items-center justify-center text-violet-400 shrink-0">
-                        <Activity className="w-2.5 h-2.5 sm:w-4 sm:h-4" />
+                  <div className="flex items-center justify-between p-2.5 sm:p-3 rounded-xl bg-slate-950/60 border border-white/5">
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-violet-500/20 border border-violet-500/20 flex items-center justify-center text-violet-400 shrink-0">
+                        <Activity className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                       </div>
                       <div className="truncate">
-                        <p className="text-[7px] sm:text-[10px] font-bold text-white truncate">TIER_3 SENIOR</p>
-                        <p className="text-[6px] sm:text-[8px] text-slate-500 truncate">Optimization active</p>
+                        <p className="text-[10px] sm:text-xs font-bold text-white truncate">TIER_3 SENIOR</p>
+                        <p className="text-[8px] sm:text-[9px] text-slate-500 truncate">Optimization active</p>
                       </div>
                     </div>
                     <div className="text-right shrink-0">
-                      <p className="text-emerald-400 font-black text-[9px] sm:text-xs leading-none">0.8%</p>
-                      <p className="text-[6px] sm:text-[8px] text-slate-600 uppercase">Yield</p>
+                      <p className="text-emerald-400 font-black text-xs leading-none">0.8%</p>
+                      <p className="text-[8px] text-slate-600 uppercase">Yield</p>
                     </div>
                   </div>
 
                   {/* Progress bar */}
-                  <div className="px-2 py-1.5 sm:px-3 sm:py-2.5 rounded-lg sm:rounded-xl bg-slate-950/60 border border-white/5">
-                    <div className="flex items-center justify-between text-[7px] sm:text-[9px] text-slate-500 mb-1 font-bold uppercase">
+                  <div className="px-3 py-2 sm:py-2.5 rounded-xl bg-slate-950/60 border border-white/5">
+                    <div className="flex items-center justify-between text-[8px] sm:text-[9px] text-slate-500 mb-1 font-bold uppercase">
                       <span>Tasks</span>
                       <span className="text-white">42 / 50</span>
                     </div>
-                    <div className="h-1 sm:h-1.5 bg-white/5 rounded-full overflow-hidden">
+                    <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
                       <div className="h-full w-[84%] bg-gradient-to-r from-cyan-500 to-indigo-500 rounded-full" />
                     </div>
                   </div>
@@ -620,13 +634,13 @@ export default function LandingPage() {
               </div>
 
               {/* Floating badge */}
-              <div className="hidden xs:flex sm:flex absolute -bottom-2 -left-2 sm:-bottom-4 sm:-left-4 bg-slate-900 border border-emerald-500/30 rounded-xl px-2 py-1 sm:px-3 sm:py-2 shadow-lg items-center gap-1.5 sm:gap-2 z-20">
-                <div className="w-5 h-5 sm:w-7 sm:h-7 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400">
-                  <CheckCircle2 size={12} />
+              <div className="hidden xs:flex sm:flex absolute -bottom-3 -left-3 sm:-bottom-4 sm:-left-4 bg-slate-900 border border-emerald-500/30 rounded-xl px-3 py-1.5 sm:px-3 sm:py-2 shadow-lg items-center gap-2 z-20">
+                <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400">
+                  <CheckCircle2 size={14} />
                 </div>
                 <div>
-                  <p className="text-[7px] sm:text-[9px] text-emerald-400 font-black uppercase">Payout Sent</p>
-                  <p className="text-white font-bold text-[8px] sm:text-xs">+$340 USDT</p>
+                  <p className="text-[8px] sm:text-[9px] text-emerald-400 font-black uppercase">Payout Sent</p>
+                  <p className="text-white font-bold text-xs">+$340 USDT</p>
                 </div>
               </div>
             </div>
