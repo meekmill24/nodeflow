@@ -22,9 +22,13 @@ import {
   Sparkles,
   Brush,
   Eye,
-  RotateCcw
+  RotateCcw,
+  Clock,
+  Power,
+  AlertTriangle
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
+import { checkWorkingHours } from '@/lib/workingHours';
 
 const THEME_PRESETS = [
   {
@@ -228,6 +232,155 @@ export default function AdminSettingsPage() {
                   </div>
                 );
               })}
+            </div>
+          </section>
+
+          {/* PILLAR 1B: OPERATIONAL WORKING HOURS & TASK DESK GATE */}
+          <section className="bg-slate-900/40 border border-white/5 p-10 rounded-[48px] backdrop-blur-xl relative overflow-hidden group hover:border-amber-500/20 transition-all duration-700">
+            <div className="absolute -top-24 -right-24 w-48 h-48 bg-amber-500/5 blur-[80px] rounded-full group-hover:bg-amber-500/10 transition-colors" />
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+              <div className="flex items-center gap-4">
+                <div className="p-3 bg-amber-500/10 rounded-2xl text-amber-400 ring-1 ring-amber-500/20">
+                  <Clock size={24} />
+                </div>
+                <div>
+                  <h3 className="text-xl font-black text-white italic uppercase tracking-tighter leading-none">Working Hours Gate</h3>
+                  <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1">Task Dispatch Schedule & CS</p>
+                </div>
+              </div>
+
+              {/* Live Status Pill */}
+              {(() => {
+                const whConfig = {
+                  working_hours_enabled: settings.find(s => s.key === 'working_hours_enabled')?.value ?? 'true',
+                  working_hours_start: settings.find(s => s.key === 'working_hours_start')?.value ?? '10:00',
+                  working_hours_end: settings.find(s => s.key === 'working_hours_end')?.value ?? '22:00',
+                  working_hours_timezone: settings.find(s => s.key === 'working_hours_timezone')?.value ?? 'UTC',
+                  working_hours_status: settings.find(s => s.key === 'working_hours_status')?.value ?? 'auto',
+                  working_hours_notice: settings.find(s => s.key === 'working_hours_notice')?.value ?? ''
+                };
+                const liveWH = checkWorkingHours(whConfig);
+                return (
+                  <div className={`px-3.5 py-1.5 rounded-full text-[9px] font-black uppercase tracking-wider flex items-center gap-2 border w-fit ${
+                    liveWH.isOpen 
+                      ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' 
+                      : 'bg-rose-500/10 border-rose-500/20 text-rose-400'
+                  }`}>
+                    <span className={`w-2 h-2 rounded-full ${liveWH.isOpen ? 'bg-emerald-400 animate-pulse' : 'bg-rose-400'}`} />
+                    <span>{liveWH.isOpen ? 'DESK OPEN' : 'DESK CLOSED'}</span>
+                  </div>
+                );
+              })()}
+            </div>
+
+            <div className="p-4 rounded-2xl bg-black/40 border border-white/5 text-[11px] text-slate-400 leading-relaxed font-medium mb-6">
+              When the operational desk is closed, <strong>users are blocked from performing tasks</strong>. Deposits, withdrawals, and wallet records remain accessible 24/7.
+            </div>
+
+            <div className="space-y-5">
+              {/* Master Enforce Toggle */}
+              {(() => {
+                const isEnabled = (settings.find(s => s.key === 'working_hours_enabled')?.value === 'true' || settings.find(s => s.key === 'working_hours_enabled')?.value === true);
+                return (
+                  <div className="flex items-center justify-between p-4 bg-black/40 rounded-2xl border border-white/5">
+                    <div>
+                      <div className="text-[11px] font-black text-white uppercase tracking-wider">Enforce Working Hours</div>
+                      <div className="text-[9px] text-slate-500 font-bold uppercase tracking-tight mt-0.5">Restrict tasks outside active shift</div>
+                    </div>
+                    <button 
+                      onClick={() => handleUpdate('working_hours_enabled', !isEnabled)}
+                      className={`w-12 h-6 rounded-full relative transition-all duration-300 ${isEnabled ? 'bg-[#3DD6C8]' : 'bg-slate-800'}`}
+                    >
+                      <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all duration-300 ${isEnabled ? 'left-7' : 'left-1 opacity-40'}`} />
+                    </button>
+                  </div>
+                );
+              })()}
+
+              {/* Status Mode (Auto / Force Open / Force Closed) */}
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 ml-1">Operational Mode</label>
+                <div className="grid grid-cols-3 gap-2">
+                  {[
+                    { id: 'auto', label: 'Daily Schedule', desc: 'Auto Clock' },
+                    { id: 'force_open', label: 'Force Open', desc: '24/7 Active' },
+                    { id: 'force_closed', label: 'Force Closed', desc: 'CS Offline' },
+                  ].map(mode => {
+                    const currentStatus = settings.find(s => s.key === 'working_hours_status')?.value || 'auto';
+                    const isSelected = currentStatus === mode.id;
+                    return (
+                      <button
+                        key={mode.id}
+                        type="button"
+                        onClick={() => handleUpdate('working_hours_status', mode.id)}
+                        className={`p-3 rounded-2xl text-left border transition-all ${
+                          isSelected 
+                            ? 'bg-[#3DD6C8]/10 border-[#3DD6C8] text-[#3DD6C8]' 
+                            : 'bg-black/40 border-white/5 text-slate-400 hover:text-white hover:border-white/10'
+                        }`}
+                      >
+                        <div className="text-[10px] font-black uppercase tracking-wider truncate">{mode.label}</div>
+                        <div className="text-[8px] font-bold opacity-60 uppercase tracking-tight truncate">{mode.desc}</div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Shift Hours (Start & End) */}
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 ml-1">Opening Time</label>
+                  <input
+                    type="time"
+                    className="w-full bg-black/60 border border-white/10 rounded-2xl px-4 py-3 text-white text-xs font-mono font-bold focus:outline-none focus:border-[#3DD6C8]"
+                    value={settings.find(s => s.key === 'working_hours_start')?.value || '10:00'}
+                    onChange={e => handleUpdate('working_hours_start', e.target.value)}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 ml-1">Closing Time</label>
+                  <input
+                    type="time"
+                    className="w-full bg-black/60 border border-white/10 rounded-2xl px-4 py-3 text-white text-xs font-mono font-bold focus:outline-none focus:border-[#3DD6C8]"
+                    value={settings.find(s => s.key === 'working_hours_end')?.value || '22:00'}
+                    onChange={e => handleUpdate('working_hours_end', e.target.value)}
+                  />
+                </div>
+              </div>
+
+              {/* Timezone Selector */}
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 ml-1">Operating Timezone</label>
+                <select
+                  className="w-full bg-black/60 border border-white/10 rounded-2xl px-4 py-3 text-white text-xs font-mono font-bold focus:outline-none focus:border-[#3DD6C8]"
+                  value={settings.find(s => s.key === 'working_hours_timezone')?.value || 'UTC'}
+                  onChange={e => handleUpdate('working_hours_timezone', e.target.value)}
+                >
+                  <option value="UTC">UTC (Universal Coordinated Time)</option>
+                  <option value="America/New_York">America/New_York (EST/EDT)</option>
+                  <option value="America/Chicago">America/Chicago (CST/CDT)</option>
+                  <option value="America/Los_Angeles">America/Los_Angeles (PST/PDT)</option>
+                  <option value="Europe/London">Europe/London (GMT/BST)</option>
+                  <option value="Europe/Paris">Europe/Paris (CET/CEST)</option>
+                  <option value="Asia/Dubai">Asia/Dubai (GST +4)</option>
+                  <option value="Asia/Singapore">Asia/Singapore (SGT +8)</option>
+                  <option value="Asia/Tokyo">Asia/Tokyo (JST +9)</option>
+                  <option value="Australia/Sydney">Australia/Sydney (AEST)</option>
+                </select>
+              </div>
+
+              {/* Closed Notice for Users */}
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 ml-1">Off-Hours Notice Message</label>
+                <textarea
+                  rows={2}
+                  className="w-full bg-black/60 border border-white/10 rounded-2xl p-4 text-white text-xs leading-relaxed focus:outline-none focus:border-[#3DD6C8] resize-none"
+                  value={settings.find(s => s.key === 'working_hours_notice')?.value || ''}
+                  placeholder="The optimization network is currently closed outside operational working hours. Deposits and withdrawals remain accessible 24/7."
+                  onChange={e => handleUpdate('working_hours_notice', e.target.value)}
+                />
+              </div>
             </div>
           </section>
 

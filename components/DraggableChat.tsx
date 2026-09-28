@@ -37,7 +37,7 @@ export default function DraggableChat() {
         <motion.div
             drag
             dragMomentum={false}
-            className="fixed bottom-24 right-6 z-[9999] cursor-grab active:cursor-grabbing md:bottom-10 md:right-10"
+            className="hidden lg:block fixed bottom-10 right-10 z-[9999] cursor-grab active:cursor-grabbing"
             initial={{ opacity: 0, scale: 0.5 }}
             animate={{ opacity: 1, scale: 1 }}
         >

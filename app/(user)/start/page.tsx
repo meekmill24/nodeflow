@@ -10,6 +10,7 @@ import ItemDetailModal from '@/components/ItemDetailModal';
 import BundledPackageModal from '@/components/BundledPackageModal';
 import type { BundlePackage } from '@/components/BundledPackageModal';
 import Portal from '@/components/Portal';
+import { toast } from 'sonner';
 import {
     Wallet,
     AlertTriangle,
@@ -41,8 +42,8 @@ import {
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { toast } from 'sonner';
 import confetti from 'canvas-confetti';
+import { checkWorkingHours, WorkingHoursCheckResult } from '@/lib/workingHours';
 
 export default function StartPage() {
     const { profile, refreshProfile } = useAuth();
@@ -70,6 +71,8 @@ export default function StartPage() {
     const [showBundleSuccessToast, setShowBundleSuccessToast] = useState(false);
     const [hasPendingTask, setHasPendingTask] = useState(false);
     const [isRefreshing, setIsRefreshing] = useState(false);
+    const [workingHours, setWorkingHours] = useState<WorkingHoursCheckResult | null>(null);
+    const [showWorkingHoursModal, setShowWorkingHoursModal] = useState(false);
 
     const [tasksPerSet, setTasksPerSet] = useState(40);
     const [setsPerDay, setSetsPerDay] = useState(3);
@@ -101,7 +104,15 @@ export default function StartPage() {
                     supabase.from('levels').select('id, tasks_per_set, sets_per_day, commission_rate').order('price', { ascending: true }),
                     supabase.from('user_tasks').select('task_item_id, status, completed_at').eq('user_id', profile.id).neq('status', 'cancelled').gt('completed_at', filterDate),
                     supabase.from('task_items').select('*').eq('is_active', true).eq('level_id', profile.level_id).order('created_at', { ascending: false }).limit(300),
-                    supabase.from('site_settings').select('key, value').in('key', ['min_task_balance'])
+                    supabase.from('site_settings').select('key, value').in('key', [
+                        'min_task_balance',
+                        'working_hours_enabled',
+                        'working_hours_start',
+                        'working_hours_end',
+                        'working_hours_timezone',
+                        'working_hours_status',
+                        'working_hours_notice'
+                    ])
                 ]);
 
                 if (pastTasksRes.data) {
@@ -111,6 +122,11 @@ export default function StartPage() {
                 if (settingsRes.data) {
                     const minBal = settingsRes.data.find((s: any) => s.key === 'min_task_balance')?.value;
                     if (minBal) setMinTaskBalance(parseFloat(minBal));
+
+                    const whMap: Record<string, any> = {};
+                    settingsRes.data.forEach((s: any) => { whMap[s.key] = s.value; });
+                    const whResult = checkWorkingHours(whMap);
+                    setWorkingHours(whResult);
                 }
                 if (levelsRes.data) {
                     const currentLevel = levelsRes.data.find(l => l.id === profile.level_id) || levelsRes.data[0];
@@ -226,6 +242,12 @@ function extractMatchingBundle(
     const handleStart = useCallback(async () => {
         if (isSpinning || items.length === 0) return;
         if (profile?.is_frozen) { return; }
+
+        // Working Hours Gate: Disallow task start if operational desk is closed
+        if (workingHours && !workingHours.isOpen) {
+            setShowWorkingHoursModal(true);
+            return;
+        }
         
         // Fast-path: Check if user has an assigned/pending bundle at or past current task
         const freshCompleted = Number(profile?.completed_count ?? completedCount ?? 0);
@@ -362,6 +384,13 @@ function extractMatchingBundle(
 
     const handleSubmitTask = async (item: TaskItem, providedCost?: number) => {
         if (isSubmitting) return;
+
+        // Working Hours Gate: Disallow task completion if operational desk is closed
+        if (workingHours && !workingHours.isOpen) {
+            setShowWorkingHoursModal(true);
+            return;
+        }
+
         setIsSubmitting(true);
         const costAmount = providedCost || (profile?.wallet_balance || 0) * 0.98;
         try {
@@ -618,6 +647,54 @@ function extractMatchingBundle(
                 );
             })()}
 
+            {/* OPERATIONAL DESK OFFLINE BANNER */}
+            {workingHours && !workingHours.isOpen && (
+                <div className="w-full max-w-3xl mx-auto p-4 sm:p-5 rounded-[24px] bg-gradient-to-r from-amber-500/15 via-[#0B0B1E] to-amber-500/15 border border-amber-500/40 shadow-[0_0_35px_rgba(245,158,11,0.15)] flex flex-col sm:flex-row items-center justify-between gap-4 animate-scale-in">
+                    <div className="flex items-center gap-3.5 text-left w-full sm:w-auto">
+                        <div className="w-12 h-12 rounded-2xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-400 shrink-0">
+                            <Clock size={22} className="animate-pulse" />
+                        </div>
+                        <div className="min-w-0">
+                            <div className="flex items-center gap-2 mb-0.5">
+                                <span className="px-2 py-0.5 rounded-full bg-amber-500/25 border border-amber-500/30 text-amber-300 text-[8px] font-black uppercase tracking-widest">
+                                    Desk Offline
+                                </span>
+                                <span className="text-[10px] font-semibold text-white/50">
+                                    Operating Hours: {workingHours.start} – {workingHours.end} ({workingHours.timezone})
+                                </span>
+                            </div>
+                            <h4 className="text-sm font-black text-white italic tracking-tight">
+                                Task Optimization Desk is Currently Closed
+                            </h4>
+                            <p className="text-[11px] text-white/60">
+                                {workingHours.notice || 'Task submissions pause outside working hours. Deposits, withdrawals, and customer care remain open 24/7.'}
+                            </p>
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-2 w-full sm:w-auto shrink-0">
+                        <Link
+                            href="/deposit"
+                            className="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 font-bold text-xs uppercase tracking-wider hover:bg-emerald-500/30 transition-all text-center"
+                        >
+                            Deposit
+                        </Link>
+                        <Link
+                            href="/withdraw"
+                            className="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl bg-cyan-500/20 border border-cyan-500/30 text-cyan-300 font-bold text-xs uppercase tracking-wider hover:bg-cyan-500/30 transition-all text-center"
+                        >
+                            Withdraw
+                        </Link>
+                        <button
+                            type="button"
+                            onClick={() => setShowWorkingHoursModal(true)}
+                            className="px-4 py-2.5 rounded-xl bg-amber-500 text-[#0B0B1E] font-black text-xs uppercase tracking-wider hover:bg-amber-400 transition-all cursor-pointer"
+                        >
+                            View Hours
+                        </button>
+                    </div>
+                </div>
+            )}
+
             {/* OPTIMIZATION GRID ENGINE */}
             <div className="relative flex flex-col items-center justify-center py-10">
                 <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full md:w-[800px] h-[600px] bg-[#3DD6C8]/5 rounded-full blur-[160px] transition-opacity duration-1000 ${isSpinning ? 'opacity-100' : 'opacity-40'}`} />
@@ -638,15 +715,26 @@ function extractMatchingBundle(
                                         disabled={isSpinning || isLocked || hasPendingTask}
                                         className={`
                                             w-full h-full rounded-full flex flex-col items-center justify-center transition-all duration-500 relative overflow-hidden group
-                                            ${isSpinning ? 'scale-95 bg-slate-800 ring-4 ring-[#3DD6C8]/20' : 'hover:scale-105 active:scale-95 bg-[#3DD6C8] shadow-[0_0_40px_rgba(61,214,200,0.3)]'}
+                                            ${isSpinning ? 'scale-95 bg-slate-800 ring-4 ring-[#3DD6C8]/20' : 'hover:scale-105 active:scale-95'}
+                                            ${workingHours && !workingHours.isOpen 
+                                                ? 'bg-gradient-to-br from-amber-500 to-amber-600 shadow-[0_0_40px_rgba(245,158,11,0.35)]' 
+                                                : (!isSpinning ? 'bg-[#3DD6C8] shadow-[0_0_40px_rgba(61,214,200,0.3)]' : '')}
                                             ${(isLocked || hasPendingTask) ? 'bg-slate-950 opacity-20 grayscale cursor-not-allowed' : ''}
                                         `}
                                     >
                                         <div className="relative z-10 flex flex-col items-center text-center">
-                                            <span className={`text-base md:text-xl font-black italic uppercase tracking-tighter ${isSpinning ? 'text-[#3DD6C8]' : 'text-[#0B0B1E]'}`}>
-                                                {isLocked ? 'DONE' : (isSpinning ? 'SYNC' : 'START')}
+                                            <span className={`text-base md:text-xl font-black italic uppercase tracking-tighter ${
+                                                isSpinning ? 'text-[#3DD6C8]' : (workingHours && !workingHours.isOpen ? 'text-[#0B0B1E]' : 'text-[#0B0B1E]')
+                                            }`}>
+                                                {workingHours && !workingHours.isOpen ? 'OFFLINE' : (isLocked ? 'DONE' : (isSpinning ? 'SYNC' : 'START'))}
                                             </span>
-                                            {!isSpinning && !isLocked && !hasPendingTask && <Pointer size={14} className="text-[#0B0B1E] animate-bounce mt-1" />}
+                                            {!isSpinning && !isLocked && !hasPendingTask && (
+                                                workingHours && !workingHours.isOpen ? (
+                                                    <Clock size={14} className="text-[#0B0B1E] animate-pulse mt-1" />
+                                                ) : (
+                                                    <Pointer size={14} className="text-[#0B0B1E] animate-bounce mt-1" />
+                                                )
+                                            )}
                                             {isSpinning && <div className="w-5 h-5 border-2 border-[#3DD6C8]/30 border-t-[#3DD6C8] rounded-full animate-spin mt-2" />}
                                         </div>
                                         <div className="absolute inset-0 bg-gradient-to-t from-white/20 to-transparent group-hover:opacity-100 opacity-0 transition-opacity" />
@@ -969,6 +1057,117 @@ function extractMatchingBundle(
                                     className="w-full py-2.5 rounded-2xl bg-white/5 border border-white/10 text-white/50 hover:text-white font-black uppercase text-[10px] tracking-widest transition-colors"
                                 >
                                     Cancel
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </Portal>
+            )}
+
+            {/* OPERATIONAL WORKING HOURS MODAL */}
+            {showWorkingHoursModal && workingHours && (
+                <Portal>
+                    <div 
+                        className="fixed inset-0 z-[10002] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-fade-in lg:pl-72 overflow-y-auto"
+                        onClick={() => setShowWorkingHoursModal(false)}
+                    >
+                        <div 
+                            className="bg-[#0B0B1E] border border-amber-500/30 w-full max-w-md rounded-[32px] p-6 sm:p-8 shadow-[0_30px_100px_rgba(0,0,0,0.9)] space-y-5 animate-scale-in max-h-[90vh] overflow-y-auto custom-scrollbar relative"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <button
+                                type="button"
+                                onClick={() => setShowWorkingHoursModal(false)}
+                                className="absolute top-5 right-5 p-2 rounded-xl bg-white/5 hover:bg-white/10 text-white/40 hover:text-white transition-colors cursor-pointer"
+                            >
+                                <X size={18} />
+                            </button>
+
+                            <div className="flex flex-col items-center text-center space-y-3">
+                                <div className="w-16 h-16 rounded-2xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400 shadow-[0_0_30px_rgba(245,158,11,0.25)]">
+                                    <Clock size={32} className="animate-pulse" />
+                                </div>
+                                <div className="space-y-1">
+                                    <span className="px-3 py-1 rounded-full bg-amber-500/20 border border-amber-500/30 text-amber-400 text-[9px] font-black uppercase tracking-[0.25em]">
+                                        Operational Desk Offline
+                                    </span>
+                                    <h3 className="text-xl sm:text-2xl font-black text-white italic tracking-tight uppercase pt-1">
+                                        Shift Closed
+                                    </h3>
+                                    <p className="text-xs text-white/60 leading-relaxed max-w-xs">
+                                        Task optimization sequences pause outside official desk hours to guarantee dedicated order routing and live audit.
+                                    </p>
+                                </div>
+                            </div>
+
+                            {/* Shift Timetable Info Card */}
+                            <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/10 space-y-3 text-xs">
+                                <div className="flex items-center justify-between">
+                                    <span className="text-white/40 uppercase tracking-wider text-[10px] font-bold">Official Hours</span>
+                                    <span className="text-amber-300 font-mono font-bold">{workingHours.start} – {workingHours.end}</span>
+                                </div>
+                                <div className="flex items-center justify-between">
+                                    <span className="text-white/40 uppercase tracking-wider text-[10px] font-bold">Timezone</span>
+                                    <span className="text-white/80 font-mono font-bold">{workingHours.timezone}</span>
+                                </div>
+                                <div className="flex items-center justify-between">
+                                    <span className="text-white/40 uppercase tracking-wider text-[10px] font-bold">Current Desk Time</span>
+                                    <span className="text-white font-mono font-bold">{workingHours.currentTimeInZone}</span>
+                                </div>
+                                <div className="pt-2 border-t border-white/5 flex items-center justify-between">
+                                    <span className="text-white/40 uppercase tracking-wider text-[10px] font-bold">Next Open Session</span>
+                                    <span className="text-emerald-400 font-semibold">{workingHours.nextOpenDescription}</span>
+                                </div>
+                            </div>
+
+                            {/* Notice from Admin */}
+                            {workingHours.notice && (
+                                <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-200/90 leading-relaxed text-left flex gap-2.5">
+                                    <AlertTriangle size={16} className="text-amber-400 shrink-0 mt-0.5" />
+                                    <span>{workingHours.notice}</span>
+                                </div>
+                            )}
+
+                            {/* 24/7 Operations Assurance */}
+                            <div className="p-3 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-[11px] text-cyan-200/80 leading-relaxed text-left">
+                                <p className="font-bold text-cyan-300 mb-0.5 flex items-center gap-1.5">
+                                    <ShieldCheck size={13} /> 24/7 Financial Access & Support
+                                </p>
+                                You can deposit funds, request withdrawals, or contact customer care 24/7 while waiting for the desk to open.
+                            </div>
+
+                            {/* Quick Actions */}
+                            <div className="space-y-2 pt-1">
+                                <div className="grid grid-cols-2 gap-2">
+                                    <Link
+                                        href="/deposit"
+                                        className="py-3 px-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black uppercase text-[11px] tracking-wider flex items-center justify-center gap-1.5 shadow-[0_0_20px_rgba(16,185,129,0.25)] transition-all text-center"
+                                    >
+                                        <ArrowDownLeft size={14} /> Deposit
+                                    </Link>
+                                    <Link
+                                        href="/withdraw"
+                                        className="py-3 px-3 rounded-xl bg-cyan-500 hover:bg-cyan-600 text-slate-950 font-black uppercase text-[11px] tracking-wider flex items-center justify-center gap-1.5 shadow-[0_0_20px_rgba(6,182,212,0.25)] transition-all text-center"
+                                    >
+                                        <ArrowUpRight size={14} /> Withdraw
+                                    </Link>
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setShowWorkingHoursModal(false);
+                                        handleConfirmSettlement();
+                                    }}
+                                    className="w-full py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold uppercase text-[11px] tracking-wider flex items-center justify-center gap-2 transition-colors cursor-pointer"
+                                >
+                                    <Headphones size={15} className="text-[#3DD6C8]" /> Contact Live Support
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setShowWorkingHoursModal(false)}
+                                    className="w-full py-2 text-white/40 hover:text-white text-[11px] font-bold uppercase tracking-widest transition-colors cursor-pointer"
+                                >
+                                    Dismiss
                                 </button>
                             </div>
                         </div>

@@ -256,3 +256,10 @@ textarea {
     text-align: center;
   }
 }
+
+/* Hide Next.js dev indicator badge so it does not block navigation dock */
+nextjs-portal,
+[data-nextjs-toast],
+div[data-nextjs-dev-overlay] {
+  display: none !important;
+}

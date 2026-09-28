@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { NextRequest, NextResponse } from 'next/server';
 import { distributeReferralCommission } from '@/lib/referral';
+import { checkWorkingHours } from '@/lib/workingHours';
 
 const getAdminClient = () => {
     const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -18,6 +19,31 @@ export async function POST(req: NextRequest) {
         }
 
         const supabaseAdmin = getAdminClient();
+
+        // Check operational working hours
+        const { data: whSettings } = await supabaseAdmin
+            .from('site_settings')
+            .select('key, value')
+            .in('key', [
+                'working_hours_enabled',
+                'working_hours_start',
+                'working_hours_end',
+                'working_hours_timezone',
+                'working_hours_status',
+                'working_hours_notice'
+            ]);
+
+        const whMap: Record<string, any> = {};
+        (whSettings || []).forEach(s => { whMap[s.key] = s.value; });
+        const whCheck = checkWorkingHours(whMap);
+
+        if (!whCheck.isOpen) {
+            return NextResponse.json({
+                error: whCheck.notice || 'The optimization network is currently closed outside operational working hours. Tasks cannot be performed at this time.',
+                isClosed: true,
+                workingHours: whCheck
+            }, { status: 403 });
+        }
 
         // 1. Fetch current profile
         const { data: profile, error: profileFetchErr } = await supabaseAdmin

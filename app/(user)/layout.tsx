@@ -49,7 +49,7 @@ export default function UserLayout({ children }: { children: React.ReactNode }) 
 
                 <div className="flex-1 lg:pl-72 h-screen flex flex-col relative bg-transparent overflow-hidden">
                     <Header onMenuClick={() => setSidebarOpen(true)} />
-                    <main id="main-content" ref={mainRef} className="flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar relative z-10 pb-28 lg:pb-8 px-3 sm:px-6 lg:px-8">
+                    <main id="main-content" ref={mainRef} className="flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar relative z-10 pb-32 md:pb-36 lg:pb-8 px-3 sm:px-6 lg:px-8">
                         <div className="max-w-7xl mx-auto relative pt-3 sm:pt-4 lg:pt-6">
                             <AnimatePage key={pathname}>
                                 {children}

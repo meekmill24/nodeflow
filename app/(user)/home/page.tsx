@@ -166,6 +166,20 @@ export default function HomePage() {
                         </h2>
                         <p className="text-[9px] font-black text-white/30 uppercase tracking-[0.2em]">{t('tether_holdings')}</p>
                     </div>
+                    <div className="pt-6 flex items-center gap-3 max-w-md">
+                        <Link 
+                            href="/deposit"
+                            className="flex-1 py-3 px-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(16,185,129,0.25)] active:scale-95 transition-all text-center"
+                        >
+                            <ArrowDownLeft size={15} /> {t('deposit')}
+                        </Link>
+                        <Link 
+                            href="/withdraw"
+                            className="flex-1 py-3 px-4 rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(6,182,212,0.25)] active:scale-95 transition-all text-center"
+                        >
+                            <ArrowUpRight size={15} /> {t('withdraw')}
+                        </Link>
+                    </div>
                 </div>
 
                 <div className="bg-[#0B0B1E] border border-white/5 p-8 rounded-[40px] shadow-2xl backdrop-blur-3xl relative overflow-hidden group hover:border-white/10 transition-all duration-700">

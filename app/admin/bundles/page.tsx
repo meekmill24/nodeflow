@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useMemo, useCallback } from 'react';
 import { supabase } from '@/lib/supabase/index';
-import { Plus, Pencil, Trash2, Save, X, Package, Users, Zap, AlertTriangle, CheckCircle, Loader2, Image as ImageIcon, ChevronDown, RefreshCcw, TrendingUp, Star, Layers, Percent, Sparkles } from 'lucide-react'; 
+import { Plus, Pencil, Trash2, Save, X, Package, Users, Zap, AlertTriangle, CheckCircle, Loader2, Image as ImageIcon, ChevronDown, RefreshCcw, TrendingUp, Star, Layers, Percent, Sparkles, Target, Clock } from 'lucide-react'; 
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 
@@ -27,6 +27,9 @@ interface UserProfile {
     profit: number;
     level_id: number | null;
     completed_count: number;
+    current_set?: number;
+    tasks_per_set_override?: number | null;
+    sets_per_day_override?: number | null;
     pending_bundle: Record<string, unknown> | null;
     has_pending_task?: boolean;
     has_pending_bundle_task?: boolean;
@@ -289,12 +292,38 @@ export default function AdminBundlesPage() {
         }
     };
 
+    const getUserTasksPerSet = useCallback((user?: UserProfile | null): number => {
+        if (!user) return 40;
+        if (user.tasks_per_set_override && Number(user.tasks_per_set_override) > 0) {
+            return Number(user.tasks_per_set_override);
+        }
+        const lvl = levels.find(l => l.id === user.level_id);
+        if (lvl?.tasks_per_set && Number(lvl.tasks_per_set) > 0) {
+            return Number(lvl.tasks_per_set);
+        }
+        return 40;
+    }, [levels]);
+
+    const getUserTaskProgress = useCallback((user?: UserProfile | null) => {
+        if (!user) return { currentTaskInSet: 1, tasksPerSet: 40, completedInSet: 0, isSetComplete: false };
+        const tasksPerSet = getUserTasksPerSet(user);
+        const completed = Number(user.completed_count || 0);
+        const completedInSet = (completed % tasksPerSet === 0 && completed > 0) ? tasksPerSet : (completed % tasksPerSet);
+        const currentTaskInSet = completedInSet >= tasksPerSet ? tasksPerSet : completedInSet + 1;
+        const isSetComplete = completedInSet >= tasksPerSet;
+        return { currentTaskInSet, tasksPerSet, completedInSet, isSetComplete };
+    }, [getUserTasksPerSet]);
+
     const handleUserSelect = (userId: string) => {
         setSelectedUserId(userId);
         const user = users.find(u => u.id === userId);
         if (user) {
             const defaultProductAmount = parseFloat((user.wallet_balance * 1.2).toFixed(2));
-            setAssignForm(f => ({ ...f, productAmount: defaultProductAmount, targetIndex: 35 }));
+            const progress = getUserTaskProgress(user);
+            const suggestedTarget = progress.currentTaskInSet < progress.tasksPerSet - 3
+                ? Math.min(progress.tasksPerSet - 2, Math.max(progress.currentTaskInSet + 3, Math.min(35, progress.tasksPerSet - 2)))
+                : progress.currentTaskInSet;
+            setAssignForm(f => ({ ...f, productAmount: defaultProductAmount, targetIndex: suggestedTarget }));
             setProductLevelFilter(user.level_id || 1);
         }
     };
@@ -400,6 +429,7 @@ export default function AdminBundlesPage() {
                 assignedAt: new Date().toISOString(),
                 taskItemIds: selectedTaskIds,
                 targetIndex: typeof assignForm.targetIndex === 'number' ? assignForm.targetIndex : parseInt(assignForm.targetIndex as string) || 35,
+                target_index: typeof assignForm.targetIndex === 'number' ? assignForm.targetIndex : parseInt(assignForm.targetIndex as string) || 35,
                 taskItem: primaryTask ? { 
                     title: primaryTask.title, 
                     image_url: primaryTask.image_url, 
@@ -467,7 +497,8 @@ export default function AdminBundlesPage() {
                 shortageAmount,
                 totalAmount: cost,
                 bonusAmount: Number(rawBundle.bonusAmount || 0),
-                targetIndex: Number(rawBundle.targetIndex || 0)
+                targetIndex: Number(rawBundle.targetIndex ?? rawBundle.target_index ?? 0),
+                target_index: Number(rawBundle.targetIndex ?? rawBundle.target_index ?? 0)
             };
             const res = await fetch('/api/admin/assign-bundle', {
                 method: 'POST',
@@ -642,27 +673,33 @@ export default function AdminBundlesPage() {
                                                         Deployment Targets Unavailable
                                                     </div>
                                                 ) : (
-                                                    filteredUsers.map(u => (
-                                                        <div 
-                                                            key={u.id}
-                                                            onClick={() => { handleUserSelect(u.id); setShowUserDropdown(false); }}
-                                                            className="px-6 py-4 hover:bg-slate-800 cursor-pointer flex items-center justify-between border-b border-slate-800/20 last:border-0"
-                                                        >
-                                                            <div className="min-w-0">
-                                                                <div className="text-sm font-bold text-white truncate">{u.username || u.email?.split('@')[0]}</div>
-                                                                <div className="text-[10px] text-slate-500 font-bold uppercase tracking-tighter flex items-center gap-1.5 flex-wrap">
-                                                                    <span className="text-amber-400 font-black">VIP {u.level_id || 1}</span>
-                                                                    <span>•</span>
-                                                                    <span className="text-purple-400">SET {(u as any).current_set || 1}</span>
-                                                                    <span>•</span>
-                                                                    <span className="text-[#3DD6C8]">TASK {(u.completed_count || 0) % 40 + 1}/40</span>
-                                                                    <span>•</span>
-                                                                    <span className="text-white">${u.wallet_balance?.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                                                    filteredUsers.map(u => {
+                                                        const progress = getUserTaskProgress(u);
+                                                        return (
+                                                            <div 
+                                                                key={u.id}
+                                                                onClick={() => { handleUserSelect(u.id); setShowUserDropdown(false); }}
+                                                                className="px-6 py-4 hover:bg-slate-800 cursor-pointer flex items-center justify-between border-b border-slate-800/20 last:border-0"
+                                                            >
+                                                                <div className="min-w-0">
+                                                                    <div className="text-sm font-bold text-white truncate">{u.username || u.email?.split('@')[0]}</div>
+                                                                    <div className="text-[10px] text-slate-500 font-bold uppercase tracking-tighter flex items-center gap-1.5 flex-wrap">
+                                                                        <span className="text-amber-400 font-black">VIP {u.level_id || 1}</span>
+                                                                        <span>•</span>
+                                                                        <span className="text-purple-400">SET {u.current_set || 1}</span>
+                                                                        <span>•</span>
+                                                                        <span className="text-[#3DD6C8] font-bold">TASK {progress.currentTaskInSet}/{progress.tasksPerSet}</span>
+                                                                        {u.has_pending_task && (
+                                                                            <span className="text-emerald-400 font-bold text-[9px] bg-emerald-500/10 px-1.5 py-0.2 rounded border border-emerald-500/30">Spinning</span>
+                                                                        )}
+                                                                        <span>•</span>
+                                                                        <span className="text-white">${u.wallet_balance?.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                                                                    </div>
                                                                 </div>
+                                                                {u.pending_bundle && <Star size={12} className="text-amber-500 flex-shrink-0" fill="currentColor" />}
                                                             </div>
-                                                            {u.pending_bundle && <Star size={12} className="text-amber-500 flex-shrink-0" fill="currentColor" />}
-                                                        </div>
-                                                    ))
+                                                        );
+                                                    })
                                                 )}
                                             </div>
                                         </div>
@@ -772,7 +809,16 @@ export default function AdminBundlesPage() {
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-1">Task Hit Index (1-40)</label>
+                                    <div className="flex items-center justify-between ml-1">
+                                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">
+                                            Task Hit Index (1-{selectedUser ? getUserTaskProgress(selectedUser).tasksPerSet : 40})
+                                        </label>
+                                        {selectedUser && (
+                                            <span className="text-[9px] font-mono text-[#3DD6C8] font-bold">
+                                                Task #{getUserTaskProgress(selectedUser).currentTaskInSet}/{getUserTaskProgress(selectedUser).tasksPerSet}
+                                            </span>
+                                        )}
+                                    </div>
                                     <input 
                                         type="number"
                                         className="w-full bg-slate-950/60 border border-slate-800 rounded-2xl px-5 py-4 text-white font-black italic focus:outline-none focus:border-[#3DD6C8]/30"
@@ -782,6 +828,119 @@ export default function AdminBundlesPage() {
                                     />
                                 </div>
                             </div>
+
+                            {/* Live Hit Calibration & Presets */}
+                            {selectedUser && (() => {
+                                const progress = getUserTaskProgress(selectedUser);
+                                const targetNum = parseInt(String(assignForm.targetIndex)) || 0;
+                                const isInstant = targetNum <= progress.currentTaskInSet;
+                                const diff = targetNum - progress.currentTaskInSet;
+
+                                return (
+                                    <div className="p-3.5 bg-slate-950/70 border border-slate-800 rounded-2xl space-y-2.5 animate-in fade-in">
+                                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 text-xs">
+                                            <div className="flex items-center gap-2">
+                                                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1">
+                                                    <Target size={12} className="text-[#3DD6C8]" /> Hit Prediction:
+                                                </span>
+                                                {isInstant ? (
+                                                    <span className="px-2.5 py-0.5 rounded-full bg-amber-500/20 border border-amber-500/40 text-amber-300 text-[10px] font-black uppercase tracking-wider">
+                                                        ⚡ Immediate Hit on Next Spin
+                                                    </span>
+                                                ) : targetNum > progress.tasksPerSet ? (
+                                                    <span className="px-2.5 py-0.5 rounded-full bg-purple-500/20 border border-purple-500/40 text-purple-300 text-[10px] font-black uppercase tracking-wider">
+                                                        Next Set (Task #{targetNum})
+                                                    </span>
+                                                ) : (
+                                                    <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-[10px] font-black uppercase tracking-wider">
+                                                        🎯 Hits at Task #{targetNum} (in {diff} {diff === 1 ? 'spin' : 'spins'})
+                                                    </span>
+                                                )}
+                                            </div>
+                                            <span className="text-[10px] font-bold text-slate-400">
+                                                Agent on Task <strong className="text-white">#{progress.currentTaskInSet}</strong> of {progress.tasksPerSet}
+                                            </span>
+                                        </div>
+
+                                        {/* Quick Presets */}
+                                        <div className="flex flex-wrap items-center gap-1.5 pt-1 border-t border-slate-800/60">
+                                            <span className="text-[9px] font-bold text-slate-500 uppercase tracking-wider mr-1">Presets:</span>
+                                            <button
+                                                type="button"
+                                                onClick={() => setAssignForm(f => ({ ...f, targetIndex: progress.currentTaskInSet }))}
+                                                className={`px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all cursor-pointer border ${
+                                                    targetNum === progress.currentTaskInSet 
+                                                        ? 'bg-amber-500 text-slate-950 border-amber-400 font-black' 
+                                                        : 'bg-slate-900 hover:bg-slate-800 text-amber-300 border-amber-500/30'
+                                                }`}
+                                            >
+                                                ⚡ Hit Now (#{progress.currentTaskInSet})
+                                            </button>
+                                            {progress.currentTaskInSet + 1 <= progress.tasksPerSet && (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setAssignForm(f => ({ ...f, targetIndex: progress.currentTaskInSet + 1 }))}
+                                                    className={`px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all cursor-pointer border ${
+                                                        targetNum === progress.currentTaskInSet + 1 
+                                                            ? 'bg-[#3DD6C8] text-slate-950 border-[#3DD6C8]' 
+                                                            : 'bg-slate-900 hover:bg-slate-800 text-slate-300 border-slate-700'
+                                                    }`}
+                                                >
+                                                    Next (#{progress.currentTaskInSet + 1})
+                                                </button>
+                                            )}
+                                            {progress.currentTaskInSet + 3 <= progress.tasksPerSet && (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setAssignForm(f => ({ ...f, targetIndex: progress.currentTaskInSet + 3 }))}
+                                                    className={`px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all cursor-pointer border ${
+                                                        targetNum === progress.currentTaskInSet + 3 
+                                                            ? 'bg-[#3DD6C8] text-slate-950 border-[#3DD6C8]' 
+                                                            : 'bg-slate-900 hover:bg-slate-800 text-slate-300 border-slate-700'
+                                                    }`}
+                                                >
+                                                    +3 (#{progress.currentTaskInSet + 3})
+                                                </button>
+                                            )}
+                                            {progress.currentTaskInSet + 5 <= progress.tasksPerSet && (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setAssignForm(f => ({ ...f, targetIndex: progress.currentTaskInSet + 5 }))}
+                                                    className={`px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all cursor-pointer border ${
+                                                        targetNum === progress.currentTaskInSet + 5 
+                                                            ? 'bg-[#3DD6C8] text-slate-950 border-[#3DD6C8]' 
+                                                            : 'bg-slate-900 hover:bg-slate-800 text-slate-300 border-slate-700'
+                                                    }`}
+                                                >
+                                                    +5 (#{progress.currentTaskInSet + 5})
+                                                </button>
+                                            )}
+                                            <button
+                                                type="button"
+                                                onClick={() => setAssignForm(f => ({ ...f, targetIndex: Math.max(progress.currentTaskInSet, progress.tasksPerSet - 2) }))}
+                                                className={`px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all cursor-pointer border ${
+                                                    targetNum === Math.max(progress.currentTaskInSet, progress.tasksPerSet - 2) 
+                                                        ? 'bg-purple-500 text-white border-purple-400' 
+                                                        : 'bg-slate-900 hover:bg-slate-800 text-purple-300 border-purple-500/30'
+                                                }`}
+                                            >
+                                                Late Set (#{Math.max(progress.currentTaskInSet, progress.tasksPerSet - 2)})
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => setAssignForm(f => ({ ...f, targetIndex: progress.tasksPerSet }))}
+                                                className={`px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all cursor-pointer border ${
+                                                    targetNum === progress.tasksPerSet 
+                                                        ? 'bg-purple-500 text-white border-purple-400' 
+                                                        : 'bg-slate-900 hover:bg-slate-800 text-purple-300 border-purple-500/30'
+                                                }`}
+                                            >
+                                                Final Task (#{progress.tasksPerSet})
+                                            </button>
+                                        </div>
+                                    </div>
+                                );
+                            })()}
 
                             {/* Item Value Distribution (SimpleMoneys & Captiv8 style asymmetric pricing) */}
                             {selectedTaskIds.length === 2 && parseFloat(assignForm.productAmount as string) > 0 && (
@@ -1033,7 +1192,10 @@ export default function AdminBundlesPage() {
                                     {users.filter(u => u.pending_bundle || u.has_pending_bundle_task).map(u => {
                                         const b = u.pending_bundle as any;
                                         const isAccepted = u.has_pending_bundle_task && !u.pending_bundle;
-                                        const currentProgressNum = (u.completed_count % 40) + (u.has_pending_task ? 1 : 0);
+                                        const progress = getUserTaskProgress(u);
+                                        const targetIndexNum = Number(b?.targetIndex ?? b?.target_index ?? 0);
+                                        const isInstant = targetIndexNum > 0 && targetIndexNum <= progress.currentTaskInSet;
+                                        const diff = targetIndexNum - progress.currentTaskInSet;
                                         
                                         return (
                                             <tr key={u.id} className={cn(
@@ -1043,12 +1205,15 @@ export default function AdminBundlesPage() {
                                                 <td className="px-4 md:px-8 py-5">
                                                     <span className="font-bold text-white tracking-widest uppercase italic text-xs md:text-sm">{u.username}</span>
                                                     <div className="flex flex-col gap-0.5 mt-1 border-l border-blue-500/30 pl-2">
-                                                        <div className="text-[8px] md:text-[9px] text-slate-500 uppercase font-black opacity-60">VIP {u.level_id} • SET {(u as any).current_set || 1}</div>
+                                                        <div className="text-[8px] md:text-[9px] text-slate-500 uppercase font-black opacity-60">VIP {u.level_id} • SET {u.current_set || 1}</div>
                                                         <div className={cn(
-                                                            "text-[7px] md:text-[8px] font-black uppercase tracking-widest",
-                                                            u.has_pending_task ? "text-green-400" : "text-blue-400"
+                                                            "text-[7px] md:text-[8px] font-black uppercase tracking-widest flex items-center gap-1.5",
+                                                            u.has_pending_task ? "text-emerald-400" : "text-[#3DD6C8]"
                                                         )}>
-                                                            TASK {currentProgressNum}/40
+                                                            TASK {progress.currentTaskInSet}/{progress.tasksPerSet}
+                                                            {u.has_pending_task && (
+                                                                <span className="text-emerald-400 text-[8px] font-bold">● Active</span>
+                                                            )}
                                                         </div>
                                                     </div>
                                                 </td>
@@ -1058,16 +1223,27 @@ export default function AdminBundlesPage() {
                                                             ACCEPTED
                                                         </span>
                                                     ) : (
-                                                        <span className="px-3 py-1 bg-amber-500/10 text-amber-500 rounded-full text-[9px] font-black italic border border-amber-500/20">
-                                                            TASK #{b?.targetIndex || '??'}
-                                                        </span>
+                                                        <div className="inline-flex flex-col items-center gap-0.5">
+                                                            <span className="px-3 py-1 bg-amber-500/10 text-amber-400 rounded-full text-[9px] font-black italic border border-amber-500/20">
+                                                                TASK #{targetIndexNum || '??'}
+                                                            </span>
+                                                            {targetIndexNum > 0 && (
+                                                                isInstant ? (
+                                                                    <span className="text-[8px] font-bold text-amber-300 uppercase tracking-tight">⚡ Next Spin</span>
+                                                                ) : targetIndexNum > progress.tasksPerSet ? (
+                                                                    <span className="text-[8px] font-bold text-purple-400 uppercase tracking-tight">Next Set</span>
+                                                                ) : (
+                                                                    <span className="text-[8px] font-bold text-emerald-400 uppercase tracking-tight">In {diff} {diff === 1 ? 'task' : 'tasks'}</span>
+                                                                )
+                                                            )}
+                                                        </div>
                                                     )}
                                                 </td>
                                                 <td className="px-4 md:px-8 py-5 text-center font-bold text-slate-300 text-xs md:text-sm">
-                                                    ${Number(isAccepted ? u.pending_cost_amount : (b?.totalAmount || 0)).toLocaleString()}
+                                                    ${Number(isAccepted ? u.pending_cost_amount : (b?.totalAmount ?? b?.total_amount ?? 0)).toLocaleString()}
                                                 </td>
                                                 <td className="px-4 md:px-8 py-5 text-center font-black text-green-500 italic text-xs md:text-sm">
-                                                    +${Number(isAccepted ? u.pending_earned_amount : (b?.bonusAmount || 0)).toLocaleString()}
+                                                    +${Number(isAccepted ? u.pending_earned_amount : (b?.bonusAmount ?? b?.bonus_amount ?? 0)).toLocaleString()}
                                                 </td>
                                                 <td className="px-4 md:px-8 py-5 text-right">
                                                     <div className="flex justify-end gap-1 md:gap-2">
@@ -1202,16 +1378,42 @@ export default function AdminBundlesPage() {
                         <div className="space-y-6">
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1">Hit Index (1-40)</label>
-                                    <input 
-                                        type="number" 
-                                        className="w-full bg-slate-900 border border-slate-800 rounded-2xl px-5 py-4 text-white font-bold italic focus:border-[#3DD6C8]/50 outline-none transition-colors"
-                                        value={(editingQueueUser.pending_bundle as any).targetIndex}
-                                        onChange={e => setEditingQueueUser({
-                                            ...editingQueueUser,
-                                            pending_bundle: { ...(editingQueueUser.pending_bundle as any), targetIndex: parseInt(e.target.value) }
-                                        })}
-                                    />
+                                    {(() => {
+                                        const qProgress = getUserTaskProgress(editingQueueUser);
+                                        const curTarget = Number((editingQueueUser.pending_bundle as any)?.targetIndex ?? (editingQueueUser.pending_bundle as any)?.target_index ?? 35);
+                                        const isInstant = curTarget <= qProgress.currentTaskInSet;
+                                        return (
+                                            <>
+                                                <div className="flex items-center justify-between pl-1">
+                                                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">
+                                                        Hit Index (1-{qProgress.tasksPerSet})
+                                                    </label>
+                                                    <span className="text-[9px] font-mono text-[#3DD6C8] font-bold">
+                                                        Active: Task #{qProgress.currentTaskInSet}/{qProgress.tasksPerSet}
+                                                    </span>
+                                                </div>
+                                                <input 
+                                                    type="number" 
+                                                    className="w-full bg-slate-900 border border-slate-800 rounded-2xl px-5 py-4 text-white font-bold italic focus:border-[#3DD6C8]/50 outline-none transition-colors"
+                                                    value={curTarget}
+                                                    onChange={e => {
+                                                        const val = parseInt(e.target.value) || 0;
+                                                        setEditingQueueUser({
+                                                            ...editingQueueUser,
+                                                            pending_bundle: {
+                                                                ...(editingQueueUser.pending_bundle as any),
+                                                                targetIndex: val,
+                                                                target_index: val
+                                                            }
+                                                        });
+                                                    }}
+                                                />
+                                                <span className={`text-[9px] font-bold block pl-1 ${isInstant ? 'text-amber-400' : 'text-emerald-400'}`}>
+                                                    {isInstant ? '⚡ Triggers immediately on next spin' : `🎯 Triggers at Task #${curTarget} (in ${curTarget - qProgress.currentTaskInSet} tasks)`}
+                                                </span>
+                                            </>
+                                        );
+                                    })()}
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1">Package Cost ($)</label>
