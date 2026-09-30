@@ -74,7 +74,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 if (allLevels && allLevels.length > 0) {
                     const targetLevelId = data.level_id || 1;
                     const assignedLevel = allLevels.find((l: any) => l.id === targetLevelId) || allLevels[0];
-                    data = { ...data, level: assignedLevel };
+                    data = { ...data, level_id: targetLevelId, level: assignedLevel };
                 }
 
                 setProfile(data);

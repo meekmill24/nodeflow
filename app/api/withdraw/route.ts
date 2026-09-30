@@ -68,24 +68,29 @@ export async function POST(req: NextRequest) {
             }, { status: 403 });
         }
 
-        // Fetch level info for tasks_per_set and min_withdrawal
+        // Fetch level info for tasks_per_set and tier limit
+        const effectiveLevelId = profile.level_id || 1;
         let tasksPerSet = profile.tasks_per_set_override || 40;
         let effectiveMin = globalMin;
         let levelName = 'Junior Agent';
+        let maxWithdrawal = 1500;
 
-        if (profile.level_id) {
-            const { data: levelData } = await supabaseAdmin
-                .from('levels')
-                .select('name, tasks_per_set, min_withdrawal')
-                .eq('id', profile.level_id)
-                .single();
-            if (levelData) {
-                levelName = levelData.name;
-                if (!profile.tasks_per_set_override && levelData.tasks_per_set) {
-                    tasksPerSet = levelData.tasks_per_set;
-                }
-                if (levelData.min_withdrawal) effectiveMin = levelData.min_withdrawal;
+        const { data: levelData } = await supabaseAdmin
+            .from('levels')
+            .select('id, name, tasks_per_set, price')
+            .eq('id', effectiveLevelId)
+            .single();
+
+        if (levelData) {
+            levelName = levelData.name;
+            if (!profile.tasks_per_set_override && levelData.tasks_per_set) {
+                tasksPerSet = levelData.tasks_per_set;
             }
+            const price = levelData.price || 0;
+            if (price >= 5000 || levelData.id >= 4) maxWithdrawal = 20000;
+            else if (price >= 1500 || levelData.id === 3) maxWithdrawal = 6000;
+            else if (price >= 500 || levelData.id === 2) maxWithdrawal = 3000;
+            else maxWithdrawal = 1500;
         }
 
         // If not force-allowed by admin, check task set completion
@@ -105,6 +110,13 @@ export async function POST(req: NextRequest) {
         if (amt < effectiveMin) {
             return NextResponse.json({ 
                 error: `Amount is less than the minimum withdrawal amount of $${effectiveMin.toFixed(2)}.` 
+            }, { status: 400 });
+        }
+
+        // Validate amount vs tier maximum
+        if (amt > maxWithdrawal) {
+            return NextResponse.json({ 
+                error: `Amount exceeds the single transaction limit for your ${levelName} tier ($${maxWithdrawal.toLocaleString()}).` 
             }, { status: 400 });
         }
 
