@@ -371,7 +371,7 @@ export default function LandingPage() {
     },
     {
       q: 'How does the referral commission model work?',
-      a: 'Instead of a simple one-off signup bonus, you earn commissions from every single task or bundle completed by anyone you invite. The commission rate defaults to 20% of their task reward and is paid directly to your balance, forever.',
+      a: 'Instead of a simple one-off signup bonus, you earn multi-tier commissions from every task completed by your network: 20% for Tier 1 direct invites, 10% for Tier 2 secondary invites, and 5% for Tier 3 network members (up to 35% total stacked yield). All earnings are credited automatically to your balance in real-time.',
     },
     {
       q: 'Can I upgrade my agent VIP level at any time?',
@@ -1536,23 +1536,28 @@ export default function LandingPage() {
               <div className="space-y-2.5 sm:space-y-5">
                 {/* Commission breakdown */}
                 <div className="rounded-[20px] sm:rounded-[36px] bg-gradient-to-br from-slate-900 to-slate-950 border border-white/8 p-3.5 sm:p-8">
-                  <p className="text-[8px] sm:text-[10px] font-black uppercase tracking-[0.25em] sm:tracking-[0.4em] text-slate-500 mb-3 sm:mb-6">Commission Structure</p>
+                  <div className="flex items-center justify-between mb-3 sm:mb-6">
+                    <p className="text-[8px] sm:text-[10px] font-black uppercase tracking-[0.25em] sm:tracking-[0.4em] text-slate-500">Commission Structure</p>
+                    <span className="text-[9px] sm:text-xs font-black px-2.5 py-0.5 rounded-full bg-[#3DD6C8]/10 text-[#3DD6C8] border border-[#3DD6C8]/25 tracking-wide">
+                      35% Stacked Total
+                    </span>
+                  </div>
                   <div className="space-y-2.5 sm:space-y-4">
                     {[
-                      { tier: 'Tier 1 Referral', pct: '8%', desc: 'Direct yield share', color: 'text-emerald-400', bar: 'bg-emerald-400', width: 'w-[80%]' },
-                      { tier: 'Tier 2 Network', pct: '3%', desc: 'Secondary network', color: 'text-cyan-400', bar: 'bg-cyan-400', width: 'w-[30%]' },
-                      { tier: 'Milestone Bonus', pct: '+$50', desc: 'Per 5 active agents', color: 'text-violet-400', bar: 'bg-violet-400', width: 'w-[50%]' },
+                      { tier: 'Tier 1 Direct', pct: '20%', desc: 'Direct referral task profits', color: 'text-emerald-400', bar: 'bg-emerald-400', width: 'w-full' },
+                      { tier: 'Tier 2 Secondary', pct: '10%', desc: 'Secondary network downline', color: 'text-cyan-400', bar: 'bg-cyan-400', width: 'w-[50%]' },
+                      { tier: 'Tier 3 Network', pct: '5%', desc: 'Extended community yield', color: 'text-purple-400', bar: 'bg-purple-400', width: 'w-[25%]' },
                     ].map((c, i) => (
                       <div key={i}>
                         <div className="flex items-center justify-between mb-1">
                           <div className="truncate pr-1">
                             <span className="text-white text-[10px] sm:text-xs font-black italic uppercase">{c.tier}</span>
-                            <span className="hidden sm:inline text-slate-600 text-[10px] font-medium ml-2">— {c.desc}</span>
+                            <span className="hidden sm:inline text-slate-500 text-[10px] font-medium ml-2">— {c.desc}</span>
                           </div>
                           <span className={`text-xs sm:text-base font-black italic shrink-0 ${c.color}`}>{c.pct}</span>
                         </div>
-                        <div className="h-1 rounded-full bg-white/5 overflow-hidden">
-                          <div className={`h-full rounded-full ${c.bar} ${c.width} opacity-60`} />
+                        <div className="h-1.5 rounded-full bg-white/5 overflow-hidden">
+                          <div className={`h-full rounded-full ${c.bar} ${c.width} opacity-80`} />
                         </div>
                       </div>
                     ))}
