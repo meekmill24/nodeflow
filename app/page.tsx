@@ -46,6 +46,7 @@ import { cn } from '@/lib/utils';
 export default function LandingPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [introDone, setIntroDone] = useState(false);
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
   const [currentNotification, setCurrentNotification] = useState<number>(0);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -189,7 +190,7 @@ export default function LandingPage() {
   }, []);
 
   useEffect(() => {
-    if (!mounted) return;
+    if (!mounted || !introDone) return;
 
     const ctx = gsap.context(() => {
       // Stats counter animation using GSAP
@@ -257,7 +258,7 @@ export default function LandingPage() {
     }, containerRef);
 
     return () => ctx.revert();
-  }, [mounted]);
+  }, [mounted, introDone]);
 
   const operationalSteps = [
     {
@@ -397,7 +398,7 @@ export default function LandingPage() {
       className="min-h-screen w-full max-w-full bg-[#020617] text-slate-100 font-sans selection:bg-cyan-500/40 selection:text-cyan-100 overflow-x-hidden"
       ref={containerRef}
     >
-      <IntroLoader />
+      <IntroLoader onComplete={() => setIntroDone(true)} />
 
       {/* ── Ambient Background ── */}
       <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
