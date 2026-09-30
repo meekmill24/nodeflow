@@ -102,8 +102,8 @@ export default function Header({ onMenuClick }: HeaderProps) {
                     }
                 }
 
-                const dismissedKey = `banner_dismissed_${text.slice(0, 20)}`;
-                if (!sessionStorage.getItem(dismissedKey)) {
+                const dismissedKey = `banner_dismissed_${profile?.id || 'guest'}_${encodeURIComponent(text.trim())}`;
+                if (typeof window !== 'undefined' && !localStorage.getItem(dismissedKey)) {
                     setAnnouncement(text);
                     setShowBanner(true);
                 } else {
@@ -130,8 +130,14 @@ export default function Header({ onMenuClick }: HeaderProps) {
                     <p className="text-amber-50 text-[11px] font-bold tracking-wide">{announcement}</p>
                 </div>
                 <button
-                    onClick={() => { setShowBanner(false); sessionStorage.setItem(`banner_dismissed_${announcement.slice(0, 20)}`, '1'); }}
-                    className="p-1 text-amber-200/60 hover:text-white transition-colors shrink-0"
+                    onClick={() => { 
+                        setShowBanner(false); 
+                        if (typeof window !== 'undefined') {
+                            localStorage.setItem(`banner_dismissed_${profile?.id || 'guest'}_${encodeURIComponent(announcement.trim())}`, '1'); 
+                        }
+                    }}
+                    className="p-1 text-amber-200/60 hover:text-white transition-colors shrink-0 cursor-pointer"
+                    aria-label="Dismiss banner"
                 >
                     <XIcon size={14} />
                 </button>
