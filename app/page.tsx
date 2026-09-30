@@ -7,6 +7,7 @@ import { Testimonials } from '@/components/landing/testimonials';
 import { LandingGallery } from '@/components/landing/gallery';
 import { Footer } from '@/components/landing/footer';
 import { LiveActivityMap } from '@/components/landing/LiveActivityMap';
+import { IntroLoader } from '@/components/landing/IntroLoader';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -396,6 +397,8 @@ export default function LandingPage() {
       className="min-h-screen w-full max-w-full bg-[#020617] text-slate-100 font-sans selection:bg-cyan-500/40 selection:text-cyan-100 overflow-x-hidden"
       ref={containerRef}
     >
+      <IntroLoader />
+
       {/* ── Ambient Background ── */}
       <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-full bg-[url('/grid.svg')] opacity-[0.03]" />
