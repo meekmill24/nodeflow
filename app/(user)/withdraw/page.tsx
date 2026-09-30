@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase/index';
 import { 
@@ -125,7 +125,6 @@ const normalizeToWithdrawNetwork = (net?: string): WithdrawNetwork => {
 
 export default function WithdrawPage() {
     const { profile, refreshProfile } = useAuth();
-    const amountInputRef = useRef<HTMLInputElement>(null);
     const [amount, setAmount] = useState('30');
     const [walletAddress, setWalletAddress] = useState(profile?.wallet_address || '');
     const [network, setNetwork] = useState<WithdrawNetwork>(normalizeToWithdrawNetwork(profile?.wallet_network || undefined));
@@ -227,8 +226,12 @@ export default function WithdrawPage() {
     const isTaskRequirementMet = isForceAllowed || (!requireTasksGlobal || isSetCompleted);
     const canWithdraw = !isBlockedByAdmin && isTaskRequirementMet;
 
-    const handleSelectPreset = (preset: 'MIN' | '25' | '50' | '75' | 'MAX') => {
+    const handleSelectPreset = (preset: 'MIN' | '25' | '50' | '75' | 'MAX' | number) => {
         setError('');
+        if (typeof preset === 'number') {
+            setAmount(String(preset));
+            return;
+        }
         if (preset === 'MIN') {
             setAmount(String(minWithdrawal));
             return;
@@ -241,7 +244,7 @@ export default function WithdrawPage() {
         const pct = parseInt(preset, 10);
         if (!isNaN(pct) && balance > 0) {
             const val = (balance * pct) / 100;
-            setAmount(val.toFixed(2));
+            setAmount(val % 1 === 0 ? String(val) : val.toFixed(2));
         }
     };
 
@@ -607,11 +610,11 @@ export default function WithdrawPage() {
                         <div className="absolute top-0 right-0 w-48 h-48 bg-[#3DD6C8]/5 rounded-full blur-3xl pointer-events-none" />
                         <div className="absolute bottom-0 left-0 w-48 h-48 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none" />
 
-                        {/* 1. AMOUNT SELECTION & INPUT SECTION */}
+                        {/* 1. AMOUNT SELECTION SECTION (PRESET-ONLY SELECTION) */}
                         <div className="space-y-4">
                             <div className="flex items-center justify-between">
                                 <label className="text-[10px] font-black text-white/60 uppercase tracking-[0.2em] block">
-                                    Withdrawal Amount (USD)
+                                    Selected Payout Amount (USD)
                                 </label>
                                 <div className="flex items-center gap-2">
                                     {!canWithdraw && (
@@ -625,65 +628,51 @@ export default function WithdrawPage() {
                                 </div>
                             </div>
 
-                            {/* Active Amount Input Card */}
-                            <div 
-                                onClick={() => amountInputRef.current?.focus()}
-                                className={`p-5 sm:p-6 bg-black/40 border rounded-[28px] transition-all relative overflow-hidden shadow-inner cursor-text group/amount ${
+                            {/* Preset Selected Amount Card (Non-editable Display) */}
+                            <div className={`p-5 sm:p-6 bg-black/40 border rounded-[28px] transition-all relative overflow-hidden shadow-inner select-none ${
                                 isLessThanMin 
                                     ? 'border-rose-500/60 shadow-[0_0_20px_rgba(244,63,94,0.15)]' 
                                     : isExceedingBalance 
                                     ? 'border-amber-500/60' 
-                                    : 'border-[#3DD6C8]/30 focus-within:border-[#3DD6C8] focus-within:shadow-[0_0_25px_rgba(61,214,200,0.2)] hover:border-[#3DD6C8]/50'
+                                    : isExceedingMax
+                                    ? 'border-amber-500/60'
+                                    : 'border-[#3DD6C8]/40 shadow-[0_0_25px_rgba(61,214,200,0.12)]'
                             }`}>
                                 <div className="flex items-center justify-between gap-3">
-                                    <div className="flex items-center gap-2 flex-1 min-w-0">
-                                        <span className="text-3xl sm:text-4xl md:text-5xl font-black text-white/50 select-none">
+                                    <div className="flex items-baseline gap-2 flex-1 min-w-0">
+                                        <span className="text-3xl sm:text-4xl md:text-5xl font-black text-[#3DD6C8] select-none">
                                             $
                                         </span>
-                                        <input
-                                            ref={amountInputRef}
-                                            type="text"
-                                            inputMode="decimal"
-                                            autoComplete="off"
-                                            value={amount}
-                                            onChange={(e) => {
-                                                const val = e.target.value;
-                                                // Allow digits and at most one decimal point
-                                                if (val === '' || /^\d*\.?\d*$/.test(val)) {
-                                                    setAmount(val);
-                                                    setError('');
-                                                }
-                                            }}
-                                            placeholder={minWithdrawal.toString()}
-                                            className="w-full bg-transparent text-3xl sm:text-4xl md:text-5xl font-black text-white font-mono tracking-tight outline-none placeholder:text-white/20"
-                                        />
-                                        {amount && (
-                                            <button
-                                                type="button"
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    setAmount('');
-                                                    amountInputRef.current?.focus();
-                                                }}
-                                                className="px-2.5 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white/60 hover:text-white transition-all text-[10px] font-black uppercase tracking-wider shrink-0 cursor-pointer flex items-center gap-1 active:scale-95"
-                                                title="Clear custom amount"
-                                            >
-                                                <X size={12} /> Clear
-                                            </button>
-                                        )}
+                                        <span className="text-3xl sm:text-4xl md:text-5xl font-black text-white font-mono tracking-tight select-none">
+                                            {parsedAmount > 0 
+                                                ? (parsedAmount % 1 === 0 ? parsedAmount.toFixed(0) : parsedAmount.toFixed(2)) 
+                                                : minWithdrawal.toFixed(2)}
+                                        </span>
+                                        <span className="text-xs font-bold text-white/40 uppercase tracking-widest ml-1 font-mono">
+                                            USD
+                                        </span>
+                                        {/* Hidden form input so standard submission holds the exact string */}
+                                        <input type="hidden" name="amount" value={amount} />
                                     </div>
-                                    <div className="text-right shrink-0">
-                                        <span className="text-xs font-black text-[#3DD6C8] uppercase tracking-widest block font-mono">
-                                            {network === 'ERC20' ? 'USDT' : network === 'ETH' ? 'ETH' : network === 'BTC' ? 'BTC' : network === 'PAYPALUSD' ? 'PYUSD' : 'USDT'}
-                                        </span>
-                                        <span className="text-[9px] font-black text-white/40 uppercase tracking-widest">
-                                            0% Fee
-                                        </span>
+                                    <div className="flex items-center gap-2">
+                                        <div className="px-3 py-1.5 rounded-full bg-white/[0.04] border border-white/10 text-[9px] font-black text-white/60 uppercase tracking-widest flex items-center gap-1.5 shadow-sm">
+                                            <Lock size={11} className="text-[#3DD6C8]" />
+                                            Preset Selection
+                                        </div>
+                                        <div className="text-right shrink-0">
+                                            <span className="text-xs font-black text-[#3DD6C8] uppercase tracking-widest block font-mono">
+                                                {network === 'ERC20' ? 'USDT' : network === 'ETH' ? 'ETH' : network === 'BTC' ? 'BTC' : network === 'PAYPALUSD' ? 'PYUSD' : 'USDT'}
+                                            </span>
+                                            <span className="text-[9px] font-black text-white/40 uppercase tracking-widest">
+                                                0% Fee
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
 
-                                <p className="text-[10px] text-white/40 mt-1.5">
-                                    Click here to type any custom amount, or select a preset percentage below.
+                                <p className="text-[10px] text-white/40 mt-2 flex items-center gap-1.5">
+                                    <Info size={12} className="text-[#3DD6C8] shrink-0" />
+                                    Select your desired payout amount from the preset tiers below. Direct manual typing is disabled.
                                 </p>
 
                                 {/* Dynamic inline status pill */}
@@ -726,9 +715,9 @@ export default function WithdrawPage() {
                             </div>
 
                             {/* Preset Buttons (Quick Percentages + MIN & MAX) */}
-                            <div className="space-y-2 pt-1">
+                            <div className="space-y-3 pt-1">
                                 <div className="flex items-center justify-between">
-                                    <span className="text-[9px] font-black text-white/40 uppercase tracking-[0.2em]">Quick Presets (or type above):</span>
+                                    <span className="text-[9px] font-black text-white/50 uppercase tracking-[0.2em]">Select Preset Amount:</span>
                                     <span className="text-[9px] font-mono text-white/40">Min: ${minWithdrawal} • Account: ${balance.toFixed(2)}</span>
                                 </div>
                                 <div className="grid grid-cols-5 gap-2">
@@ -760,7 +749,7 @@ export default function WithdrawPage() {
                                                 }`}
                                             >
                                                 <span className="text-[8px] uppercase tracking-wider opacity-60">{pct}%</span>
-                                                <span className="font-mono font-bold">${targetVal > 0 ? targetVal.toFixed(0) : '0'}</span>
+                                                <span className="font-mono font-bold">${targetVal > 0 ? (targetVal % 1 === 0 ? targetVal.toFixed(0) : targetVal.toFixed(2)) : '0'}</span>
                                             </button>
                                         );
                                     })}
@@ -775,9 +764,41 @@ export default function WithdrawPage() {
                                         }`}
                                     >
                                         <span className="text-[8px] uppercase tracking-wider text-emerald-400/80">MAX</span>
-                                        <span className="font-mono font-bold text-emerald-400">${balance > 0 ? balance.toFixed(0) : '0'}</span>
+                                        <span className="font-mono font-bold text-emerald-400">${balance > 0 ? (balance % 1 === 0 ? balance.toFixed(0) : balance.toFixed(2)) : '0'}</span>
                                     </button>
                                 </div>
+
+                                {/* Standard Denominations (when balance allows) */}
+                                {balance >= 50 && (
+                                    <div className="pt-1.5 space-y-1.5">
+                                        <span className="text-[8px] font-black text-white/40 uppercase tracking-[0.2em] block">
+                                            Fixed Denominations:
+                                        </span>
+                                        <div className="flex flex-wrap gap-2">
+                                            {[50, 100, 200, 500, 1000, 1500].filter(d => d >= minWithdrawal && d <= maxWithdrawal).map(denom => {
+                                                const isSelected = parsedAmount === denom;
+                                                const canAfford = denom <= balance;
+                                                return (
+                                                    <button
+                                                        key={denom}
+                                                        type="button"
+                                                        disabled={!canAfford}
+                                                        onClick={() => handleSelectPreset(denom)}
+                                                        className={`px-3.5 py-1.5 rounded-xl border text-[10px] font-black font-mono transition-all ${
+                                                            isSelected
+                                                                ? 'bg-[#3DD6C8] text-[#0B0B1E] border-[#3DD6C8] shadow-[0_0_12px_rgba(61,214,200,0.35)] scale-[1.03]'
+                                                                : canAfford
+                                                                ? 'bg-white/[0.04] border-white/10 text-white/80 hover:bg-white/10 hover:text-white cursor-pointer'
+                                                                : 'bg-white/[0.01] border-white/5 text-white/20 cursor-not-allowed opacity-40'
+                                                        }`}
+                                                    >
+                                                        ${denom}
+                                                    </button>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         </div>
 
