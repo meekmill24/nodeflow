@@ -148,17 +148,20 @@ export function Footer() {
           </p>
 
           {/* Payment badges */}
-          <div className="flex items-center gap-4">
+          <div className="flex flex-wrap items-center justify-center gap-3">
             <span className="text-[10px] text-slate-600 uppercase tracking-widest">Accepted</span>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               {[
                 { name: "USDT", color: "#26A17B", bg: "rgba(38,161,123,0.1)" },
                 { name: "ETH", color: "#627EEA", bg: "rgba(98,126,234,0.1)" },
                 { name: "BTC", color: "#F7931A", bg: "rgba(247,147,26,0.1)" },
+                { name: "USDC", color: "#2775CA", bg: "rgba(39,117,202,0.1)" },
+                { name: "BNB", color: "#F3BA2F", bg: "rgba(243,186,47,0.1)" },
+                { name: "PYUSD", color: "#0079C1", bg: "rgba(0,121,193,0.1)" },
               ].map((c) => (
                 <div
                   key={c.name}
-                  className="h-8 px-3 rounded-lg border border-white/10 flex items-center justify-center"
+                  className="h-8 px-2.5 sm:px-3 rounded-lg border border-white/10 flex items-center justify-center transition-all duration-200 hover:scale-105"
                   style={{ background: c.bg }}
                 >
                   <span className="text-[10px] font-black" style={{ color: c.color }}>
