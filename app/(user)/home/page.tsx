@@ -59,6 +59,7 @@ export default function HomePage() {
     const [levels, setLevels] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [referralRate, setReferralRate] = useState('20');
+    const [hubFilter, setHubFilter] = useState<'all' | 'finance' | 'protocol' | 'support'>('all');
 
     useEffect(() => {
         const fetchData = async () => {
@@ -219,71 +220,136 @@ export default function HomePage() {
                 </div>
             </div>
 
-            {/* LIVE OPERATIONS & HUB */}
+            {/* LIVE OPERATIONS & HUB — Enhanced PC-Style Command Center */}
             <div className="grid grid-cols-1 gap-12">
                 {/* System Hub & Actions */}
-                <div className="space-y-6">
-                    <div className="flex items-center gap-3 px-4">
-                        <div className="w-1.5 h-1.5 rounded-full bg-rose-500 shadow-[0_0_8px_rgba(239,68,68,0.8)]" />
-                        <h3 className="text-[10px] font-black text-white/50 uppercase tracking-[0.4em]">QUICK HUB SELECT</h3>
+                <div className="space-y-4 sm:space-y-5">
+                    {/* Header + Category Filter Tabs */}
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-1 sm:px-2">
+                        <div className="flex items-center gap-2.5">
+                            <div className="w-2 h-2 rounded-full bg-[#3DD6C8] animate-pulse shadow-[0_0_10px_rgba(61,214,200,0.8)]" />
+                            <h3 className="text-xs font-black text-white uppercase tracking-[0.3em]">QUICK HUB SELECT</h3>
+                        </div>
+
+                        {/* PC Terminal Style Filter Tabs */}
+                        <div className="flex items-center gap-1 p-1 rounded-xl bg-slate-900/80 border border-white/5 self-start sm:self-auto overflow-x-auto max-w-full">
+                            {[
+                                { id: 'all', label: 'All' },
+                                { id: 'finance', label: 'Finance' },
+                                { id: 'protocol', label: 'Protocol' },
+                                { id: 'support', label: 'Support' }
+                            ].map(tab => (
+                                <button
+                                    key={tab.id}
+                                    onClick={() => setHubFilter(tab.id as any)}
+                                    className={`px-3 py-1 rounded-lg text-[9px] sm:text-[10px] font-black uppercase tracking-wider transition-all whitespace-nowrap ${
+                                        hubFilter === tab.id
+                                            ? 'bg-[#3DD6C8] text-slate-950 shadow-[0_0_15px_rgba(61,214,200,0.4)] scale-[1.02]'
+                                            : 'text-white/40 hover:text-white hover:bg-white/5'
+                                    }`}
+                                >
+                                    {tab.label}
+                                </button>
+                            ))}
+                        </div>
                     </div>
                     
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                    {/* PC-Style Compact Multi-Column Grid (3 cols on mobile, 4 on tablet, 6 on desktop) */}
+                    <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-2.5 sm:gap-3.5 md:gap-4">
                         {[
-                            { icon: ArrowDownLeft, label: t('deposit'), href: '/deposit', color: 'text-[#3DD6C8]', bg: 'bg-[#3DD6C8]/5' },
-                            { icon: ArrowUpRight, label: t('withdraw'), href: '/withdraw', color: 'text-amber-500', bg: 'bg-amber-500/5' },
-                            { icon: Headset, label: 'Customer Support', href: '/service', color: 'text-rose-500', bg: 'bg-rose-500/5' },
-                            { icon: Building2, label: t('company'), href: '/company', color: 'text-indigo-400', bg: 'bg-indigo-400/5' },
-                            { icon: FileText, label: 'Certificate', href: '/certificate', color: 'text-pink-500', bg: 'bg-pink-500/5' },
-                            { icon: ShieldCheck, label: 'Security Compliance', href: '/compliance', color: 'text-emerald-400', bg: 'bg-emerald-400/5' },
-                            { icon: FileText, label: 'Operating Protocol', href: '/protocol', color: 'text-[#3DD6C8]', bg: 'bg-[#3DD6C8]/5' },
-                            { icon: ShieldCheck, label: 'Terms and Conditions', href: '/rules', color: 'text-teal-500', bg: 'bg-teal-500/5' },
-                            { icon: HelpCircle, label: 'FAQ', href: '/faq', color: 'text-blue-500', bg: 'bg-blue-500/5' },
-                            { icon: ShieldAlert, label: 'Privacy', href: '/privacy', color: 'text-orange-500', bg: 'bg-orange-500/5' },
-                            { icon: Map, label: 'VIP Map & Rewards', href: '/levels', color: 'text-violet-400', bg: 'bg-violet-400/5' },
-                            { icon: TrendingUp, label: 'Salary Structure', href: '/salary', color: 'text-cyan-400', bg: 'bg-cyan-400/5' },
-                        ].map((hub, i) => (
-                            <Link key={i} href={hub.href} className="group p-6 rounded-[36px] bg-[#0B0B1E] border border-white/5 flex flex-col items-center gap-4 hover:border-white/10 transition-all duration-500 hover:-translate-y-1">
-                                <div className={`w-12 h-12 rounded-2xl ${hub.bg} border border-white/5 flex items-center justify-center ${hub.color} group-hover:scale-110 transition-transform duration-700`}>
-                                    <hub.icon size={22} />
+                            { icon: ArrowDownLeft, label: t('deposit'), href: '/deposit', color: 'text-[#3DD6C8]', bg: 'bg-[#3DD6C8]/10', border: 'border-[#3DD6C8]/20', category: 'finance', badge: 'Instant' },
+                            { icon: ArrowUpRight, label: t('withdraw'), href: '/withdraw', color: 'text-amber-400', bg: 'bg-amber-400/10', border: 'border-amber-400/20', category: 'finance', badge: '24/7' },
+                            { icon: TrendingUp, label: 'Salary Structure', href: '/salary', color: 'text-cyan-400', bg: 'bg-cyan-400/10', border: 'border-cyan-400/20', category: 'finance', badge: 'Tiers' },
+                            { icon: Map, label: 'VIP Map & Rewards', href: '/levels', color: 'text-violet-400', bg: 'bg-violet-400/10', border: 'border-violet-400/20', category: 'finance', badge: 'VIP' },
+                            { icon: Headset, label: 'Live Support', href: '/service', color: 'text-rose-400', bg: 'bg-rose-400/10', border: 'border-rose-400/20', category: 'support', badge: 'Active' },
+                            { icon: HelpCircle, label: 'FAQ', href: '/faq', color: 'text-blue-400', bg: 'bg-blue-400/10', border: 'border-blue-400/20', category: 'support', badge: 'Guide' },
+                            { icon: Building2, label: t('company'), href: '/company', color: 'text-indigo-400', bg: 'bg-indigo-400/10', border: 'border-indigo-400/20', category: 'protocol', badge: 'HQ' },
+                            { icon: FileText, label: 'Certificate', href: '/certificate', color: 'text-pink-400', bg: 'bg-pink-400/10', border: 'border-pink-400/20', category: 'protocol', badge: 'Audit' },
+                            { icon: ShieldCheck, label: 'Security Compliance', href: '/compliance', color: 'text-emerald-400', bg: 'bg-emerald-400/10', border: 'border-emerald-400/20', category: 'protocol', badge: 'SSL' },
+                            { icon: FileText, label: 'Operating Protocol', href: '/protocol', color: 'text-[#3DD6C8]', bg: 'bg-[#3DD6C8]/10', border: 'border-[#3DD6C8]/20', category: 'protocol', badge: 'Rules' },
+                            { icon: ShieldCheck, label: 'Terms & Conditions', href: '/rules', color: 'text-teal-400', bg: 'bg-teal-400/10', border: 'border-teal-400/20', category: 'protocol', badge: 'Legal' },
+                            { icon: ShieldAlert, label: 'Privacy Policy', href: '/privacy', color: 'text-orange-400', bg: 'bg-orange-400/10', border: 'border-orange-400/20', category: 'protocol', badge: 'Encrypted' },
+                        ]
+                            .filter(item => hubFilter === 'all' || item.category === hubFilter)
+                            .map((hub, i) => (
+                                <Link 
+                                    key={i} 
+                                    href={hub.href} 
+                                    className="group relative p-3 sm:p-4 lg:p-5 rounded-2xl sm:rounded-[28px] lg:rounded-[32px] bg-[#0B0B1E]/90 border border-white/5 hover:border-[#3DD6C8]/40 flex flex-col items-center justify-between text-center gap-2 sm:gap-3 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_10px_30px_rgba(0,0,0,0.8)] active:scale-95 overflow-hidden"
+                                >
+                                    <div className="absolute top-0 inset-x-0 h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent group-hover:via-[#3DD6C8]/50 transition-colors" />
+                                    
+                                    <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl ${hub.bg} border ${hub.border} flex items-center justify-center ${hub.color} group-hover:scale-110 transition-transform duration-500 shadow-inner shrink-0`}>
+                                        <hub.icon size={20} className="sm:hidden" />
+                                        <hub.icon size={22} className="hidden sm:block" />
+                                    </div>
+                                    <span className="text-[8.5px] sm:text-[9.5px] lg:text-[10px] font-black text-white/70 group-hover:text-white uppercase tracking-wider text-center leading-tight line-clamp-2 transition-colors">
+                                        {hub.label}
+                                    </span>
+                                </Link>
+                            ))}
+
+                        {/* WFP External Link — Shown when All or Support filter active */}
+                        {(hubFilter === 'all' || hubFilter === 'support') && (
+                            <a 
+                                href="https://www.wfp.org" 
+                                target="_blank" 
+                                rel="noopener noreferrer" 
+                                className="group relative p-3 sm:p-4 lg:p-5 rounded-2xl sm:rounded-[28px] lg:rounded-[32px] bg-[#0B0B1E]/90 border border-white/5 hover:border-blue-500/40 flex flex-col items-center justify-between text-center gap-2 sm:gap-3 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_10px_30px_rgba(0,0,0,0.8)] active:scale-95 overflow-hidden"
+                            >
+                                <div className="absolute top-0 inset-x-0 h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent group-hover:via-blue-500/50 transition-colors" />
+                                
+                                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-blue-600/10 border border-blue-500/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-500 p-2 shadow-inner shrink-0">
+                                    <img src="/wfp-logo.svg" alt="World Food Programme" className="w-6 h-6 sm:w-7 sm:h-7 object-contain filter drop-shadow-[0_0_8px_rgba(82,137,195,0.5)]" />
                                 </div>
-                                <span className="text-[10px] font-black text-white/60 uppercase tracking-[0.25em] text-center">{hub.label}</span>
-                            </Link>
-                        ))}
-                        {/* WFP External Link */}
-                        <a href="https://www.wfp.org" target="_blank" rel="noopener noreferrer" className="group p-6 rounded-[36px] bg-[#0B0B1E] border border-white/5 flex flex-col items-center gap-4 hover:border-white/10 transition-all duration-500 hover:-translate-y-1">
-                            <div className="w-12 h-12 rounded-2xl bg-blue-600/10 border border-white/5 flex items-center justify-center group-hover:scale-110 transition-transform duration-700 p-2">
-                                <img src="/wfp-logo.svg" alt="World Food Programme" className="w-7 h-7 object-contain filter drop-shadow-[0_0_8px_rgba(82,137,195,0.5)]" />
-                            </div>
-                            <span className="text-[10px] font-black text-white/60 uppercase tracking-[0.25em] text-center">WFP</span>
-                        </a>
+                                <span className="text-[8.5px] sm:text-[9.5px] lg:text-[10px] font-black text-white/70 group-hover:text-white uppercase tracking-wider text-center leading-tight line-clamp-2 transition-colors">
+                                    WFP
+                                </span>
+                            </a>
+                        )}
                     </div>
                 </div>
             </div>
 
-            {/* ADVERTISING BANNER PROTOCOL */}
-            <div className="relative group overflow-hidden rounded-[48px] bg-slate-900 border border-white/5">
-                <div className="absolute inset-0 bg-gradient-to-r from-[#3DD6C8]/20 to-transparent opacity-40 mix-blend-overlay" />
-                <div className="relative p-12 md:p-16 flex flex-col md:flex-row md:items-center justify-between gap-10">
-                    <div className="max-w-xl space-y-6">
-                        <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-2xl bg-[#3DD6C8]/10 flex items-center justify-center text-[#3DD6C8] border border-[#3DD6C8]/20">
-                                <Sparkles size={20} />
+            {/* ADVERTISING BANNER PROTOCOL — Network Expansion Program */}
+            <div className="relative group overflow-hidden rounded-3xl sm:rounded-[36px] md:rounded-[48px] bg-gradient-to-br from-slate-900 via-[#0B0B1E] to-slate-950 border border-white/10 shadow-2xl">
+                {/* Cyber ambient glow */}
+                <div className="absolute top-0 right-0 w-96 h-96 bg-[#3DD6C8]/10 rounded-full blur-[100px] pointer-events-none group-hover:bg-[#3DD6C8]/15 transition-all duration-700" />
+                <div className="absolute bottom-0 left-0 w-80 h-80 bg-indigo-500/10 rounded-full blur-[90px] pointer-events-none" />
+                <div className="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-[#3DD6C8]/40 to-transparent" />
+
+                <div className="relative p-6 sm:p-10 md:p-14 flex flex-col md:flex-row md:items-center justify-between gap-6 sm:gap-8 md:gap-10">
+                    <div className="max-w-xl space-y-3 sm:space-y-4">
+                        <div className="flex items-center gap-2.5">
+                            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-[#3DD6C8]/10 flex items-center justify-center text-[#3DD6C8] border border-[#3DD6C8]/25 shadow-[0_0_15px_rgba(61,214,200,0.2)]">
+                                <Sparkles size={18} className="animate-pulse" />
                             </div>
-                            <span className="text-[10px] font-black text-[#3DD6C8] uppercase tracking-[0.5em]">Network Expansion Program</span>
+                            <span className="text-[9px] sm:text-[10px] font-black text-[#3DD6C8] uppercase tracking-[0.3em] sm:tracking-[0.4em]">
+                                Network Expansion Program
+                            </span>
                         </div>
-                        <h3 className="text-3xl md:text-5xl font-black text-white italic uppercase tracking-tighter leading-none">
+
+                        <h3 className="text-2xl sm:text-4xl md:text-5xl font-black text-white italic uppercase tracking-tighter leading-tight sm:leading-none">
                             Accelerate your <br />
-                            <span className="text-white/40 group-hover:text-white transition-all duration-700">Wealth Extraction.</span>
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#3DD6C8] via-teal-300 to-indigo-300">
+                                Wealth Optimization.
+                            </span>
                         </h3>
-                        <p className="text-[11px] font-bold text-white/30 uppercase tracking-[0.2em] leading-relaxed">
-                            Invite your friends and earn {referralRate}% commission from their daily task earnings.
+
+                        <p className="text-[10px] sm:text-xs font-bold text-slate-300/80 uppercase tracking-wider leading-relaxed max-w-lg">
+                            Establish agent nodes and earn up to <span className="text-[#3DD6C8] font-black">{referralRate}% automated commissions</span> on daily task volume across your multi-tier network.
                         </p>
                     </div>
                     
-                    <Link href="/invite" className="flex items-center gap-6 px-12 py-7 bg-[#3DD6C8] text-[#0B0B1E] rounded-[24px] font-black uppercase tracking-[0.2em] text-sm hover:scale-105 active:scale-95 transition-all shadow-[0_0_50px_rgba(61,214,200,0.3)] group-hover:shadow-[0_0_70px_rgba(61,214,200,0.5)]">
-                        Invite Friends <ArrowRight size={20} />
-                    </Link>
+                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 shrink-0">
+                        <Link 
+                            href="/invite" 
+                            className="flex items-center justify-center gap-3 py-3.5 sm:py-5 px-6 sm:px-8 bg-gradient-to-r from-[#3DD6C8] to-teal-400 text-slate-950 rounded-xl sm:rounded-2xl font-black uppercase tracking-wider text-xs sm:text-sm hover:scale-105 active:scale-95 transition-all shadow-[0_0_35px_rgba(61,214,200,0.35)] hover:shadow-[0_0_50px_rgba(61,214,200,0.55)]"
+                        >
+                            <span>Establish Node</span>
+                            <ArrowRight size={18} />
+                        </Link>
+                    </div>
                 </div>
             </div>
 

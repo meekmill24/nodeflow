@@ -36,6 +36,9 @@ import {
   MessageSquare,
   AlertCircle,
   Check,
+  ArrowRight,
+  Sparkles,
+  HelpCircle,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -429,31 +432,53 @@ export default function LandingPage() {
 
             {/* Desktop Auth Buttons */}
             <div className="hidden md:flex items-center gap-3 lg:gap-4 shrink-0">
-              <Link href="/auth/login">
-                <button className="px-4 lg:px-6 py-2 sm:py-2.5 rounded-xl border border-white/10 text-[11px] font-bold uppercase tracking-widest hover:bg-white/5 transition-all text-slate-300">
-                  Sign In
-                </button>
+              <Link
+                href="/auth/login"
+                prefetch={true}
+                className="px-4 lg:px-6 py-2 sm:py-2.5 rounded-xl border border-white/10 text-[11px] font-bold uppercase tracking-widest hover:bg-white/5 transition-all text-slate-300 inline-block"
+              >
+                Sign In
               </Link>
-              <Link href="/auth/sign-up">
-                <button className="px-5 lg:px-6 py-2 sm:py-2.5 rounded-xl bg-cyan-500 text-slate-950 text-[11px] font-black uppercase tracking-widest shadow-lg shadow-cyan-500/20 hover:scale-105 active:scale-95 transition-all">
-                  Access Hub
-                </button>
+              <Link
+                href="/auth/sign-up"
+                prefetch={true}
+                className="px-5 lg:px-6 py-2 sm:py-2.5 rounded-xl bg-cyan-500 text-slate-950 text-[11px] font-black uppercase tracking-widest shadow-lg shadow-cyan-500/20 hover:scale-105 active:scale-95 transition-all inline-block"
+              >
+                Access Hub
               </Link>
             </div>
 
             {/* Mobile Top Right: Access Hub + Menu Icon Button */}
             <div className="flex md:hidden items-center gap-2 shrink-0">
-              <Link href="/auth/sign-up">
-                <button className="px-3 py-1.5 rounded-lg bg-cyan-500 text-slate-950 text-[10px] font-black uppercase tracking-wider shadow-md shadow-cyan-500/20 active:scale-95 transition-all">
-                  Access Hub
-                </button>
-              </Link>
+              {/* Only show top Access Hub when menu is closed; hides when open so it does not duplicate and crowd the close button */}
+              <AnimatePresence>
+                {!isMenuOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.9 }}
+                    transition={{ duration: 0.15 }}
+                  >
+                    <Link
+                      href="/auth/sign-up"
+                      prefetch={true}
+                      className="px-3 py-1.5 rounded-lg bg-cyan-500 text-slate-950 text-[10px] font-black uppercase tracking-wider shadow-md shadow-cyan-500/20 active:scale-95 transition-all inline-block"
+                    >
+                      Access Hub
+                    </Link>
+                  </motion.div>
+                )}
+              </AnimatePresence>
 
               {/* Hamburger Menu Icon Button at Top Right */}
               <button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
                 aria-label="Toggle navigation menu"
-                className="w-8 h-8 rounded-lg bg-slate-900 border border-white/10 flex items-center justify-center text-slate-300 hover:text-white hover:bg-white/10 active:scale-95 transition-all"
+                className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all ${
+                  isMenuOpen
+                    ? 'bg-cyan-500/15 border border-cyan-500/40 text-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.3)]'
+                    : 'bg-slate-900 border border-white/10 text-white hover:bg-white/10'
+                }`}
               >
                 {isMenuOpen ? <X size={18} className="text-cyan-400" /> : <Menu size={18} className="text-white" />}
               </button>
@@ -461,40 +486,105 @@ export default function LandingPage() {
           </div>
         </nav>
 
-        {/* Mobile Drawer */}
+        {/* Mobile Drawer — Enhanced Futuristic Command Center UI */}
         <AnimatePresence>
           {isMenuOpen && (
             <motion.div
-              initial={{ opacity: 0, y: -10 }}
+              initial={{ opacity: 0, y: -12 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
-              className="md:hidden fixed inset-x-0 top-[57px] z-40 bg-slate-950/95 backdrop-blur-2xl border-b border-white/10 px-6 py-6 shadow-[0_20px_50px_rgba(0,0,0,0.8)]"
+              exit={{ opacity: 0, y: -12 }}
+              transition={{ duration: 0.22, ease: 'easeOut' }}
+              className="md:hidden fixed inset-x-0 top-[57px] z-40 bg-slate-950/95 backdrop-blur-2xl border-b border-cyan-500/20 px-5 py-5 shadow-[0_25px_60px_rgba(0,0,0,0.9)] max-h-[calc(100vh-60px)] overflow-y-auto"
             >
-              <div className="flex flex-col gap-4">
-                {['Protocol', 'Ecosystem', 'Tiers', 'Members', 'FAQ'].map((item) => (
-                  <Link
-                    key={item}
-                    href={`#${item.toLowerCase()}`}
-                    onClick={() => setIsMenuOpen(false)}
-                    className="text-slate-300 hover:text-cyan-400 font-black uppercase tracking-widest text-sm transition-colors py-1 flex items-center justify-between"
+              <div className="flex flex-col gap-2.5">
+                {/* Live System Status Strip */}
+                <div className="flex items-center justify-between px-3 py-2 rounded-xl bg-slate-900/80 border border-white/10 mb-1">
+                  <div className="flex items-center gap-2">
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+                    </span>
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-300">Platform Online</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 text-[9px] font-mono font-bold uppercase tracking-wider text-cyan-400 bg-cyan-500/10 px-2 py-0.5 rounded border border-cyan-500/20">
+                    <Sparkles size={10} />
+                    Matrix v2.5
+                  </div>
+                </div>
+
+                {/* Navigation Items with Icons and Micro-Subtitles */}
+                {[
+                  { name: 'Protocol', desc: 'Core Architecture', href: '#protocol', icon: Layers, num: '01' },
+                  { name: 'Ecosystem', desc: 'Decentralized Engine', href: '#ecosystem', icon: Activity, num: '02' },
+                  { name: 'Tiers', desc: 'Commission Multipliers', href: '#tiers', icon: Trophy, num: '03' },
+                  { name: 'Members', desc: 'Verified Earnings', href: '#members', icon: Users, num: '04' },
+                  { name: 'FAQ', desc: 'Knowledge Base', href: '#faq', icon: HelpCircle, num: '05' },
+                ].map((item, idx) => (
+                  <motion.div
+                    key={item.name}
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: idx * 0.04 }}
                   >
-                    <span>{item}</span>
-                    <span className="text-slate-600 text-xs">→</span>
-                  </Link>
+                    <Link
+                      href={item.href}
+                      onClick={() => setIsMenuOpen(false)}
+                      className="group flex items-center justify-between p-2.5 rounded-xl bg-white/[0.02] border border-white/5 hover:border-cyan-500/30 hover:bg-cyan-500/[0.06] active:scale-[0.98] transition-all"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-lg bg-slate-900 border border-white/10 flex items-center justify-center text-cyan-400 group-hover:border-cyan-500/40 group-hover:scale-105 transition-all">
+                          <item.icon size={15} />
+                        </div>
+                        <div>
+                          <div className="text-white font-black italic tracking-wide text-sm group-hover:text-cyan-400 transition-colors uppercase">
+                            {item.name}
+                          </div>
+                          <div className="text-slate-400 text-[10px] font-medium">
+                            {item.desc}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] font-mono text-slate-400 group-hover:text-cyan-400/80 transition-colors">
+                          {item.num}
+                        </span>
+                        <span className="w-6 h-6 rounded-lg bg-slate-900 border border-white/5 flex items-center justify-center text-slate-400 group-hover:text-cyan-400 group-hover:border-cyan-500/30 group-hover:translate-x-0.5 transition-all">
+                          <ArrowRight size={12} />
+                        </span>
+                      </div>
+                    </Link>
+                  </motion.div>
                 ))}
-                <div className="h-px bg-white/10 my-1" />
-                <div className="grid grid-cols-2 gap-3 pt-1">
-                  <Link href="/auth/login" onClick={() => setIsMenuOpen(false)}>
-                    <button className="w-full py-3 rounded-xl border border-white/10 text-xs font-bold uppercase tracking-widest hover:bg-white/5 transition-all text-slate-300">
-                      Sign In
-                    </button>
+
+                {/* Glowing Separator */}
+                <div className="h-px bg-gradient-to-r from-transparent via-cyan-500/20 to-transparent my-1.5" />
+
+                {/* Quick Auth Actions */}
+                <div className="grid grid-cols-2 gap-3 pt-0.5">
+                  <Link
+                    href="/auth/login"
+                    prefetch={true}
+                    onClick={() => setIsMenuOpen(false)}
+                    className="py-3 px-4 rounded-xl border border-white/15 bg-slate-900/90 text-center text-xs font-bold uppercase tracking-widest text-slate-200 hover:text-white hover:bg-white/10 active:scale-95 transition-all shadow-inner"
+                  >
+                    Sign In
                   </Link>
-                  <Link href="/auth/sign-up" onClick={() => setIsMenuOpen(false)}>
-                    <button className="w-full py-3 rounded-xl bg-cyan-500 text-slate-950 text-xs font-black uppercase tracking-widest shadow-lg shadow-cyan-500/20 hover:bg-cyan-400 transition-all">
-                      Access Hub
-                    </button>
+                  <Link
+                    href="/auth/sign-up"
+                    prefetch={true}
+                    onClick={() => setIsMenuOpen(false)}
+                    className="py-3 px-4 rounded-xl bg-gradient-to-r from-cyan-400 via-cyan-500 to-blue-500 text-slate-950 text-center text-xs font-black uppercase tracking-widest shadow-[0_0_25px_rgba(6,182,212,0.45)] hover:shadow-[0_0_35px_rgba(6,182,212,0.6)] active:scale-95 transition-all flex items-center justify-center gap-1.5"
+                  >
+                    <span>Access Hub</span>
+                    <ArrowRight size={14} />
                   </Link>
+                </div>
+
+                {/* Trust Footer */}
+                <div className="text-center pt-1.5">
+                  <p className="text-[9px] font-bold uppercase tracking-widest text-slate-400">
+                    Instant Clearance • 256-Bit Cold Storage Vaults
+                  </p>
                 </div>
               </div>
             </motion.div>
@@ -1605,30 +1695,61 @@ export default function LandingPage() {
         </section>
 
         {/* ══════════════════════════════════════════
-            CONNECT HUB — Dual Panel Newsletter & Contact Us (2 Columns across Mobile, Tablet & PC)
+            CONNECT HUB — Dual Panel Newsletter & Contact Us
         ══════════════════════════════════════════ */}
         <section id="connect-hub" className="px-3 sm:px-6 lg:px-12 py-12 sm:py-24 max-w-7xl mx-auto border-t border-white/5 relative">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-indigo-500/[0.015] blur-[150px] rounded-full pointer-events-none" />
           
-          <div className="grid grid-cols-2 gap-2.5 sm:gap-6 lg:gap-8 items-stretch relative z-10">
+          {/* Section Header */}
+          <div className="section-header text-center mb-8 sm:mb-14 relative z-10">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-[10px] font-bold uppercase tracking-widest text-indigo-400 mb-4 sm:mb-6">
+              <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse" />
+              Connect Hub
+            </div>
+            <h2 className="text-2xl sm:text-4xl md:text-5xl font-black italic uppercase tracking-tight text-white mb-2 sm:mb-3">
+              GET IN <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-violet-400">TOUCH</span>
+            </h2>
+            <p className="text-slate-400 text-xs sm:text-sm max-w-lg mx-auto">
+              Subscribe for exclusive updates and a $5 welcome bonus, or reach our support operators directly.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 items-stretch relative z-10">
             {/* Panel 1: Newsletter */}
-            <div className="relative rounded-[18px] sm:rounded-[32px] bg-slate-900/60 backdrop-blur-xl border border-white/5 overflow-hidden p-3 sm:p-8 md:p-10 flex flex-col justify-between shadow-[0_20px_50px_rgba(0,0,0,0.5)] group hover:border-cyan-500/20 transition-all duration-300">
+            <div className="relative rounded-[22px] sm:rounded-[32px] bg-slate-900/80 backdrop-blur-xl border border-white/8 overflow-hidden p-4 sm:p-8 md:p-10 flex flex-col justify-between shadow-[0_20px_50px_rgba(0,0,0,0.5)] group hover:border-cyan-500/25 transition-all duration-300">
               <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/[0.02] blur-3xl rounded-full pointer-events-none" />
               
               <div className="relative z-10 flex-1 flex flex-col">
-                <div className="inline-flex self-start items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-[8px] sm:text-[9px] font-bold uppercase tracking-widest text-cyan-400 mb-2.5 sm:mb-6">
+                <div className="inline-flex self-start items-center gap-1.5 sm:gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-cyan-400 mb-3 sm:mb-6">
                   <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
                   Exclusive Uplink
                 </div>
 
-                <h3 className="text-sm sm:text-2xl md:text-3xl font-black italic uppercase tracking-tight text-white mb-1.5 sm:mb-3">
+                <h3 className="text-xl sm:text-2xl md:text-3xl font-black italic uppercase tracking-tight text-white mb-2 sm:mb-3">
                   SYNC WITH <span className="text-cyan-400">MATRIX</span>
                 </h3>
-                <p className="text-slate-400 text-[9px] sm:text-xs md:text-sm leading-relaxed mb-3 sm:mb-8 line-clamp-3 sm:line-clamp-none">
-                  Subscribe to platform updates &amp; telemetry — claim a <strong className="text-emerald-400">$5 welcome bonus</strong>.
+                <p className="text-slate-400 text-xs sm:text-sm leading-relaxed mb-4 sm:mb-6">
+                  Subscribe to platform telemetry and distribution updates — claim an instant <strong className="text-emerald-400 font-bold">$5 welcome bonus</strong>.
                 </p>
 
-                <div className="flex-1 flex flex-col justify-center">
+                {/* Exclusive Perks List to balance height with contact form */}
+                <div className="space-y-2 sm:space-y-2.5 mb-5 sm:mb-6">
+                  {[
+                    { icon: "⚡", title: "Instant $5 Balance", desc: "Credited to your wallet upon confirmation." },
+                    { icon: "📈", title: "Node Yield Alerts", desc: "Real-time updates on top yield distribution cycles." },
+                    { icon: "🔒", title: "Priority Approval", desc: "Fast-track verification during market hours." },
+                  ].map((perk, idx) => (
+                    <div key={idx} className="flex items-center gap-2.5 sm:gap-3 p-2 sm:p-2.5 rounded-xl bg-slate-950/40 border border-white/5">
+                      <span className="text-sm sm:text-base shrink-0">{perk.icon}</span>
+                      <div className="min-w-0">
+                        <p className="text-white font-bold text-[11px] sm:text-xs leading-none">{perk.title}</p>
+                        <p className="text-slate-400 text-[9px] sm:text-[11px] mt-0.5 leading-snug">{perk.desc}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <div>
                   <AnimatePresence mode="wait">
                     {emailSubmitted ? (
                       <motion.div
@@ -1636,15 +1757,15 @@ export default function LandingPage() {
                         initial={{ opacity: 0, scale: 0.95 }}
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.95 }}
-                        className="flex flex-col items-center justify-center text-center p-3 sm:p-6 bg-slate-950/40 border border-emerald-500/20 rounded-xl sm:rounded-2xl"
+                        className="flex flex-col items-center justify-center text-center p-4 sm:p-6 bg-slate-950/40 border border-emerald-500/20 rounded-xl sm:rounded-2xl"
                       >
-                        <div className="w-8 h-8 sm:w-14 sm:h-14 rounded-full bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400 mb-2 sm:mb-4 shadow-lg shadow-emerald-500/10">
-                          <Check size={18} />
+                        <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-full bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400 mb-2 sm:mb-4 shadow-lg shadow-emerald-500/10">
+                          <Check size={20} />
                         </div>
-                        <p className="text-white font-black text-xs sm:text-lg uppercase tracking-tight mb-1">Telemetry Connected!</p>
-                        <p className="text-slate-400 text-[9px] sm:text-xs max-w-xs mb-3">Your $5 welcome credit has been reserved.</p>
+                        <p className="text-white font-black text-sm sm:text-lg uppercase tracking-tight mb-1">Telemetry Connected!</p>
+                        <p className="text-slate-400 text-[10px] sm:text-xs max-w-xs mb-3">Your $5 welcome credit has been reserved.</p>
                         <Link href="/auth/sign-up" className="w-full">
-                          <button className="w-full py-2 sm:py-3 bg-cyan-500 text-slate-950 rounded-lg sm:rounded-xl font-black text-[9px] sm:text-xs uppercase tracking-wider sm:tracking-widest shadow-lg shadow-cyan-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all">
+                          <button className="w-full py-2.5 sm:py-3 bg-cyan-500 text-slate-950 rounded-xl font-black text-xs uppercase tracking-wider shadow-lg shadow-cyan-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all">
                             Complete Setup →
                           </button>
                         </Link>
@@ -1653,7 +1774,7 @@ export default function LandingPage() {
                       <motion.form
                         key="form-newsletter"
                         onSubmit={handleNewsletterSubmit}
-                        className="space-y-2 sm:space-y-4"
+                        className="space-y-3"
                       >
                         <div className="relative">
                           <input
@@ -1666,14 +1787,14 @@ export default function LandingPage() {
                             placeholder="Enter email address..."
                             disabled={emailLoading}
                             className={cn(
-                              "w-full px-3 sm:px-5 py-2.5 sm:py-4 bg-slate-950/60 border rounded-lg sm:rounded-xl text-[10px] sm:text-xs md:text-sm text-white placeholder-slate-500 focus:outline-none transition-all pr-8 sm:pr-12",
-                              emailError ? "border-rose-500/50 focus:border-rose-500" :
-                              (emailInput.includes('@') && emailInput.length >= 5) ? "border-emerald-500/40 focus:border-emerald-500" : "border-white/10 focus:border-cyan-500/50"
+                              "w-full px-4 py-3 bg-slate-950 border rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none transition-all pr-10",
+                              emailError ? "border-rose-500/60 focus:border-rose-500" :
+                              (emailInput.includes('@') && emailInput.length >= 5) ? "border-emerald-500/50 focus:border-emerald-500" : "border-white/15 focus:border-cyan-500/60"
                             )}
                           />
-                          <div className="absolute right-2.5 sm:right-4 top-1/2 -translate-y-1/2 flex items-center gap-1 pointer-events-none">
-                            {emailError && <AlertCircle className="w-3.5 h-3.5 text-rose-500 animate-pulse" />}
-                            {(!emailError && emailInput.includes('@') && emailInput.length >= 5) && <Check className="w-3.5 h-3.5 text-emerald-400" />}
+                          <div className="absolute right-3.5 top-1/2 -translate-y-1/2 flex items-center gap-1 pointer-events-none">
+                            {emailError && <AlertCircle className="w-4 h-4 text-rose-500 animate-pulse" />}
+                            {(!emailError && emailInput.includes('@') && emailInput.length >= 5) && <Check className="w-4 h-4 text-emerald-400" />}
                           </div>
                         </div>
 
@@ -1681,7 +1802,7 @@ export default function LandingPage() {
                           <motion.p
                             initial={{ opacity: 0, y: -5 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="text-[9px] sm:text-xs text-rose-500 font-medium pl-1"
+                            className="text-[10px] sm:text-xs text-rose-500 font-medium pl-1"
                           >
                             {emailError}
                           </motion.p>
@@ -1690,12 +1811,12 @@ export default function LandingPage() {
                         <button
                           type="submit"
                           disabled={emailLoading}
-                          className="w-full py-2.5 sm:py-4 bg-cyan-500 text-slate-950 rounded-lg sm:rounded-xl font-black text-[9px] sm:text-xs uppercase tracking-wider sm:tracking-widest shadow-lg shadow-cyan-500/10 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-1.5 sm:gap-2 whitespace-nowrap"
+                          className="w-full py-3 bg-cyan-500 text-slate-950 rounded-xl font-black text-xs sm:text-sm uppercase tracking-wider shadow-lg shadow-cyan-500/20 hover:scale-[1.01] active:scale-[0.99] transition-all flex items-center justify-center gap-2"
                         >
                           {emailLoading ? (
-                            <><RefreshCw className="animate-spin w-3.5 h-3.5" /> BINDING...</>
+                            <><RefreshCw className="animate-spin w-4 h-4" /> BINDING...</>
                           ) : (
-                            <>Claim $5 Credit <ArrowUpRight className="w-3.5 h-3.5" /></>
+                            <>Claim $5 Credit <ArrowUpRight className="w-4 h-4" /></>
                           )}
                         </button>
                       </motion.form>
@@ -1704,30 +1825,30 @@ export default function LandingPage() {
                 </div>
               </div>
 
-              <div className="mt-4 sm:mt-8 pt-2.5 sm:pt-6 border-t border-white/5 flex items-center justify-between text-[8px] sm:text-[10px] text-slate-500">
-                <span>TLS 1.3</span>
+              <div className="mt-5 sm:mt-8 pt-3 sm:pt-6 border-t border-white/5 flex items-center justify-between text-[9px] sm:text-[11px] text-slate-500">
+                <span>TLS 1.3 Encryption</span>
                 <span>One-click exit</span>
               </div>
             </div>
 
             {/* Panel 2: Contact Us */}
-            <div className="relative rounded-[18px] sm:rounded-[32px] bg-slate-900/60 backdrop-blur-xl border border-white/5 overflow-hidden p-3 sm:p-8 md:p-10 flex flex-col justify-between shadow-[0_20px_50px_rgba(0,0,0,0.5)] group hover:border-violet-500/20 transition-all duration-300">
+            <div className="relative rounded-[22px] sm:rounded-[32px] bg-slate-900/80 backdrop-blur-xl border border-white/8 overflow-hidden p-4 sm:p-8 md:p-10 flex flex-col justify-between shadow-[0_20px_50px_rgba(0,0,0,0.5)] group hover:border-violet-500/25 transition-all duration-300">
               <div className="absolute top-0 right-0 w-64 h-64 bg-violet-500/[0.02] blur-3xl rounded-full pointer-events-none" />
 
               <div className="relative z-10 flex-1 flex flex-col">
-                <div className="inline-flex self-start items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full bg-violet-500/10 border border-violet-500/20 text-[8px] sm:text-[9px] font-bold uppercase tracking-widest text-violet-400 mb-2.5 sm:mb-6">
+                <div className="inline-flex self-start items-center gap-1.5 sm:gap-2 px-3 py-1 rounded-full bg-violet-500/10 border border-violet-500/20 text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-violet-400 mb-3 sm:mb-6">
                   <span className="w-1.5 h-1.5 rounded-full bg-violet-400 animate-pulse" />
                   Support Gateway
                 </div>
 
-                <h3 className="text-sm sm:text-2xl md:text-3xl font-black italic uppercase tracking-tight text-white mb-1.5 sm:mb-3">
+                <h3 className="text-xl sm:text-2xl md:text-3xl font-black italic uppercase tracking-tight text-white mb-2 sm:mb-3">
                   DIRECT <span className="text-violet-400">UPLINK</span>
                 </h3>
-                <p className="text-slate-400 text-[9px] sm:text-xs md:text-sm leading-relaxed mb-2.5 sm:mb-6 line-clamp-2 sm:line-clamp-none">
-                  Secure connection with operators. Processed in 15 mins.
+                <p className="text-slate-400 text-xs sm:text-sm leading-relaxed mb-4 sm:mb-6">
+                  Secure encrypted connection with operators. Average response time: <strong className="text-violet-300 font-bold">&lt; 15 mins</strong>.
                 </p>
 
-                <div className="flex-1 flex flex-col justify-center">
+                <div>
                   <AnimatePresence mode="wait">
                     {contactSubmitted ? (
                       <motion.div
@@ -1735,13 +1856,13 @@ export default function LandingPage() {
                         initial={{ opacity: 0, scale: 0.95 }}
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.95 }}
-                        className="flex flex-col items-center justify-center text-center p-3 sm:p-6 bg-slate-950/40 border border-emerald-500/20 rounded-xl sm:rounded-2xl h-full min-h-[200px]"
+                        className="flex flex-col items-center justify-center text-center p-4 sm:p-6 bg-slate-950/40 border border-emerald-500/20 rounded-xl sm:rounded-2xl min-h-[220px]"
                       >
-                        <div className="w-8 h-8 sm:w-14 sm:h-14 rounded-full bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400 mb-2 sm:mb-4 shadow-lg shadow-emerald-500/10">
-                          <Check size={18} />
+                        <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-full bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400 mb-2 sm:mb-4 shadow-lg shadow-emerald-500/10">
+                          <Check size={20} />
                         </div>
-                        <p className="text-white font-black text-xs sm:text-lg uppercase tracking-tight mb-1">Transmission Sent!</p>
-                        <p className="text-slate-400 text-[9px] sm:text-xs max-w-xs">Logged under ID <code>#NF-{Math.floor(1000 + Math.random()*9000)}</code>.</p>
+                        <p className="text-white font-black text-sm sm:text-lg uppercase tracking-tight mb-1">Transmission Sent!</p>
+                        <p className="text-slate-400 text-[10px] sm:text-xs max-w-xs">Logged under ID <code>#NF-{Math.floor(1000 + Math.random()*9000)}</code>.</p>
                         <button
                           onClick={() => {
                             setContactSubmitted(false);
@@ -1750,7 +1871,7 @@ export default function LandingPage() {
                             setContactMessage('');
                             setContactTopic('support');
                           }}
-                          className="mt-3 sm:mt-6 px-4 py-1.5 border border-white/10 text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-slate-400 hover:bg-white/5 rounded-lg transition-all"
+                          className="mt-3 sm:mt-6 px-4 py-2 border border-white/10 text-[10px] sm:text-xs font-bold uppercase tracking-wider text-slate-400 hover:bg-white/5 rounded-lg transition-all"
                         >
                           Send Another
                         </button>
@@ -1759,9 +1880,9 @@ export default function LandingPage() {
                       <motion.form
                         key="form-contact"
                         onSubmit={handleContactSubmit}
-                        className="space-y-2 sm:space-y-3.5"
+                        className="space-y-3"
                       >
-                        <div className="grid grid-cols-2 gap-1.5 sm:gap-3">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                           <div className="relative">
                             <input
                               type="text"
@@ -1770,12 +1891,12 @@ export default function LandingPage() {
                                 setContactName(e.target.value);
                                 if (contactError) setContactError(null);
                               }}
-                              placeholder="Name"
+                              placeholder="Your Name"
                               disabled={contactLoading}
                               className={cn(
-                                "w-full px-2.5 sm:px-4 py-2 sm:py-3 bg-slate-950/60 border rounded-lg sm:rounded-xl text-[10px] sm:text-xs text-white placeholder-slate-500 focus:outline-none transition-all",
-                                contactError && !contactName.trim() ? "border-rose-500/50 focus:border-rose-500" :
-                                contactName.trim().length >= 2 ? "border-emerald-500/40 focus:border-emerald-500" : "border-white/10 focus:border-violet-500/50"
+                                "w-full px-3.5 sm:px-4 py-2.5 sm:py-3 bg-slate-950 border rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none transition-all",
+                                contactError && !contactName.trim() ? "border-rose-500/60 focus:border-rose-500" :
+                                contactName.trim().length >= 2 ? "border-emerald-500/50 focus:border-emerald-500" : "border-white/15 focus:border-violet-500/60"
                               )}
                             />
                           </div>
@@ -1788,12 +1909,12 @@ export default function LandingPage() {
                                 setContactEmail(e.target.value);
                                 if (contactError) setContactError(null);
                               }}
-                              placeholder="Email"
+                              placeholder="Your Email"
                               disabled={contactLoading}
                               className={cn(
-                                "w-full px-2.5 sm:px-4 py-2 sm:py-3 bg-slate-950/60 border rounded-lg sm:rounded-xl text-[10px] sm:text-xs text-white placeholder-slate-500 focus:outline-none transition-all",
-                                contactError && (!contactEmail.includes('@') || contactEmail.length < 5) ? "border-rose-500/50 focus:border-rose-500" :
-                                (contactEmail.includes('@') && contactEmail.length >= 5) ? "border-emerald-500/40 focus:border-emerald-500" : "border-white/10 focus:border-violet-500/50"
+                                "w-full px-3.5 sm:px-4 py-2.5 sm:py-3 bg-slate-950 border rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none transition-all",
+                                contactError && (!contactEmail.includes('@') || contactEmail.length < 5) ? "border-rose-500/60 focus:border-rose-500" :
+                                (contactEmail.includes('@') && contactEmail.length >= 5) ? "border-emerald-500/50 focus:border-emerald-500" : "border-white/15 focus:border-violet-500/60"
                               )}
                             />
                           </div>
@@ -1804,14 +1925,15 @@ export default function LandingPage() {
                             value={contactTopic}
                             onChange={e => setContactTopic(e.target.value)}
                             disabled={contactLoading}
-                            className="w-full px-2.5 sm:px-4 py-2 sm:py-3 bg-slate-950/80 border border-white/10 rounded-lg sm:rounded-xl text-[9px] sm:text-xs text-slate-300 focus:outline-none focus:border-violet-500/50 transition-all appearance-none cursor-pointer"
+                            style={{ backgroundColor: 'rgb(2 6 23 / 0.8)', color: 'rgb(226 232 240)' }}
+                            className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 border border-white/10 rounded-xl text-xs sm:text-sm focus:outline-none focus:border-violet-500/50 transition-all appearance-none cursor-pointer"
                           >
                             <option value="support">Technical Support</option>
                             <option value="deposit">Deposit &amp; Payouts</option>
                             <option value="referral">Referral Matrix</option>
                             <option value="business">Partnership</option>
                           </select>
-                          <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-500 text-[8px]">▼</div>
+                          <div className="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-500 text-[10px]">▼</div>
                         </div>
 
                         <div className="relative">
@@ -1821,13 +1943,13 @@ export default function LandingPage() {
                               setContactMessage(e.target.value);
                               if (contactError) setContactError(null);
                             }}
-                            placeholder="Type message..."
+                            placeholder="Type your message..."
                             disabled={contactLoading}
-                            rows={2}
+                            rows={3}
                             className={cn(
-                              "w-full px-2.5 sm:px-4 py-2 sm:py-3 bg-slate-950/60 border rounded-lg sm:rounded-xl text-[10px] sm:text-xs text-white placeholder-slate-500 focus:outline-none transition-all resize-none",
-                              contactError && contactMessage.trim().length < 10 ? "border-rose-500/50 focus:border-rose-500" :
-                              contactMessage.trim().length >= 10 ? "border-emerald-500/40 focus:border-emerald-500" : "border-white/10 focus:border-violet-500/50"
+                              "w-full px-3.5 sm:px-4 py-2.5 sm:py-3 bg-slate-950 border rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none transition-all resize-none",
+                              contactError && contactMessage.trim().length < 10 ? "border-rose-500/60 focus:border-rose-500" :
+                              contactMessage.trim().length >= 10 ? "border-emerald-500/50 focus:border-emerald-500" : "border-white/15 focus:border-violet-500/60"
                             )}
                           />
                         </div>
@@ -1836,7 +1958,7 @@ export default function LandingPage() {
                           <motion.p
                             initial={{ opacity: 0, y: -5 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="text-[9px] sm:text-xs text-rose-500 font-medium pl-1"
+                            className="text-[10px] sm:text-xs text-rose-500 font-medium pl-1"
                           >
                             {contactError}
                           </motion.p>
@@ -1845,12 +1967,12 @@ export default function LandingPage() {
                         <button
                           type="submit"
                           disabled={contactLoading}
-                          className="w-full py-2.5 sm:py-3.5 bg-violet-600 text-white rounded-lg sm:rounded-xl font-black text-[9px] sm:text-xs uppercase tracking-wider sm:tracking-widest shadow-lg shadow-violet-600/10 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-1.5 sm:gap-2 whitespace-nowrap"
+                          className="w-full py-3 bg-violet-600 text-white rounded-xl font-black text-xs sm:text-sm uppercase tracking-wider shadow-lg shadow-violet-600/20 hover:scale-[1.01] active:scale-[0.99] transition-all flex items-center justify-center gap-2"
                         >
                           {contactLoading ? (
-                            <><RefreshCw className="animate-spin w-3.5 h-3.5" /> TRANSMITTING...</>
+                            <><RefreshCw className="animate-spin w-4 h-4" /> TRANSMITTING...</>
                           ) : (
-                            <>Transmit <Send className="w-3.5 h-3.5" /></>
+                            <>Transmit Message <Send className="w-4 h-4" /></>
                           )}
                         </button>
                       </motion.form>
@@ -1859,9 +1981,9 @@ export default function LandingPage() {
                 </div>
               </div>
 
-              <div className="mt-4 sm:mt-8 pt-2.5 sm:pt-6 border-t border-white/5 flex items-center justify-between text-[8px] sm:text-[10px] text-slate-500">
-                <span>SSL Gateway</span>
-                <span>Operators Online</span>
+              <div className="mt-5 sm:mt-8 pt-3 sm:pt-6 border-t border-white/5 flex items-center justify-between text-[9px] sm:text-[11px] text-slate-500">
+                <span>Secure SSL Gateway</span>
+                <span>Active Operators: Online</span>
               </div>
             </div>
           </div>

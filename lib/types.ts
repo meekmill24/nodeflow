@@ -52,6 +52,8 @@ export interface Level {
     sets_per_day: number;
     description: string;
     badge_color: string;
+    min_withdrawal?: number | null;
+    max_withdrawal?: number | null;
 }
 
 export interface TaskItem {

@@ -154,38 +154,38 @@ export default function CertificatePage() {
     return (
         <div className="space-y-8 pb-24 max-w-5xl mx-auto">
             {/* Header */}
-            <div className="flex items-center justify-between animate-slide-up">
-                <div className="flex items-center gap-4">
-                    <Link href="/home" className="p-2.5 rounded-2xl bg-white/5 hover:bg-white/10 transition-all text-white border border-white/5">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 animate-slide-up">
+                <div className="flex items-center gap-3">
+                    <Link href="/home" className="p-2.5 rounded-2xl bg-white/5 hover:bg-white/10 transition-all text-white border border-white/5 shrink-0">
                         <ArrowLeft size={18} />
                     </Link>
-                    <div>
-                        <h1 className="text-2xl font-black text-white tracking-tight uppercase">Credentials & Licensing</h1>
-                        <p className="text-[10px] font-black text-[#3DD6C8] uppercase tracking-[0.25em]">Cryptographic & Institutional Verification</p>
+                    <div className="min-w-0">
+                        <h1 className="text-lg sm:text-2xl font-black text-white tracking-tight uppercase truncate">Credentials &amp; Licensing</h1>
+                        <p className="text-[9px] sm:text-[10px] font-black text-[#3DD6C8] uppercase tracking-[0.2em] truncate">Cryptographic &amp; Institutional Verification</p>
                     </div>
                 </div>
                 
                 {/* View Toggle */}
-                <div className="flex bg-black/40 p-1.5 rounded-2xl border border-white/10">
+                <div className="flex bg-black/40 p-1 sm:p-1.5 rounded-2xl border border-white/10 shrink-0">
                     <button 
                         onClick={() => setView('personal')}
-                        className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
+                        className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition-all ${
                             view === 'personal' 
                                 ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-black shadow-lg shadow-amber-500/20' 
                                 : 'text-slate-400 hover:text-white'
                         }`}
                     >
-                        Operator Certificate
+                        <span className="hidden xs:inline">Operator </span>Cert
                     </button>
                     <button 
                         onClick={() => setView('company')}
-                        className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
+                        className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition-all ${
                             view === 'company' 
                                 ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-black shadow-lg shadow-amber-500/20' 
                                 : 'text-slate-400 hover:text-white'
                         }`}
                     >
-                        Corporate License
+                        <span className="hidden xs:inline">Corporate </span>License
                     </button>
                 </div>
             </div>
@@ -203,7 +203,7 @@ export default function CertificatePage() {
                 >
                     {/* Double Ornamental Guilloche Border */}
                     <div className="border border-amber-500/30 rounded-[28px] p-2 sm:p-4 relative">
-                        <div className="border-2 border-amber-400/60 rounded-[22px] p-6 sm:p-10 md:p-14 relative flex flex-col justify-between min-h-[580px]">
+                        <div className="border-2 border-amber-400/60 rounded-[22px] p-4 sm:p-10 md:p-14 relative flex flex-col justify-between min-h-[480px] sm:min-h-[580px]">
                             
                             {/* Corner Decorative Accents */}
                             <div className="absolute top-2 left-2 w-8 h-8 border-t-2 border-l-2 border-amber-400" />
@@ -220,14 +220,14 @@ export default function CertificatePage() {
                                 <>
                                     {/* PERSONAL CERTIFICATE TOP */}
                                     <div className="relative z-10 text-center space-y-4">
-                                        <div className="flex items-center justify-between mb-2">
+                                        <div className="flex flex-wrap items-start justify-between gap-2 mb-2">
                                             <div className="text-left">
-                                                <span className="text-[9px] font-black uppercase tracking-[0.25em] text-amber-400">SMARTBUG MEDIA OPERATIONS</span>
-                                                <p className="text-[8px] font-mono text-slate-500">{certId}</p>
+                                                <span className="text-[8px] sm:text-[9px] font-black uppercase tracking-[0.2em] text-amber-400">SMARTBUG MEDIA OPERATIONS</span>
+                                                <p className="text-[7px] sm:text-[8px] font-mono text-slate-500 truncate max-w-[160px] sm:max-w-none">{certId}</p>
                                             </div>
-                                            <div className="flex items-center gap-1.5 px-3 py-1 bg-amber-500/10 border border-amber-500/30 rounded-full">
-                                                <ShieldCheck size={12} className="text-amber-400" />
-                                                <span className="text-[8px] font-black uppercase tracking-widest text-amber-400">AUTHENTICATED LEDGER</span>
+                                            <div className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 bg-amber-500/10 border border-amber-500/30 rounded-full">
+                                                <ShieldCheck size={10} className="text-amber-400" />
+                                                <span className="text-[7px] sm:text-[8px] font-black uppercase tracking-widest text-amber-400">AUTHENTICATED</span>
                                             </div>
                                         </div>
 
@@ -253,8 +253,8 @@ export default function CertificatePage() {
                                             This prestigious operational credential is duly conferred upon
                                         </p>
                                         
-                                        <div className="py-2 border-b-2 border-amber-400/60 inline-block min-w-[280px] sm:min-w-[420px]">
-                                            <h3 className="text-2xl sm:text-4xl md:text-5xl font-serif font-black tracking-wider text-amber-300 uppercase drop-shadow-[0_0_20px_rgba(251,191,36,0.4)]">
+                                        <div className="py-2 border-b-2 border-amber-400/60 w-full sm:inline-block sm:min-w-[420px] overflow-hidden">
+                                            <h3 className="text-xl sm:text-4xl md:text-5xl font-serif font-black tracking-wider text-amber-300 uppercase drop-shadow-[0_0_20px_rgba(251,191,36,0.4)] break-words">
                                                 {profile?.display_name || profile?.username || 'Valued Member'}
                                             </h3>
                                         </div>
@@ -305,14 +305,14 @@ export default function CertificatePage() {
                                 <>
                                     {/* INSTITUTIONAL LICENSE TOP */}
                                     <div className="relative z-10 text-center space-y-4">
-                                        <div className="flex items-center justify-between mb-2">
+                                        <div className="flex flex-wrap items-start justify-between gap-2 mb-2">
                                             <div className="text-left">
-                                                <span className="text-[9px] font-black uppercase tracking-[0.25em] text-amber-400">STATE OF CALIFORNIA • DEPARTMENT OF COMMERCE</span>
-                                                <p className="text-[8px] font-mono text-slate-500">ENTITY ID: C2984102-SBM • INCORPORATED 2007</p>
+                                                <span className="text-[7px] sm:text-[9px] font-black uppercase tracking-[0.2em] text-amber-400">STATE OF CALIFORNIA • DEPT. OF COMMERCE</span>
+                                                <p className="text-[7px] sm:text-[8px] font-mono text-slate-500">ENTITY ID: C2984102-SBM • INC. 2007</p>
                                             </div>
-                                            <div className="flex items-center gap-1.5 px-3 py-1 bg-amber-500/10 border border-amber-500/30 rounded-full">
-                                                <Building size={12} className="text-amber-400" />
-                                                <span className="text-[8px] font-black uppercase tracking-widest text-amber-400">CORPORATE CHARTER</span>
+                                            <div className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 bg-amber-500/10 border border-amber-500/30 rounded-full">
+                                                <Building size={10} className="text-amber-400" />
+                                                <span className="text-[7px] sm:text-[8px] font-black uppercase tracking-widest text-amber-400">CORP. CHARTER</span>
                                             </div>
                                         </div>
 
@@ -338,8 +338,8 @@ export default function CertificatePage() {
                                             This is to officially certify that the operating corporation
                                         </p>
                                         
-                                        <div className="py-2 border-b-2 border-amber-400/60 inline-block min-w-[280px] sm:min-w-[420px]">
-                                            <h3 className="text-2xl sm:text-4xl md:text-5xl font-serif font-black tracking-wider text-amber-300 uppercase drop-shadow-[0_0_20px_rgba(251,191,36,0.4)]">
+                                        <div className="py-2 border-b-2 border-amber-400/60 w-full sm:inline-block sm:min-w-[420px] overflow-hidden">
+                                            <h3 className="text-lg sm:text-4xl md:text-5xl font-serif font-black tracking-wider text-amber-300 uppercase drop-shadow-[0_0_20px_rgba(251,191,36,0.4)] break-words">
                                                 SmartBug Media Operations Inc.
                                             </h3>
                                         </div>

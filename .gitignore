@@ -29,4 +29,6 @@ simple-money-unzipped/
 simple-money-temp-*/
 # Scratch
 scratch/
+.!*
+.~*
 
