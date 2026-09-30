@@ -9,11 +9,9 @@ export function BottomNav() {
   const pathname = usePathname()
   
   const navItems = [
-    { id: 'home', label: 'HOME', href: '/app', icon: Home },
-    { id: 'record', label: 'RECORD', href: '/app/record', icon: History },
-    { id: 'task', label: 'TASK', href: '/app/tasks', icon: Play, isCenter: true },
-    { id: 'wallet', label: 'WALLET', href: '/app/wallet', icon: Wallet },
-    { id: 'profile', label: 'MINE', href: '/app/profile', icon: User },
+    { id: 'home', label: 'HOME', href: '/home', icon: Home },
+    { id: 'start', label: 'START', href: '/start', icon: Play, isCenter: true },
+    { id: 'record', label: 'RECORD', href: '/record', icon: History },
   ]
 
   const getIsActive = (itemIdx: number) => {
