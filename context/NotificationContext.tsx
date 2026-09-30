@@ -244,19 +244,21 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
             
             {/* Real-time Toast Banner */}
             {shouldDisplayPopups && toast && (
-                <div className="fixed top-20 right-4 z-[100] w-full max-w-sm animate-slide-in">
-                    <div className={`p-4 rounded-2xl shadow-2xl border backdrop-blur-xl flex items-start gap-4 ${
-                        toast.type === 'success' ? 'bg-success/20 border-success text-success' :
-                        toast.type === 'danger' ? 'bg-danger/20 border-danger text-danger' :
-                        'bg-surface/80 border-white/10 text-white'
+                <div className="fixed top-20 sm:top-24 inset-x-3 sm:inset-x-auto sm:right-6 sm:w-auto sm:max-w-sm z-[100] animate-slide-in">
+                    <div className={`p-4 rounded-2xl shadow-2xl border backdrop-blur-xl flex items-start gap-3.5 ${
+                        toast.type === 'success' ? 'bg-emerald-950/90 border-emerald-500/40 text-emerald-200 shadow-emerald-950/40' :
+                        toast.type === 'danger' ? 'bg-rose-950/90 border-rose-500/40 text-rose-200 shadow-rose-950/40' :
+                        'bg-[#0B0B1E]/95 border-white/10 text-white shadow-black/60'
                     }`}>
-                        <div className="flex-1">
-                            <h4 className="font-bold text-sm tracking-tight">{toast.title}</h4>
-                            <p className="text-xs opacity-90 leading-snug mt-1">{toast.message}</p>
+                        <div className="flex-1 min-w-0">
+                            <h4 className="font-bold text-xs sm:text-sm tracking-tight truncate">{toast.title}</h4>
+                            <p className="text-[11px] sm:text-xs opacity-85 leading-snug mt-1 break-words">{toast.message}</p>
                         </div>
                         <button 
+                            type="button"
                             onClick={() => setToast(null)}
-                            className="p-1 hover:bg-white/10 rounded-lg transition-colors"
+                            className="p-1 hover:bg-white/10 rounded-lg transition-colors shrink-0 text-white/50 hover:text-white cursor-pointer"
+                            aria-label="Dismiss toast"
                         >
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />

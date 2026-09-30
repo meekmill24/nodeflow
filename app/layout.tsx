@@ -57,7 +57,23 @@ export default function RootLayout({
                 <ThemeProvider>
                   <NotificationProvider>
                     {children}
-                    <Toaster position="top-center" richColors toastOptions={{ style: { marginTop: '24px', borderRadius: '24px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(15, 23, 42, 0.8)', backdropFilter: 'blur(12px)' }, className: '!left-1/2 -translate-x-1/2' }} />
+                    <Toaster 
+                      position="top-center" 
+                      richColors 
+                      closeButton
+                      toastOptions={{ 
+                        style: { 
+                          marginTop: 'max(env(safe-area-inset-top, 0px), 12px)',
+                          borderRadius: '20px', 
+                          border: '1px solid rgba(61, 214, 200, 0.25)', 
+                          background: 'rgba(11, 11, 30, 0.95)', 
+                          backdropFilter: 'blur(16px)',
+                          color: '#FFFFFF',
+                          boxShadow: '0 20px 50px rgba(0, 0, 0, 0.6)'
+                        }, 
+                        className: 'font-sans font-medium text-xs sm:text-sm tracking-wide !w-[calc(100vw-32px)] sm:!w-auto sm:max-w-md'
+                      }} 
+                    />
                     <Analytics />
                     
                     <TawkMessenger />

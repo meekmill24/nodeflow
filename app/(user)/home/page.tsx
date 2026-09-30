@@ -38,7 +38,8 @@ import {
     Share2,
     Check,
     BarChart3,
-    Layers
+    Layers,
+    Link2
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -56,10 +57,52 @@ export default function HomePage() {
         commissionEarned: 0
     });
     const [referralCopied, setReferralCopied] = useState(false);
+    const [linkCopied, setLinkCopied] = useState(false);
     const [levels, setLevels] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [referralRate, setReferralRate] = useState('20');
     const [hubFilter, setHubFilter] = useState<'all' | 'finance' | 'protocol' | 'support'>('all');
+
+    const handleCopyCode = (e?: React.MouseEvent) => {
+        e?.stopPropagation();
+        if (!profile?.referral_code) return;
+        navigator.clipboard.writeText(profile.referral_code);
+        setReferralCopied(true);
+        toast.success('Referral code copied to clipboard!');
+        setTimeout(() => setReferralCopied(false), 2000);
+    };
+
+    const handleCopyLink = (e?: React.MouseEvent) => {
+        e?.stopPropagation();
+        const link = typeof window !== 'undefined' && profile?.referral_code
+            ? `${window.location.origin}/auth/sign-up?ref=${profile.referral_code}`
+            : '';
+        if (!link) return;
+        navigator.clipboard.writeText(link);
+        setLinkCopied(true);
+        toast.success('Invite link copied to clipboard!');
+        setTimeout(() => setLinkCopied(false), 2000);
+    };
+
+    const handleShareLink = async (e?: React.MouseEvent) => {
+        e?.stopPropagation();
+        const link = typeof window !== 'undefined' && profile?.referral_code
+            ? `${window.location.origin}/auth/sign-up?ref=${profile.referral_code}`
+            : '';
+        if (typeof navigator !== 'undefined' && navigator.share && link) {
+            try {
+                await navigator.share({
+                    title: 'Join NodeFlow Network',
+                    text: `Join NodeFlow using my referral code ${profile?.referral_code || ''} to start earning task rewards:`,
+                    url: link,
+                });
+            } catch (err) {
+                handleCopyLink();
+            }
+        } else {
+            handleCopyLink();
+        }
+    };
 
     useEffect(() => {
         const fetchData = async () => {
@@ -354,101 +397,149 @@ export default function HomePage() {
             </div>
 
             {/* REFERRAL SPOTLIGHT */}
-            <div className="relative group overflow-hidden rounded-[48px] bg-[#0B0B1E] border border-white/5">
-                {/* Animated glow orbs */}
-                <div className="absolute -top-20 -left-20 w-64 h-64 bg-indigo-500/10 rounded-full blur-[80px] group-hover:bg-indigo-500/20 transition-all duration-1000 pointer-events-none" />
-                <div className="absolute -bottom-20 -right-20 w-80 h-80 bg-violet-500/10 rounded-full blur-[100px] group-hover:bg-violet-500/15 transition-all duration-1000 pointer-events-none" />
-                <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-indigo-400/40 to-transparent" />
+            <div className="relative group overflow-hidden rounded-[28px] sm:rounded-[36px] md:rounded-[44px] bg-[#090C1E] border border-white/5 shadow-2xl">
+                {/* Animated glow orbs - Brand aligned with Cyber Teal and Emerald */}
+                <div className="absolute -top-24 -left-24 w-72 h-72 bg-[#3DD6C8]/10 rounded-full blur-[90px] group-hover:bg-[#3DD6C8]/15 transition-all duration-1000 pointer-events-none" />
+                <div className="absolute -bottom-24 -right-24 w-80 h-80 bg-emerald-500/10 rounded-full blur-[100px] group-hover:bg-emerald-500/15 transition-all duration-1000 pointer-events-none" />
+                <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#3DD6C8]/50 to-transparent" />
 
-                <div className="relative p-10 md:p-14 space-y-10">
+                <div className="relative p-5 sm:p-8 md:p-10 lg:p-12 space-y-6 sm:space-y-8">
                     {/* Section header */}
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 rounded-3xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center shadow-[0_0_24px_rgba(99,102,241,0.2)]">
-                                <Star className="text-indigo-400" size={22} fill="rgba(99,102,241,0.3)" />
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div className="flex items-center gap-3.5 sm:gap-4">
+                            <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl sm:rounded-3xl bg-[#3DD6C8]/10 border border-[#3DD6C8]/25 flex items-center justify-center shadow-[0_0_24px_rgba(61,214,200,0.2)] shrink-0">
+                                <Star className="text-[#3DD6C8]" size={22} fill="rgba(61,214,200,0.3)" />
                             </div>
                             <div>
-                                <h3 className="text-lg font-black text-white italic uppercase tracking-tight leading-none">Referral Spotlight</h3>
-                                <p className="text-[9px] font-black text-white/30 uppercase tracking-[0.3em] mt-1">Your Network Performance</p>
+                                <div className="flex items-center gap-2">
+                                    <h3 className="text-base sm:text-lg font-black text-white italic uppercase tracking-tight leading-none">Referral Spotlight</h3>
+                                    <span className="px-2 py-0.5 rounded-full bg-[#3DD6C8]/10 border border-[#3DD6C8]/30 text-[9px] font-mono font-black text-[#3DD6C8] uppercase tracking-wider">
+                                        3-Tier Matrix
+                                    </span>
+                                </div>
+                                <p className="text-[9px] sm:text-[10px] font-black text-white/40 uppercase tracking-[0.25em] mt-1">
+                                    Network Performance &amp; Passive Commissions
+                                </p>
                             </div>
                         </div>
-                        <Link href="/invite" className="text-[9px] font-black text-indigo-400 uppercase tracking-[0.2em] hover:tracking-[0.3em] transition-all flex items-center gap-2 group/lnk">
-                            View All <ArrowRight size={13} className="group-hover/lnk:translate-x-1 transition-transform" />
-                        </Link>
+                        <div className="flex items-center gap-3 self-end sm:self-center">
+                            <Link href="/invite" className="text-[10px] font-black text-[#3DD6C8] uppercase tracking-[0.2em] hover:tracking-[0.25em] transition-all flex items-center gap-1.5 group/lnk">
+                                View Full Network <ArrowRight size={13} className="group-hover/lnk:translate-x-1 transition-transform" />
+                            </Link>
+                        </div>
                     </div>
 
                     {/* Stats row */}
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
                         {/* Total Referrals */}
-                        <div className="relative p-6 rounded-[32px] bg-white/[0.03] border border-white/5 overflow-hidden group/card hover:border-indigo-500/20 transition-all duration-500">
+                        <div className="relative p-5 sm:p-6 rounded-[24px] sm:rounded-[30px] bg-white/[0.03] border border-white/5 overflow-hidden group/card hover:border-[#3DD6C8]/25 transition-all duration-500">
                             <div className="absolute top-0 right-0 p-5 opacity-5">
                                 <Users size={64} />
                             </div>
-                            <p className="text-[9px] font-black text-white/30 uppercase tracking-[0.3em] mb-3">Total Referrals</p>
-                            <p className="text-5xl font-black text-white italic tracking-tighter drop-shadow-[0_0_20px_rgba(99,102,241,0.3)]">
+                            <p className="text-[9px] sm:text-[10px] font-black text-white/40 uppercase tracking-[0.25em] mb-2 sm:mb-3">
+                                Total Recruits
+                            </p>
+                            <p className="text-3xl sm:text-4xl md:text-5xl font-black text-white italic tracking-tighter drop-shadow-[0_0_20px_rgba(255,255,255,0.15)]">
                                 {referralStats.totalReferrals}
                             </p>
                             <div className="flex items-center gap-2 mt-3">
-                                <div className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse shadow-[0_0_8px_rgba(99,102,241,0.8)]" />
-                                <span className="text-[8px] font-black text-indigo-400 uppercase tracking-widest">Active Members</span>
+                                <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
+                                <span className="text-[9px] font-black text-emerald-400 uppercase tracking-widest">Direct Downline</span>
                             </div>
                         </div>
 
                         {/* Commission Earned */}
-                        <div className="relative p-6 rounded-[32px] bg-white/[0.03] border border-white/5 overflow-hidden group/card hover:border-violet-500/20 transition-all duration-500">
+                        <div className="relative p-5 sm:p-6 rounded-[24px] sm:rounded-[30px] bg-white/[0.03] border border-white/5 overflow-hidden group/card hover:border-[#3DD6C8]/25 transition-all duration-500">
                             <div className="absolute top-0 right-0 p-5 opacity-5">
                                 <TrendingUp size={64} />
                             </div>
-                            <p className="text-[9px] font-black text-white/30 uppercase tracking-[0.3em] mb-3">Commission Earned</p>
-                            <p className="text-5xl font-black text-violet-400 italic tracking-tighter drop-shadow-[0_0_20px_rgba(167,139,250,0.3)]">
+                            <p className="text-[9px] sm:text-[10px] font-black text-white/40 uppercase tracking-[0.25em] mb-2 sm:mb-3">
+                                Commission Yield
+                            </p>
+                            <p className="text-3xl sm:text-4xl md:text-5xl font-black text-[#3DD6C8] italic tracking-tighter drop-shadow-[0_0_20px_rgba(61,214,200,0.3)] truncate">
                                 {format(referralStats.commissionEarned)}
                             </p>
                             <div className="flex items-center gap-2 mt-3">
-                                <div className="w-1.5 h-1.5 rounded-full bg-violet-400 animate-pulse shadow-[0_0_8px_rgba(167,139,250,0.8)]" />
-                                <span className="text-[8px] font-black text-violet-400 uppercase tracking-widest">20% Yield Rate</span>
+                                <div className="w-1.5 h-1.5 rounded-full bg-[#3DD6C8] animate-pulse shadow-[0_0_8px_rgba(61,214,200,0.8)]" />
+                                <span className="text-[9px] font-black text-[#3DD6C8] uppercase tracking-widest">{referralRate}% L1 Direct Yield</span>
                             </div>
                         </div>
 
-                        {/* Referral Code */}
-                        <div className="relative p-6 rounded-[32px] bg-white/[0.03] border border-white/5 overflow-hidden group/card hover:border-[#3DD6C8]/20 transition-all duration-500">
+                        {/* Referral Code & Dual Copy Actions */}
+                        <div className="relative p-5 sm:p-6 rounded-[24px] sm:rounded-[30px] bg-white/[0.03] border border-white/5 overflow-hidden group/card hover:border-[#3DD6C8]/25 transition-all duration-500 flex flex-col justify-between">
                             <div className="absolute top-0 right-0 p-5 opacity-5">
                                 <Share2 size={64} />
                             </div>
-                            <p className="text-[9px] font-black text-white/30 uppercase tracking-[0.3em] mb-3">Your Referral Code</p>
-                            <div
-                                onClick={() => {
-                                    navigator.clipboard.writeText(profile?.referral_code || '');
-                                    setReferralCopied(true);
-                                    setTimeout(() => setReferralCopied(false), 2000);
-                                }}
-                                className="flex items-center gap-3 cursor-pointer group/code"
-                            >
-                                <p className="text-5xl font-black text-[#3DD6C8] italic tracking-tighter drop-shadow-[0_0_20px_rgba(61,214,200,0.3)]">
-                                    {profile?.referral_code || '---'}
+                            <div>
+                                <p className="text-[9px] sm:text-[10px] font-black text-white/40 uppercase tracking-[0.25em] mb-2 sm:mb-3">
+                                    Your Referral Code
                                 </p>
-                                <div className="w-8 h-8 rounded-xl bg-[#3DD6C8]/10 border border-[#3DD6C8]/20 flex items-center justify-center shrink-0 group-hover/code:scale-110 transition-transform">
-                                    {referralCopied ? <Check size={14} className="text-[#3DD6C8]" /> : <Copy size={14} className="text-[#3DD6C8]" />}
+                                <div
+                                    onClick={handleCopyCode}
+                                    className="flex items-center justify-between gap-3 cursor-pointer group/code py-1"
+                                    title="Click to copy code"
+                                >
+                                    <p className="text-2xl sm:text-3xl md:text-4xl font-black text-white font-mono tracking-tight group-hover/code:text-[#3DD6C8] transition-colors truncate">
+                                        {profile?.referral_code || '---'}
+                                    </p>
+                                    <button
+                                        type="button"
+                                        onClick={handleCopyCode}
+                                        className="w-8 h-8 rounded-xl bg-[#3DD6C8]/10 border border-[#3DD6C8]/25 flex items-center justify-center shrink-0 group-hover/code:scale-110 active:scale-95 transition-all cursor-pointer"
+                                    >
+                                        {referralCopied ? <Check size={14} className="text-[#3DD6C8]" /> : <Copy size={14} className="text-[#3DD6C8]" />}
+                                    </button>
                                 </div>
                             </div>
-                            <div className="flex items-center gap-2 mt-3">
-                                <div className="w-1.5 h-1.5 rounded-full bg-[#3DD6C8] animate-pulse shadow-[0_0_8px_rgba(61,214,200,0.8)]" />
-                                <span className="text-[8px] font-black text-[#3DD6C8] uppercase tracking-widest">{referralCopied ? 'Copied!' : 'Tap to Copy'}</span>
+                            <div className="flex items-center justify-between gap-2 mt-3 pt-2 border-t border-white/5">
+                                <div className="flex items-center gap-2">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-[#3DD6C8] animate-pulse shadow-[0_0_8px_rgba(61,214,200,0.8)]" />
+                                    <span className="text-[9px] font-black text-[#3DD6C8] uppercase tracking-widest">
+                                        {referralCopied ? 'Code Copied!' : 'Tap to Copy Code'}
+                                    </span>
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={handleCopyLink}
+                                    className="text-[9px] font-bold text-white/60 hover:text-white flex items-center gap-1 hover:underline cursor-pointer"
+                                >
+                                    <Link2 size={11} className="text-[#3DD6C8]" />
+                                    {linkCopied ? 'Link Copied!' : 'Copy Link'}
+                                </button>
                             </div>
                         </div>
                     </div>
 
-                    {/* CTA */}
-                    <div className="flex flex-col sm:flex-row items-center justify-between gap-6 pt-4 border-t border-white/5">
-                        <p className="text-[10px] font-bold text-white/30 uppercase tracking-[0.2em] leading-relaxed max-w-md">
-                            Earn a perpetual <span className="text-indigo-400 font-black">20% commission</span> from every member you refer. Share your code and watch your network grow.
-                        </p>
-                        <Link
-                            href="/invite"
-                            className="flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-indigo-500 to-violet-500 text-white rounded-[20px] font-black uppercase tracking-[0.2em] text-[11px] hover:scale-105 active:scale-95 transition-all shadow-[0_0_40px_rgba(99,102,241,0.3)] hover:shadow-[0_0_60px_rgba(99,102,241,0.5)] shrink-0"
-                        >
-                            <Share2 size={16} />
-                            Invite & Earn
-                        </Link>
+                    {/* CTA & Commission Matrix Explainer */}
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pt-4 border-t border-white/5">
+                        <div className="space-y-1.5 max-w-xl">
+                            <p className="text-[11px] font-bold text-white/70 leading-relaxed">
+                                Earn <span className="text-[#3DD6C8] font-black">{referralRate}% direct commission</span> on Tier 1 recruits, plus passive <span className="text-white font-black">10% (L2)</span> and <span className="text-white font-black">5% (L3)</span> network yields.
+                            </p>
+                            <div className="flex flex-wrap items-center gap-2 text-[9px] font-mono text-white/40">
+                                <span className="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-[#3DD6C8] font-bold">L1: {referralRate}%</span>
+                                <span className="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-white/70 font-bold">L2: 10%</span>
+                                <span className="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-white/70 font-bold">L3: 5%</span>
+                                <span>• Daily settlements</span>
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-3 w-full sm:w-auto shrink-0 pt-2 sm:pt-0">
+                            <button
+                                type="button"
+                                onClick={handleShareLink}
+                                className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-3.5 bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-2xl font-black uppercase tracking-[0.15em] text-[10px] active:scale-95 transition-all cursor-pointer"
+                            >
+                                <Share2 size={14} className="text-[#3DD6C8]" />
+                                {linkCopied ? 'Link Copied' : 'Share Link'}
+                            </button>
+                            <Link
+                                href="/invite"
+                                className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-6 py-3.5 bg-gradient-to-r from-[#3DD6C8] to-teal-500 hover:from-[#34c4b7] hover:to-teal-400 text-[#070714] rounded-2xl font-black uppercase tracking-[0.18em] text-[10px] hover:scale-105 active:scale-95 transition-all shadow-[0_0_30px_rgba(61,214,200,0.3)] shrink-0"
+                            >
+                                <span>Invite &amp; Earn</span>
+                                <ArrowRight size={14} />
+                            </Link>
+                        </div>
                     </div>
                 </div>
             </div>
