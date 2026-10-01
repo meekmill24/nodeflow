@@ -29,6 +29,7 @@ import {
 import Link from 'next/link';
 import TransactionReceipt from '@/components/TransactionReceipt';
 import { toast } from 'sonner';
+import { getTierWithdrawalLimits } from '@/lib/tierLimits';
 
 
 type WithdrawNetwork = 'TRX' | 'BEP20' | 'ERC20' | 'ETH' | 'BTC' | 'USDC' | 'BNB' | 'PAYPALUSD';
@@ -125,15 +126,16 @@ const normalizeToWithdrawNetwork = (net?: string): WithdrawNetwork => {
 
 export default function WithdrawPage() {
     const { profile, refreshProfile } = useAuth();
-    const [amount, setAmount] = useState('30');
+    const [amount, setAmount] = useState('100');
     const [walletAddress, setWalletAddress] = useState(profile?.wallet_address || '');
     const [network, setNetwork] = useState<WithdrawNetwork>(normalizeToWithdrawNetwork(profile?.wallet_network || undefined));
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
     const [error, setError] = useState('');
-    const [minWithdrawal, setMinWithdrawal] = useState(30);
-    const [maxWithdrawal, setMaxWithdrawal] = useState(1500);
+    const [minWithdrawal, setMinWithdrawal] = useState(100);
+    const [maxWithdrawal, setMaxWithdrawal] = useState<number>(1499);
     const [levelName, setLevelName] = useState(profile?.level?.name || 'Junior Agent');
+    const [levelId, setLevelId] = useState<number>(profile?.level_id || profile?.level?.id || 1);
     const [tasksPerSet, setTasksPerSet] = useState(profile?.level?.tasks_per_set || 40);
     const [withdrawalPermission, setWithdrawalPermission] = useState<'allow' | 'block' | 'require_tasks'>('require_tasks');
     const [requireTasksGlobal, setRequireTasksGlobal] = useState(true);
@@ -144,15 +146,13 @@ export default function WithdrawPage() {
 
     useEffect(() => {
         const fetchSettings = async () => {
-            // Fetch global min_withdrawal and permissions
+            // Fetch global settings and admin permissions
             const { data: siteData } = await supabase
                 .from('site_settings')
                 .select('key, value')
-                .in('key', ['min_withdrawal', 'require_task_completion_to_withdraw', 'user_withdrawal_permissions']);
+                .in('key', ['require_task_completion_to_withdraw', 'user_withdrawal_permissions']);
 
-            let globalMin = 30;
             siteData?.forEach(s => {
-                if (s.key === 'min_withdrawal') globalMin = parseFloat(s.value || '30');
                 if (s.key === 'require_task_completion_to_withdraw') setRequireTasksGlobal(s.value === 'true');
                 if (s.key === 'user_withdrawal_permissions' && profile?.id) {
                     try {
@@ -166,37 +166,44 @@ export default function WithdrawPage() {
                 }
             });
 
-            setMinWithdrawal(globalMin);
+            // Always resolve fresh user profile level_id directly from DB to tally with account level
+            let effectiveLevelId = profile?.level_id || profile?.level?.id || 1;
+            if (profile?.id) {
+                const { data: freshProf } = await supabase
+                    .from('profiles')
+                    .select('level_id, tasks_per_set_override')
+                    .eq('id', profile.id)
+                    .single();
+                if (freshProf?.level_id) {
+                    effectiveLevelId = freshProf.level_id;
+                }
+            }
+            setLevelId(effectiveLevelId);
 
-            const effectiveLevelId = profile?.level_id || profile?.level?.id || 1;
-
-            // Fetch level-specific settings from levels table (columns: id, name, price, commission_rate, tasks_per_set, sets_per_day)
-            const { data: levelData, error: levelErr } = await supabase
+            // Fetch level-specific settings from levels table
+            const { data: levelData } = await supabase
                 .from('levels')
                 .select('id, name, price, commission_rate, tasks_per_set, sets_per_day')
                 .eq('id', effectiveLevelId)
                 .single();
 
-            if (levelData) {
-                setLevelName(levelData.name);
-                if (levelData.tasks_per_set) setTasksPerSet(levelData.tasks_per_set);
-                
-                // Tier withdrawal quota limits: Junior $1,500 | Intermediate $2,500 | Senior $5,000 | Mentor $5,000
-                const price = levelData.price || 0;
-                if (price >= 5000 || levelData.id >= 4) setMaxWithdrawal(5000);
-                else if (price >= 1500 || levelData.id === 3) setMaxWithdrawal(5000);
-                else if (price >= 500 || levelData.id === 2) setMaxWithdrawal(2500);
-                else setMaxWithdrawal(1500);
-
-                setAmount(prev => (!prev || prev === '30' ? String(globalMin) : prev));
-            } else {
-                setLevelName(profile?.level?.name || 'Junior Agent');
-                const levelId = Number(effectiveLevelId);
-                if (levelId >= 3) setMaxWithdrawal(5000);
-                else if (levelId === 2) setMaxWithdrawal(2500);
-                else setMaxWithdrawal(1500);
-                setAmount(prev => (!prev || prev === '30' ? String(globalMin) : prev));
+            const resolvedName = levelData?.name || profile?.level?.name || 'Junior Agent';
+            setLevelName(resolvedName);
+            if (levelData?.tasks_per_set) {
+                setTasksPerSet(levelData.tasks_per_set);
             }
+
+            // Platform Canonical Tier Limits:
+            // Junior: 100 - 1499 | Intermediate: 1500 - 2499 | Senior: 2500 - 4999 | Mentor: 5000 to any amount
+            const limits = getTierWithdrawalLimits(
+                levelData?.id || effectiveLevelId,
+                levelData?.price,
+                resolvedName
+            );
+
+            setMinWithdrawal(limits.min);
+            setMaxWithdrawal(limits.max);
+            setAmount(String(limits.min));
         };
         fetchSettings();
     }, [profile?.level_id, profile?.level?.id, profile?.level?.name, profile?.id]);
@@ -213,7 +220,7 @@ export default function WithdrawPage() {
     const parsedAmount = parseFloat(amount) || 0;
     const isLessThanMin = parsedAmount > 0 && parsedAmount < minWithdrawal;
     const isExceedingBalance = parsedAmount > balance;
-    const isExceedingMax = parsedAmount > maxWithdrawal;
+    const isExceedingMax = maxWithdrawal !== Infinity && parsedAmount > maxWithdrawal;
     const isBalanceBelowMin = balance < minWithdrawal;
 
     const effectiveTasksPerSet = profile?.tasks_per_set_override || tasksPerSet || 40;
@@ -237,7 +244,8 @@ export default function WithdrawPage() {
         }
         if (preset === 'MAX') {
             const fullBalance = Math.max(0, balance);
-            setAmount(fullBalance.toFixed(2));
+            const maxAllowed = maxWithdrawal === Infinity ? fullBalance : Math.min(fullBalance, maxWithdrawal);
+            setAmount(maxAllowed > 0 ? (maxAllowed % 1 === 0 ? maxAllowed.toFixed(0) : maxAllowed.toFixed(2)) : fullBalance.toFixed(2));
             return;
         }
     };
@@ -291,7 +299,7 @@ export default function WithdrawPage() {
 
         // 2. Validate amount is less than min (Crucial requirement)
         if (amt < minWithdrawal) {
-            const msg = `Amount is less than the minimum withdrawal amount of $${minWithdrawal.toFixed(2)}.`;
+            const msg = `Amount is less than the minimum withdrawal amount of $${minWithdrawal.toLocaleString()} for ${levelName}.`;
             setError(msg);
             toast.error(msg);
             return;
@@ -305,8 +313,8 @@ export default function WithdrawPage() {
             return;
         }
 
-        // 4. Validate tier max
-        if (amt > maxWithdrawal) {
+        // 4. Validate tier max (Mentor is Infinity / Unlimited)
+        if (maxWithdrawal !== Infinity && amt > maxWithdrawal) {
             setShowLimitModal(true);
             return;
         }
@@ -424,7 +432,7 @@ export default function WithdrawPage() {
                 <div className="mb-5 px-5 py-2 rounded-full bg-white/[0.04] border border-white/15 backdrop-blur-xl flex items-center gap-2.5 shadow-[0_4px_20px_rgba(0,0,0,0.35)] group-hover:border-[#3DD6C8]/40 transition-all">
                     <ShieldCheck size={16} className="text-[#3DD6C8]" />
                     <span className="text-[11px] sm:text-xs font-black text-white uppercase tracking-[0.25em]">
-                        VIP Lv.{profile?.level_id || profile?.level?.id || 1} • {levelName}
+                        VIP Lv.{levelId} • {levelName}
                     </span>
                 </div>
 
@@ -447,11 +455,13 @@ export default function WithdrawPage() {
                 <div className="mt-7 grid grid-cols-1 sm:grid-cols-3 gap-3 w-full max-w-xl">
                     <div className="px-4 py-2.5 rounded-2xl bg-white/[0.03] border border-white/10 flex items-center justify-between text-left">
                         <span className="text-[10px] font-bold text-white/40 uppercase tracking-wider">Min Payout</span>
-                        <span className="text-xs font-black text-[#3DD6C8] font-mono">${minWithdrawal.toFixed(2)}</span>
+                        <span className="text-xs font-black text-[#3DD6C8] font-mono">${minWithdrawal.toLocaleString()}</span>
                     </div>
                     <div className="px-4 py-2.5 rounded-2xl bg-white/[0.03] border border-white/10 flex items-center justify-between text-left">
                         <span className="text-[10px] font-bold text-white/40 uppercase tracking-wider">Tier Limit</span>
-                        <span className="text-xs font-black text-white font-mono">${maxWithdrawal.toLocaleString()}</span>
+                        <span className="text-xs font-black text-white font-mono">
+                            {maxWithdrawal === Infinity ? 'Unlimited' : `$${maxWithdrawal.toLocaleString()}`}
+                        </span>
                     </div>
                     <div className="px-4 py-2.5 rounded-2xl bg-white/[0.03] border border-white/10 flex items-center justify-between text-left">
                         <span className="text-[10px] font-bold text-white/40 uppercase tracking-wider">Processing Fee</span>
@@ -472,7 +482,7 @@ export default function WithdrawPage() {
                                 Minimum Balance Notice
                             </h4>
                             <p className="text-xs text-white/70 leading-relaxed">
-                                Your balance of <span className="font-bold text-white font-mono">${balance.toFixed(2)}</span> is less than the required minimum withdrawal of <span className="font-bold text-amber-300 font-mono">${minWithdrawal.toFixed(2)}</span>.
+                                Your balance of <span className="font-bold text-white font-mono">${balance.toFixed(2)}</span> is less than the required minimum withdrawal of <span className="font-bold text-amber-300 font-mono">${minWithdrawal.toLocaleString()}</span> for {levelName}.
                             </p>
                         </div>
                     </div>
@@ -640,7 +650,7 @@ export default function WithdrawPage() {
                                         <span className="text-3xl sm:text-4xl md:text-5xl font-black text-white font-mono tracking-tight select-none">
                                             {parsedAmount > 0 
                                                 ? (parsedAmount % 1 === 0 ? parsedAmount.toFixed(0) : parsedAmount.toFixed(2)) 
-                                                : minWithdrawal.toFixed(2)}
+                                                : minWithdrawal.toLocaleString()}
                                         </span>
                                         <span className="text-xs font-bold text-white/40 uppercase tracking-widest ml-1 font-mono">
                                             USD
@@ -674,7 +684,7 @@ export default function WithdrawPage() {
                                     {isLessThanMin ? (
                                         <div className="flex items-center gap-2 text-rose-400 text-[10px] font-black uppercase tracking-wider animate-pulse">
                                             <AlertCircle size={14} />
-                                            Amount is less than minimum withdrawal (${minWithdrawal.toFixed(2)})
+                                            Amount is less than minimum withdrawal (${minWithdrawal.toLocaleString()})
                                         </div>
                                     ) : isExceedingBalance ? (
                                         <div className="flex items-center gap-2 text-amber-400 text-[10px] font-black uppercase tracking-wider">
@@ -684,7 +694,7 @@ export default function WithdrawPage() {
                                     ) : isExceedingMax ? (
                                         <div className="flex items-center gap-2 text-amber-400 text-[10px] font-black uppercase tracking-wider">
                                             <AlertCircle size={14} />
-                                            Exceeds single payout quota (${maxWithdrawal.toLocaleString()})
+                                            Exceeds single payout quota ({maxWithdrawal === Infinity ? 'Unlimited' : `$${maxWithdrawal.toLocaleString()}`})
                                         </div>
                                     ) : parsedAmount >= minWithdrawal ? (
                                         <div className="flex items-center gap-2 text-emerald-400 text-[10px] font-black uppercase tracking-wider">
@@ -693,11 +703,11 @@ export default function WithdrawPage() {
                                         </div>
                                     ) : (
                                         <span className="text-[10px] text-white/40 font-mono">
-                                            Min: ${minWithdrawal.toFixed(2)} • Max: ${maxWithdrawal.toLocaleString()}
+                                            Min: ${minWithdrawal.toLocaleString()} • Max: {maxWithdrawal === Infinity ? 'Unlimited' : `$${maxWithdrawal.toLocaleString()}`}
                                         </span>
                                     )}
                                     <span className="text-[9px] font-mono text-[#3DD6C8]/80 hidden sm:inline-block">
-                                        Verified Tier: VIP Lv.{profile?.level_id || profile?.level?.id || 1} • {levelName}
+                                        Verified Tier: VIP Lv.{levelId} • {levelName}
                                     </span>
                                 </div>
                                 {!canWithdraw && !isBlockedByAdmin && parsedAmount >= minWithdrawal && (
@@ -709,45 +719,59 @@ export default function WithdrawPage() {
                             </div>
 
                             {/* Preset Buttons (MIN and MAX Only) */}
-                            <div className="space-y-2 pt-1">
-                                <div className="flex items-center justify-between">
-                                    <span className="text-[9px] font-black text-white/50 uppercase tracking-[0.2em]">Select Preset Amount:</span>
-                                    <span className="text-[9px] font-mono text-white/40">Min: ${minWithdrawal} • Account: ${balance.toFixed(2)}</span>
-                                </div>
-                                <div className="grid grid-cols-2 gap-3">
-                                    <button
-                                        type="button"
-                                        onClick={() => handleSelectPreset('MIN')}
-                                        className={`py-4 px-4 rounded-2xl border text-xs font-black transition-all flex items-center justify-between cursor-pointer ${
-                                            parsedAmount === minWithdrawal 
-                                                ? 'bg-[#3DD6C8] text-[#0B0B1E] border-[#3DD6C8] shadow-[0_0_20px_rgba(61,214,200,0.35)] scale-[1.02]' 
-                                                : 'bg-white/5 border-white/10 text-white/80 hover:bg-white/10 hover:border-white/20'
-                                        }`}
-                                    >
-                                        <div className="flex flex-col items-start gap-0.5">
-                                            <span className="text-[8px] font-black uppercase tracking-wider opacity-60">Minimum Payout</span>
-                                            <span className="text-base font-mono font-black">${minWithdrawal}</span>
-                                        </div>
-                                        <span className="text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full bg-white/10">MIN</span>
-                                    </button>
+                            {(() => {
+                                const targetMaxAmount = maxWithdrawal === Infinity ? balance : Math.min(balance, maxWithdrawal);
+                                const isMinActive = parsedAmount === minWithdrawal;
+                                const isMaxActive = (parsedAmount === targetMaxAmount && targetMaxAmount > 0) || (maxWithdrawal !== Infinity && parsedAmount === maxWithdrawal);
 
-                                    <button
-                                        type="button"
-                                        onClick={() => handleSelectPreset('MAX')}
-                                        className={`py-4 px-4 rounded-2xl border text-xs font-black transition-all flex items-center justify-between cursor-pointer ${
-                                            parsedAmount === balance && balance > 0
-                                                ? 'bg-emerald-400 text-[#0B0B1E] border-emerald-400 shadow-[0_0_20px_rgba(52,211,153,0.35)] scale-[1.02]' 
-                                                : 'bg-white/5 border-white/10 text-white/80 hover:bg-white/10 hover:border-white/20'
-                                        }`}
-                                    >
-                                        <div className="flex flex-col items-start gap-0.5">
-                                            <span className="text-[8px] font-black uppercase tracking-wider text-emerald-400/80">Account Balance</span>
-                                            <span className="text-base font-mono font-black text-emerald-400">${balance.toFixed(2)}</span>
+                                return (
+                                    <div className="space-y-2 pt-1">
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-[9px] font-black text-white/50 uppercase tracking-[0.2em]">Select Preset Amount:</span>
+                                            <span className="text-[9px] font-mono text-white/40">
+                                                Min: ${minWithdrawal.toLocaleString()} • Tier Max: {maxWithdrawal === Infinity ? 'Unlimited' : `$${maxWithdrawal.toLocaleString()}`}
+                                            </span>
                                         </div>
-                                        <span className="text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300">MAX</span>
-                                    </button>
-                                </div>
-                            </div>
+                                        <div className="grid grid-cols-2 gap-3">
+                                            <button
+                                                type="button"
+                                                onClick={() => handleSelectPreset('MIN')}
+                                                className={`py-4 px-4 rounded-2xl border text-xs font-black transition-all flex items-center justify-between cursor-pointer ${
+                                                    isMinActive 
+                                                        ? 'bg-[#3DD6C8] text-[#0B0B1E] border-[#3DD6C8] shadow-[0_0_20px_rgba(61,214,200,0.35)] scale-[1.02]' 
+                                                        : 'bg-white/5 border-white/10 text-white/80 hover:bg-white/10 hover:border-white/20'
+                                                }`}
+                                            >
+                                                <div className="flex flex-col items-start gap-0.5">
+                                                    <span className="text-[8px] font-black uppercase tracking-wider opacity-60">Minimum Payout</span>
+                                                    <span className="text-base font-mono font-black">${minWithdrawal.toLocaleString()}</span>
+                                                </div>
+                                                <span className="text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full bg-white/10">MIN</span>
+                                            </button>
+
+                                            <button
+                                                type="button"
+                                                onClick={() => handleSelectPreset('MAX')}
+                                                className={`py-4 px-4 rounded-2xl border text-xs font-black transition-all flex items-center justify-between cursor-pointer ${
+                                                    isMaxActive
+                                                        ? 'bg-emerald-400 text-[#0B0B1E] border-emerald-400 shadow-[0_0_20px_rgba(52,211,153,0.35)] scale-[1.02]' 
+                                                        : 'bg-white/5 border-white/10 text-white/80 hover:bg-white/10 hover:border-white/20'
+                                                }`}
+                                            >
+                                                <div className="flex flex-col items-start gap-0.5">
+                                                    <span className="text-[8px] font-black uppercase tracking-wider text-emerald-400/80">
+                                                        {maxWithdrawal !== Infinity && balance > maxWithdrawal ? 'Tier Max Limit' : 'Available Balance'}
+                                                    </span>
+                                                    <span className="text-base font-mono font-black text-emerald-400">
+                                                        ${(targetMaxAmount > 0 ? targetMaxAmount : balance).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                                    </span>
+                                                </div>
+                                                <span className="text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300">MAX</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                );
+                            })()}
                         </div>
 
                         {/* 2. TARGET SETTLEMENT NETWORK SWITCHER */}
@@ -948,7 +972,7 @@ export default function WithdrawPage() {
                             <span className="text-[10px] font-black text-amber-400 uppercase tracking-[0.3em]">Institutional Verification</span>
                             <h3 className="text-2xl font-black text-white italic tracking-tight uppercase">Withdrawal Limit Notice</h3>
                             <p className="text-xs text-white/60 leading-relaxed pt-2">
-                                You have reached or exceeded the single-transaction withdrawal quota for <strong className="text-white">{levelName}</strong> (${maxWithdrawal.toLocaleString()} max).
+                                You have reached or exceeded the single-transaction withdrawal quota for <strong className="text-white">{levelName}</strong> ({maxWithdrawal === Infinity ? 'Unlimited' : `$${maxWithdrawal.toLocaleString()} max`}).
                             </p>
                             <p className="text-[11px] text-amber-400/90 font-bold leading-relaxed">
                                 To unlock higher clearance or finalize this payout, please contact your dedicated Customer Service agent.

@@ -1,3 +1,4 @@
+import { getTierWithdrawalLimits } from '@/lib/tierLimits';
 import { createClient } from '@supabase/supabase-js';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -45,15 +46,13 @@ export async function POST(req: NextRequest) {
         const { data: settings } = await supabaseAdmin
             .from('site_settings')
             .select('key, value')
-            .in('key', ['require_task_completion_to_withdraw', 'user_withdrawal_permissions', 'min_withdrawal']);
+            .in('key', ['require_task_completion_to_withdraw', 'user_withdrawal_permissions']);
 
         let requireTasksGlobal = true;
         let userPermissions: Record<string, string> = {};
-        let globalMin = 30;
 
         settings?.forEach(s => {
             if (s.key === 'require_task_completion_to_withdraw') requireTasksGlobal = s.value === 'true';
-            if (s.key === 'min_withdrawal') globalMin = parseFloat(s.value || '30');
             if (s.key === 'user_withdrawal_permissions') {
                 try { userPermissions = JSON.parse(s.value || '{}'); } catch { userPermissions = {}; }
             }
@@ -71,9 +70,6 @@ export async function POST(req: NextRequest) {
         // Fetch level info for tasks_per_set and tier limit
         const effectiveLevelId = profile.level_id || 1;
         let tasksPerSet = profile.tasks_per_set_override || 40;
-        let effectiveMin = globalMin;
-        let levelName = 'Junior Agent';
-        let maxWithdrawal = 1500;
 
         const { data: levelData } = await supabaseAdmin
             .from('levels')
@@ -81,23 +77,26 @@ export async function POST(req: NextRequest) {
             .eq('id', effectiveLevelId)
             .single();
 
+        const resolvedLevelName = levelData?.name || 'Junior Agent';
         if (levelData) {
-            levelName = levelData.name;
             if (!profile.tasks_per_set_override && levelData.tasks_per_set) {
                 tasksPerSet = levelData.tasks_per_set;
             }
-            const price = levelData.price || 0;
-            // Tier withdrawal limits: Junior $1,500 | Intermediate $2,500 | Senior $5,000 | Mentor $5,000
-            if (price >= 5000 || levelData.id >= 4) maxWithdrawal = 5000;
-            else if (price >= 1500 || levelData.id === 3) maxWithdrawal = 5000;
-            else if (price >= 500 || levelData.id === 2) maxWithdrawal = 2500;
-            else maxWithdrawal = 1500;
-        } else {
-            const levelId = Number(effectiveLevelId);
-            if (levelId >= 3) maxWithdrawal = 5000;
-            else if (levelId === 2) maxWithdrawal = 2500;
-            else maxWithdrawal = 1500;
         }
+
+        // Exact Canonical Tier Limits:
+        // Junior: 100 - 1499
+        // Intermediate: 1500 - 2499
+        // Senior: 2500 - 4999
+        // Mentor: 5000 to any amount (Unlimited)
+        const tierLimits = getTierWithdrawalLimits(
+            levelData?.id || effectiveLevelId,
+            levelData?.price,
+            resolvedLevelName
+        );
+        const levelName = tierLimits.tierName;
+        const minWithdrawal = tierLimits.min;
+        const maxWithdrawal = tierLimits.max;
 
         // If not force-allowed by admin, check task set completion
         if (userPerm !== 'allow' && requireTasksGlobal) {
@@ -112,17 +111,17 @@ export async function POST(req: NextRequest) {
             }
         }
 
-        // Validate amount vs minimum
-        if (amt < effectiveMin) {
+        // Validate amount vs tier minimum
+        if (amt < minWithdrawal) {
             return NextResponse.json({ 
-                error: `Amount is less than the minimum withdrawal amount of $${effectiveMin.toFixed(2)}.` 
+                error: `Amount is less than the minimum withdrawal amount of $${minWithdrawal.toLocaleString()} for ${levelName}.` 
             }, { status: 400 });
         }
 
-        // Validate amount vs tier maximum
-        if (amt > maxWithdrawal) {
+        // Validate amount vs tier maximum (Mentor is Infinity)
+        if (maxWithdrawal !== Infinity && amt > maxWithdrawal) {
             return NextResponse.json({ 
-                error: `Amount exceeds the single transaction limit for your ${levelName} tier ($${maxWithdrawal.toLocaleString()}).` 
+                error: `Amount exceeds the single transaction limit for your ${levelName} tier ($${maxWithdrawal.toLocaleString()} max).` 
             }, { status: 400 });
         }
 
