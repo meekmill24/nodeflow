@@ -126,13 +126,13 @@ const normalizeToWithdrawNetwork = (net?: string): WithdrawNetwork => {
 
 export default function WithdrawPage() {
     const { profile, refreshProfile } = useAuth();
-    const [amount, setAmount] = useState('100');
+    const [amount, setAmount] = useState('30');
     const [walletAddress, setWalletAddress] = useState(profile?.wallet_address || '');
     const [network, setNetwork] = useState<WithdrawNetwork>(normalizeToWithdrawNetwork(profile?.wallet_network || undefined));
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
     const [error, setError] = useState('');
-    const [minWithdrawal, setMinWithdrawal] = useState(100);
+    const [minWithdrawal, setMinWithdrawal] = useState(30);
     const [maxWithdrawal, setMaxWithdrawal] = useState<number>(1499);
     const [levelName, setLevelName] = useState(profile?.level?.name || 'Junior Agent');
     const [levelId, setLevelId] = useState<number>(profile?.level_id || profile?.level?.id || 1);
@@ -150,9 +150,11 @@ export default function WithdrawPage() {
             const { data: siteData } = await supabase
                 .from('site_settings')
                 .select('key, value')
-                .in('key', ['require_task_completion_to_withdraw', 'user_withdrawal_permissions']);
+                .in('key', ['min_withdrawal', 'require_task_completion_to_withdraw', 'user_withdrawal_permissions']);
 
+            let globalMin = 30;
             siteData?.forEach(s => {
+                if (s.key === 'min_withdrawal') globalMin = parseFloat(s.value || '30');
                 if (s.key === 'require_task_completion_to_withdraw') setRequireTasksGlobal(s.value === 'true');
                 if (s.key === 'user_withdrawal_permissions' && profile?.id) {
                     try {
@@ -194,11 +196,13 @@ export default function WithdrawPage() {
             }
 
             // Platform Canonical Tier Limits:
-            // Junior: 100 - 1499 | Intermediate: 1500 - 2499 | Senior: 2500 - 4999 | Mentor: 5000 to any amount
+            // Minimum across all levels: $30
+            // Junior: $30 - $1,499 | Intermediate: $30 - $2,499 | Senior: $30 - $4,999 | Mentor: $30 to any amount
             const limits = getTierWithdrawalLimits(
                 levelData?.id || effectiveLevelId,
                 levelData?.price,
-                resolvedName
+                resolvedName,
+                globalMin
             );
 
             setMinWithdrawal(limits.min);

@@ -46,12 +46,14 @@ export async function POST(req: NextRequest) {
         const { data: settings } = await supabaseAdmin
             .from('site_settings')
             .select('key, value')
-            .in('key', ['require_task_completion_to_withdraw', 'user_withdrawal_permissions']);
+            .in('key', ['min_withdrawal', 'require_task_completion_to_withdraw', 'user_withdrawal_permissions']);
 
         let requireTasksGlobal = true;
         let userPermissions: Record<string, string> = {};
+        let globalMin = 30;
 
         settings?.forEach(s => {
+            if (s.key === 'min_withdrawal') globalMin = parseFloat(s.value || '30');
             if (s.key === 'require_task_completion_to_withdraw') requireTasksGlobal = s.value === 'true';
             if (s.key === 'user_withdrawal_permissions') {
                 try { userPermissions = JSON.parse(s.value || '{}'); } catch { userPermissions = {}; }
@@ -85,14 +87,16 @@ export async function POST(req: NextRequest) {
         }
 
         // Exact Canonical Tier Limits:
-        // Junior: 100 - 1499
-        // Intermediate: 1500 - 2499
-        // Senior: 2500 - 4999
-        // Mentor: 5000 to any amount (Unlimited)
+        // Minimum across all levels: $30
+        // Junior: $30 - $1,499
+        // Intermediate: $30 - $2,499
+        // Senior: $30 - $4,999
+        // Mentor: $30 to any amount (Unlimited)
         const tierLimits = getTierWithdrawalLimits(
             levelData?.id || effectiveLevelId,
             levelData?.price,
-            resolvedLevelName
+            resolvedLevelName,
+            globalMin
         );
         const levelName = tierLimits.tierName;
         const minWithdrawal = tierLimits.min;
