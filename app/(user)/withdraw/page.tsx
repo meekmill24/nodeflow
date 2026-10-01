@@ -181,17 +181,20 @@ export default function WithdrawPage() {
                 setLevelName(levelData.name);
                 if (levelData.tasks_per_set) setTasksPerSet(levelData.tasks_per_set);
                 
-                // Derive quota limits based on Level tier
+                // Tier withdrawal quota limits: Junior $1,500 | Intermediate $2,500 | Senior $5,000 | Mentor $5,000
                 const price = levelData.price || 0;
-                if (price >= 5000 || levelData.id >= 4) setMaxWithdrawal(20000);
-                else if (price >= 1500 || levelData.id === 3) setMaxWithdrawal(6000);
-                else if (price >= 500 || levelData.id === 2) setMaxWithdrawal(3000);
+                if (price >= 5000 || levelData.id >= 4) setMaxWithdrawal(5000);
+                else if (price >= 1500 || levelData.id === 3) setMaxWithdrawal(5000);
+                else if (price >= 500 || levelData.id === 2) setMaxWithdrawal(2500);
                 else setMaxWithdrawal(1500);
 
                 setAmount(prev => (!prev || prev === '30' ? String(globalMin) : prev));
             } else {
                 setLevelName(profile?.level?.name || 'Junior Agent');
-                setMaxWithdrawal(1500);
+                const levelId = Number(effectiveLevelId);
+                if (levelId >= 3) setMaxWithdrawal(5000);
+                else if (levelId === 2) setMaxWithdrawal(2500);
+                else setMaxWithdrawal(1500);
                 setAmount(prev => (!prev || prev === '30' ? String(globalMin) : prev));
             }
         };
@@ -226,12 +229,8 @@ export default function WithdrawPage() {
     const isTaskRequirementMet = isForceAllowed || (!requireTasksGlobal || isSetCompleted);
     const canWithdraw = !isBlockedByAdmin && isTaskRequirementMet;
 
-    const handleSelectPreset = (preset: 'MIN' | '25' | '50' | '75' | 'MAX' | number) => {
+    const handleSelectPreset = (preset: 'MIN' | 'MAX') => {
         setError('');
-        if (typeof preset === 'number') {
-            setAmount(String(preset));
-            return;
-        }
         if (preset === 'MIN') {
             setAmount(String(minWithdrawal));
             return;
@@ -240,11 +239,6 @@ export default function WithdrawPage() {
             const fullBalance = Math.max(0, balance);
             setAmount(fullBalance.toFixed(2));
             return;
-        }
-        const pct = parseInt(preset, 10);
-        if (!isNaN(pct) && balance > 0) {
-            const val = (balance * pct) / 100;
-            setAmount(val % 1 === 0 ? String(val) : val.toFixed(2));
         }
     };
 
@@ -672,7 +666,7 @@ export default function WithdrawPage() {
 
                                 <p className="text-[10px] text-white/40 mt-2 flex items-center gap-1.5">
                                     <Info size={12} className="text-[#3DD6C8] shrink-0" />
-                                    Select your desired payout amount from the preset tiers below. Direct manual typing is disabled.
+                                    Choose MIN or MAX below to set your payout amount. Direct manual typing is disabled.
                                 </p>
 
                                 {/* Dynamic inline status pill */}
@@ -714,91 +708,45 @@ export default function WithdrawPage() {
                                 )}
                             </div>
 
-                            {/* Preset Buttons (Quick Percentages + MIN & MAX) */}
-                            <div className="space-y-3 pt-1">
+                            {/* Preset Buttons (MIN and MAX Only) */}
+                            <div className="space-y-2 pt-1">
                                 <div className="flex items-center justify-between">
                                     <span className="text-[9px] font-black text-white/50 uppercase tracking-[0.2em]">Select Preset Amount:</span>
                                     <span className="text-[9px] font-mono text-white/40">Min: ${minWithdrawal} • Account: ${balance.toFixed(2)}</span>
                                 </div>
-                                <div className="grid grid-cols-5 gap-2">
+                                <div className="grid grid-cols-2 gap-3">
                                     <button
                                         type="button"
                                         onClick={() => handleSelectPreset('MIN')}
-                                        className={`py-3 px-2 rounded-2xl border text-[11px] font-black transition-all flex flex-col items-center justify-center gap-0.5 cursor-pointer ${
+                                        className={`py-4 px-4 rounded-2xl border text-xs font-black transition-all flex items-center justify-between cursor-pointer ${
                                             parsedAmount === minWithdrawal 
-                                                ? 'bg-[#3DD6C8] text-[#0B0B1E] border-[#3DD6C8] shadow-[0_0_15px_rgba(61,214,200,0.35)] scale-[1.02]' 
+                                                ? 'bg-[#3DD6C8] text-[#0B0B1E] border-[#3DD6C8] shadow-[0_0_20px_rgba(61,214,200,0.35)] scale-[1.02]' 
                                                 : 'bg-white/5 border-white/10 text-white/80 hover:bg-white/10 hover:border-white/20'
                                         }`}
                                     >
-                                        <span className="text-[8px] uppercase tracking-wider opacity-60">MIN</span>
-                                        <span className="font-mono font-bold">${minWithdrawal}</span>
+                                        <div className="flex flex-col items-start gap-0.5">
+                                            <span className="text-[8px] font-black uppercase tracking-wider opacity-60">Minimum Payout</span>
+                                            <span className="text-base font-mono font-black">${minWithdrawal}</span>
+                                        </div>
+                                        <span className="text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full bg-white/10">MIN</span>
                                     </button>
-
-                                    {(['25', '50', '75'] as const).map(pct => {
-                                        const targetVal = balance > 0 ? (balance * parseInt(pct, 10)) / 100 : 0;
-                                        const isSelected = parsedAmount > 0 && Math.abs(parsedAmount - targetVal) < 0.05;
-                                        return (
-                                            <button
-                                                key={pct}
-                                                type="button"
-                                                onClick={() => handleSelectPreset(pct)}
-                                                className={`py-3 px-2 rounded-2xl border text-[11px] font-black transition-all flex flex-col items-center justify-center gap-0.5 cursor-pointer ${
-                                                    isSelected 
-                                                        ? 'bg-[#3DD6C8] text-[#0B0B1E] border-[#3DD6C8] shadow-[0_0_15px_rgba(61,214,200,0.35)] scale-[1.02]' 
-                                                        : 'bg-white/5 border-white/10 text-white/80 hover:bg-white/10 hover:border-white/20'
-                                                }`}
-                                            >
-                                                <span className="text-[8px] uppercase tracking-wider opacity-60">{pct}%</span>
-                                                <span className="font-mono font-bold">${targetVal > 0 ? (targetVal % 1 === 0 ? targetVal.toFixed(0) : targetVal.toFixed(2)) : '0'}</span>
-                                            </button>
-                                        );
-                                    })}
 
                                     <button
                                         type="button"
                                         onClick={() => handleSelectPreset('MAX')}
-                                        className={`py-3 px-2 rounded-2xl border text-[11px] font-black transition-all flex flex-col items-center justify-center gap-0.5 cursor-pointer ${
+                                        className={`py-4 px-4 rounded-2xl border text-xs font-black transition-all flex items-center justify-between cursor-pointer ${
                                             parsedAmount === balance && balance > 0
-                                                ? 'bg-emerald-400 text-[#0B0B1E] border-emerald-400 shadow-[0_0_15px_rgba(52,211,153,0.35)] scale-[1.02]' 
+                                                ? 'bg-emerald-400 text-[#0B0B1E] border-emerald-400 shadow-[0_0_20px_rgba(52,211,153,0.35)] scale-[1.02]' 
                                                 : 'bg-white/5 border-white/10 text-white/80 hover:bg-white/10 hover:border-white/20'
                                         }`}
                                     >
-                                        <span className="text-[8px] uppercase tracking-wider text-emerald-400/80">MAX</span>
-                                        <span className="font-mono font-bold text-emerald-400">${balance > 0 ? (balance % 1 === 0 ? balance.toFixed(0) : balance.toFixed(2)) : '0'}</span>
+                                        <div className="flex flex-col items-start gap-0.5">
+                                            <span className="text-[8px] font-black uppercase tracking-wider text-emerald-400/80">Account Balance</span>
+                                            <span className="text-base font-mono font-black text-emerald-400">${balance.toFixed(2)}</span>
+                                        </div>
+                                        <span className="text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300">MAX</span>
                                     </button>
                                 </div>
-
-                                {/* Standard Denominations (when balance allows) */}
-                                {balance >= 50 && (
-                                    <div className="pt-1.5 space-y-1.5">
-                                        <span className="text-[8px] font-black text-white/40 uppercase tracking-[0.2em] block">
-                                            Fixed Denominations:
-                                        </span>
-                                        <div className="flex flex-wrap gap-2">
-                                            {[50, 100, 200, 500, 1000, 1500].filter(d => d >= minWithdrawal && d <= maxWithdrawal).map(denom => {
-                                                const isSelected = parsedAmount === denom;
-                                                const canAfford = denom <= balance;
-                                                return (
-                                                    <button
-                                                        key={denom}
-                                                        type="button"
-                                                        disabled={!canAfford}
-                                                        onClick={() => handleSelectPreset(denom)}
-                                                        className={`px-3.5 py-1.5 rounded-xl border text-[10px] font-black font-mono transition-all ${
-                                                            isSelected
-                                                                ? 'bg-[#3DD6C8] text-[#0B0B1E] border-[#3DD6C8] shadow-[0_0_12px_rgba(61,214,200,0.35)] scale-[1.03]'
-                                                                : canAfford
-                                                                ? 'bg-white/[0.04] border-white/10 text-white/80 hover:bg-white/10 hover:text-white cursor-pointer'
-                                                                : 'bg-white/[0.01] border-white/5 text-white/20 cursor-not-allowed opacity-40'
-                                                        }`}
-                                                    >
-                                                        ${denom}
-                                                    </button>
-                                                );
-                                            })}
-                                        </div>
-                                    </div>
-                                )}
                             </div>
                         </div>
 

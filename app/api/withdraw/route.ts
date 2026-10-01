@@ -87,9 +87,15 @@ export async function POST(req: NextRequest) {
                 tasksPerSet = levelData.tasks_per_set;
             }
             const price = levelData.price || 0;
-            if (price >= 5000 || levelData.id >= 4) maxWithdrawal = 20000;
-            else if (price >= 1500 || levelData.id === 3) maxWithdrawal = 6000;
-            else if (price >= 500 || levelData.id === 2) maxWithdrawal = 3000;
+            // Tier withdrawal limits: Junior $1,500 | Intermediate $2,500 | Senior $5,000 | Mentor $5,000
+            if (price >= 5000 || levelData.id >= 4) maxWithdrawal = 5000;
+            else if (price >= 1500 || levelData.id === 3) maxWithdrawal = 5000;
+            else if (price >= 500 || levelData.id === 2) maxWithdrawal = 2500;
+            else maxWithdrawal = 1500;
+        } else {
+            const levelId = Number(effectiveLevelId);
+            if (levelId >= 3) maxWithdrawal = 5000;
+            else if (levelId === 2) maxWithdrawal = 2500;
             else maxWithdrawal = 1500;
         }
 
