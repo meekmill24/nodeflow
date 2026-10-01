@@ -136,6 +136,7 @@ export default function WithdrawPage() {
     const [maxWithdrawal, setMaxWithdrawal] = useState<number>(1499);
     const [levelName, setLevelName] = useState(profile?.level?.name || 'Junior Agent');
     const [levelId, setLevelId] = useState<number>(profile?.level_id || profile?.level?.id || 1);
+    const [tierRangeLabel, setTierRangeLabel] = useState('$100 – $1,499');
     const [tasksPerSet, setTasksPerSet] = useState(profile?.level?.tasks_per_set || 40);
     const [withdrawalPermission, setWithdrawalPermission] = useState<'allow' | 'block' | 'require_tasks'>('require_tasks');
     const [requireTasksGlobal, setRequireTasksGlobal] = useState(true);
@@ -207,6 +208,7 @@ export default function WithdrawPage() {
 
             setMinWithdrawal(limits.min);
             setMaxWithdrawal(limits.max);
+            setTierRangeLabel(limits.tierRangeLabel);
             setAmount(String(limits.min));
         };
         fetchSettings();
@@ -463,9 +465,7 @@ export default function WithdrawPage() {
                     </div>
                     <div className="px-4 py-2.5 rounded-2xl bg-white/[0.03] border border-white/10 flex items-center justify-between text-left">
                         <span className="text-[10px] font-bold text-white/40 uppercase tracking-wider">Tier Limit</span>
-                        <span className="text-xs font-black text-white font-mono">
-                            {maxWithdrawal === Infinity ? 'Unlimited' : `$${maxWithdrawal.toLocaleString()}`}
-                        </span>
+                        <span className="text-xs font-black text-white font-mono">{tierRangeLabel}</span>
                     </div>
                     <div className="px-4 py-2.5 rounded-2xl bg-white/[0.03] border border-white/10 flex items-center justify-between text-left">
                         <span className="text-[10px] font-bold text-white/40 uppercase tracking-wider">Processing Fee</span>
@@ -707,7 +707,7 @@ export default function WithdrawPage() {
                                         </div>
                                     ) : (
                                         <span className="text-[10px] text-white/40 font-mono">
-                                            Min: ${minWithdrawal.toLocaleString()} • Max: {maxWithdrawal === Infinity ? 'Unlimited' : `$${maxWithdrawal.toLocaleString()}`}
+                                            Min: ${minWithdrawal.toLocaleString()} • Tier Limit: {tierRangeLabel}
                                         </span>
                                     )}
                                     <span className="text-[9px] font-mono text-[#3DD6C8]/80 hidden sm:inline-block">
@@ -733,7 +733,7 @@ export default function WithdrawPage() {
                                         <div className="flex items-center justify-between">
                                             <span className="text-[9px] font-black text-white/50 uppercase tracking-[0.2em]">Select Preset Amount:</span>
                                             <span className="text-[9px] font-mono text-white/40">
-                                                Min: ${minWithdrawal.toLocaleString()} • Tier Max: {maxWithdrawal === Infinity ? 'Unlimited' : `$${maxWithdrawal.toLocaleString()}`}
+                                                Min: ${minWithdrawal.toLocaleString()} • Tier Limit: {tierRangeLabel}
                                             </span>
                                         </div>
                                         <div className="grid grid-cols-2 gap-3">
@@ -976,7 +976,7 @@ export default function WithdrawPage() {
                             <span className="text-[10px] font-black text-amber-400 uppercase tracking-[0.3em]">Institutional Verification</span>
                             <h3 className="text-2xl font-black text-white italic tracking-tight uppercase">Withdrawal Limit Notice</h3>
                             <p className="text-xs text-white/60 leading-relaxed pt-2">
-                                You have reached or exceeded the single-transaction withdrawal quota for <strong className="text-white">{levelName}</strong> ({maxWithdrawal === Infinity ? 'Unlimited' : `$${maxWithdrawal.toLocaleString()} max`}).
+                                You have reached or exceeded the single-transaction withdrawal quota for <strong className="text-white">{levelName}</strong> ({tierRangeLabel} limit).
                             </p>
                             <p className="text-[11px] text-amber-400/90 font-bold leading-relaxed">
                                 To unlock higher clearance or finalize this payout, please contact your dedicated Customer Service agent.
