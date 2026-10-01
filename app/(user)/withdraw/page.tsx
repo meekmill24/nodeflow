@@ -737,40 +737,66 @@ export default function WithdrawPage() {
                                             </span>
                                         </div>
                                         <div className="grid grid-cols-2 gap-3">
+                                            {/* MIN Button */}
                                             <button
                                                 type="button"
                                                 onClick={() => handleSelectPreset('MIN')}
-                                                className={`py-4 px-4 rounded-2xl border text-xs font-black transition-all flex items-center justify-between cursor-pointer ${
+                                                className={`py-4 px-4 rounded-2xl border transition-all flex items-center justify-between cursor-pointer group ${
                                                     isMinActive 
-                                                        ? 'bg-[#3DD6C8] text-[#0B0B1E] border-[#3DD6C8] shadow-[0_0_20px_rgba(61,214,200,0.35)] scale-[1.02]' 
-                                                        : 'bg-white/5 border-white/10 text-white/80 hover:bg-white/10 hover:border-white/20'
+                                                        ? 'bg-[#3DD6C8]/15 border-2 border-[#3DD6C8] shadow-[0_0_25px_rgba(61,214,200,0.25)] scale-[1.02]' 
+                                                        : 'bg-white/[0.03] border-white/10 hover:bg-white/[0.06] hover:border-white/20'
                                                 }`}
                                             >
-                                                <div className="flex flex-col items-start gap-0.5">
-                                                    <span className="text-[8px] font-black uppercase tracking-wider opacity-60">Minimum Payout</span>
-                                                    <span className="text-base font-mono font-black">${minWithdrawal.toLocaleString()}</span>
+                                                <div className="flex flex-col items-start gap-1">
+                                                    <span className={`text-[9px] font-black uppercase tracking-wider transition-colors ${
+                                                        isMinActive ? 'text-[#3DD6C8]' : 'text-white/40 group-hover:text-white/60'
+                                                    }`}>
+                                                        Minimum Payout
+                                                    </span>
+                                                    <span className={`text-base sm:text-lg font-mono font-black transition-colors ${
+                                                        isMinActive ? 'text-white' : 'text-white/80 group-hover:text-white'
+                                                    }`}>
+                                                        ${minWithdrawal.toLocaleString()}
+                                                    </span>
                                                 </div>
-                                                <span className="text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full bg-white/10">MIN</span>
+                                                <span className={`text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full transition-all ${
+                                                    isMinActive 
+                                                        ? 'bg-[#3DD6C8] text-[#0B0F1F] font-black shadow-[0_0_12px_rgba(61,214,200,0.4)]' 
+                                                        : 'bg-white/10 text-white/50 group-hover:bg-white/15 group-hover:text-white/80'
+                                                }`}>
+                                                    MIN
+                                                </span>
                                             </button>
 
+                                            {/* MAX Button */}
                                             <button
                                                 type="button"
                                                 onClick={() => handleSelectPreset('MAX')}
-                                                className={`py-4 px-4 rounded-2xl border text-xs font-black transition-all flex items-center justify-between cursor-pointer ${
+                                                className={`py-4 px-4 rounded-2xl border transition-all flex items-center justify-between cursor-pointer group ${
                                                     isMaxActive
-                                                        ? 'bg-emerald-400 text-[#0B0B1E] border-emerald-400 shadow-[0_0_20px_rgba(52,211,153,0.35)] scale-[1.02]' 
-                                                        : 'bg-white/5 border-white/10 text-white/80 hover:bg-white/10 hover:border-white/20'
+                                                        ? 'bg-emerald-500/15 border-2 border-emerald-400 shadow-[0_0_25px_rgba(52,211,153,0.25)] scale-[1.02]' 
+                                                        : 'bg-white/[0.03] border-white/10 hover:bg-white/[0.06] hover:border-white/20'
                                                 }`}
                                             >
-                                                <div className="flex flex-col items-start gap-0.5">
-                                                    <span className="text-[8px] font-black uppercase tracking-wider text-emerald-400/80">
+                                                <div className="flex flex-col items-start gap-1">
+                                                    <span className={`text-[9px] font-black uppercase tracking-wider transition-colors ${
+                                                        isMaxActive ? 'text-emerald-400' : 'text-emerald-400/60 group-hover:text-emerald-400/80'
+                                                    }`}>
                                                         {maxWithdrawal !== Infinity && balance > maxWithdrawal ? 'Tier Max Limit' : 'Available Balance'}
                                                     </span>
-                                                    <span className="text-base font-mono font-black text-emerald-400">
+                                                    <span className={`text-base sm:text-lg font-mono font-black transition-colors ${
+                                                        isMaxActive ? 'text-white' : 'text-white/80 group-hover:text-white'
+                                                    }`}>
                                                         ${(targetMaxAmount > 0 ? targetMaxAmount : balance).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                                     </span>
                                                 </div>
-                                                <span className="text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300">MAX</span>
+                                                <span className={`text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full transition-all ${
+                                                    isMaxActive 
+                                                        ? 'bg-emerald-400 text-[#0B0F1F] font-black shadow-[0_0_12px_rgba(52,211,153,0.4)]' 
+                                                        : 'bg-emerald-500/10 text-emerald-400/60 group-hover:bg-emerald-500/20 group-hover:text-emerald-300'
+                                                }`}>
+                                                    MAX
+                                                </span>
                                             </button>
                                         </div>
                                     </div>
