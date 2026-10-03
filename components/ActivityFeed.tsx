@@ -86,7 +86,7 @@ export default function ActivityFeed() {
     if (!currentActivity) return null;
 
     return (
-        <div className={`fixed top-13 sm:top-15 md:!top-6 md:!left-[59%] left-1/2 -translate-x-1/2 z-[55] transition-all duration-500 ease-out transform pointer-events-none ${
+        <div className={`activity-feed-pill fixed top-13 sm:top-15 md:!top-6 md:!left-[59%] left-1/2 -translate-x-1/2 z-[55] transition-all duration-500 ease-out transform pointer-events-none ${
             isVisible ? 'translate-y-0 opacity-100 scale-100' : '-translate-y-8 opacity-0 scale-95'
         }`}>
             <div 

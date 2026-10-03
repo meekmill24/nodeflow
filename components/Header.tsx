@@ -25,7 +25,11 @@ import {
     Globe,
     Megaphone,
     X as XIcon,
-    Download
+    Download,
+    Check,
+    Trash2,
+    Clock,
+    ArrowRight
 } from 'lucide-react';
 import { useCurrency, CurrencyCode } from '@/context/CurrencyContext';
 import { useLanguage } from '@/context/LanguageContext';
@@ -120,6 +124,75 @@ export default function Header({ onMenuClick }: HeaderProps) {
         document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
+
+    const getRelativeTime = (dateStr: string) => {
+        try {
+            const date = new Date(dateStr);
+            const now = new Date();
+            const diffMs = now.getTime() - date.getTime();
+            const diffSecs = Math.floor(diffMs / 1000);
+            const diffMins = Math.floor(diffSecs / 60);
+
+            if (diffSecs < 60) return 'Just now';
+            if (diffMins < 60) return `${diffMins}m ago`;
+            
+            const isToday = date.toDateString() === now.toDateString();
+            const timeStr = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            if (isToday) return `Today, ${timeStr}`;
+
+            const yesterday = new Date(now);
+            yesterday.setDate(now.getDate() - 1);
+            if (date.toDateString() === yesterday.toDateString()) return `Yesterday, ${timeStr}`;
+
+            return `${date.toLocaleDateString([], { month: 'short', day: 'numeric' })}, ${timeStr}`;
+        } catch {
+            return dateStr;
+        }
+    };
+
+    const getNotificationVisuals = (node: { title?: string; type?: string }) => {
+        const title = (node.title || '').toLowerCase();
+        const type = node.type || '';
+
+        if (title.includes('deposit') || title.includes('credit') || title.includes('earn') || type === 'success') {
+            return {
+                icon: Wallet,
+                color: 'text-emerald-400',
+                bg: 'bg-emerald-500/15 border-emerald-500/30',
+                badge: 'DEPOSIT'
+            };
+        }
+        if (title.includes('withdraw') || title.includes('payout')) {
+            return {
+                icon: CreditCard,
+                color: 'text-[#3DD6C8]',
+                bg: 'bg-[#3DD6C8]/15 border-[#3DD6C8]/30',
+                badge: 'PAYOUT'
+            };
+        }
+        if (title.includes('hour') || title.includes('working') || title.includes('broadcast') || title.includes('notice') || title.includes('announc')) {
+            return {
+                icon: Megaphone,
+                color: 'text-amber-400',
+                bg: 'bg-amber-500/15 border-amber-500/30',
+                badge: 'NOTICE'
+            };
+        }
+        if (title.includes('security') || title.includes('password') || title.includes('shield') || type === 'danger') {
+            return {
+                icon: ShieldCheck,
+                color: 'text-rose-400',
+                bg: 'bg-rose-500/15 border-rose-500/30',
+                badge: 'SECURITY'
+            };
+        }
+        return {
+            icon: Cpu,
+            color: 'text-blue-400',
+            bg: 'bg-blue-500/15 border-blue-500/30',
+            badge: 'SIGNAL'
+        };
+    };
 
     return (
         <div className="sticky top-0 z-50">
@@ -218,47 +291,113 @@ export default function Header({ onMenuClick }: HeaderProps) {
                                 <>
                                     {/* Mobile backdrop overlay */}
                                     <div 
-                                        className="fixed inset-0 bg-black/60 backdrop-blur-xs z-40 sm:hidden"
+                                        className="fixed inset-0 bg-black/60 backdrop-blur-xs z-[65] sm:hidden animate-fade-in"
                                         onClick={() => setIsNotifOpen(false)}
                                     />
-                                    <div className="fixed inset-x-3 sm:inset-x-auto sm:right-0 sm:absolute top-[4.5rem] sm:top-full mt-1.5 sm:mt-3 w-auto sm:w-96 bg-[#0B0B1E]/95 backdrop-blur-2xl border border-white/10 rounded-[28px] shadow-[0_30px_90px_rgba(0,0,0,0.9)] p-4 sm:p-5 z-50 animate-in slide-in-from-top-2 duration-300 max-h-[80vh] sm:max-h-[520px] flex flex-col">
+                                    <div 
+                                        data-notif-panel="true"
+                                        className="fixed inset-x-3 sm:inset-x-auto sm:right-0 sm:absolute top-[4.5rem] sm:top-full mt-1.5 sm:mt-3 w-auto sm:w-[410px] bg-[#0B0B1E]/95 backdrop-blur-2xl border border-white/10 rounded-[28px] shadow-[0_30px_90px_rgba(0,0,0,0.95)] p-4 sm:p-5 z-[70] animate-in slide-in-from-top-2 duration-300 max-h-[82vh] sm:max-h-[540px] flex flex-col"
+                                    >
                                          <div className="flex items-center justify-between pb-3.5 mb-3 border-b border-white/5 shrink-0">
                                             <div className="flex items-center gap-2">
-                                                <span className="w-2 h-2 rounded-full bg-[#3DD6C8] animate-pulse" />
+                                                <span className="w-2 h-2 rounded-full bg-[#3DD6C8] animate-pulse shadow-[0_0_8px_rgba(61,214,200,0.8)]" />
                                                 <h3 className="text-xs font-bold text-white tracking-wider uppercase">Signal Logs</h3>
+                                                {unreadCount > 0 && (
+                                                    <span className="px-1.5 py-0.5 rounded-full bg-[#E34304] text-[9px] font-black text-white leading-none">
+                                                        {unreadCount}
+                                                    </span>
+                                                )}
                                             </div>
-                                            {unreadCount > 0 && (
-                                                <button 
-                                                    onClick={markAllRead} 
-                                                    className="text-xs font-semibold text-[#3DD6C8] hover:text-[#3DD6C8]/80 transition-colors cursor-pointer"
+                                            <div className="flex items-center gap-2">
+                                                {unreadCount > 0 && (
+                                                    <button 
+                                                        onClick={markAllRead} 
+                                                        className="text-[11px] font-bold text-[#3DD6C8] hover:text-[#3DD6C8]/80 transition-colors cursor-pointer flex items-center gap-1"
+                                                        title={t('mark_all_read')}
+                                                    >
+                                                        <Check size={13} /> {t('mark_all_read')}
+                                                    </button>
+                                                )}
+                                                {notifications.length > 0 && (
+                                                    <button
+                                                        onClick={clearAll}
+                                                        className="p-1 text-white/30 hover:text-rose-400 transition-colors cursor-pointer rounded-lg hover:bg-white/5"
+                                                        title="Clear All Notifications"
+                                                    >
+                                                        <Trash2 size={13} />
+                                                    </button>
+                                                )}
+                                                <button
+                                                    onClick={() => setIsNotifOpen(false)}
+                                                    className="sm:hidden p-1 text-white/40 hover:text-white transition-colors cursor-pointer rounded-lg hover:bg-white/5 ml-1"
+                                                    aria-label="Close notification panel"
                                                 >
-                                                    {t('mark_all_read')}
+                                                    <XIcon size={14} />
                                                 </button>
-                                            )}
+                                            </div>
                                          </div>
-                                         <div className="space-y-2.5 overflow-y-auto pr-1 custom-scrollbar flex-1">
+
+                                         <div className="space-y-2.5 overflow-y-auto pr-1 custom-scrollbar flex-1 min-h-0">
                                             {notifications.length === 0 ? (
-                                                <div className="py-12 text-center text-white/30 text-xs font-medium">No signals found</div>
-                                            ) : notifications.slice(0, 10).map(node => (
-                                                <div 
-                                                    key={node.id} 
-                                                    onClick={() => markAsRead(node.id)}
-                                                    className={`p-3.5 sm:p-4 rounded-2xl border transition-all cursor-pointer group ${
-                                                        !node.is_read 
-                                                            ? 'bg-[#3DD6C8]/10 border-[#3DD6C8]/30 hover:border-[#3DD6C8]/50' 
-                                                            : 'bg-white/[0.03] border-white/5 hover:border-white/15 hover:bg-white/[0.06]'
-                                                    }`}
-                                                >
-                                                     <div className="flex items-center justify-between gap-2">
-                                                         <p className="text-sm font-semibold text-white group-hover:text-[#3DD6C8] transition-colors">{node.title}</p>
-                                                         {!node.is_read && (
-                                                             <span className="w-1.5 h-1.5 rounded-full bg-[#3DD6C8] shrink-0" />
-                                                         )}
-                                                     </div>
-                                                     <p className="text-xs text-white/70 mt-1 line-clamp-3 leading-relaxed font-normal">{node.message}</p>
-                                                     <span className="text-[10px] font-medium text-white/40 mt-2 block">{new Date(node.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</span>
+                                                <div className="py-12 flex flex-col items-center justify-center text-center space-y-2">
+                                                    <div className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-white/30 mb-1">
+                                                        <Bell size={22} className="opacity-40" />
+                                                    </div>
+                                                    <p className="text-xs font-bold text-white/80 uppercase tracking-wider">All Clear • No New Signals</p>
+                                                    <p className="text-[10px] text-white/40 max-w-[200px]">System communications and ledger audits will be displayed here.</p>
                                                 </div>
-                                            ))}
+                                            ) : notifications.slice(0, 10).map(node => {
+                                                const visual = getNotificationVisuals(node);
+                                                const VisualIcon = visual.icon;
+                                                return (
+                                                    <div 
+                                                        key={node.id} 
+                                                        onClick={() => markAsRead(node.id)}
+                                                        className={`p-3.5 sm:p-4 rounded-2xl border transition-all cursor-pointer group flex items-start gap-3 ${
+                                                            !node.is_read 
+                                                                ? 'bg-[#3DD6C8]/10 border-[#3DD6C8]/30 hover:border-[#3DD6C8]/50' 
+                                                                : 'bg-white/[0.03] border-white/5 hover:border-white/15 hover:bg-white/[0.06]'
+                                                        }`}
+                                                    >
+                                                         <div className={`w-8 h-8 rounded-xl border flex items-center justify-center shrink-0 mt-0.5 ${visual.bg} ${visual.color}`}>
+                                                             <VisualIcon size={15} />
+                                                         </div>
+                                                         <div className="flex-1 min-w-0">
+                                                             <div className="flex items-center justify-between gap-2">
+                                                                 <p className="text-xs sm:text-sm font-bold text-white group-hover:text-[#3DD6C8] transition-colors truncate">
+                                                                     {node.title}
+                                                                 </p>
+                                                                 <div className="flex items-center gap-1.5 shrink-0">
+                                                                     <span className="text-[8px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded bg-white/5 text-white/40 border border-white/5">
+                                                                         {visual.badge}
+                                                                     </span>
+                                                                     {!node.is_read && (
+                                                                         <span className="w-2 h-2 rounded-full bg-[#3DD6C8] shadow-[0_0_8px_rgba(61,214,200,0.8)] shrink-0" />
+                                                                     )}
+                                                                 </div>
+                                                             </div>
+                                                             <p className="text-xs text-white/70 mt-1 line-clamp-3 leading-relaxed font-normal">{node.message}</p>
+                                                             <div className="flex items-center gap-1 text-[10px] font-medium text-white/40 mt-2">
+                                                                 <Clock size={11} className="opacity-60" />
+                                                                 <span>{getRelativeTime(node.created_at)}</span>
+                                                             </div>
+                                                         </div>
+                                                    </div>
+                                                );
+                                            })}
+                                         </div>
+
+                                         <div className="pt-3 mt-2 border-t border-white/5 flex items-center justify-between shrink-0">
+                                             <span className="text-[10px] font-mono text-white/40 uppercase tracking-widest">
+                                                 {notifications.length} {notifications.length === 1 ? 'Signal' : 'Signals'}
+                                             </span>
+                                             <Link
+                                                 href="/notifications"
+                                                 onClick={() => setIsNotifOpen(false)}
+                                                 className="text-[11px] font-black text-[#3DD6C8] hover:text-[#3DD6C8]/80 flex items-center gap-1.5 uppercase tracking-wider group transition-colors cursor-pointer"
+                                             >
+                                                 Signal Archive <ArrowRight size={12} className="group-hover:translate-x-0.5 transition-transform" />
+                                             </Link>
                                          </div>
                                     </div>
                                 </>

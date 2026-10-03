@@ -290,6 +290,15 @@ div[data-nextjs-dev-overlay] {
   display: none !important;
 }
 
+/* Suppress floating activity feed pill when notification drawer is opened */
+body:has([data-notif-panel="true"]) .activity-feed-pill {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  transform: translate(-50%, -24px) scale(0.9) !important;
+  transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s !important;
+}
+
 /* ==========================================================================
    Tawk.to Legacy Launcher & "We Are Here!" Attention Grabber Suppression
    Permanently prevents the old green chat bubble from appearing on page reload.
