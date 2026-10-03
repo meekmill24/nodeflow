@@ -46,28 +46,20 @@ export async function POST(req: NextRequest) {
         const { data: settings } = await supabaseAdmin
             .from('site_settings')
             .select('key, value')
-            .in('key', ['min_withdrawal', 'require_task_completion_to_withdraw', 'user_withdrawal_permissions']);
+            .in('key', [
+                'min_withdrawal', 
+                'require_task_completion_to_withdraw', 
+                'user_withdrawal_permissions',
+                'daily_withdrawal_limit_junior',
+                'daily_withdrawal_limit_intermediate',
+                'daily_withdrawal_limit_senior',
+                'daily_withdrawal_limit_mentor'
+            ]);
 
         let requireTasksGlobal = true;
         let userPermissions: Record<string, string> = {};
         let globalMin = 30;
-
-        settings?.forEach(s => {
-            if (s.key === 'min_withdrawal') globalMin = parseFloat(s.value || '30');
-            if (s.key === 'require_task_completion_to_withdraw') requireTasksGlobal = s.value === 'true';
-            if (s.key === 'user_withdrawal_permissions') {
-                try { userPermissions = JSON.parse(s.value || '{}'); } catch { userPermissions = {}; }
-            }
-        });
-
-        const userPerm = userPermissions[userId]; // 'allow' | 'block' | 'require_tasks'
-
-        // Check if admin explicitly blocked this user
-        if (userPerm === 'block') {
-            return NextResponse.json({ 
-                error: 'Withdrawal Restricted: Withdrawals on your account have been restricted by platform administration. Please contact customer service.' 
-            }, { status: 403 });
-        }
+        let overrideDailyCount: number | null = null;
 
         // Fetch level info for tasks_per_set and tier limit
         const effectiveLevelId = profile.level_id || 1;
@@ -86,21 +78,87 @@ export async function POST(req: NextRequest) {
             }
         }
 
+        settings?.forEach(s => {
+            if (s.key === 'min_withdrawal') globalMin = parseFloat(s.value || '30');
+            if (s.key === 'require_task_completion_to_withdraw') requireTasksGlobal = s.value === 'true';
+            if (s.key === 'user_withdrawal_permissions') {
+                try { userPermissions = JSON.parse(s.value || '{}'); } catch { userPermissions = {}; }
+            }
+            const lvlLower = resolvedLevelName.toLowerCase();
+            if (lvlLower.includes('junior') && s.key === 'daily_withdrawal_limit_junior') {
+                overrideDailyCount = parseInt(s.value, 10);
+            } else if (lvlLower.includes('intermediate') && s.key === 'daily_withdrawal_limit_intermediate') {
+                overrideDailyCount = parseInt(s.value, 10);
+            } else if (lvlLower.includes('senior') && s.key === 'daily_withdrawal_limit_senior') {
+                overrideDailyCount = parseInt(s.value, 10);
+            } else if (lvlLower.includes('mentor') && s.key === 'daily_withdrawal_limit_mentor') {
+                overrideDailyCount = parseInt(s.value, 10);
+            }
+        });
+
+        const userPerm = userPermissions[userId]; // 'allow' | 'block' | 'require_tasks'
+
+        // Check if admin explicitly blocked this user
+        if (userPerm === 'block') {
+            return NextResponse.json({ 
+                error: 'Withdrawal Restricted: Withdrawals on your account have been restricted by platform administration. Please contact customer service.' 
+            }, { status: 403 });
+        }
+
         // Exact Canonical Tier Limits:
-        // Minimum across all levels: $30
-        // Junior: $30 - $1,499
-        // Intermediate: $30 - $2,499
-        // Senior: $30 - $4,999
+        // Junior: $30 - $1,499 (1 withdrawal per day)
+        // Intermediate: $30 - $2,499 (2 withdrawals per day)
+        // Senior: $30 - $4,999 (3 withdrawals per day)
         // Mentor: $30 to any amount (Unlimited)
         const tierLimits = getTierWithdrawalLimits(
             levelData?.id || effectiveLevelId,
             levelData?.price,
             resolvedLevelName,
-            globalMin
+            globalMin,
+            overrideDailyCount
         );
         const levelName = tierLimits.tierName;
         const minWithdrawal = tierLimits.min;
         const maxWithdrawal = tierLimits.max;
+        const dailyCountLimit = tierLimits.dailyCountLimit;
+
+        // Check user daily withdrawals
+        const now = new Date();
+        const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const resetTimestamp = profile.last_reset_at;
+        const filterDate = resetTimestamp && new Date(resetTimestamp) > startOfToday 
+            ? new Date(resetTimestamp).toISOString() 
+            : startOfToday.toISOString();
+
+        const { data: todayWithdrawals } = await supabaseAdmin
+            .from('transactions')
+            .select('id, amount, status, created_at')
+            .eq('user_id', userId)
+            .eq('type', 'withdrawal')
+            .neq('status', 'rejected')
+            .gte('created_at', filterDate);
+
+        const todayWithdrawalCount = todayWithdrawals?.length || 0;
+        const todayWithdrawnAmount = (todayWithdrawals || []).reduce((sum, tx) => sum + Number(tx.amount || 0), 0);
+
+        // If not force-allowed by admin, check daily limits
+        if (userPerm !== 'allow') {
+            // 1. Daily frequency / count limit check
+            if (dailyCountLimit !== Infinity && todayWithdrawalCount >= dailyCountLimit) {
+                return NextResponse.json({ 
+                    error: `Daily Withdrawal Limit Reached: You have reached your daily withdrawal quota (${todayWithdrawalCount}/${dailyCountLimit} completed today) for the ${levelName} tier. Please contact customer service to upgrade your account.`,
+                    code: 'DAILY_LIMIT_REACHED'
+                }, { status: 403 });
+            }
+
+            // 2. Cumulative daily amount limit check
+            if (maxWithdrawal !== Infinity && (todayWithdrawnAmount + amt) > maxWithdrawal) {
+                return NextResponse.json({ 
+                    error: `Daily Amount Limit Reached: Withdrawing $${amt.toLocaleString()} will exceed your daily limit of $${maxWithdrawal.toLocaleString()} for the ${levelName} tier (Already withdrawn today: $${todayWithdrawnAmount.toLocaleString()}). Please contact customer service to upgrade your account.`,
+                    code: 'DAILY_AMOUNT_EXCEEDED'
+                }, { status: 403 });
+            }
+        }
 
         // If not force-allowed by admin, check task set completion
         if (userPerm !== 'allow' && requireTasksGlobal) {

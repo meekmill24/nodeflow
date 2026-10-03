@@ -24,7 +24,8 @@ import {
     Check,
     AlertTriangle,
     Coins,
-    Ban as BanIcon
+    Ban as BanIcon,
+    Crown
 } from 'lucide-react';
 import Link from 'next/link';
 import TransactionReceipt from '@/components/TransactionReceipt';
@@ -134,6 +135,10 @@ export default function WithdrawPage() {
     const [error, setError] = useState('');
     const [minWithdrawal, setMinWithdrawal] = useState(30);
     const [maxWithdrawal, setMaxWithdrawal] = useState<number>(1499);
+    const [dailyCountLimit, setDailyCountLimit] = useState<number>(1);
+    const [dailyWithdrawalCount, setDailyWithdrawalCount] = useState<number>(0);
+    const [dailyWithdrawnAmount, setDailyWithdrawnAmount] = useState<number>(0);
+    const [limitModalReason, setLimitModalReason] = useState<'count' | 'amount' | 'single_max'>('count');
     const [levelName, setLevelName] = useState(profile?.level?.name || 'Junior Agent');
     const [levelId, setLevelId] = useState<number>(profile?.level_id || profile?.level?.id || 1);
     const [tierRangeLabel, setTierRangeLabel] = useState('$100 – $1,499');
@@ -145,15 +150,72 @@ export default function WithdrawPage() {
 
     const balance = profile?.wallet_balance || 0;
 
+    const fetchTodayWithdrawals = async () => {
+        if (!profile?.id) return;
+        try {
+            const now = new Date();
+            const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            const resetTimestamp = profile.last_reset_at;
+            const filterDate = resetTimestamp && new Date(resetTimestamp) > startOfToday 
+                ? new Date(resetTimestamp).toISOString() 
+                : startOfToday.toISOString();
+
+            const { data: todayTxs } = await supabase
+                .from('transactions')
+                .select('id, amount, status, created_at')
+                .eq('user_id', profile.id)
+                .eq('type', 'withdrawal')
+                .neq('status', 'rejected')
+                .gte('created_at', filterDate);
+
+            const count = todayTxs?.length || 0;
+            const sumAmt = (todayTxs || []).reduce((acc, t) => acc + Number(t.amount || 0), 0);
+            setDailyWithdrawalCount(count);
+            setDailyWithdrawnAmount(sumAmt);
+        } catch (e) {
+            console.error('Failed to fetch today withdrawals', e);
+        }
+    };
+
+    useEffect(() => {
+        fetchTodayWithdrawals();
+
+        if (!profile?.id) return;
+        const channel = supabase
+            .channel(`withdraw-daily-tracker-${profile.id}`)
+            .on('postgres_changes', {
+                event: '*',
+                schema: 'public',
+                table: 'transactions',
+                filter: `user_id=eq.${profile.id}`
+            }, () => {
+                fetchTodayWithdrawals();
+            })
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(channel);
+        };
+    }, [profile?.id, profile?.last_reset_at]);
+
     useEffect(() => {
         const fetchSettings = async () => {
             // Fetch global settings and admin permissions
             const { data: siteData } = await supabase
                 .from('site_settings')
                 .select('key, value')
-                .in('key', ['min_withdrawal', 'require_task_completion_to_withdraw', 'user_withdrawal_permissions']);
+                .in('key', [
+                    'min_withdrawal', 
+                    'require_task_completion_to_withdraw', 
+                    'user_withdrawal_permissions',
+                    'daily_withdrawal_limit_junior',
+                    'daily_withdrawal_limit_intermediate',
+                    'daily_withdrawal_limit_senior',
+                    'daily_withdrawal_limit_mentor'
+                ]);
 
             let globalMin = 30;
+            let overrideDailyCount: number | null = null;
             siteData?.forEach(s => {
                 if (s.key === 'min_withdrawal') globalMin = parseFloat(s.value || '30');
                 if (s.key === 'require_task_completion_to_withdraw') setRequireTasksGlobal(s.value === 'true');
@@ -196,18 +258,35 @@ export default function WithdrawPage() {
                 setTasksPerSet(levelData.tasks_per_set);
             }
 
+            siteData?.forEach(s => {
+                const lvlLower = resolvedName.toLowerCase();
+                if (lvlLower.includes('junior') && s.key === 'daily_withdrawal_limit_junior') {
+                    overrideDailyCount = parseInt(s.value, 10);
+                } else if (lvlLower.includes('intermediate') && s.key === 'daily_withdrawal_limit_intermediate') {
+                    overrideDailyCount = parseInt(s.value, 10);
+                } else if (lvlLower.includes('senior') && s.key === 'daily_withdrawal_limit_senior') {
+                    overrideDailyCount = parseInt(s.value, 10);
+                } else if (lvlLower.includes('mentor') && s.key === 'daily_withdrawal_limit_mentor') {
+                    overrideDailyCount = parseInt(s.value, 10);
+                }
+            });
+
             // Platform Canonical Tier Limits:
-            // Minimum across all levels: $30
-            // Junior: $30 - $1,499 | Intermediate: $30 - $2,499 | Senior: $30 - $4,999 | Mentor: $30 to any amount
+            // Junior: $30 - $1,499 (1 withdrawal per day)
+            // Intermediate: $30 - $2,499 (2 withdrawals per day)
+            // Senior: $30 - $4,999 (3 withdrawals per day)
+            // Mentor: $30 to any amount (Unlimited)
             const limits = getTierWithdrawalLimits(
                 levelData?.id || effectiveLevelId,
                 levelData?.price,
                 resolvedName,
-                globalMin
+                globalMin,
+                overrideDailyCount
             );
 
             setMinWithdrawal(limits.min);
             setMaxWithdrawal(limits.max);
+            setDailyCountLimit(limits.dailyCountLimit);
             setTierRangeLabel(limits.tierRangeLabel);
             setAmount(String(limits.min));
         };
@@ -238,19 +317,30 @@ export default function WithdrawPage() {
     const isBlockedByAdmin = withdrawalPermission === 'block' || isFrozen;
     const isForceAllowed = withdrawalPermission === 'allow';
 
+    // Daily Limit Checks
+    const isDailyCountLimitReached = !isForceAllowed && dailyCountLimit !== Infinity && dailyWithdrawalCount >= dailyCountLimit;
+    const isDailyAmountLimitReached = !isForceAllowed && maxWithdrawal !== Infinity && dailyWithdrawnAmount >= maxWithdrawal;
+    const isDailyLimitReached = isDailyCountLimitReached || isDailyAmountLimitReached;
+
     // Must satisfy task completion unless admin explicitly force-allowed it or global rule is disabled
     const isTaskRequirementMet = isForceAllowed || (!requireTasksGlobal || isSetCompleted);
-    const canWithdraw = !isBlockedByAdmin && isTaskRequirementMet;
+    const canWithdraw = !isBlockedByAdmin && isTaskRequirementMet && !isDailyLimitReached;
 
     const handleSelectPreset = (preset: 'MIN' | 'MAX') => {
         setError('');
+        if (isDailyLimitReached) {
+            setLimitModalReason(isDailyCountLimitReached ? 'count' : 'amount');
+            setShowLimitModal(true);
+            return;
+        }
         if (preset === 'MIN') {
             setAmount(String(minWithdrawal));
             return;
         }
         if (preset === 'MAX') {
             const fullBalance = Math.max(0, balance);
-            const maxAllowed = maxWithdrawal === Infinity ? fullBalance : Math.min(fullBalance, maxWithdrawal);
+            const remainingDailyCap = maxWithdrawal === Infinity ? fullBalance : Math.max(0, maxWithdrawal - dailyWithdrawnAmount);
+            const maxAllowed = Math.min(fullBalance, remainingDailyCap);
             setAmount(maxAllowed > 0 ? (maxAllowed % 1 === 0 ? maxAllowed.toFixed(0) : maxAllowed.toFixed(2)) : fullBalance.toFixed(2));
             return;
         }
@@ -319,8 +409,23 @@ export default function WithdrawPage() {
             return;
         }
 
+        // Daily limit check
+        if (!isForceAllowed) {
+            if (isDailyCountLimitReached) {
+                setLimitModalReason('count');
+                setShowLimitModal(true);
+                return;
+            }
+            if (maxWithdrawal !== Infinity && (dailyWithdrawnAmount + amt) > maxWithdrawal) {
+                setLimitModalReason('amount');
+                setShowLimitModal(true);
+                return;
+            }
+        }
+
         // 4. Validate tier max (Mentor is Infinity / Unlimited)
         if (maxWithdrawal !== Infinity && amt > maxWithdrawal) {
+            setLimitModalReason('single_max');
             setShowLimitModal(true);
             return;
         }
@@ -354,6 +459,15 @@ export default function WithdrawPage() {
 
             const data = await res.json();
             if (!res.ok) {
+                if (data.code === 'DAILY_LIMIT_REACHED') {
+                    setLimitModalReason('count');
+                    setShowLimitModal(true);
+                    fetchTodayWithdrawals();
+                } else if (data.code === 'DAILY_AMOUNT_EXCEEDED') {
+                    setLimitModalReason('amount');
+                    setShowLimitModal(true);
+                    fetchTodayWithdrawals();
+                }
                 throw new Error(data.error || 'Withdrawal processing encountered an issue.');
             }
 
@@ -368,6 +482,7 @@ export default function WithdrawPage() {
             });
 
             toast.success('Withdrawal request initiated successfully!');
+            await fetchTodayWithdrawals();
             await refreshProfile();
             setSuccess(true);
         } catch (err: any) {
@@ -582,6 +697,55 @@ export default function WithdrawPage() {
                             <span>Complete Set ({effectiveTasksPerSet - tasksInCurrentSet} Left)</span>
                             <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
                         </Link>
+                    </div>
+                </div>
+            )}
+
+            {/* Daily Limit Reached Notice */}
+            {isDailyLimitReached && (
+                <div className="p-6 sm:p-7 bg-gradient-to-r from-amber-500/15 via-[#0B0F22] to-amber-500/15 border border-amber-500/35 rounded-3xl backdrop-blur-xl relative overflow-hidden shadow-[0_15px_45px_rgba(245,158,11,0.2)] animate-scale-in">
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 relative z-10">
+                        <div className="flex items-start gap-4">
+                            <div className="w-12 h-12 rounded-2xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 shrink-0 mt-1 shadow-[0_0_20px_rgba(245,158,11,0.25)]">
+                                <Headphones size={22} className="animate-pulse" />
+                            </div>
+                            <div className="space-y-1.5">
+                                <div className="flex items-center gap-2">
+                                    <span className="px-2.5 py-0.5 rounded-full bg-amber-500/20 border border-amber-500/30 text-amber-300 text-[9px] font-black uppercase tracking-widest">
+                                        Daily Limit Reached
+                                    </span>
+                                    <span className="text-[10px] font-black text-white/50 uppercase tracking-widest font-mono">
+                                        {dailyWithdrawalCount} / {dailyCountLimit === Infinity ? '∞' : dailyCountLimit} today
+                                    </span>
+                                </div>
+                                <h4 className="text-sm sm:text-base font-black text-white uppercase tracking-tight">
+                                    Account Upgrade Required for Further Withdrawals
+                                </h4>
+                                <p className="text-xs text-slate-300 leading-relaxed max-w-xl">
+                                    You have reached your daily withdrawal limit for the <strong className="text-amber-300">{levelName}</strong> tier ({dailyCountLimit} withdrawal/day • {tierRangeLabel} cap). To perform additional withdrawals, please contact customer service to upgrade your tier.
+                                </p>
+                            </div>
+                        </div>
+                        <div className="flex flex-col sm:flex-row items-center gap-2 w-full sm:w-auto shrink-0">
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setLimitModalReason(isDailyCountLimitReached ? 'count' : 'amount');
+                                    setShowLimitModal(true);
+                                }}
+                                className="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-[#0B0B1E] font-black uppercase text-[11px] tracking-widest shadow-xl shadow-amber-500/20 transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95"
+                            >
+                                <Headphones size={15} />
+                                <span>Contact CS to Upgrade</span>
+                            </button>
+                            <Link
+                                href="/levels"
+                                className="w-full sm:w-auto px-4 py-3.5 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 text-white font-black uppercase text-[10px] tracking-wider transition-all text-center flex items-center justify-center gap-1.5"
+                            >
+                                <Crown size={13} className="text-amber-400" /> Tiers
+                            </Link>
+                        </div>
                     </div>
                 </div>
             )}
@@ -944,11 +1108,19 @@ export default function WithdrawPage() {
                         {/* 6. SUBMISSION CTA */}
                         <div className="space-y-4 pt-2">
                             <button
-                                type="submit"
-                                disabled={loading || !canWithdraw}
+                                type={isDailyLimitReached ? "button" : "submit"}
+                                onClick={() => {
+                                    if (isDailyLimitReached) {
+                                        setLimitModalReason(isDailyCountLimitReached ? 'count' : 'amount');
+                                        setShowLimitModal(true);
+                                    }
+                                }}
+                                disabled={loading || (isBlockedByAdmin || !isTaskRequirementMet)}
                                 className={`w-full py-5 sm:py-6 rounded-[24px] font-black uppercase tracking-[0.25em] text-xs sm:text-sm transition-all duration-300 flex items-center justify-center gap-3 ${
-                                    !canWithdraw
+                                    isBlockedByAdmin || !isTaskRequirementMet
                                         ? 'bg-slate-800/80 text-slate-500 border border-slate-700/60 cursor-not-allowed shadow-none'
+                                        : isDailyLimitReached
+                                        ? 'bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-[#0B0B1E] shadow-[0_15px_40px_rgba(245,158,11,0.35)] cursor-pointer active:scale-98'
                                         : 'bg-gradient-to-r from-rose-500 via-rose-600 to-rose-700 text-white shadow-[0_15px_40px_rgba(244,63,94,0.35)] hover:shadow-[0_20px_50px_rgba(244,63,94,0.5)] hover:-translate-y-0.5 active:translate-y-0 cursor-pointer'
                                 } disabled:opacity-50 disabled:translate-y-0`}
                             >
@@ -966,6 +1138,11 @@ export default function WithdrawPage() {
                                     <>
                                         <Lock size={18} className="text-amber-400" />
                                         <span>Complete Set Tasks to Withdraw ({tasksInCurrentSet}/{effectiveTasksPerSet})</span>
+                                    </>
+                                ) : isDailyLimitReached ? (
+                                    <>
+                                        <Headphones size={18} className="animate-pulse" />
+                                        <span>Daily Limit Reached • Contact CS to Upgrade</span>
                                     </>
                                 ) : (
                                     <>
@@ -995,17 +1172,21 @@ export default function WithdrawPage() {
             {showLimitModal && (
                 <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-fade-in">
                     <div className="bg-[#0B0F22] border border-amber-500/35 w-full max-w-md rounded-[36px] p-8 shadow-[0_30px_100px_rgba(0,0,0,0.95)] relative overflow-hidden text-center space-y-6 animate-scale-in">
-                        <div className="w-20 h-20 mx-auto rounded-3xl bg-amber-500/10 border border-amber-500/25 flex items-center justify-center text-amber-400">
+                        <div className="w-20 h-20 mx-auto rounded-3xl bg-amber-500/10 border border-amber-500/25 flex items-center justify-center text-amber-400 shadow-[0_0_30px_rgba(245,158,11,0.2)]">
                             <Headphones size={36} className="animate-pulse" />
                         </div>
                         <div className="space-y-2">
                             <span className="text-[10px] font-black text-amber-400 uppercase tracking-[0.3em]">Institutional Verification</span>
-                            <h3 className="text-2xl font-black text-white italic tracking-tight uppercase">Withdrawal Limit Notice</h3>
-                            <p className="text-xs text-white/60 leading-relaxed pt-2">
-                                You have reached or exceeded the single-transaction withdrawal quota for <strong className="text-white">{levelName}</strong> ({tierRangeLabel} limit).
+                            <h3 className="text-2xl font-black text-white italic tracking-tight uppercase">Daily Limit Notice</h3>
+                            <p className="text-xs text-white/70 leading-relaxed pt-2">
+                                {limitModalReason === 'count' 
+                                    ? `You have reached your daily withdrawal count limit (${dailyWithdrawalCount}/${dailyCountLimit === Infinity ? '∞' : dailyCountLimit} completed today) for ${levelName}.`
+                                    : limitModalReason === 'amount'
+                                    ? `Withdrawing this amount exceeds your cumulative daily clearance of $${maxWithdrawal.toLocaleString()} for ${levelName} (Already withdrawn today: $${dailyWithdrawnAmount.toLocaleString()}).`
+                                    : `You have reached or exceeded the single-transaction withdrawal quota for ${levelName} (${tierRangeLabel} limit).`}
                             </p>
-                            <p className="text-[11px] text-amber-400/90 font-bold leading-relaxed">
-                                To unlock higher clearance or finalize this payout, please contact your dedicated Customer Service agent.
+                            <p className="text-[11px] text-amber-400 font-bold leading-relaxed">
+                                To perform additional withdrawals or unlock higher daily quotas, please contact Customer Service to upgrade your account tier.
                             </p>
                         </div>
                         <div className="space-y-3 pt-2">
@@ -1019,14 +1200,21 @@ export default function WithdrawPage() {
                                         window.location.href = '/concierge';
                                     }
                                 }}
-                                className="w-full py-4 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 text-[#0B0B1E] font-black uppercase text-xs tracking-[0.2em] flex items-center justify-center gap-2 shadow-[0_0_25px_rgba(245,158,11,0.3)] hover:scale-[1.02] transition-all"
+                                className="w-full py-4 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-[#0B0B1E] font-black uppercase text-xs tracking-[0.2em] flex items-center justify-center gap-2 shadow-[0_0_25px_rgba(245,158,11,0.3)] hover:scale-[1.02] transition-all cursor-pointer"
                             >
-                                <Headphones size={16} /> Contact Customer Service
+                                <Headphones size={16} /> Contact Customer Service to Upgrade
                             </button>
+                            <Link
+                                href="/levels"
+                                onClick={() => setShowLimitModal(false)}
+                                className="w-full py-3.5 rounded-2xl bg-white/10 hover:bg-white/15 border border-white/15 text-white font-black uppercase text-xs tracking-wider flex items-center justify-center gap-2 transition-all"
+                            >
+                                <Crown size={15} className="text-amber-400" /> View VIP Upgrade Tiers
+                            </Link>
                             <button
                                 type="button"
                                 onClick={() => setShowLimitModal(false)}
-                                className="w-full py-3 rounded-2xl bg-white/5 border border-white/10 text-white/50 hover:text-white font-black uppercase text-[10px] tracking-widest transition-colors"
+                                className="w-full py-3 rounded-2xl bg-white/5 border border-white/10 text-white/50 hover:text-white font-black uppercase text-[10px] tracking-widest transition-colors cursor-pointer"
                             >
                                 Dismiss
                             </button>
