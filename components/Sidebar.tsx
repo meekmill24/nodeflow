@@ -63,20 +63,20 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
             `}>
                 
                 {/* Branding Block */}
-                <div className="p-8 pb-4 flex items-center justify-between group">
-                    <div className="flex items-center gap-4">
-                        <div className="w-11 h-11 rounded-2xl bg-slate-950 border border-[#3DD6C8]/20 flex items-center justify-center p-2 relative shadow-[0_0_20px_rgba(61,214,200,0.1)] group-hover:shadow-[0_0_30px_rgba(61,214,200,0.25)] transition-all duration-700 overflow-hidden">
+                <div className="px-5 py-6 pb-4 flex items-center justify-between group">
+                    <div className="flex items-center gap-3 min-w-0 flex-1">
+                        <div className="w-11 h-11 rounded-2xl bg-slate-950 border border-[#3DD6C8]/20 flex items-center justify-center p-2 relative shadow-[0_0_20px_rgba(61,214,200,0.1)] group-hover:shadow-[0_0_30px_rgba(61,214,200,0.25)] transition-all duration-700 overflow-hidden shrink-0">
                              <div className="absolute inset-0 bg-[#3DD6C8]/5 animate-pulse" />
                              <img src="/logo.png" alt="Logo" className="w-full h-full object-contain relative z-10 filter drop-shadow-[0_0_8px_rgba(61,214,200,0.5)] group-hover:scale-110 transition-transform duration-500" />
                         </div>
-                        <div className="flex flex-col">
-                            <h1 className="text-sm font-black text-[#3DD6C8] uppercase tracking-tighter italic flex items-baseline leading-none">
+                        <div className="flex flex-col min-w-0">
+                            <h1 className="text-[13px] sm:text-sm font-black text-[#3DD6C8] uppercase tracking-tight italic flex items-baseline leading-none whitespace-nowrap">
                                 SmartBugMedia<span className="text-[#E34304] scale-125 ml-0.5 animate-pulse">.</span>
                             </h1>
-                            <span className="text-[8px] font-black text-white/30 uppercase tracking-[0.4em] mt-1.5 leading-none">Node Controller</span>
+                            <span className="text-[8px] font-black text-white/40 uppercase tracking-[0.3em] mt-1.5 leading-none whitespace-nowrap">Node Controller</span>
                         </div>
                     </div>
-                    <button onClick={onClose} className="lg:hidden p-2 text-white/40 hover:text-white transition-colors"><X size={20} /></button> 
+                    <button onClick={onClose} className="lg:hidden p-2 -mr-1 text-white/40 hover:text-white transition-colors shrink-0" aria-label="Close navigation drawer"><X size={20} /></button> 
                 </div>
 
                 <div className="flex-1 overflow-y-auto custom-scrollbar px-6 py-8 space-y-10">
