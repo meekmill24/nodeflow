@@ -522,52 +522,53 @@ function extractMatchingBundle(
                 </Portal>
             )}
             {/* Top Navigation */}
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between gap-1.5 sm:gap-2">
                 <Link 
                     href="/home" 
-                    className="inline-flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 text-white/80 hover:text-white text-xs font-black uppercase tracking-wider transition-all"
+                    className="inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 text-white/80 hover:text-white text-[11px] sm:text-xs font-black uppercase tracking-wider transition-all whitespace-nowrap shrink-0"
                 >
-                    <ArrowLeft size={16} /> Back to Home
+                    <ArrowLeft size={14} className="shrink-0" /> Back to Home
                 </Link>
-                <div className="flex items-center gap-2">
-                    <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-purple-500/15 border border-purple-500/30 text-purple-300 text-[10px] font-black uppercase tracking-widest shadow-[0_0_15px_rgba(168,85,247,0.2)]">
-                        <Layers size={13} className="text-purple-400" /> SET <strong className="text-white">{currentSet}</strong> / {setsPerDay}
+                <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+                    <div className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full bg-purple-500/15 border border-purple-500/30 text-purple-300 text-[9px] sm:text-[10px] font-black uppercase tracking-widest shadow-[0_0_15px_rgba(168,85,247,0.2)] whitespace-nowrap shrink-0">
+                        <Layers size={12} className="text-purple-400 shrink-0" /> SET <strong className="text-white">{currentSet}</strong>&nbsp;/&nbsp;{setsPerDay}
                     </div>
-                    <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#3DD6C8]/10 border border-[#3DD6C8]/20 text-[#3DD6C8] text-[10px] font-black uppercase tracking-widest">
-                        <Activity size={14} /> Optimization Node
+                    <div className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full bg-[#3DD6C8]/10 border border-[#3DD6C8]/20 text-[#3DD6C8] text-[9px] sm:text-[10px] font-black uppercase tracking-widest whitespace-nowrap shrink-0">
+                        <Activity size={12} className="shrink-0" />
+                        <span>Optimization Node</span>
                     </div>
                 </div>
             </div>
 
             {/* ACTIVE HUB BANNER */}
-            <div className="bg-[#0B0B1E] border border-white/5 p-10 md:p-14 rounded-[48px] shadow-2xl relative overflow-hidden group">
+            <div className="bg-[#0B0B1E] border border-white/5 p-5 sm:p-8 md:p-14 rounded-[32px] sm:rounded-[48px] shadow-2xl relative overflow-hidden group">
                  <div className="absolute top-0 right-0 w-96 h-96 bg-[#3DD6C8]/5 blur-[120px] rounded-full pointer-events-none" />
-                 <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-10">
-                    <div className="flex items-center gap-6">
-                        <div className="w-16 h-16 rounded-[24px] bg-[#3DD6C8]/10 border border-[#3DD6C8]/30 flex items-center justify-center relative overflow-hidden group-hover:scale-105 transition-transform duration-700">
-                            <Cpu className="text-[#3DD6C8] z-10" size={32} />
+                 <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6 sm:gap-10">
+                    <div className="flex items-start sm:items-center gap-3.5 sm:gap-6">
+                        <div className="w-12 h-12 sm:w-16 sm:h-16 shrink-0 aspect-square rounded-[18px] sm:rounded-[24px] bg-[#3DD6C8]/10 border border-[#3DD6C8]/30 flex items-center justify-center relative overflow-hidden group-hover:scale-105 transition-transform duration-700">
+                            <Cpu className="text-[#3DD6C8] z-10 w-6 h-6 sm:w-8 sm:h-8 shrink-0" />
                             <div className="absolute inset-0 bg-gradient-to-t from-[#3DD6C8]/20 to-transparent animate-pulse" />
                         </div>
-                        <div>
-                            <h1 className="text-3xl md:text-5xl font-black text-white italic uppercase tracking-tighter leading-none mb-3">
+                        <div className="min-w-0 flex-1">
+                            <h1 className="text-2xl sm:text-3xl md:text-5xl font-black text-white italic uppercase tracking-tighter leading-tight md:leading-none mb-2.5 sm:mb-3">
                                 OPTIMIZATION COMMAND CENTER
                             </h1>
-                            <div className="flex flex-wrap items-center gap-3">
-                                <span className="px-3 py-1 bg-white/5 rounded-full text-[9px] font-black text-white/40 uppercase tracking-[0.2em] border border-white/10 italic">Module: Start.exe</span>
-                                <div className="flex items-center gap-2 px-3 py-1 bg-purple-500/10 border border-purple-500/25 rounded-full">
-                                    <Layers size={10} className="text-purple-400" />
+                            <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                                <span className="px-2.5 sm:px-3 py-1 bg-white/5 rounded-full text-[9px] font-black text-white/40 uppercase tracking-[0.2em] border border-white/10 italic whitespace-nowrap">Module: Start.exe</span>
+                                <div className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1 bg-purple-500/10 border border-purple-500/25 rounded-full whitespace-nowrap">
+                                    <Layers size={10} className="text-purple-400 shrink-0" />
                                     <span className="text-[9px] font-black text-purple-300 uppercase tracking-widest">SET {currentSet} OF {setsPerDay}</span>
                                 </div>
-                                <div className="flex items-center gap-2 px-3 py-1 bg-white/5 border border-white/10 rounded-full group/ref cursor-pointer hover:bg-white/10 transition-all" onClick={() => {
+                                <div className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1 bg-white/5 border border-white/10 rounded-full group/ref cursor-pointer hover:bg-white/10 transition-all whitespace-nowrap" onClick={() => {
                                     navigator.clipboard.writeText(profile?.referral_code || '');
                                     toast.success('Referral Protocol Copied');
                                 }}>
                                     <span className="text-[9px] font-black text-white/40 uppercase tracking-[0.2em]">Referral Code:</span>
                                     <span className="text-[9px] font-black text-[#3DD6C8] uppercase tracking-widest">{profile?.referral_code || '---'}</span>
-                                    <Copy size={10} className="text-white/20 group-hover/ref:text-[#3DD6C8] transition-colors" />
+                                    <Copy size={10} className="text-white/20 group-hover/ref:text-[#3DD6C8] transition-colors shrink-0" />
                                 </div>
-                                <div className="flex items-center gap-2">
-                                    <div className="w-2 h-2 rounded-full bg-[#3DD6C8] shadow-[0_0_8px_rgba(61,214,200,1)] animate-pulse" />
+                                <div className="flex items-center gap-1.5 whitespace-nowrap">
+                                    <div className="w-2 h-2 rounded-full bg-[#3DD6C8] shadow-[0_0_8px_rgba(61,214,200,1)] animate-pulse shrink-0" />
                                     <span className="text-[9px] font-black text-[#3DD6C8] uppercase tracking-[0.4em]">{matchingStatus}</span>
                                 </div>
                             </div>
@@ -576,7 +577,7 @@ function extractMatchingBundle(
                  </div>
 
                  {/* LIVE OPERATIONS & HUB */}
-                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 mt-12 pt-10 border-t border-white/5">
+                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 sm:gap-4 mt-8 sm:mt-12 pt-6 sm:pt-10 border-t border-white/5">
                     {[
                         { label: t('wallet_balance'), value: format(profile?.wallet_balance || 0), icon: Wallet, color: 'text-white' },
                         { label: t('daily_profits'), value: format(profile?.profit || 0), icon: TrendingUp, color: 'text-amber-400' },
@@ -584,11 +585,11 @@ function extractMatchingBundle(
                         { label: t('set_progress'), value: `${tasksInCurrentSet}/${totalTasks} Tasks`, icon: Activity, color: 'text-[#3DD6C8]' },
                         { label: t('frozen_asset'), value: format(profile?.freeze_balance || 0), icon: Lock, color: 'text-rose-500' },
                     ].map((stat, i) => (
-                        <div key={i} className="flex flex-col gap-1">
-                            <span className="text-[8px] font-black text-white/20 uppercase tracking-[0.4em] flex items-center gap-2">
-                                <stat.icon size={10} /> {stat.label}
+                        <div key={i} className={`flex flex-col gap-1 ${i === 4 ? 'col-span-2 sm:col-span-1' : ''}`}>
+                            <span className="text-[8px] font-black text-white/20 uppercase tracking-[0.4em] flex items-center gap-1.5 sm:gap-2">
+                                <stat.icon size={10} className="shrink-0" /> {stat.label}
                             </span>
-                            <span className={`text-xl font-black italic uppercase ${stat.color}`}>{stat.value}</span>
+                            <span className={`text-lg sm:text-xl font-black italic uppercase ${stat.color}`}>{stat.value}</span>
                         </div>
                     ))}
                  </div>
