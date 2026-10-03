@@ -86,17 +86,17 @@ export default function ActivityFeed() {
     if (!currentActivity) return null;
 
     return (
-        <div className={`fixed top-18 sm:top-22 md:!top-6 md:!left-[59%] left-1/2 -translate-x-1/2 z-40 transition-all duration-500 ease-out transform pointer-events-none ${
+        <div className={`fixed top-13 sm:top-15 md:!top-6 md:!left-[59%] left-1/2 -translate-x-1/2 z-[55] transition-all duration-500 ease-out transform pointer-events-none ${
             isVisible ? 'translate-y-0 opacity-100 scale-100' : '-translate-y-8 opacity-0 scale-95'
         }`}>
             <div 
                 onClick={handleSupportClick}
-                className={`glass-card-strong pointer-events-auto px-4 py-2 sm:py-2.5 flex items-center gap-3 border transition-all duration-300 min-w-[240px] max-w-[calc(100vw-32px)] cursor-pointer hover:scale-105 active:scale-95 shadow-[0_12px_36px_rgba(0,0,0,0.65)] ${
+                className={`glass-card-strong pointer-events-auto px-3.5 py-1.5 sm:py-2 flex items-center gap-2.5 sm:gap-3 border transition-all duration-300 min-w-[230px] max-w-[calc(100vw-32px)] cursor-pointer hover:scale-105 active:scale-95 shadow-[0_12px_36px_rgba(0,0,0,0.65)] ${
                 theme === 'dark' 
                 ? 'border-white/15 bg-[#0B0B1E]/95 backdrop-blur-2xl' 
                 : 'border-gray-200 bg-white shadow-[0_15px_50px_-10px_rgba(0,0,0,0.3)]'
             } rounded-full`}>
-                <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center shrink-0 ${
+                <div className={`w-7 h-7 sm:w-7.5 sm:h-7.5 rounded-full flex items-center justify-center shrink-0 ${
                     currentActivity.type === 'earning' ? 'bg-success/20 text-success' : 
                     currentActivity.type === 'upgrade' ? 'bg-gold/20 text-gold' : 'bg-primary/20 text-primary-light'
                 }`}>
