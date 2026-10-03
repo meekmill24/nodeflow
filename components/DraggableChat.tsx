@@ -7,14 +7,8 @@ import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 
 export default function DraggableChat() {
-    const [isVisible, setIsVisible] = useState(false);
+    const [isVisible, setIsVisible] = useState(true);
     const pathname = usePathname();
-    
-    useEffect(() => {
-        // Delay visibility to ensure Tawk is loaded
-        const timer = setTimeout(() => setIsVisible(true), 1500);
-        return () => clearTimeout(timer);
-    }, []);
 
     const toggleChat = () => {
         const tawk = (window as any).Tawk_API;

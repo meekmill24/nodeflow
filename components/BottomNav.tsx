@@ -30,7 +30,7 @@ export default function BottomNav() {
                 {/* Subtle Neon Top Highlight */}
                 <div className="absolute top-0 inset-x-6 md:inset-x-10 h-[1px] bg-gradient-to-r from-transparent via-[#3DD6C8]/50 to-transparent pointer-events-none" />
 
-                <div className="relative grid grid-cols-3 w-full h-[4.5rem] sm:h-20 items-center px-3 sm:px-6 pb-[max(0.4rem,env(safe-area-inset-bottom))] md:pb-0">
+                <div className="relative grid grid-cols-3 w-full h-[4.75rem] sm:h-20 items-center px-3 sm:px-6 pb-[max(0.5rem,env(safe-area-inset-bottom))] md:pb-0">
                     {tabs.map((item) => {
                         const { icon: Icon, label, href, isCenter } = item;
                         const isActive = pathname === href || (href === '/start' && pathname.startsWith('/start'));
@@ -50,20 +50,20 @@ export default function BottomNav() {
 
                                             {/* Center Action Button */}
                                             <div
-                                                className={`w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center relative z-10 transition-all duration-300 ring-4 ring-[#0B0B1E] border border-white/40
+                                                className={`w-[3.75rem] h-[3.75rem] sm:w-16 sm:h-16 rounded-full flex items-center justify-center relative z-10 transition-all duration-300 ring-4 ring-[#0B0B1E] border border-white/40
                                                     ${isActive
                                                         ? 'bg-gradient-to-tr from-[#169387] via-[#3DD6C8] to-[#7ef1e4] shadow-[0_10px_35px_rgba(61,214,200,0.6)] scale-105'
                                                         : 'bg-gradient-to-tr from-[#198b80] via-[#3DD6C8] to-[#5eead4] shadow-[0_8px_30px_rgba(61,214,200,0.45)] group-hover:scale-105 active:scale-95'
                                                     }`}
                                             >
                                                 <Icon 
-                                                    size={26} 
+                                                    size={27} 
                                                     className="text-[#0B0B1E] transition-transform duration-300 group-hover:scale-110" 
                                                     fill="currentColor"
                                                 />
                                             </div>
                                         </div>
-                                        <span className="text-[9px] mt-1 font-black transition-all duration-300 uppercase tracking-widest italic text-[#3DD6C8] drop-shadow-[0_0_8px_rgba(61,214,200,0.7)]">
+                                        <span className="text-[9.5px] sm:text-[10px] mt-1 font-black transition-all duration-300 uppercase tracking-widest italic text-[#3DD6C8] drop-shadow-[0_0_8px_rgba(61,214,200,0.7)]">
                                             {displayLabel}
                                         </span>
                                     </Link>
@@ -77,14 +77,14 @@ export default function BottomNav() {
                                     isActive ? 'bg-[#3DD6C8]/15 border border-[#3DD6C8]/30 shadow-[0_0_15px_rgba(61,214,200,0.25)]' : 'bg-transparent border border-transparent'
                                 }`}>
                                     <Icon
-                                        size={22}
+                                        size={23}
                                         className={`transition-all duration-300 group-active:scale-90 ${
                                             isActive ? 'text-[#3DD6C8]' : 'text-white/40 group-hover:text-white/80'
                                         }`}
                                     />
                                 </div>
                                 <span
-                                    className={`text-[10px] font-black transition-all duration-300 uppercase tracking-wider text-center line-clamp-1 ${
+                                    className={`text-[10.5px] sm:text-[11px] font-black transition-all duration-300 uppercase tracking-wider text-center line-clamp-1 ${
                                         isActive ? 'text-[#3DD6C8] drop-shadow-[0_0_6px_rgba(61,214,200,0.5)]' : 'text-white/40 group-hover:text-white/70'
                                     }`}
                                 >

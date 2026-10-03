@@ -143,20 +143,20 @@ export default function Header({ onMenuClick }: HeaderProps) {
                 </button>
             </div>
         )}
-        <header className="h-16 sm:h-20 lg:h-24 flex items-center px-3 sm:px-6 lg:px-10 bg-[#0B0B1E]/90 backdrop-blur-2xl border-b border-white/5">
-            <div className="max-w-7xl w-full mx-auto flex items-center justify-between gap-2 sm:gap-6">
+        <header className="h-[4.25rem] sm:h-20 lg:h-24 flex items-center px-3.5 sm:px-6 lg:px-10 bg-[#0B0B1E]/90 backdrop-blur-2xl border-b border-white/5">
+            <div className="max-w-7xl w-full mx-auto flex items-center justify-between gap-2.5 sm:gap-6">
                 
                 {/* Mobile & Tablet Menu & Logo */}
-                <div className="flex items-center gap-2 sm:gap-4 shrink-0">
+                <div className="flex items-center gap-2.5 sm:gap-4 shrink-0">
                     <button 
                         onClick={onMenuClick}
-                        className="lg:hidden w-10 h-10 rounded-xl bg-white/10 hover:bg-[#3DD6C8]/20 border border-white/15 hover:border-[#3DD6C8]/40 text-[#3DD6C8] shadow-lg active:scale-95 transition-all flex items-center justify-center shrink-0 cursor-pointer"
+                        className="lg:hidden w-10 h-10 rounded-2xl bg-white/10 hover:bg-[#3DD6C8]/20 border border-white/15 hover:border-[#3DD6C8]/40 text-[#3DD6C8] shadow-lg active:scale-95 transition-all flex items-center justify-center shrink-0 cursor-pointer"
                         aria-label="Toggle navigation drawer"
                     >
                         <Menu size={22} className="text-[#3DD6C8]" />
                     </button>
                     <div className="lg:hidden flex items-center gap-2 shrink-0">
-                         <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-slate-950 border border-[#3DD6C8]/30 flex items-center justify-center p-1.5 shadow-[0_0_15px_rgba(61,214,200,0.25)] shrink-0">
+                         <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-slate-950 border border-[#3DD6C8]/30 flex items-center justify-center p-1.5 shadow-[0_0_15px_rgba(61,214,200,0.25)] shrink-0">
                             <img src="/logo.png" alt="Logo" className="w-full h-full object-contain filter drop-shadow-[0_0_5px_rgba(61,214,200,0.5)]" />
                          </div>
                     </div>
@@ -173,17 +173,17 @@ export default function Header({ onMenuClick }: HeaderProps) {
                     </div>
                 </div>
 
-                <div className="flex items-center gap-1.5 sm:gap-3 md:gap-5 ml-auto shrink-0 min-w-0">
+                <div className="flex items-center gap-2 sm:gap-3 md:gap-5 ml-auto shrink-0 min-w-0">
                     {/* ASSET PILL */}
-                    <div className="flex items-center gap-2 sm:gap-4 lg:gap-8 rounded-2xl sm:rounded-[24px] px-2.5 sm:px-5 py-1.5 sm:py-2.5 bg-black/50 border border-white/10 shadow-2xl group cursor-pointer active:scale-95 transition-all shrink-0">
+                    <div className="flex items-center gap-2.5 sm:gap-4 lg:gap-8 rounded-2xl sm:rounded-[24px] px-3 sm:px-5 py-2 sm:py-2.5 bg-black/50 border border-white/10 shadow-2xl group cursor-pointer active:scale-95 transition-all shrink-0">
                         <div className="flex flex-col">
-                            <span className="text-[6.5px] sm:text-[7px] font-black text-white/40 uppercase tracking-[0.2em] sm:tracking-[0.4em] leading-none mb-0.5 sm:mb-1">BALANCE</span>
-                            <span className="text-xs sm:text-sm lg:text-xl font-black text-white italic tracking-tighter uppercase leading-none drop-shadow-md">
+                            <span className="text-[7.5px] sm:text-[8px] font-black text-white/50 uppercase tracking-[0.25em] sm:tracking-[0.4em] leading-none mb-1">BALANCE</span>
+                            <span className="text-xs sm:text-base lg:text-xl font-black text-white italic tracking-tight uppercase leading-none drop-shadow-md">
                                 {format(profile?.wallet_balance ?? 0)}
                             </span>
                         </div>
-                        <div className="w-7 h-7 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-[#3DD6C8]/10 border border-[#3DD6C8]/20 flex items-center justify-center text-[#3DD6C8] group-hover:scale-110 transition-transform shrink-0">
-                             <Wallet size={15} className="sm:hidden" />
+                        <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-[#3DD6C8]/10 border border-[#3DD6C8]/20 flex items-center justify-center text-[#3DD6C8] group-hover:scale-110 transition-transform shrink-0">
+                             <Wallet size={16} className="sm:hidden" />
                              <Wallet size={18} className="hidden sm:block" />
                         </div>
                     </div>
@@ -191,7 +191,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
                     <div className="h-10 w-[1px] bg-white/10 hidden lg:block mx-1" />
 
                     {/* ACTIONS */}
-                    <div className="flex items-center gap-1.5 sm:gap-2 lg:gap-3 shrink-0">
+                    <div className="flex items-center gap-2 sm:gap-2 lg:gap-3 shrink-0">
                         {/* Mobile & Tablet Install App Trigger */}
                         <button
                             onClick={() => {
@@ -209,10 +209,10 @@ export default function Header({ onMenuClick }: HeaderProps) {
                         <div className="relative shrink-0" ref={notifRef}>
                              <button 
                                 onClick={() => { setIsNotifOpen(!isNotifOpen); setIsProfileOpen(false); }}
-                                className={`w-9 h-9 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl transition-all relative border flex items-center justify-center shrink-0 ${isNotifOpen ? 'bg-[#3DD6C8]/10 border-[#3DD6C8]/30 text-[#3DD6C8]' : 'bg-white/5 border-white/5 text-white/50 hover:text-white hover:bg-white/10'}`}
+                                className={`w-10 h-10 sm:w-11 sm:h-11 rounded-2xl transition-all relative border flex items-center justify-center shrink-0 ${isNotifOpen ? 'bg-[#3DD6C8]/10 border-[#3DD6C8]/30 text-[#3DD6C8]' : 'bg-white/5 border-white/5 text-white/50 hover:text-white hover:bg-white/10'}`}
                              >
-                                <Bell size={18} />
-                                {unreadCount > 0 && <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[#E34304] border-2 border-[#0B0B1E] animate-pulse" />}
+                                <Bell size={19} />
+                                {unreadCount > 0 && <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-[#E34304] border-2 border-[#0B0B1E] animate-pulse" />}
                              </button>
                              {isNotifOpen && (
                                 <div className="absolute top-full right-0 mt-3 w-80 sm:w-96 bg-[#0B0B1E]/95 backdrop-blur-2xl border border-white/10 rounded-[28px] shadow-[0_30px_90px_rgba(0,0,0,0.9)] p-5 z-50 animate-in slide-in-from-top-2 duration-300">
@@ -261,10 +261,10 @@ export default function Header({ onMenuClick }: HeaderProps) {
                         {/* Profile Hub */}
                         <Link 
                             href="/profile"
-                            className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl transition-all border bg-white/5 border-white/5 text-white/50 hover:text-[#3DD6C8] hover:bg-white/10 hover:border-[#3DD6C8]/30 flex items-center justify-center shrink-0"
+                            className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl transition-all border bg-white/5 border-white/5 text-white/50 hover:text-[#3DD6C8] hover:bg-white/10 hover:border-[#3DD6C8]/30 flex items-center justify-center shrink-0"
                             title="Profile"
                         >
-                            <User size={18} />
+                            <User size={19} />
                         </Link>
                     </div>
                 </div>

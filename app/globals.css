@@ -284,3 +284,48 @@ nextjs-portal,
 div[data-nextjs-dev-overlay] {
   display: none !important;
 }
+
+/* ==========================================================================
+   Tawk.to Legacy Launcher & "We Are Here!" Attention Grabber Suppression
+   Permanently prevents the old green chat bubble from appearing on page reload.
+   Only the modern custom DraggableChat and maximized chat window are rendered.
+   ========================================================================== */
+#chat-bubble,
+#chat-bubble *,
+#min-widget,
+#min-widget *,
+#message-preview,
+#message-preview *,
+#branding-widget,
+#branding-widget *,
+.tawk-min-container,
+.tawk-min-container *,
+.tawk-bubble,
+.tawk-bubble *,
+.tawk-button,
+[id*="tawk-bubble"],
+[id*="tawk-bubble"] *,
+[id*="chat-bubble"],
+[id*="chat-bubble"] *,
+[id*="min-widget"],
+[id*="min-widget"] *,
+iframe[title="chat:minimized"],
+iframe[title="chat:bubble"] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  clip: rect(0, 0, 0, 0) !important;
+  clip-path: inset(100%) !important;
+  width: 0 !important;
+  height: 0 !important;
+  max-width: 0 !important;
+  max-height: 0 !important;
+  overflow: hidden !important;
+  position: fixed !important;
+  left: -9999px !important;
+  top: -9999px !important;
+  z-index: -9999 !important;
+  transform: scale(0) !important;
+}
+
