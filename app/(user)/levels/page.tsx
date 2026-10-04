@@ -118,13 +118,14 @@ export default function LevelsPage() {
                         const isCompleted = userLevel ? Number(level.price) < Number(userLevel.price) : false;
 
                         const nextLevel = levels[idx + 1];
-                        const dynamicDepositRange = nextLevel
+                        const specFallback = TIER_SPECS[level.name];
+                        const dynamicDepositRange = specFallback?.depositRange || (nextLevel
                             ? `$${Number(level.price).toLocaleString()} to $${(Number(nextLevel.price) - 1).toLocaleString()}`
-                            : `$${Number(level.price).toLocaleString()} upwards`;
+                            : `$${Number(level.price).toLocaleString()} upwards`);
 
-                        const commPercent = `${(Number(level.commission_rate) * 100).toFixed(1)}%`;
-                        const setsCount = Number(level.sets_per_day) || 3;
-                        const tasksPerSet = Number(level.tasks_per_set) || 40;
+                        const commPercent = specFallback?.commPercent || `${(Number(level.commission_rate) * 100).toFixed(1)}%`;
+                        const setsCount = Number(level.sets_per_day) || specFallback?.sets || 3;
+                        const tasksPerSet = Number(level.tasks_per_set) || specFallback?.tasksPerSet || 40;
                         const totalMaintenance = setsCount * tasksPerSet;
 
                         const currentTasks = completedCount % tasksPerSet;
@@ -137,7 +138,7 @@ export default function LevelsPage() {
                                 className={`w-[85vw] max-w-[320px] shrink-0 snap-center md:w-auto md:max-w-none bg-[#0B0B1E] border p-6 lg:p-7 rounded-[32px] relative overflow-hidden transition-all duration-500 flex flex-col justify-between group ${
                                     isCurrentLevel 
                                         ? 'border-[#3DD6C8] shadow-[0_0_35px_rgba(61,214,200,0.18)] z-10' 
-                                        : 'border-white/5 hover:border-white/10'
+                                        : 'border-white/10 hover:border-white/20'
                                 }`}
                             >
                                 <div className={`absolute inset-0 bg-gradient-to-br ${colorClass} opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none`} />
@@ -150,15 +151,15 @@ export default function LevelsPage() {
                                         </div>
                                         <div>
                                             {isCurrentLevel ? (
-                                                <span className="text-[9px] font-black text-[#3DD6C8] uppercase tracking-[0.2em] px-3 py-1 bg-[#3DD6C8]/10 rounded-full border border-[#3DD6C8]/30">
+                                                <span className="text-[10px] font-black text-[#3DD6C8] uppercase tracking-[0.2em] px-3.5 py-1 bg-[#3DD6C8]/10 rounded-full border border-[#3DD6C8]/30 shadow-[0_0_12px_rgba(61,214,200,0.2)]">
                                                     Active
                                                 </span>
                                             ) : isLocked ? (
-                                                <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center">
-                                                    <Lock size={12} className="text-white/30" />
+                                                <div className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center">
+                                                    <Lock size={12} className="text-white/40" />
                                                 </div>
                                             ) : (
-                                                <div className="w-8 h-8 rounded-full bg-[#3DD6C8]/10 flex items-center justify-center">
+                                                <div className="w-8 h-8 rounded-full bg-[#3DD6C8]/10 border border-[#3DD6C8]/20 flex items-center justify-center shadow-[0_0_10px_rgba(61,214,200,0.2)]">
                                                     <CheckCircle size={14} className="text-[#3DD6C8]" />
                                                 </div>
                                             )}
@@ -167,33 +168,80 @@ export default function LevelsPage() {
 
                                     {/* Title Header with uniform height container for perfect horizontal alignment */}
                                     <div>
-                                        <div className="min-h-[48px] flex items-center mb-3">
-                                            <h3 className="text-lg xl:text-[19px] font-black text-white uppercase tracking-tight leading-snug group-hover:text-[#3DD6C8] transition-colors">
+                                        <div className="min-h-[44px] flex items-center justify-between mb-3.5">
+                                            <h3 className="text-lg xl:text-xl font-black text-white uppercase tracking-tight leading-snug group-hover:text-[#3DD6C8] transition-colors">
                                                 {level.name}
                                             </h3>
+                                            <span className="text-[10px] font-black text-white/40 uppercase tracking-widest font-mono px-2 py-0.5 rounded-md bg-white/[0.04] border border-white/5">
+                                                Lv.{idx + 1}
+                                            </span>
                                         </div>
                                         
-                                        {/* Specification Table - DB Synced & Visually Formatted */}
-                                        <div className="p-4 sm:p-4.5 rounded-2xl bg-white/[0.03] border border-white/5 space-y-2.5">
-                                            <div className="flex items-center justify-between">
-                                                <span className="text-[9px] font-black text-white/40 uppercase tracking-[0.16em]">In:</span>
-                                                <span className="text-[11px] sm:text-xs font-black text-amber-400 font-mono tracking-tight">{dynamicDepositRange}</span>
+                                        {/* Specification Table - Redesigned with Rich Typography, High Contrast & Polished Aesthetics */}
+                                        <div className="p-4 sm:p-4.5 rounded-2xl bg-black/50 border border-white/10 space-y-3 backdrop-blur-md shadow-inner">
+                                            {/* In: */}
+                                            <div className="flex items-center justify-between gap-2 pb-2.5 border-b border-white/[0.06]">
+                                                <div className="flex items-center gap-2">
+                                                    <span className="w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0" />
+                                                    <span className="text-[11px] font-bold text-white/70 uppercase tracking-[0.12em]">
+                                                        In:
+                                                    </span>
+                                                </div>
+                                                <span className="text-xs sm:text-[13px] font-black text-amber-300 font-mono tracking-tight px-2.5 py-0.5 rounded-lg bg-amber-400/10 border border-amber-400/25 shadow-sm text-right">
+                                                    {dynamicDepositRange}
+                                                </span>
                                             </div>
-                                            <div className="flex items-center justify-between">
-                                                <span className="text-[9px] font-black text-white/40 uppercase tracking-[0.16em]">Commission rate:</span>
-                                                <span className="text-[11px] sm:text-xs font-black text-[#3DD6C8] font-mono tracking-tight">{commPercent}</span>
+
+                                            {/* Commission rate */}
+                                            <div className="flex items-center justify-between gap-2">
+                                                <div className="flex items-center gap-2">
+                                                    <span className="w-1.5 h-1.5 rounded-full bg-[#3DD6C8] shrink-0" />
+                                                    <span className="text-[11px] font-bold text-white/70 uppercase tracking-[0.12em]">
+                                                        Commission rate:
+                                                    </span>
+                                                </div>
+                                                <span className="text-xs sm:text-[13px] font-black text-[#3DD6C8] font-mono tracking-tight px-2.5 py-0.5 rounded-lg bg-[#3DD6C8]/10 border border-[#3DD6C8]/25 shadow-sm">
+                                                    {commPercent}
+                                                </span>
                                             </div>
-                                            <div className="flex items-center justify-between">
-                                                <span className="text-[9px] font-black text-white/40 uppercase tracking-[0.16em]">Sets of tasks:</span>
-                                                <span className="text-[11px] sm:text-xs font-black text-white/90 font-mono tracking-tight">{setsCount} sets</span>
+
+                                            {/* Sets of tasks */}
+                                            <div className="flex items-center justify-between gap-2">
+                                                <div className="flex items-center gap-2">
+                                                    <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 shrink-0" />
+                                                    <span className="text-[11px] font-bold text-white/70 uppercase tracking-[0.12em]">
+                                                        Sets of tasks:
+                                                    </span>
+                                                </div>
+                                                <span className="text-xs sm:text-[13px] font-black text-white/95 font-mono tracking-tight">
+                                                    {setsCount} sets
+                                                </span>
                                             </div>
-                                            <div className="flex items-center justify-between">
-                                                <span className="text-[9px] font-black text-white/40 uppercase tracking-[0.16em]">Products per task:</span>
-                                                <span className="text-[11px] sm:text-xs font-black text-white/90 font-mono tracking-tight">{tasksPerSet} products</span>
+
+                                            {/* Products per task */}
+                                            <div className="flex items-center justify-between gap-2">
+                                                <div className="flex items-center gap-2">
+                                                    <span className="w-1.5 h-1.5 rounded-full bg-violet-400 shrink-0" />
+                                                    <span className="text-[11px] font-bold text-white/70 uppercase tracking-[0.12em]">
+                                                        Products per task:
+                                                    </span>
+                                                </div>
+                                                <span className="text-xs sm:text-[13px] font-black text-white/95 font-mono tracking-tight">
+                                                    {tasksPerSet} products
+                                                </span>
                                             </div>
-                                            <div className="flex items-center justify-between pt-2.5 border-t border-white/[0.07]">
-                                                <span className="text-[9px] font-black text-white/50 uppercase tracking-[0.16em]">Total maintenance:</span>
-                                                <span className="text-[11px] sm:text-xs font-black text-emerald-400 font-mono tracking-tight">{totalMaintenance} products</span>
+
+                                            {/* Total maintenance */}
+                                            <div className="flex items-center justify-between gap-2 pt-2.5 border-t border-white/[0.08]">
+                                                <div className="flex items-center gap-2">
+                                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0 shadow-[0_0_8px_rgba(52,211,153,0.6)]" />
+                                                    <span className="text-[11px] font-black text-white/85 uppercase tracking-[0.12em]">
+                                                        Total maintenance:
+                                                    </span>
+                                                </div>
+                                                <span className="text-xs sm:text-[13px] font-black text-emerald-400 font-mono tracking-tight px-2.5 py-0.5 rounded-lg bg-emerald-500/10 border border-emerald-500/25 shadow-[0_0_12px_rgba(52,211,153,0.15)]">
+                                                    {totalMaintenance} products
+                                                </span>
                                             </div>
                                         </div>
                                     </div>
