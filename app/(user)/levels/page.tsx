@@ -104,8 +104,8 @@ export default function LevelsPage() {
                  </div>
             </div>
 
-            {/* LEVEL GRID - RESPONSIVE: Mobile Horizontal Snap Scroll, Tablet 2-Col, PC 4-Col */}
-            <div className="flex overflow-x-auto pb-4 pt-1 snap-x snap-mandatory gap-4 -mx-4 px-4 scrollbar-none md:grid md:grid-cols-2 lg:grid-cols-4 md:gap-5 md:overflow-visible md:p-0 md:m-0">
+            {/* LEVEL GRID - RESPONSIVE: Mobile Horizontal Snap Scroll, Tablet & Laptop 2-Col, Desktop 4-Col */}
+            <div className="flex overflow-x-auto pb-4 pt-1 snap-x snap-mandatory gap-4 -mx-4 px-4 scrollbar-none md:grid md:grid-cols-2 xl:grid-cols-4 md:gap-5 md:overflow-visible md:p-0 md:m-0">
                 {loading ? (
                     Array(4).fill(0).map((_, i) => <div key={i} className="h-[460px] w-[85vw] max-w-[320px] shrink-0 md:w-auto md:max-w-none bg-slate-900/40 rounded-[32px] animate-pulse border border-white/5" />)
                 ) : (
@@ -168,8 +168,8 @@ export default function LevelsPage() {
 
                                     {/* Title Header with uniform height container for perfect horizontal alignment */}
                                     <div>
-                                        <div className="min-h-[40px] flex items-center justify-between mb-3">
-                                            <h3 className="text-base sm:text-lg font-black text-white uppercase tracking-tight leading-snug group-hover:text-[#3DD6C8] transition-colors truncate">
+                                        <div className="min-h-[44px] flex items-center justify-between mb-3">
+                                            <h3 className="text-base sm:text-lg font-black text-white uppercase tracking-tight leading-tight group-hover:text-[#3DD6C8] transition-colors">
                                                 {level.name}
                                             </h3>
                                             <span className="text-[9px] font-bold text-white/50 font-mono px-2 py-0.5 rounded-md bg-white/[0.04] border border-white/5 shrink-0 ml-2">
@@ -177,8 +177,8 @@ export default function LevelsPage() {
                                             </span>
                                         </div>
                                         
-                                        {/* Specification Table - Clean, Compact, Zero Overflow */}
-                                        <div className="p-3 sm:p-3.5 rounded-2xl bg-black/50 border border-white/10 space-y-2.5 backdrop-blur-md shadow-inner overflow-hidden">
+                                        {/* Specification Table - Clean, Spacious, Zero Overflow */}
+                                        <div className="p-3 sm:p-3.5 rounded-2xl bg-black/50 border border-white/10 space-y-2.5 backdrop-blur-md shadow-inner">
                                             {/* In: */}
                                             <div className="flex items-center justify-between gap-1.5 pb-2 border-b border-white/[0.06]">
                                                 <div className="flex items-center gap-1.5 shrink-0">
@@ -213,7 +213,7 @@ export default function LevelsPage() {
                                                         Sets of tasks:
                                                     </span>
                                                 </div>
-                                                <span className="text-[11px] sm:text-xs font-bold text-white/95 font-mono tracking-tight whitespace-nowrap pr-0.5">
+                                                <span className="text-[11px] sm:text-xs font-bold text-white/95 font-mono tracking-tight whitespace-nowrap">
                                                     {setsCount} sets
                                                 </span>
                                             </div>
@@ -226,7 +226,7 @@ export default function LevelsPage() {
                                                         Products per task:
                                                     </span>
                                                 </div>
-                                                <span className="text-[11px] sm:text-xs font-bold text-white/95 font-mono tracking-tight whitespace-nowrap pr-0.5">
+                                                <span className="text-[11px] sm:text-xs font-bold text-white/95 font-mono tracking-tight whitespace-nowrap">
                                                     {tasksPerSet} products
                                                 </span>
                                             </div>
@@ -239,7 +239,7 @@ export default function LevelsPage() {
                                                         Total maintenance:
                                                     </span>
                                                 </div>
-                                                <span className="text-[11px] sm:text-xs font-black text-emerald-400 font-mono tracking-tight whitespace-nowrap pr-0.5">
+                                                <span className="text-[11px] sm:text-xs font-black text-emerald-400 font-mono tracking-tight whitespace-nowrap">
                                                     {totalMaintenance} products
                                                 </span>
                                             </div>
