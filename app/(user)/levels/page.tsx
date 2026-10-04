@@ -232,16 +232,18 @@ export default function LevelsPage() {
                                             </div>
 
                                             {/* Total maintenance: */}
-                                            <div className="flex items-center justify-between gap-1.5 pt-2 border-t border-white/[0.08]">
-                                                <div className="flex items-center gap-1.5 shrink-0">
+                                            <div className="pt-2 border-t border-white/[0.08] space-y-1">
+                                                <div className="flex items-center gap-1.5">
                                                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0 shadow-[0_0_8px_rgba(52,211,153,0.6)]" />
-                                                    <span className="text-[11px] font-semibold text-white/80 whitespace-nowrap">
+                                                    <span className="text-[11px] font-semibold text-white/80">
                                                         Total maintenance:
                                                     </span>
                                                 </div>
-                                                <span className="text-[11px] sm:text-xs font-black text-emerald-400 font-mono tracking-tight whitespace-nowrap">
-                                                    {totalMaintenance} products
-                                                </span>
+                                                <div className="pl-3">
+                                                    <span className="text-xs sm:text-sm font-black text-emerald-400 font-mono tracking-tight">
+                                                        {totalMaintenance} products
+                                                    </span>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
