@@ -177,8 +177,8 @@ export default function LevelsPage() {
                                             </span>
                                         </div>
                                         
-                                        {/* Specification Table - Clean, Compact, Zero Wrapping */}
-                                        <div className="p-3 sm:p-3.5 rounded-2xl bg-black/50 border border-white/10 space-y-2.5 backdrop-blur-md shadow-inner">
+                                        {/* Specification Table - Clean, Compact, Zero Overflow */}
+                                        <div className="p-3 sm:p-3.5 rounded-2xl bg-black/50 border border-white/10 space-y-2.5 backdrop-blur-md shadow-inner overflow-hidden">
                                             {/* In: */}
                                             <div className="flex items-center justify-between gap-1.5 pb-2 border-b border-white/[0.06]">
                                                 <div className="flex items-center gap-1.5 shrink-0">
@@ -187,7 +187,7 @@ export default function LevelsPage() {
                                                         In:
                                                     </span>
                                                 </div>
-                                                <span className="text-[11px] sm:text-xs font-black text-amber-300 font-mono tracking-tight px-2 py-0.5 rounded-md bg-amber-400/10 border border-amber-400/25 shadow-sm whitespace-nowrap">
+                                                <span className="text-[11px] sm:text-xs font-black text-amber-300 font-mono tracking-tight px-1.5 py-0.5 rounded-md bg-amber-400/10 border border-amber-400/20 whitespace-nowrap">
                                                     {dynamicDepositRange}
                                                 </span>
                                             </div>
@@ -200,7 +200,7 @@ export default function LevelsPage() {
                                                         Commission rate:
                                                     </span>
                                                 </div>
-                                                <span className="text-[11px] sm:text-xs font-black text-[#3DD6C8] font-mono tracking-tight px-2 py-0.5 rounded-md bg-[#3DD6C8]/10 border border-[#3DD6C8]/25 shadow-sm whitespace-nowrap">
+                                                <span className="text-[11px] sm:text-xs font-black text-[#3DD6C8] font-mono tracking-tight px-1.5 py-0.5 rounded-md bg-[#3DD6C8]/10 border border-[#3DD6C8]/20 whitespace-nowrap">
                                                     {commPercent}
                                                 </span>
                                             </div>
@@ -213,7 +213,7 @@ export default function LevelsPage() {
                                                         Sets of tasks:
                                                     </span>
                                                 </div>
-                                                <span className="text-[11px] sm:text-xs font-bold text-white/95 font-mono tracking-tight whitespace-nowrap">
+                                                <span className="text-[11px] sm:text-xs font-bold text-white/95 font-mono tracking-tight whitespace-nowrap pr-0.5">
                                                     {setsCount} sets
                                                 </span>
                                             </div>
@@ -226,7 +226,7 @@ export default function LevelsPage() {
                                                         Products per task:
                                                     </span>
                                                 </div>
-                                                <span className="text-[11px] sm:text-xs font-bold text-white/95 font-mono tracking-tight whitespace-nowrap">
+                                                <span className="text-[11px] sm:text-xs font-bold text-white/95 font-mono tracking-tight whitespace-nowrap pr-0.5">
                                                     {tasksPerSet} products
                                                 </span>
                                             </div>
@@ -239,7 +239,7 @@ export default function LevelsPage() {
                                                         Total maintenance:
                                                     </span>
                                                 </div>
-                                                <span className="text-[11px] sm:text-xs font-black text-emerald-400 font-mono tracking-tight px-2 py-0.5 rounded-md bg-emerald-500/10 border border-emerald-500/25 shadow-[0_0_10px_rgba(52,211,153,0.15)] whitespace-nowrap">
+                                                <span className="text-[11px] sm:text-xs font-black text-emerald-400 font-mono tracking-tight whitespace-nowrap pr-0.5">
                                                     {totalMaintenance} products
                                                 </span>
                                             </div>
