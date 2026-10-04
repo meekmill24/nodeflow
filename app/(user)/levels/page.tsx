@@ -178,7 +178,7 @@ export default function LevelsPage() {
                                         </div>
                                         
                                         {/* Specification Table - Clean, Spacious, Zero Overflow */}
-                                        <div className="p-3 sm:p-3.5 rounded-2xl bg-black/50 border border-white/10 space-y-2.5 backdrop-blur-md shadow-inner">
+                                        <div className="p-3 sm:p-3.5 rounded-2xl bg-black/50 border border-white/10 space-y-2.5 backdrop-blur-md shadow-inner overflow-hidden">
                                             {/* In: */}
                                             <div className="flex items-center justify-between gap-1.5 pb-2 border-b border-white/[0.06]">
                                                 <div className="flex items-center gap-1.5 shrink-0">
@@ -231,19 +231,17 @@ export default function LevelsPage() {
                                                 </span>
                                             </div>
 
-                                            {/* Total Maintenance - Contained Highlight Card */}
-                                            <div className="pt-1.5 border-t border-white/[0.08]">
-                                                <div className="bg-emerald-500/[0.08] border border-emerald-500/25 rounded-xl px-2.5 py-2 flex items-center justify-between gap-1 shadow-sm">
-                                                    <div className="flex items-center gap-1.5 shrink-0">
-                                                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0 shadow-[0_0_8px_rgba(52,211,153,0.6)]" />
-                                                        <span className="text-[11px] font-bold text-white/90 whitespace-nowrap">
-                                                            Total maintenance:
-                                                        </span>
-                                                    </div>
-                                                    <span className="text-[11px] sm:text-xs font-black text-emerald-400 font-mono tracking-tight whitespace-nowrap">
-                                                        {totalMaintenance} products
+                                            {/* Total maintenance: */}
+                                            <div className="flex items-center justify-between gap-1.5 pt-2 border-t border-white/[0.08]">
+                                                <div className="flex items-center gap-1.5 shrink-0">
+                                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0 shadow-[0_0_8px_rgba(52,211,153,0.6)]" />
+                                                    <span className="text-[11px] font-semibold text-white/80 whitespace-nowrap">
+                                                        Total maintenance:
                                                     </span>
                                                 </div>
+                                                <span className="text-[11px] sm:text-xs font-black text-emerald-400 font-mono tracking-tight whitespace-nowrap">
+                                                    {totalMaintenance} products
+                                                </span>
                                             </div>
                                         </div>
                                     </div>
