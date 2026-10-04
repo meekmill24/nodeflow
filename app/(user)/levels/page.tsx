@@ -231,17 +231,19 @@ export default function LevelsPage() {
                                                 </span>
                                             </div>
 
-                                            {/* Total maintenance: */}
-                                            <div className="flex items-center justify-between gap-1.5 pt-2 border-t border-white/[0.08]">
-                                                <div className="flex items-center gap-1.5 shrink-0">
-                                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0 shadow-[0_0_8px_rgba(52,211,153,0.6)]" />
-                                                    <span className="text-[11px] font-bold text-white/85 whitespace-nowrap">
-                                                        Total maintenance:
+                                            {/* Total Maintenance - Contained Highlight Card */}
+                                            <div className="pt-1.5 border-t border-white/[0.08]">
+                                                <div className="bg-emerald-500/[0.08] border border-emerald-500/25 rounded-xl px-2.5 py-2 flex items-center justify-between gap-1 shadow-sm">
+                                                    <div className="flex items-center gap-1.5 shrink-0">
+                                                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0 shadow-[0_0_8px_rgba(52,211,153,0.6)]" />
+                                                        <span className="text-[11px] font-bold text-white/90 whitespace-nowrap">
+                                                            Total maintenance:
+                                                        </span>
+                                                    </div>
+                                                    <span className="text-[11px] sm:text-xs font-black text-emerald-400 font-mono tracking-tight whitespace-nowrap">
+                                                        {totalMaintenance} products
                                                     </span>
                                                 </div>
-                                                <span className="text-[11px] sm:text-xs font-black text-emerald-400 font-mono tracking-tight whitespace-nowrap">
-                                                    {totalMaintenance} products
-                                                </span>
                                             </div>
                                         </div>
                                     </div>
