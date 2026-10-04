@@ -29,12 +29,12 @@ import {
 
 const levelIcons = [Star, Crown, Trophy, Gem, Sparkles, Diamond];
 const levelColors = [
-    'from-[#3DD6C8] to-transparent',
-    'from-amber-400 to-transparent',
-    'from-indigo-400 to-transparent',
-    'from-rose-500 to-transparent',
-    'from-emerald-400 to-transparent',
-    'from-sky-400 to-transparent'
+    'from-[#3DD6C8]/15 via-[#3DD6C8]/5 to-transparent',
+    'from-amber-400/15 via-amber-400/5 to-transparent',
+    'from-indigo-400/15 via-indigo-400/5 to-transparent',
+    'from-amber-500/15 via-amber-500/5 to-transparent',
+    'from-emerald-400/15 via-emerald-400/5 to-transparent',
+    'from-sky-400/15 via-sky-400/5 to-transparent'
 ];
 
 const TIER_SPECS: Record<string, { depositRange: string; commPercent: string; sets: number; tasksPerSet: number; totalMaintenance: number }> = {
@@ -135,7 +135,7 @@ export default function LevelsPage() {
                         return (
                             <div 
                                 key={level.id} 
-                                className={`w-[85vw] max-w-[320px] shrink-0 snap-center md:w-auto md:max-w-none bg-[#0B0B1E] border p-6 lg:p-7 rounded-[32px] relative overflow-hidden transition-all duration-500 flex flex-col justify-between group ${
+                                className={`w-[85vw] max-w-[320px] shrink-0 snap-center md:w-auto md:max-w-none bg-[#0B0B1E] border p-4.5 sm:p-5 rounded-[28px] relative overflow-hidden transition-all duration-500 flex flex-col justify-between group ${
                                     isCurrentLevel 
                                         ? 'border-[#3DD6C8] shadow-[0_0_35px_rgba(61,214,200,0.18)] z-10' 
                                         : 'border-white/10 hover:border-white/20'
@@ -143,15 +143,15 @@ export default function LevelsPage() {
                             >
                                 <div className={`absolute inset-0 bg-gradient-to-br ${colorClass} opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none`} />
                                 
-                                <div className="relative z-10 flex-1 flex flex-col justify-between space-y-5">
+                                <div className="relative z-10 flex-1 flex flex-col justify-between space-y-4">
                                     {/* Card Top: Icon & Badge */}
                                     <div className="flex justify-between items-start">
-                                        <div className={`w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center ${isCurrentLevel ? 'bg-[#3DD6C8]/10 border-[#3DD6C8]/30 shadow-[0_0_15px_rgba(61,214,200,0.15)]' : 'group-hover:bg-white/10'} transition-all duration-500`}>
-                                            <Icon size={22} className={isCurrentLevel ? 'text-[#3DD6C8]' : 'text-white/40'} />
+                                        <div className={`w-11 h-11 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center ${isCurrentLevel ? 'bg-[#3DD6C8]/10 border-[#3DD6C8]/30 shadow-[0_0_15px_rgba(61,214,200,0.15)]' : 'group-hover:bg-white/10'} transition-all duration-500`}>
+                                            <Icon size={20} className={isCurrentLevel ? 'text-[#3DD6C8]' : 'text-white/40'} />
                                         </div>
                                         <div>
                                             {isCurrentLevel ? (
-                                                <span className="text-[10px] font-black text-[#3DD6C8] uppercase tracking-[0.2em] px-3.5 py-1 bg-[#3DD6C8]/10 rounded-full border border-[#3DD6C8]/30 shadow-[0_0_12px_rgba(61,214,200,0.2)]">
+                                                <span className="text-[10px] font-black text-[#3DD6C8] uppercase tracking-[0.2em] px-3 py-1 bg-[#3DD6C8]/10 rounded-full border border-[#3DD6C8]/30 shadow-[0_0_12px_rgba(61,214,200,0.2)]">
                                                     Active
                                                 </span>
                                             ) : isLocked ? (
@@ -168,78 +168,78 @@ export default function LevelsPage() {
 
                                     {/* Title Header with uniform height container for perfect horizontal alignment */}
                                     <div>
-                                        <div className="min-h-[44px] flex items-center justify-between mb-3.5">
-                                            <h3 className="text-lg xl:text-xl font-black text-white uppercase tracking-tight leading-snug group-hover:text-[#3DD6C8] transition-colors">
+                                        <div className="min-h-[40px] flex items-center justify-between mb-3">
+                                            <h3 className="text-base sm:text-lg font-black text-white uppercase tracking-tight leading-snug group-hover:text-[#3DD6C8] transition-colors truncate">
                                                 {level.name}
                                             </h3>
-                                            <span className="text-[10px] font-black text-white/40 uppercase tracking-widest font-mono px-2 py-0.5 rounded-md bg-white/[0.04] border border-white/5">
+                                            <span className="text-[9px] font-bold text-white/50 font-mono px-2 py-0.5 rounded-md bg-white/[0.04] border border-white/5 shrink-0 ml-2">
                                                 Lv.{idx + 1}
                                             </span>
                                         </div>
                                         
-                                        {/* Specification Table - Redesigned with Rich Typography, High Contrast & Polished Aesthetics */}
-                                        <div className="p-4 sm:p-4.5 rounded-2xl bg-black/50 border border-white/10 space-y-3 backdrop-blur-md shadow-inner">
+                                        {/* Specification Table - Clean, Compact, Zero Wrapping */}
+                                        <div className="p-3 sm:p-3.5 rounded-2xl bg-black/50 border border-white/10 space-y-2.5 backdrop-blur-md shadow-inner">
                                             {/* In: */}
-                                            <div className="flex items-center justify-between gap-2 pb-2.5 border-b border-white/[0.06]">
-                                                <div className="flex items-center gap-2">
+                                            <div className="flex items-center justify-between gap-1.5 pb-2 border-b border-white/[0.06]">
+                                                <div className="flex items-center gap-1.5 shrink-0">
                                                     <span className="w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0" />
-                                                    <span className="text-[11px] font-bold text-white/70 uppercase tracking-[0.12em]">
+                                                    <span className="text-[11px] font-semibold text-white/70">
                                                         In:
                                                     </span>
                                                 </div>
-                                                <span className="text-xs sm:text-[13px] font-black text-amber-300 font-mono tracking-tight px-2.5 py-0.5 rounded-lg bg-amber-400/10 border border-amber-400/25 shadow-sm text-right">
+                                                <span className="text-[11px] sm:text-xs font-black text-amber-300 font-mono tracking-tight px-2 py-0.5 rounded-md bg-amber-400/10 border border-amber-400/25 shadow-sm whitespace-nowrap">
                                                     {dynamicDepositRange}
                                                 </span>
                                             </div>
 
-                                            {/* Commission rate */}
-                                            <div className="flex items-center justify-between gap-2">
-                                                <div className="flex items-center gap-2">
+                                            {/* Commission rate: */}
+                                            <div className="flex items-center justify-between gap-1.5">
+                                                <div className="flex items-center gap-1.5 shrink-0">
                                                     <span className="w-1.5 h-1.5 rounded-full bg-[#3DD6C8] shrink-0" />
-                                                    <span className="text-[11px] font-bold text-white/70 uppercase tracking-[0.12em]">
+                                                    <span className="text-[11px] font-medium text-white/70 whitespace-nowrap">
                                                         Commission rate:
                                                     </span>
                                                 </div>
-                                                <span className="text-xs sm:text-[13px] font-black text-[#3DD6C8] font-mono tracking-tight px-2.5 py-0.5 rounded-lg bg-[#3DD6C8]/10 border border-[#3DD6C8]/25 shadow-sm">
+                                                <span className="text-[11px] sm:text-xs font-black text-[#3DD6C8] font-mono tracking-tight px-2 py-0.5 rounded-md bg-[#3DD6C8]/10 border border-[#3DD6C8]/25 shadow-sm whitespace-nowrap">
                                                     {commPercent}
                                                 </span>
                                             </div>
 
-                                            {/* Sets of tasks */}
-                                            <div className="flex items-center justify-between gap-2">
-                                                <div className="flex items-center gap-2">
+                                            {/* Sets of tasks: */}
+                                            <div className="flex items-center justify-between gap-1.5">
+                                                <div className="flex items-center gap-1.5 shrink-0">
                                                     <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 shrink-0" />
-                                                    <span className="text-[11px] font-bold text-white/70 uppercase tracking-[0.12em]">
+                                                    <span className="text-[11px] font-medium text-white/70 whitespace-nowrap">
                                                         Sets of tasks:
                                                     </span>
                                                 </div>
-                                                <span className="text-xs sm:text-[13px] font-black text-white/95 font-mono tracking-tight">
+                                                <span className="text-[11px] sm:text-xs font-bold text-white/95 font-mono tracking-tight whitespace-nowrap">
                                                     {setsCount} sets
                                                 </span>
                                             </div>
 
-                                            {/* Products per task */}
-                                            <div className="flex items-center justify-between gap-2">
-                                                <div className="flex items-center gap-2">
+                                            {/* Products per task: */}
+                                            <div className="flex items-center justify-between gap-1.5">
+                                                <div className="flex items-center gap-1.5 shrink-0">
                                                     <span className="w-1.5 h-1.5 rounded-full bg-violet-400 shrink-0" />
-                                                    <span className="text-[11px] font-bold text-white/70 uppercase tracking-[0.12em]">
+                                                    <span className="text-[11px] font-medium text-white/70 whitespace-nowrap">
                                                         Products per task:
                                                     </span>
                                                 </div>
-                                                <span className="text-xs sm:text-[13px] font-black text-white/95 font-mono tracking-tight">
+                                                <span className="text-[11px] sm:text-xs font-bold text-white/95 font-mono tracking-tight whitespace-nowrap">
                                                     {tasksPerSet} products
                                                 </span>
                                             </div>
 
-                                            {/* Total maintenance */}
-                                            <div className="flex items-center justify-between gap-2 pt-2.5 border-t border-white/[0.08]">
-                                                <div className="flex items-center gap-2">
+                                            {/* Total maintenance: */}
+                                            <div className="flex items-center justify-between gap-1.5 pt-2 border-t border-white/[0.08]">
+                                                <div className="flex items-center gap-1.5 shrink-0">
                                                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0 shadow-[0_0_8px_rgba(52,211,153,0.6)]" />
-                                                    <span className="text-[11px] font-black text-white/85 uppercase tracking-[0.12em]">
+                                                    <span className="text-[11px] font-bold text-white/85 whitespace-nowrap">
                                                         Total maintenance:
                                                     </span>
                                                 </div>
-                                                <span className="text-xs sm:text-[13px] font-black text-emerald-400 font-mono tracking-tight px-2.5 py-0.5 rounded-lg bg-emerald-500/10 border border-emerald-500/25 shadow-[0_0_12px_rgba(52,211,153,0.15)]">
+                                                <span className="text-[11px] sm:text-xs font-black text-emerald-400 font-mono tracking-tight px-2 py-0.5 rounded-md bg-emerald-500/10 border border-emerald-500/25 shadow-[0_0_10px_rgba(52,211,153,0.15)] whitespace-nowrap">
                                                     {totalMaintenance} products
                                                 </span>
                                             </div>
