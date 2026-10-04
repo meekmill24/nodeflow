@@ -1038,14 +1038,14 @@ export default function WithdrawPage() {
 
                         {/* 3. DESTINATION WALLET ADDRESS FIELD */}
                         <div className="space-y-3">
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-2">
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                                <div className="flex flex-wrap items-center gap-2">
                                     <label className="text-[10px] font-black text-white/60 uppercase tracking-[0.2em] block">
                                         Recipient {currentNetworkConfig.label} Address
                                     </label>
                                     {profile?.wallet_address && (
                                         <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-[9px] font-black uppercase tracking-wider">
-                                            <CheckCircle2 size={10} /> Bound Wallet Auto-Loaded
+                                            <CheckCircle2 size={10} /> Bound Auto-Loaded
                                         </span>
                                     )}
                                 </div>
@@ -1065,7 +1065,7 @@ export default function WithdrawPage() {
                                     <button
                                         type="button"
                                         onClick={handlePasteAddress}
-                                        className="text-[10px] font-black text-[#3DD6C8] hover:text-[#3DD6C8]/80 uppercase tracking-widest flex items-center gap-1 transition-colors"
+                                        className="text-[10px] font-black text-[#3DD6C8] hover:text-[#3DD6C8]/80 uppercase tracking-widest flex items-center gap-1 transition-colors cursor-pointer"
                                     >
                                         <Copy size={12} /> Paste Clipboard
                                     </button>
