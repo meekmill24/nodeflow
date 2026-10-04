@@ -50,10 +50,11 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
     const [showHistory, setShowHistory] = useState(false);
     const [loading, setLoading] = useState(false);
 
-    // Completely prevent popups and notifications for unauthenticated users or public auth pages
+    // Completely prevent popups and notifications for unauthenticated users, public auth pages, or admin panel
     const isPublicAuthPage = pathname === '/' || pathname?.startsWith('/auth');
+    const isAdminPage = pathname?.startsWith('/admin');
     const isUserLoggedIn = Boolean(user && profile?.id && !authLoading);
-    const shouldDisplayPopups = isUserLoggedIn && !isPublicAuthPage;
+    const shouldDisplayPopups = isUserLoggedIn && !isPublicAuthPage && !isAdminPage;
 
     const formatTimestamp = (dateStr: string) => {
         try {
@@ -72,13 +73,36 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
         }
     };
 
-    const isBroadcast = (n: Notification) => 
-        n.type === 'info' || 
-        n.title?.toLowerCase().includes('broadcast') || 
-        n.title?.toLowerCase().includes('system') || 
-        n.title?.toLowerCase().includes('announcement') || 
-        n.title?.toLowerCase().includes('notice') ||
-        n.title?.toLowerCase().includes('maintenance');
+    const isBroadcast = (n: Notification) => {
+        if (!n) return false;
+        const lowerTitle = (n.title || '').toLowerCase();
+        const lowerMessage = (n.message || '').toLowerCase();
+
+        // 1. Explicitly exclude personal user transactions & receipts
+        if (
+            lowerTitle.includes('deposit') || 
+            lowerTitle.includes('withdraw') || 
+            lowerTitle.includes('txid') || 
+            lowerTitle.includes('transaction') ||
+            lowerTitle.includes('commission') ||
+            lowerTitle.includes('wallet') ||
+            lowerTitle.includes('reward') ||
+            lowerMessage.includes('deposit of') ||
+            lowerMessage.includes('withdrawal of') ||
+            lowerMessage.includes('txid:')
+        ) {
+            return false;
+        }
+
+        // 2. Only actual system broadcasts/announcements trigger the full-screen modal
+        return (
+            lowerTitle.includes('broadcast') || 
+            lowerTitle.includes('announcement') || 
+            lowerTitle.includes('maintenance') ||
+            lowerTitle.includes('system update') ||
+            lowerTitle.includes('official notice')
+        );
+    };
 
     const fetchNotifications = useCallback(async () => {
         if (!isUserLoggedIn || !profile?.id) {
@@ -151,8 +175,10 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
             }, (payload) => {
                 const newNotif = payload.new as Notification;
                 setToast(newNotif);
-                // Promptly show as modal if it is a broadcast notification
-                setBroadcastModal(newNotif);
+                // Promptly show as modal only if it is a broadcast notification
+                if (isBroadcast(newNotif)) {
+                    setBroadcastModal(newNotif);
+                }
                 fetchNotifications();
             })
             .subscribe();
