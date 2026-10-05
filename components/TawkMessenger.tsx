@@ -6,8 +6,8 @@ import { useEffect } from 'react';
 export default function TawkMessenger() {
     const settings = useSiteSettings() as any;
     
-    const propertyId = settings?.tawkto_property_id || '6a466c3aa8e00f1d434a0ef9';
-    const widgetId = settings?.tawkto_widget_id || '1jshhdhta';
+    const propertyId = settings?.tawkto_property_id || '6abe44e19762d834392b3344';
+    const widgetId = settings?.tawkto_widget_id || '1k3rjq8ai';
 
     useEffect(() => {
         // Initialize Tawk variables on the window object

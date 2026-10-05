@@ -33,8 +33,8 @@ export default function AdminLiveChatPage() {
           .in('key', ['tawkto_property_id', 'tawkto_widget_id']);
 
         if (data) {
-          const prop = data.find(s => s.key === 'tawkto_property_id')?.value || '6a466c3aa8e00f1d434a0ef9';
-          const widg = data.find(s => s.key === 'tawkto_widget_id')?.value || '1jshhdhta';
+          const prop = data.find(s => s.key === 'tawkto_property_id')?.value || '6abe44e19762d834392b3344';
+          const widg = data.find(s => s.key === 'tawkto_widget_id')?.value || '1k3rjq8ai';
           setPropertyId(prop);
           setWidgetId(widg);
         }
