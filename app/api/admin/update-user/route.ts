@@ -51,6 +51,21 @@ export async function POST(req: NextRequest) {
 
         if (error) throw error;
 
+        // If role or is_admin is updated, keep Supabase auth user_metadata in sync
+        if (payload.role !== undefined || payload.is_admin !== undefined) {
+            try {
+                const isAdmin = payload.role === 'admin' || payload.is_admin === true;
+                await supabaseAdmin.auth.admin.updateUserById(userId, {
+                    user_metadata: {
+                        role: payload.role || (isAdmin ? 'admin' : 'user'),
+                        is_admin: isAdmin
+                    }
+                });
+            } catch (authErr) {
+                console.warn('Could not sync auth user_metadata:', authErr);
+            }
+        }
+
         return NextResponse.json({ success: true, user: data?.[0] });
     } catch (err: any) {
         console.error('Update User Error:', err);

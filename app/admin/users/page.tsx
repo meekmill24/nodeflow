@@ -159,7 +159,7 @@ export default function AdminUsersPage() {
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || 'Failed to recalibrate node');
 
-        toast.success(`User account calibrated! Balance: $${Number(updatePayload.wallet_balance).toFixed(2)}`);
+        toast.success(`User updated (${updatePayload.role === 'admin' ? 'ADMIN_ROOT' : 'STANDARD_NODE'})! Balance: $${Number(updatePayload.wallet_balance).toFixed(2)}`);
         setEditingId(null);
         fetchUsers();
     } catch (err: any) {
@@ -438,14 +438,34 @@ export default function AdminUsersPage() {
                   <td className="px-4 md:px-8 py-6 hidden sm:table-cell">
                     <div className="flex flex-col gap-2">
                       <div className="flex items-center gap-2">
-                        {user.role === 'admin' ? (
-                          <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#3DD6C8]/10 text-[#3DD6C8] text-[9px] font-black uppercase tracking-widest border border-[#3DD6C8]/20">
-                            <Shield size={10} /> ADMIN_ROOT
-                          </span>
+                        {editingId === user.id ? (
+                          <div className="relative">
+                            <select 
+                              className="bg-black/60 border rounded-xl px-2.5 py-1 text-[9px] font-black uppercase tracking-widest focus:outline-none appearance-none cursor-pointer transition-all shadow-sm"
+                              style={{
+                                color: editData.role === 'admin' ? '#3DD6C8' : '#94A3B8',
+                                backgroundColor: editData.role === 'admin' ? 'rgba(61,214,200,0.1)' : 'rgba(30,41,59,0.5)',
+                                borderColor: editData.role === 'admin' ? 'rgba(61,214,200,0.4)' : 'rgba(148,163,184,0.3)'
+                              }}
+                              value={editData.role || 'user'}
+                              onChange={(e) => setEditData({ ...editData, role: e.target.value as any })}
+                            >
+                              <option value="user" className="bg-[#12122A] text-slate-300">STANDARD_NODE</option>
+                              <option value="admin" className="bg-[#12122A] text-[#3DD6C8]">ADMIN_ROOT</option>
+                            </select>
+                          </div>
                         ) : (
-                          <span className="px-3 py-1 rounded-full bg-slate-800/50 text-slate-500 text-[9px] font-black uppercase tracking-widest border border-slate-800">
-                            STANDARD_NODE
-                          </span>
+                          <>
+                            {user.role === 'admin' ? (
+                              <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#3DD6C8]/10 text-[#3DD6C8] text-[9px] font-black uppercase tracking-widest border border-[#3DD6C8]/20">
+                                <Shield size={10} /> ADMIN_ROOT
+                              </span>
+                            ) : (
+                              <span className="px-3 py-1 rounded-full bg-slate-800/50 text-slate-500 text-[9px] font-black uppercase tracking-widest border border-slate-800">
+                                STANDARD_NODE
+                              </span>
+                            )}
+                          </>
                         )}
                         {user.is_frozen && (
                           <span className="flex items-center gap-1 px-2 py-1 rounded-full bg-red-500/10 text-red-400 text-[8px] font-black uppercase tracking-widest border border-red-500/20 animate-pulse">
