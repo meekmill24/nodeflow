@@ -14,8 +14,15 @@ import {
     BadgeAlert,
     ArrowLeft
 } from 'lucide-react';
+import { useSiteSettings } from '@/context/SettingsContext';
+import FormattedDocContent from '@/components/FormattedDocContent';
 
 export default function PrivacyPolicyPage() {
+    const settings = useSiteSettings() as any;
+    const customContent = settings?.privacy_policy_content;
+    const title = settings?.privacy_policy_title || 'Privacy Protocol';
+    const subtitle = settings?.privacy_policy_subtitle || 'Data Sovereignty Protocols Active';
+
     return (
         <div className="max-w-4xl mx-auto pb-20 animate-fade-in space-y-12">
             {/* Top Navigation */}
@@ -35,16 +42,20 @@ export default function PrivacyPolicyPage() {
             <div className="text-center space-y-4">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-success/10 border border-success/20 text-success text-[10px] font-black uppercase tracking-[0.2em] mb-4">
                     <ShieldCheck size={12} />
-                    Data Sovereignty Protocols Active
+                    {subtitle}
                 </div>
                 <h1 className="text-4xl font-black text-white uppercase italic tracking-tighter leading-none">
-                    Privacy <span className="text-success">Protocol</span>
+                    {title}
                 </h1>
                 <p className="max-w-2xl mx-auto text-white/40 text-xs font-bold uppercase tracking-widest leading-relaxed">
                     Last Global Sync: December 2026 • Security Level: High-Fidelity
                 </p>
             </div>
 
+            {customContent ? (
+                <FormattedDocContent content={customContent} accentColor="#10B981" />
+            ) : (
+            <>
             {/* Core Privacy Values */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {[
@@ -135,6 +146,8 @@ export default function PrivacyPolicyPage() {
                     <p className="text-[9px] font-black text-white/20 uppercase tracking-[0.3em]">For privacy inquiries, contact the Neural Matrix Team through official channels.</p>
                 </div>
             </div>
+            </>
+            )}
 
         </div>
     );

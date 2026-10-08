@@ -129,3 +129,69 @@ export const PasswordResetEmail = (resetLink: string) => `
 </body>
 </html>
 `;
+
+export const EmailVerificationTemplate = (confirmationLink: string, username?: string) => `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>SmartBugMedia Email Verification</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #0F172A; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #FFFFFF;">
+  <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #0F172A; padding: 40px 20px;">
+    <tr>
+      <td align="center">
+        <table width="600" border="0" cellspacing="0" cellpadding="0" style="background-color: #1A1A2E; border-radius: 32px; border: 1px solid rgba(61, 214, 200, 0.2); overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.5);">
+          <!-- Header -->
+          <tr>
+            <td align="center" style="padding: 40px 0 20px 0;">
+              <h1 style="color: #3DD6C8; font-size: 32px; font-weight: 900; margin: 0; font-style: italic; letter-spacing: -1px;">
+                SmartBugMedia<span style="color: #E34304;">.</span>
+              </h1>
+              <p style="color: rgba(61, 214, 200, 0.6); font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 4px; margin-top: 8px;">
+                Identity Verification Protocol
+              </p>
+            </td>
+          </tr>
+          
+          <!-- Body -->
+          <tr>
+            <td style="padding: 0 50px 40px 50px; text-align: center;">
+              <h2 style="font-size: 24px; font-weight: 800; margin-bottom: 16px;">Verify Your Email${username ? `, ${username}` : ''}</h2>
+              <p style="color: #94A3B8; font-size: 14px; line-height: 1.6; margin-bottom: 30px;">
+                Thank you for joining SmartBugMedia. Click the button below to verify your email address and activate your institutional node. Once verified, your account will be unlocked and credited with your $25.00 first user signup bonus.
+              </p>
+              
+              <!-- Action Button -->
+              <table border="0" cellspacing="0" cellpadding="0" style="margin: 0 auto;">
+                <tr>
+                  <td align="center" style="border-radius: 16px; background-color: #3DD6C8;">
+                    <a href="${confirmationLink}" target="_blank" style="font-size: 14px; font-weight: 900; color: #0F172A; text-decoration: none; padding: 18px 40px; display: inline-block; text-transform: uppercase; letter-spacing: 1px;">
+                      Verify Email & Activate Node
+                    </a>
+                  </td>
+                </tr>
+              </table>
+              <p style="color: rgba(255,255,255,0.4); font-size: 11px; margin-top: 30px;">
+                If you did not create an account with SmartBugMedia, please disregard this transmission.
+              </p>
+            </td>
+          </tr>
+          
+          <!-- Footer -->
+          <tr>
+            <td style="background-color: rgba(0,0,0,0.2); padding: 30px 50px; text-align: center;">
+              <p style="color: rgba(255,255,255,0.3); font-size: 11px; margin: 0;">
+                SmartBugMedia Institutional Node Network<br>
+                &copy; 2026 SmartBugMedia Global. All rights reserved.
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+`;
+

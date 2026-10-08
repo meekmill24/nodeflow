@@ -15,8 +15,15 @@ import {
     Compass,
     ArrowRight
 } from 'lucide-react';
+import { useSiteSettings } from '@/context/SettingsContext';
+import FormattedDocContent from '@/components/FormattedDocContent';
 
 export default function ProtocolPage() {
+    const settings = useSiteSettings() as any;
+    const customContent = settings?.operating_protocol_content;
+    const title = settings?.operating_protocol_title || 'Simple Worker Operating Protocol';
+    const subtitle = settings?.operating_protocol_subtitle || 'Standard Operating Procedure';
+
     return (
         <div className="max-w-5xl mx-auto pb-24 animate-fade-in space-y-10">
             {/* Top Navigation */}
@@ -37,10 +44,10 @@ export default function ProtocolPage() {
                 <div className="absolute top-0 right-0 w-96 h-96 bg-cyan-500/10 blur-[120px] rounded-full pointer-events-none" />
                 <div className="relative z-10 space-y-4 max-w-3xl">
                     <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-[10px] font-black uppercase tracking-[0.2em]">
-                        Standard Operating Procedure
+                        {subtitle}
                     </div>
                     <h1 className="text-3xl md:text-5xl font-black text-white uppercase italic tracking-tight leading-tight">
-                        Simple Worker <span className="text-[#3DD6C8]">Operating Protocol</span>
+                        {title}
                     </h1>
                     <p className="text-white/60 text-xs md:text-sm font-bold uppercase tracking-wider leading-relaxed">
                         For a worker, think of this protocol as your daily compass: how to log in, handle assignments, collaborate safely, and finalize operations every single day.
@@ -48,6 +55,10 @@ export default function ProtocolPage() {
                 </div>
             </div>
 
+            {customContent ? (
+                <FormattedDocContent content={customContent} accentColor="#06B6D4" />
+            ) : (
+            <>
             {/* Easy Workflow Strip */}
             <div className="p-8 rounded-[32px] bg-gradient-to-r from-slate-900 via-cyan-950/40 to-slate-900 border border-cyan-500/30 space-y-4">
                 <div className="flex items-center gap-2">
@@ -145,6 +156,8 @@ export default function ProtocolPage() {
                     </div>
                 ))}
             </div>
+            </>
+            )}
 
             {/* Bottom Contact Mentor CTA */}
             <div className="p-8 rounded-[32px] bg-white/[0.02] border border-white/10 flex flex-col sm:flex-row items-center justify-between gap-6">

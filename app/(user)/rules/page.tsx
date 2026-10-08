@@ -6,8 +6,15 @@ import {
     ShieldCheck,
     ArrowLeft
 } from 'lucide-react';
+import { useSiteSettings } from '@/context/SettingsContext';
+import FormattedDocContent from '@/components/FormattedDocContent';
 
 export default function RulesPage() {
+    const settings = useSiteSettings() as any;
+    const customContent = settings?.terms_conditions_content;
+    const title = settings?.terms_conditions_title || 'User Agreement & Terms and Conditions';
+    const subtitle = settings?.terms_conditions_subtitle || 'SmartBugMedia. Institutional Protocol v4.5';
+
     return (
         <div className="max-w-5xl mx-auto pb-20 animate-fade-in space-y-10">
             {/* Top Navigation */}
@@ -33,10 +40,13 @@ export default function RulesPage() {
                     </div>
                     <div className="space-y-10 w-full">
                         <div>
-                            <h2 className="text-3xl font-black text-white uppercase italic tracking-tighter leading-none mb-3">User Agreement & Terms and Conditions</h2>
-                            <p className="text-[10px] font-black text-white/30 uppercase tracking-[0.4em]">SmartBugMedia. Institutional Protocol v4.5</p>
+                            <h2 className="text-3xl font-black text-white uppercase italic tracking-tighter leading-none mb-3">{title}</h2>
+                            <p className="text-[10px] font-black text-white/30 uppercase tracking-[0.4em]">{subtitle}</p>
                         </div>
                         
+                        {customContent ? (
+                            <FormattedDocContent content={customContent} accentColor="#3DD6C8" />
+                        ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 text-[11px] font-bold text-white/60 leading-relaxed uppercase tracking-widest">
                             <div className="space-y-8">
                                 <div>
@@ -83,6 +93,7 @@ export default function RulesPage() {
                                 </div>
                             </div>
                         </div>
+                        )}
 
                         <div className="p-8 bg-white/5 border border-white/10 rounded-3xl space-y-4">
                              <h4 className="text-xs font-black text-white italic tracking-widest uppercase">Acceptance of Terms</h4>

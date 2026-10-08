@@ -25,7 +25,11 @@ import {
   RotateCcw,
   Clock,
   Power,
-  AlertTriangle
+  AlertTriangle,
+  FileText,
+  ExternalLink,
+  FileCheck2,
+  Shield
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { checkWorkingHours } from '@/lib/workingHours';
@@ -78,6 +82,187 @@ const THEME_PRESETS = [
   }
 ];
 
+const DOC_TEMPLATES = {
+  terms: {
+    id: 'terms' as const,
+    label: 'Terms & Conditions',
+    href: '/rules',
+    badge: 'Legal',
+    color: 'text-teal-400',
+    borderColor: 'border-teal-400/30',
+    activeBg: 'bg-teal-500/10 text-teal-300 border-teal-500/30',
+    titleKey: 'terms_conditions_title',
+    subtitleKey: 'terms_conditions_subtitle',
+    contentKey: 'terms_conditions_content',
+    defaultTitle: 'User Agreement & Terms and Conditions',
+    defaultSubtitle: 'SmartBugMedia. Institutional Protocol v4.5',
+    defaultContent: `1. Product Listing Maintenance Tasks
+1.1 Users must maintain a minimum account balance of 100 USDT in order to begin a new cycle of product maintenance tasks.
+1.2 Initiating a new product maintenance cycle will reset the task counter and requires the minimum balance to be available in the account.
+1.3 After completing a full set of product maintenance tasks, users may choose to withdraw available balances or continue completing 3–6 task cycles to increase accumulated earnings.
+
+2. User Levels and Account Status
+2.1 SmartBugMedia maintains a tiered user system based on account activity and balance. Users may apply for level upgrades through Customer Support.
+2.2 After resetting an account cycle, users must complete the assigned product maintenance tasks before initiating withdrawal.
+2.3 Withdrawal requests require the user account credit score to remain at 100%.
+
+3. Financial Security
+3.1 All user funds are securely stored within the platform account system.
+3.2 Once all assigned product maintenance tasks are completed, users may request withdrawal of their available funds.
+3.3 The platform utilizes automated systems to process operational data and minimize human error.
+
+4. Account Security & Verification
+4.1 Users must safeguard their login and withdrawal passphrases. Platform personnel will never ask for private security keys.
+4.2 Multi-factor security protocols and SSL encryption are enforced across all transactional layers.
+4.3 Suspicious activity may result in temporary node calibration freeze until identity is re-verified.
+
+5. Product Packages and Platform Rewards
+5.1 Platform tasks may include Standard Product Listings and Special Product Packages (Super Orders). Super orders contain multiple product listings bundled together and generate substantial reward multipliers.
+5.2 Users receive their tier standard rebate (e.g. 0.4%–0.6%) for completing standard product maintenance tasks.
+5.3 Special package listings (Super Orders) generate rebates between 6x and 50x the standard task rate for all levels (e.g., 2.4% minimum up to 20.0%–30.0% maximum depending on user tier).
+
+6. Deposits & Withdrawals
+6.1 Users may determine their deposit amounts independently based on their financial capacity.
+6.2 When additional funds are required to complete a product package, the system will display the required balance difference.
+6.3 Before making any deposit, users should confirm the official wallet address through the platform’s Customer Support.
+6.4 Withdrawal requests are processed 24/7 following verification of set completion and account standing.`
+  },
+  compliance: {
+    id: 'compliance' as const,
+    label: 'Security Compliance',
+    href: '/compliance',
+    badge: 'SSL',
+    color: 'text-emerald-400',
+    borderColor: 'border-emerald-400/30',
+    activeBg: 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30',
+    titleKey: 'security_compliance_title',
+    subtitleKey: 'security_compliance_subtitle',
+    contentKey: 'security_compliance_content',
+    defaultTitle: 'Simple Worker Security Compliance',
+    defaultSubtitle: 'SmartBug Media Compliance Directive',
+    defaultContent: `Core Golden Rule:
+Protect the account. Protect the device. Protect the client’s data. Verify unusual requests. Report security problems immediately to our customer support on the platform.
+
+01. Protect your login
+Use a strong, unique password and enable MFA/2FA wherever available across your assigned portals.
+
+02. Never share passwords
+Do not send passwords, verification codes, recovery codes, or authentication links to anyone under any circumstances.
+
+03. Protect client data
+Client names, emails, CRM records, campaign data, reports, credentials, and customer information must be treated as strictly confidential.
+
+04. Use approved systems
+Store and share company/client information only through approved company tools and accounts, not personal email, drives, or unauthorized apps.
+
+05. Check access before sharing
+Make sure only authorized employees, clients, or contractors can access files, HubSpot records, advertising accounts, and reports.
+
+06. Watch for phishing
+Verify unusual emails, login requests, payment instructions, password-reset messages, and requests to change banking or wallet information.
+
+07. Secure your device
+Keep your computer updated, use screen locking, approved security software, and avoid leaving work devices unattended in public spaces.
+
+08. Follow privacy rules
+Only collect, access, download, or use customer information strictly needed for your active assigned tasks.
+
+09. Report incidents immediately
+Report suspicious logins, phishing attempts, lost devices, accidental data sharing, malware, or unauthorized access through customer support.
+
+10. When unsure, don’t share
+Verify the request with your assigned manager, mentor, or authorized client contact before releasing sensitive information.`
+  },
+  protocol: {
+    id: 'protocol' as const,
+    label: 'Operating Protocol',
+    href: '/protocol',
+    badge: 'Rules',
+    color: 'text-cyan-400',
+    borderColor: 'border-cyan-400/30',
+    activeBg: 'bg-cyan-500/10 text-cyan-300 border-cyan-500/30',
+    titleKey: 'operating_protocol_title',
+    subtitleKey: 'operating_protocol_subtitle',
+    contentKey: 'operating_protocol_content',
+    defaultTitle: 'Simple Worker Operating Protocol',
+    defaultSubtitle: 'Standard Operating Procedure',
+    defaultContent: `Key Principle:
+Do your assigned work, protect your information, check your work before publishing, and communicate immediately when something goes wrong.
+
+Workflow Steps:
+Check -> Work -> Protect -> Review -> Approve -> Deliver -> Update
+
+01. Log in securely
+Use your own approved account, a strong password, and MFA. Never share your password or verification codes with anyone.
+
+02. Check your assigned work
+Make sure you understand the client, task, deadline, and expected result before starting.
+
+03. Use approved tools only
+Work only through the company’s approved platforms, including this platform, CRM systems, project management tools, marketing tools, and communication systems.
+
+04. Protect client information
+Never send client lists, passwords, campaign data, CRM records, or confidential documents to unauthorized individuals.
+
+05. Follow instructions and scope
+Do not make major changes to campaigns, websites, CRM systems, budgets, or client data without authorization from the platform’s customer service team.
+
+06. Check your work
+Before submitting or publishing anything, verify spelling, links, data, audience, tracking information, attachments, and details through our customer support.
+
+07. Get approval when required
+Do not publish content or make significant client-facing changes until approval has been received from the appropriate supervisor or mentor.
+
+08. Communicate problems early
+If you are delayed, confused, blocked, or notice an error, inform your manager, mentor, or support team immediately rather than hiding the issue.
+
+09. Watch for scams
+Be cautious of unexpected password requests, payment requests from third parties unlike your mentor or customer support, or suspicious links. We accept only digital currencies. Always contact your mentor or our customer service team for assistance with account upgrades.
+
+10. Report security problems immediately
+If you click a suspicious link aside our platform link, lose a device, expose confidential information, or notice unauthorized access, report the incident immediately through SmartBug’s customer support on the platform.
+
+11. Close your work properly
+Update task or project status, save files in the correct location, record any outstanding actions, and secure your device when you finish working.`
+  },
+  privacy: {
+    id: 'privacy' as const,
+    label: 'Privacy Policy',
+    href: '/privacy',
+    badge: 'Encrypted',
+    color: 'text-orange-400',
+    borderColor: 'border-orange-400/30',
+    activeBg: 'bg-orange-500/10 text-orange-300 border-orange-500/30',
+    titleKey: 'privacy_policy_title',
+    subtitleKey: 'privacy_policy_subtitle',
+    contentKey: 'privacy_policy_content',
+    defaultTitle: 'Privacy Protocol',
+    defaultSubtitle: 'Data Sovereignty Protocols Active',
+    defaultContent: `Core Privacy Values:
+- Data Security: Enterprise-grade encryption across all nodal activity and wealth calibration cycles.
+- Neural Masking: Anonymized processing of user records through decentralized blockchain protocols.
+- Zero Extraction: No personal data is sold or exported to third-party commercial matrixes.
+
+1. Eligibility & Acceptance
+By using the SmartBugMedia platform, you confirm you are at least 18 years of age, have the legal capacity to enter into binding agreements, and agree to comply with all platform policies and applicable laws.
+
+2. Personal Information Protection
+SmartBugMedia is committed to protecting user privacy. We collect limited personal information necessary to operate our services, including account registration details, contact info, transaction records, and platform activity data. This data is used strictly for account management, transaction verification, platform security, and customer support.
+
+3. Security & Compliance
+SmartBugMedia uses secure digital infrastructure and blockchain-supported transaction systems (USDT, Ethereum, TRC Network) to provide transparent and traceable financial operations. Blockchain technology provides tamper-resistant transaction verification and secure global payment infrastructure.
+
+4. Reporting Improper Behavior
+SmartBugMedia maintains strict operational integrity standards. Employees or contractors associated with the platform are not permitted to engage in unauthorized activities. If users identify suspicious behavior or misuse of the SmartBugMedia brand, they may report the incident by submitting written descriptions and screenshots to the official support channel.
+
+5. Fund Management & Security
+SmartBugMedia implements automated transaction monitoring and financial processing systems. Users are responsible for ensuring the accuracy of wallet addresses and verifying transaction details before submitting payments. Transactions sent to incorrect addresses cannot always be reversed due to blockchain design.
+
+6. Institutional Tax Compliance
+Users are responsible for complying with tax regulations in their respective jurisdictions. Individuals receiving significant financial income may be required to report earnings and maintain financial records.`
+  }
+};
+
 interface SiteSetting {
   id: string;
   key: string;
@@ -91,6 +276,8 @@ export default function AdminSettingsPage() {
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
   const [provisioningKeys, setProvisioningKeys] = useState<Record<string, boolean>>({});
+  const [activeDocTab, setActiveDocTab] = useState<'terms' | 'compliance' | 'protocol' | 'privacy'>('terms');
+  const [savingDoc, setSavingDoc] = useState(false);
 
   useEffect(() => {
     fetchSettings();
@@ -150,6 +337,48 @@ export default function AdminSettingsPage() {
     }
   };
 
+  const handleLoadDefaultDoc = (docKey: 'terms' | 'compliance' | 'protocol' | 'privacy') => {
+    const doc = DOC_TEMPLATES[docKey];
+    handleUpdate(doc.titleKey, doc.defaultTitle);
+    handleUpdate(doc.subtitleKey, doc.defaultSubtitle);
+    handleUpdate(doc.contentKey, doc.defaultContent);
+    toast.success(`Loaded default template for ${doc.label}`);
+  };
+
+  const handleResetDoc = (docKey: 'terms' | 'compliance' | 'protocol' | 'privacy') => {
+    const doc = DOC_TEMPLATES[docKey];
+    handleUpdate(doc.titleKey, '');
+    handleUpdate(doc.subtitleKey, '');
+    handleUpdate(doc.contentKey, '');
+    toast.success(`Reset ${doc.label} to system defaults`);
+  };
+
+  const handleSaveDoc = async (docKey: 'terms' | 'compliance' | 'protocol' | 'privacy') => {
+    const doc = DOC_TEMPLATES[docKey];
+    setSavingDoc(true);
+    try {
+      const keysToSave = [doc.titleKey, doc.subtitleKey, doc.contentKey];
+      const payload = keysToSave.map(k => ({
+        key: k,
+        value: settings.find(s => s.key === k)?.value ?? ''
+      }));
+
+      const res = await fetch('/api/admin/site-settings', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ settings: payload })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to save document');
+      toast.success(`${doc.label} committed and live on user side!`);
+      fetchSettings();
+    } catch (err: any) {
+      toast.error(err.message);
+    } finally {
+      setSavingDoc(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
@@ -168,7 +397,18 @@ export default function AdminSettingsPage() {
           </div>
           <p className="text-slate-500 text-[10px] font-black uppercase tracking-[0.5em]">Global site controls and financial calibration protocols.</p>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex flex-wrap items-center gap-4">
+            <button 
+              type="button"
+              onClick={() => {
+                const el = document.getElementById('quick-hub-documents');
+                if (el) el.scrollIntoView({ behavior: 'smooth' });
+              }}
+              className="flex items-center gap-2.5 px-6 py-5 rounded-[24px] font-black uppercase tracking-[0.2em] text-[11px] bg-teal-500/10 hover:bg-teal-500/20 text-teal-300 border border-teal-500/30 transition-all hover:scale-105 active:scale-95 shadow-lg"
+            >
+              <FileText size={18} />
+              <span>QUICK HUB POLICIES</span>
+            </button>
             <button 
               onClick={() => handleSave()} 
               disabled={saving} 
@@ -648,6 +888,188 @@ export default function AdminSettingsPage() {
                         </div>
                     </div>
                 </div>
+           </section>
+
+           {/* PILLAR 2B: QUICK HUB POLICIES & LEGAL DOCUMENTS MATRIX */}
+           <section id="quick-hub-documents" className="bg-slate-900/40 border border-white/5 p-8 md:p-10 rounded-[48px] backdrop-blur-xl relative overflow-hidden group hover:border-[#3DD6C8]/20 transition-all duration-700">
+             <div className="absolute top-0 right-0 w-96 h-96 bg-[#3DD6C8]/5 blur-[120px] rounded-full pointer-events-none" />
+             
+             {/* Header */}
+             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-8 pb-8 border-b border-white/5">
+                <div className="flex items-center gap-4">
+                  <div className="p-3.5 bg-teal-500/10 rounded-2xl text-teal-400 ring-1 ring-teal-500/20 shadow-[0_0_20px_rgba(20,184,166,0.15)]">
+                    <FileText size={26} />
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-black text-white italic uppercase tracking-tighter leading-none flex items-center gap-3">
+                      Quick Hub Document Matrix
+                      <span className="px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-widest bg-teal-500/10 text-teal-300 border border-teal-500/30">Live Policies</span>
+                    </h3>
+                    <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1.5">
+                      Configure user-facing legal, security, operational, and privacy directives.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <a
+                    href={DOC_TEMPLATES[activeDocTab].href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white text-[10px] font-black uppercase tracking-wider border border-white/10 transition-all"
+                  >
+                    <span>View Live Page</span>
+                    <ExternalLink size={12} />
+                  </a>
+                </div>
+             </div>
+
+             {/* Document Switcher Tabs */}
+             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
+               {(Object.keys(DOC_TEMPLATES) as Array<keyof typeof DOC_TEMPLATES>).map((tabKey) => {
+                 const doc = DOC_TEMPLATES[tabKey];
+                 const isSelected = activeDocTab === tabKey;
+                 const hasCustomContent = !!settings.find(s => s.key === doc.contentKey)?.value;
+
+                 return (
+                   <button
+                     key={tabKey}
+                     type="button"
+                     onClick={() => setActiveDocTab(tabKey)}
+                     className={`p-4 rounded-2xl text-left border transition-all duration-300 relative ${
+                       isSelected
+                         ? `${doc.activeBg} shadow-lg scale-[1.02]`
+                         : 'bg-black/30 border-white/5 hover:border-white/20 text-slate-400 hover:text-white'
+                     }`}
+                   >
+                     <div className="flex items-center justify-between mb-2">
+                       <span className={`text-[8.5px] font-black uppercase tracking-widest px-2 py-0.5 rounded-md border ${
+                         isSelected ? 'bg-white/10 border-white/20' : 'bg-white/5 border-white/10'
+                       }`}>
+                         {doc.badge}
+                       </span>
+                       <span className={`w-2 h-2 rounded-full ${hasCustomContent ? 'bg-emerald-400' : 'bg-slate-700'}`} title={hasCustomContent ? 'Customized' : 'Using default'} />
+                     </div>
+                     <div className="text-xs font-black uppercase tracking-tight text-white">{doc.label}</div>
+                     <div className="text-[9px] font-bold text-slate-500 mt-1 uppercase tracking-wider">{doc.href}</div>
+                   </button>
+                 );
+               })}
+             </div>
+
+             {/* Active Document Editor */}
+             {(() => {
+               const doc = DOC_TEMPLATES[activeDocTab];
+               const currentTitle = settings.find(s => s.key === doc.titleKey)?.value ?? '';
+               const currentSubtitle = settings.find(s => s.key === doc.subtitleKey)?.value ?? '';
+               const currentContent = settings.find(s => s.key === doc.contentKey)?.value ?? '';
+               const isCustomized = !!currentContent;
+
+               return (
+                 <div className="space-y-6 bg-black/40 p-6 md:p-8 rounded-[32px] border border-white/5">
+                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-white/5">
+                     <div className="flex items-center gap-2">
+                       <span className={`text-xs font-black uppercase tracking-wider ${doc.color}`}>
+                         Editing {doc.label}
+                       </span>
+                       <span className={`text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full border ${
+                         isCustomized 
+                           ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30' 
+                           : 'bg-slate-800 text-slate-500 border-slate-700'
+                       }`}>
+                         {isCustomized ? 'Custom Content Active' : 'Default Content Active'}
+                       </span>
+                     </div>
+
+                     <div className="flex flex-wrap items-center gap-2">
+                       <button
+                         type="button"
+                         onClick={() => handleLoadDefaultDoc(activeDocTab)}
+                         className="px-3.5 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 text-[9px] font-black uppercase tracking-wider transition-all"
+                       >
+                         Load Default Template
+                       </button>
+                       <button
+                         type="button"
+                         onClick={() => handleResetDoc(activeDocTab)}
+                         className="px-3.5 py-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 text-[9px] font-black uppercase tracking-wider transition-all"
+                       >
+                         Reset to Default
+                       </button>
+                     </div>
+                   </div>
+
+                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                     <div className="space-y-2">
+                       <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 ml-1">
+                         Document Title (Header)
+                       </label>
+                       <input 
+                         className="w-full bg-black/60 border border-white/10 rounded-2xl px-5 py-3.5 text-white font-bold text-xs focus:outline-none focus:border-[#3DD6C8] transition-all"
+                         value={currentTitle}
+                         onChange={(e) => handleUpdate(doc.titleKey, e.target.value)}
+                         placeholder={doc.defaultTitle}
+                       />
+                     </div>
+
+                     <div className="space-y-2">
+                       <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 ml-1">
+                         Document Subtitle / Directive Pill
+                       </label>
+                       <input 
+                         className="w-full bg-black/60 border border-white/10 rounded-2xl px-5 py-3.5 text-white font-bold text-xs focus:outline-none focus:border-[#3DD6C8] transition-all"
+                         value={currentSubtitle}
+                         onChange={(e) => handleUpdate(doc.subtitleKey, e.target.value)}
+                         placeholder={doc.defaultSubtitle}
+                       />
+                     </div>
+                   </div>
+
+                   <div className="space-y-2">
+                     <div className="flex items-center justify-between ml-1">
+                       <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">
+                         Document Body Content
+                       </label>
+                       <span className="text-[9px] text-slate-600 font-bold uppercase tracking-wider">
+                         {currentContent ? `${currentContent.length} chars` : 'Default template in use'}
+                       </span>
+                     </div>
+                     <textarea 
+                       rows={14}
+                       className="w-full bg-black/70 border border-white/10 rounded-2xl p-5 text-slate-200 font-mono text-[11px] leading-relaxed focus:outline-none focus:border-[#3DD6C8] transition-all"
+                       value={currentContent}
+                       onChange={(e) => handleUpdate(doc.contentKey, e.target.value)}
+                       placeholder={`Enter your custom ${doc.label} here. Leave empty to display system defaults, or click "Load Default Template" above to start with the pre-written text.`}
+                     />
+                     <p className="text-[9px] text-slate-500 font-medium ml-1">
+                       Tip: Separate numbered sections (e.g. 1. Title, 2. Title) or bullet points (- Item) with newlines. The platform automatically styles them for users.
+                     </p>
+                   </div>
+
+                   <div className="flex items-center justify-between pt-4 border-t border-white/5">
+                     <a
+                       href={doc.href}
+                       target="_blank"
+                       rel="noopener noreferrer"
+                       className="text-[10px] font-black uppercase tracking-wider text-[#3DD6C8] hover:underline flex items-center gap-1.5"
+                     >
+                       <span>Preview {doc.href}</span>
+                       <ExternalLink size={12} />
+                     </a>
+
+                     <button
+                       type="button"
+                       disabled={savingDoc}
+                       onClick={() => handleSaveDoc(activeDocTab)}
+                       className="flex items-center gap-2 px-6 py-3 rounded-2xl bg-[#3DD6C8] hover:bg-[#34b7ab] text-slate-950 font-black text-[10px] uppercase tracking-widest transition-all shadow-lg active:scale-95 disabled:opacity-50"
+                     >
+                       {savingDoc ? <Loader2 className="animate-spin" size={14} /> : <Save size={14} />}
+                       <span>Save {doc.label}</span>
+                     </button>
+                   </div>
+                 </div>
+               );
+             })()}
            </section>
 
            {/* PILLAR 3: VISUAL APPEARANCE & THEME ENGINE */}

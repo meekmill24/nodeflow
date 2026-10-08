@@ -177,7 +177,7 @@ function SignUpForm() {
                         body: JSON.stringify({ email: email, username: username || email })
                     }).catch(e => console.error('Silent Email Error:', e));
                 }
-                router.push('/auth/sign-up-success')
+                router.push(`/auth/sign-up-success?email=${encodeURIComponent(email)}`)
             }
         } catch (error: unknown) {
             setError(error instanceof Error ? error.message : 'An error occurred')

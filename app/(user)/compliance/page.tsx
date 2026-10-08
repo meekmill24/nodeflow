@@ -16,8 +16,15 @@ import {
     Headphones,
     CheckCircle2
 } from 'lucide-react';
+import { useSiteSettings } from '@/context/SettingsContext';
+import FormattedDocContent from '@/components/FormattedDocContent';
 
 export default function CompliancePage() {
+    const settings = useSiteSettings() as any;
+    const customContent = settings?.security_compliance_content;
+    const title = settings?.security_compliance_title || 'Simple Worker Security Compliance';
+    const subtitle = settings?.security_compliance_subtitle || 'SmartBug Media Compliance Directive';
+
     return (
         <div className="max-w-5xl mx-auto pb-24 animate-fade-in space-y-10">
             {/* Top Navigation */}
@@ -38,10 +45,10 @@ export default function CompliancePage() {
                 <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/10 blur-[120px] rounded-full pointer-events-none" />
                 <div className="relative z-10 space-y-4 max-w-3xl">
                     <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-black uppercase tracking-[0.2em]">
-                        SmartBug Media Compliance Directive
+                        {subtitle}
                     </div>
                     <h1 className="text-3xl md:text-5xl font-black text-white uppercase italic tracking-tight leading-tight">
-                        Simple Worker <span className="text-emerald-400">Security Compliance</span>
+                        {title}
                     </h1>
                     <p className="text-white/60 text-xs md:text-sm font-bold uppercase tracking-wider leading-relaxed">
                         A worker handling company, client, CRM, advertising, or marketing data must follow these everyday baseline controls to maintain institutional integrity.
@@ -49,6 +56,10 @@ export default function CompliancePage() {
                 </div>
             </div>
 
+            {customContent ? (
+                <FormattedDocContent content={customContent} accentColor="#10B981" />
+            ) : (
+            <>
             {/* Simple Core Rule Highlight */}
             <div className="p-8 rounded-[32px] bg-gradient-to-r from-emerald-950/40 via-slate-900 to-cyan-950/40 border border-emerald-500/30 relative overflow-hidden">
                 <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
@@ -136,6 +147,8 @@ export default function CompliancePage() {
                     </div>
                 ))}
             </div>
+            </>
+            )}
 
             {/* Bottom Support CTA */}
             <div className="p-8 rounded-[32px] bg-white/[0.02] border border-white/10 flex flex-col sm:flex-row items-center justify-between gap-6">
