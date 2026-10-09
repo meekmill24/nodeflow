@@ -19,8 +19,10 @@ import {
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase/index';
+import { useSiteSettings } from '@/context/SettingsContext';
+import FormattedDocContent from '@/components/FormattedDocContent';
 
-const salaryData = [
+const DEFAULT_SALARY_DATA = [
     { level: 1, name: 'Junior', rewards: [100, 300, 800, 1500, 4000], total: 6700 },
     { level: 2, name: 'Intermediate', rewards: [200, 500, 1500, 3000, 6000], total: 11200 },
     { level: 3, name: 'Senior', rewards: [300, 700, 2500, 5000, 10000], total: 18000 },
@@ -32,8 +34,27 @@ const days = [2, 4, 7, 15, 30];
 export default function SalaryPage() {
     const { profile } = useAuth();
     const { format } = useCurrency();
+    const settings = useSiteSettings() as any;
     const [claiming, setClaiming] = useState(false);
     const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+
+    const title = settings?.salary_structure_title || 'Salary Structure';
+    const subtitle = settings?.salary_structure_subtitle || 'Monthly Compensation Model';
+    const workingHoursBadge = settings?.salary_working_hours_badge || '10:00 AM – 7:00 PM CT';
+
+    let activeSalaryData = DEFAULT_SALARY_DATA;
+    if (settings?.salary_tiers_data) {
+        try {
+            const parsed = typeof settings.salary_tiers_data === 'string'
+                ? JSON.parse(settings.salary_tiers_data)
+                : settings.salary_tiers_data;
+            if (Array.isArray(parsed) && parsed.length > 0) {
+                activeSalaryData = parsed;
+            }
+        } catch (e) {
+            // fallback to default
+        }
+    }
 
     const currentDays = (profile as any)?.salary_days_count || 0;
     const currentLevel = profile?.level_id || 1;
@@ -64,14 +85,14 @@ export default function SalaryPage() {
                         <ChevronLeft size={16} /> Back to Home
                     </Link>
                     <div>
-                        <h1 className="text-2xl font-black text-text-primary uppercase tracking-tight">Salary Structure</h1>
-                        <p className="text-[10px] font-black text-text-secondary uppercase tracking-[0.2em] opacity-40">Monthly Compensation Model</p>
+                        <h1 className="text-2xl font-black text-text-primary uppercase tracking-tight">{title}</h1>
+                        <p className="text-[10px] font-black text-text-secondary uppercase tracking-[0.2em] opacity-40">{subtitle}</p>
                     </div>
                 </div>
                 <div className="flex flex-wrap items-center gap-3">
                     <div className="px-3.5 py-1.5 rounded-xl bg-amber-400/10 border border-amber-400/25 flex items-center gap-2 shadow-sm">
                         <Clock size={14} className="text-amber-400 animate-pulse" />
-                        <span className="text-xs font-black text-amber-300 uppercase tracking-widest">10:00 AM – 7:00 PM CT</span>
+                        <span className="text-xs font-black text-amber-300 uppercase tracking-widest">{workingHoursBadge}</span>
                     </div>
                     <div className="px-3.5 py-1.5 rounded-xl bg-primary/10 border border-primary/20 flex items-center gap-2">
                         <Calendar size={14} className="text-primary-light" />
@@ -143,8 +164,8 @@ export default function SalaryPage() {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-black/5 dark:divide-white/5">
-                            {salaryData.map((row, i) => (
-                                <tr key={row.level} className={`group hover:bg-white/[0.02] transition-colors ${currentLevel === row.level ? 'bg-primary/5' : ''}`}>
+                            {activeSalaryData.map((row: any, i: number) => (
+                                <tr key={row.level || i} className={`group hover:bg-white/[0.02] transition-colors ${currentLevel === row.level ? 'bg-primary/5' : ''}`}>
                                     <td className="p-4 pl-6">
                                         <div className="flex items-center gap-3">
                                             <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs font-black text-white shadow-lg bg-gradient-to-br ${
@@ -153,18 +174,18 @@ export default function SalaryPage() {
                                                 i === 2 ? 'from-amber-400 to-orange-500' :
                                                 'from-rose-500 to-red-600'
                                             }`}>
-                                                {row.level}
+                                                {row.level || (i + 1)}
                                             </div>
                                             <div className="flex flex-col">
                                                 <span className="text-xs font-black text-white uppercase tracking-tight">{row.name}</span>
-                                                <span className="text-[8px] font-bold text-text-secondary uppercase tracking-widest opacity-40">Tier {row.level}</span>
+                                                <span className="text-[8px] font-bold text-text-secondary uppercase tracking-widest opacity-40">Tier {row.level || (i + 1)}</span>
                                             </div>
                                         </div>
                                     </td>
-                                    {row.rewards.map((reward, j) => (
+                                    {(row.rewards || []).map((reward: number, j: number) => (
                                         <td key={j} className="p-4 text-center">
                                             <div className={`text-xs font-black tracking-tighter ${currentDays >= days[j] && currentLevel === row.level ? 'text-success' : 'text-white'}`}>
-                                                ${reward.toLocaleString()}
+                                                ${(Number(reward) || 0).toLocaleString()}
                                             </div>
                                             {currentDays >= days[j] && currentLevel === row.level && (
                                                 <div className="text-[8px] font-black text-success uppercase tracking-tighter">Unlocked</div>
@@ -173,7 +194,7 @@ export default function SalaryPage() {
                                     ))}
                                     <td className="p-4 pr-6 text-right">
                                         <div className="text-sm font-black text-primary-light tracking-tighter">
-                                            ${row.total.toLocaleString()}
+                                            ${(Number(row.total) || 0).toLocaleString()}
                                         </div>
                                         <div className="text-[7px] font-black text-text-secondary uppercase tracking-tighter opacity-40">30 Day Cycle</div>
                                     </td>
@@ -185,7 +206,21 @@ export default function SalaryPage() {
             </div>
 
             {/* Rules & Info */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {settings?.salary_structure_content ? (
+                <div className="glass-card p-8 md:p-10 space-y-6">
+                    <div className="flex items-center gap-3 pb-4 border-b border-white/5">
+                        <div className="w-10 h-10 rounded-xl bg-amber-400/10 border border-amber-400/20 flex items-center justify-center text-amber-400">
+                            <ShieldCheck size={20} />
+                        </div>
+                        <div>
+                            <h3 className="text-sm font-black text-white uppercase tracking-[0.2em]">Operational Guidelines & Protocol</h3>
+                            <p className="text-[10px] text-text-secondary uppercase tracking-widest font-bold opacity-60">Verified Compensation Standards</p>
+                        </div>
+                    </div>
+                    <FormattedDocContent content={settings.salary_structure_content} accentColor="#f59e0b" />
+                </div>
+            ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div className="glass-card p-8 space-y-6">
                     <h3 className="text-xs font-black text-white uppercase tracking-[0.3em] flex items-center gap-2">
                         <Info size={16} className="text-primary" />
@@ -250,6 +285,7 @@ export default function SalaryPage() {
                     </div>
                 </div>
             </div>
+            )}
         </div>
     );
 }

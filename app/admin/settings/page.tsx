@@ -260,8 +260,88 @@ SmartBugMedia implements automated transaction monitoring and financial processi
 
 6. Institutional Tax Compliance
 Users are responsible for complying with tax regulations in their respective jurisdictions. Individuals receiving significant financial income may be required to report earnings and maintain financial records.`
+  },
+  faq: {
+    id: 'faq' as const,
+    label: 'FAQ & Support',
+    href: '/faq',
+    badge: 'Support',
+    color: 'text-blue-400',
+    borderColor: 'border-blue-400/30',
+    activeBg: 'bg-blue-500/10 text-blue-300 border-blue-500/30',
+    titleKey: 'faq_title',
+    subtitleKey: 'faq_subtitle',
+    contentKey: 'faq_content',
+    defaultTitle: 'Support Matrix',
+    defaultSubtitle: 'Integrated Intelligence & Frequently Asked Questions',
+    defaultContent: `[Category: Payments & Accounts]
+Q: What payment methods does SmartBugMedia support?
+A: SmartBugMedia currently supports Cryptocurrency (USDT / USDC), Bank Wire Transfer, and Bank Check. Transactions below 10,000 USDT are typically processed using cryptocurrency. Above 10,000 USDT, bank options become available.
+
+Q: How are bank checks issued and delivered?
+A: Bank checks may be issued through institutions like Chase, Citibank, Barclays, or BNP Paribas. Above 50,000 USDT: FedEx Overnight Delivery. 10,000 – 30,000 USDT: USPS Priority Mail. Next business day delivery is standard for high-volume transactions.
+
+Q: How long do bank transfers take?
+A: Bank wire transfers typically follow a 4–6 business day processing timeline, depending on local bank holidays, international banking compliance checks, and country-specific regulations.
+
+[Category: Operations & Tasks]
+Q: What are the platform operating hours?
+A: The SmartBugMedia platform operates daily from 09:00 AM – 09:00 PM Central Time (CT) for product maintenance tasks, withdrawal processing, and customer support. System maintenance runs daily from 02:00 – 04:00 AM Central Time (CT).
+
+Q: How are promotional gift packages assigned?
+A: Gift packages are randomly allocated by the system based on account activity and task progress. Allocation ensures equal opportunity across the network, but negative balances must be cleared first.
+
+Q: How are user levels determined?
+A: User levels (Junior, Intermediate, Senior, Mentor) are determined by the initial deposit amount and task volume. Each level offers progressive return rates and base salaries (up to 400 USDT for Mentor level).
+
+[Category: Security & Compliance]
+Q: How does account security work?
+A: SmartBugMedia mandates separate login and withdrawal passwords. Entering the wrong password three times will result in temporary suspension to prevent unauthorized access.
+
+Q: What are the tax reporting requirements?
+A: Users are responsible for domestic tax compliance. In the US, cash payments exceeding $10,000 may require IRS Form 8300 reporting. SmartBugMedia provides transaction records to assist users in fulfilling these obligations.
+
+Q: Are international wire transfers secure?
+A: Yes. All transfers pass through regulated financial institutions and are monitored by the U.S. Treasury (OFAC) to ensure security and prevent fraudulent activities.`
+  },
+  salary: {
+    id: 'salary' as const,
+    label: 'Salary Structure',
+    href: '/salary',
+    badge: 'Payroll',
+    color: 'text-amber-400',
+    borderColor: 'border-amber-400/30',
+    activeBg: 'bg-amber-500/10 text-amber-300 border-amber-500/30',
+    titleKey: 'salary_structure_title',
+    subtitleKey: 'salary_structure_subtitle',
+    contentKey: 'salary_structure_content',
+    defaultTitle: 'Salary Structure',
+    defaultSubtitle: 'Monthly Compensation Model',
+    defaultContent: `Important Notes:
+- Minimum salary is $6,700 for 30 consecutive days of work.
+- Salary increases with higher employee grades (VIP Levels).
+- Pay periods available every 2, 4, 7, 15, and 30 days.
+- Official working hours: US Central Time 10:00 AM – 7:00 PM (11:00 AM – 8:00 PM Eastern Time), Monday to Sunday.
+- Daily operational commitment: ~30 to 60 minutes to complete designated task sets during working hours.
+- Missed or interrupted workdays will reset the daily cycle accrual.
+
+Compliance & Working Schedule:
+- Working Hours Window: 10:00 AM – 7:00 PM CT (11:00 AM – 8:00 PM ET) • 7 Days a Week (Mon–Sun). Payouts and claims are validated in real-time by customer support.
+- Claim Window: Claims must be processed after all daily task sets are finalized. Manual verification may be required for high-tier claims.
+- Audited By: TLS 1.3 Verified Hub with automated compliance tracking.`
   }
 };
+
+const DEFAULT_SALARY_DATA = [
+  { level: 1, name: 'Junior', rewards: [100, 300, 800, 1500, 4000], total: 6700 },
+  { level: 2, name: 'Intermediate', rewards: [200, 500, 1500, 3000, 6000], total: 11200 },
+  { level: 3, name: 'Senior', rewards: [300, 700, 2500, 5000, 10000], total: 18000 },
+  { level: 4, name: 'Mentor', rewards: [400, 900, 3500, 6000, 12000], total: 22800 },
+];
+
+const SALARY_DAYS = [2, 4, 7, 15, 30];
+
+type DocTabKey = 'terms' | 'compliance' | 'protocol' | 'privacy' | 'faq' | 'salary';
 
 interface SiteSetting {
   id: string;
@@ -276,8 +356,9 @@ export default function AdminSettingsPage() {
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
   const [provisioningKeys, setProvisioningKeys] = useState<Record<string, boolean>>({});
-  const [activeDocTab, setActiveDocTab] = useState<'terms' | 'compliance' | 'protocol' | 'privacy'>('terms');
+  const [activeDocTab, setActiveDocTab] = useState<DocTabKey>('terms');
   const [savingDoc, setSavingDoc] = useState(false);
+  const [savingEmail, setSavingEmail] = useState(false);
 
   useEffect(() => {
     fetchSettings();
@@ -337,27 +418,61 @@ export default function AdminSettingsPage() {
     }
   };
 
-  const handleLoadDefaultDoc = (docKey: 'terms' | 'compliance' | 'protocol' | 'privacy') => {
+  const handleSaveEmailMatrix = async () => {
+    setSavingEmail(true);
+    try {
+      const emailKeys = ['support_email', 'admin_notification_email', 'resend_from_email'];
+      const emailSettings = emailKeys.map(key => ({
+        key,
+        value: settings.find(s => s.key === key)?.value || ''
+      }));
+      const res = await fetch('/api/admin/site-settings', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ settings: emailSettings })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to save email matrix');
+      toast.success('Email Matrix Saved! Live on user portal (/service, /concierge, footer).');
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to save email settings');
+    } finally {
+      setSavingEmail(false);
+    }
+  };
+
+  const handleLoadDefaultDoc = (docKey: DocTabKey) => {
     const doc = DOC_TEMPLATES[docKey];
     handleUpdate(doc.titleKey, doc.defaultTitle);
     handleUpdate(doc.subtitleKey, doc.defaultSubtitle);
     handleUpdate(doc.contentKey, doc.defaultContent);
+    if (docKey === 'salary') {
+      handleUpdate('salary_working_hours_badge', '10:00 AM – 7:00 PM CT');
+      handleUpdate('salary_tiers_data', JSON.stringify(DEFAULT_SALARY_DATA));
+    }
     toast.success(`Loaded default template for ${doc.label}`);
   };
 
-  const handleResetDoc = (docKey: 'terms' | 'compliance' | 'protocol' | 'privacy') => {
+  const handleResetDoc = (docKey: DocTabKey) => {
     const doc = DOC_TEMPLATES[docKey];
     handleUpdate(doc.titleKey, '');
     handleUpdate(doc.subtitleKey, '');
     handleUpdate(doc.contentKey, '');
+    if (docKey === 'salary') {
+      handleUpdate('salary_working_hours_badge', '');
+      handleUpdate('salary_tiers_data', '');
+    }
     toast.success(`Reset ${doc.label} to system defaults`);
   };
 
-  const handleSaveDoc = async (docKey: 'terms' | 'compliance' | 'protocol' | 'privacy') => {
+  const handleSaveDoc = async (docKey: DocTabKey) => {
     const doc = DOC_TEMPLATES[docKey];
     setSavingDoc(true);
     try {
       const keysToSave = [doc.titleKey, doc.subtitleKey, doc.contentKey];
+      if (docKey === 'salary') {
+        keysToSave.push('salary_working_hours_badge', 'salary_tiers_data');
+      }
       const payload = keysToSave.map(k => ({
         key: k,
         value: settings.find(s => s.key === k)?.value ?? ''
@@ -668,25 +783,38 @@ export default function AdminSettingsPage() {
 
           {/* EMAIL & COMMUNICATION SECTION */}
           <section className="bg-slate-900/40 border border-white/5 p-10 rounded-[48px] backdrop-blur-xl group hover:border-violet-500/20 transition-all">
-            <div className="flex items-center gap-4 mb-8">
-              <div className="p-3 bg-violet-500/10 rounded-2xl text-violet-400 ring-1 ring-violet-500/20">
-                <Mail size={24} />
+            <div className="flex items-center justify-between mb-8 gap-4 flex-wrap">
+              <div className="flex items-center gap-4">
+                <div className="p-3 bg-violet-500/10 rounded-2xl text-violet-400 ring-1 ring-violet-500/20">
+                  <Mail size={24} />
+                </div>
+                <div>
+                  <h3 className="text-xl font-black text-white italic uppercase tracking-tighter leading-none">Email Matrix</h3>
+                  <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1">Support & Operations Dispatch</p>
+                </div>
               </div>
-              <div>
-                <h3 className="text-xl font-black text-white italic uppercase tracking-tighter leading-none">Email Matrix</h3>
-                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1">Support & Operations Dispatch</p>
-              </div>
+
+              <button
+                type="button"
+                onClick={handleSaveEmailMatrix}
+                disabled={savingEmail}
+                className="px-5 py-2.5 rounded-2xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-black text-[11px] uppercase tracking-wider flex items-center gap-2 transition-all active:scale-95 disabled:opacity-50 shadow-lg shadow-violet-600/30 ring-1 ring-white/10"
+              >
+                {savingEmail ? <Loader2 size={13} className="animate-spin" /> : <Save size={13} />}
+                Save Email Matrix
+              </button>
             </div>
 
             <div className="space-y-6">
               <div className="space-y-2">
-                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-600 ml-1">1. Primary Member Support Email</label>
+                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-600 ml-1">1. Primary Member Support Email (Live on User Portal)</label>
                 <input 
                   className="w-full bg-black/40 border border-white/5 rounded-2xl px-6 py-4 text-white font-mono text-[11px] focus:outline-none focus:ring-2 focus:ring-violet-500/20 transition-all" 
                   value={settings.find(s => s.key === 'support_email')?.value || ''} 
                   onChange={(e) => handleUpdate('support_email', e.target.value)} 
                   placeholder="support@smartbugmedia.io" 
                 />
+                <p className="text-[9px] text-slate-500 font-bold ml-1">Reflects dynamically in Customer Service (/service), Concierge Hub (/concierge), and Footer.</p>
               </div>
 
               <div className="space-y-2">
@@ -708,6 +836,22 @@ export default function AdminSettingsPage() {
                   onChange={(e) => handleUpdate('resend_from_email', e.target.value)} 
                   placeholder="SmartBugMedia <notifications@smartbugmedia.io>" 
                 />
+              </div>
+
+              <div className="pt-2 border-t border-white/5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                <div className="flex items-center gap-2 text-[10px] text-slate-400 font-medium">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  <span>Realtime Supabase Sync: User portal updates immediately on save</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleSaveEmailMatrix}
+                  disabled={savingEmail}
+                  className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-violet-600/80 hover:bg-violet-600 text-white font-black text-[10px] uppercase tracking-wider flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-50"
+                >
+                  {savingEmail ? <Loader2 size={13} className="animate-spin" /> : <Save size={13} />}
+                  Save Email Settings
+                </button>
               </div>
             </div>
           </section>
@@ -925,7 +1069,7 @@ export default function AdminSettingsPage() {
              </div>
 
              {/* Document Switcher Tabs */}
-             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
+             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-8">
                {(Object.keys(DOC_TEMPLATES) as Array<keyof typeof DOC_TEMPLATES>).map((tabKey) => {
                  const doc = DOC_TEMPLATES[tabKey];
                  const isSelected = activeDocTab === tabKey;
@@ -1024,6 +1168,131 @@ export default function AdminSettingsPage() {
                        />
                      </div>
                    </div>
+
+                   {/* SPECIAL SALARY STRUCTURE CONFIGURATION */}
+                   {activeDocTab === 'salary' && (() => {
+                     let currentSalaryTiers = DEFAULT_SALARY_DATA;
+                     const tiersRaw = settings.find(s => s.key === 'salary_tiers_data')?.value;
+                     if (tiersRaw) {
+                       try {
+                         const parsed = typeof tiersRaw === 'string' ? JSON.parse(tiersRaw) : tiersRaw;
+                         if (Array.isArray(parsed) && parsed.length > 0) currentSalaryTiers = parsed;
+                       } catch (e) {}
+                     }
+                     const salaryWorkingHours = settings.find(s => s.key === 'salary_working_hours_badge')?.value ?? '10:00 AM – 7:00 PM CT';
+
+                     const updateTierReward = (tierIdx: number, dayIdx: number, val: number) => {
+                       const updated = currentSalaryTiers.map((t, idx) => {
+                         if (idx !== tierIdx) return t;
+                         const newRewards = [...t.rewards];
+                         newRewards[dayIdx] = Math.max(0, val || 0);
+                         const newTotal = newRewards.reduce((a, b) => a + b, 0);
+                         return { ...t, rewards: newRewards, total: newTotal };
+                       });
+                       handleUpdate('salary_tiers_data', JSON.stringify(updated));
+                     };
+
+                     return (
+                       <div className="space-y-6 pt-2 pb-2">
+                         {/* Working Hours Badge Input */}
+                         <div className="p-5 rounded-2xl bg-amber-500/5 border border-amber-500/20 space-y-2">
+                           <label className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-400 flex items-center gap-2">
+                             <Clock size={12} /> Working Hours Badge & Daily Window
+                           </label>
+                           <input 
+                             className="w-full bg-black/70 border border-amber-500/30 rounded-xl px-4 py-2.5 text-amber-200 font-bold text-xs focus:outline-none focus:border-amber-400 transition-all"
+                             value={salaryWorkingHours}
+                             onChange={(e) => handleUpdate('salary_working_hours_badge', e.target.value)}
+                             placeholder="10:00 AM – 7:00 PM CT"
+                           />
+                           <p className="text-[9px] text-slate-500">Displayed in the header badge on the user-facing salary page.</p>
+                         </div>
+
+                         {/* Interactive Salary Tiers Matrix Editor */}
+                         <div className="space-y-3">
+                           <div className="flex items-center justify-between ml-1">
+                             <label className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-400">
+                               Salary Compensation Matrix (Tiers & Cycle Payouts)
+                             </label>
+                             <button
+                               type="button"
+                               onClick={() => handleUpdate('salary_tiers_data', JSON.stringify(DEFAULT_SALARY_DATA))}
+                               className="text-[9px] font-black text-amber-400 hover:text-amber-300 uppercase tracking-wider"
+                             >
+                               Reset Matrix to Defaults
+                             </button>
+                           </div>
+
+                           <div className="overflow-x-auto rounded-2xl border border-white/10 bg-black/60">
+                             <table className="w-full text-left border-collapse text-xs">
+                               <thead>
+                                 <tr className="border-b border-white/10 bg-white/[0.02] text-[9px] font-black uppercase tracking-widest text-slate-400">
+                                   <th className="p-3 pl-4">VIP Level</th>
+                                   {SALARY_DAYS.map(day => (
+                                     <th key={day} className="p-3 text-center">Day {day} ($)</th>
+                                   ))}
+                                   <th className="p-3 pr-4 text-right">30-Day Total</th>
+                                 </tr>
+                               </thead>
+                               <tbody className="divide-y divide-white/5">
+                                 {currentSalaryTiers.map((tier, tIdx) => (
+                                   <tr key={tier.level || tIdx} className="hover:bg-white/[0.02]">
+                                     <td className="p-3 pl-4 font-black text-white whitespace-nowrap">
+                                       <span className="text-amber-400 mr-1.5">L{tier.level}</span> {tier.name}
+                                     </td>
+                                     {SALARY_DAYS.map((_, dIdx) => (
+                                       <td key={dIdx} className="p-2 text-center">
+                                         <input 
+                                           type="number"
+                                           min={0}
+                                           className="w-20 bg-black/80 border border-white/10 rounded-lg px-2 py-1.5 text-center text-xs font-mono font-bold text-white focus:outline-none focus:border-amber-400"
+                                           value={tier.rewards?.[dIdx] ?? 0}
+                                           onChange={(e) => updateTierReward(tIdx, dIdx, parseFloat(e.target.value) || 0)}
+                                         />
+                                       </td>
+                                     ))}
+                                     <td className="p-3 pr-4 text-right font-mono font-black text-amber-400">
+                                       ${((tier.rewards || []).reduce((a: number, b: number) => a + b, 0)).toLocaleString()}
+                                     </td>
+                                   </tr>
+                                 ))}
+                               </tbody>
+                             </table>
+                           </div>
+                           <p className="text-[9px] text-slate-500 ml-1">
+                             Modify the dollar amounts for each day milestone. The 30-day cumulative totals update automatically for users.
+                           </p>
+                         </div>
+                       </div>
+                     );
+                   })()}
+
+                   {/* FAQ SPECIAL QUICK TEMPLATE INSERTION */}
+                   {activeDocTab === 'faq' && (
+                     <div className="flex flex-wrap items-center gap-2 p-3 rounded-2xl bg-blue-500/5 border border-blue-500/20">
+                       <span className="text-[9px] font-black text-blue-400 uppercase tracking-widest mr-2">FAQ Format Helpers:</span>
+                       <button
+                         type="button"
+                         onClick={() => {
+                           const template = `\n\n[Category: New Category Name]\nQ: What is the question?\nA: Provide the clear answer here.\n`;
+                           handleUpdate(doc.contentKey, (currentContent || doc.defaultContent) + template);
+                         }}
+                         className="px-3 py-1 rounded-lg bg-blue-500/10 hover:bg-blue-500/20 text-blue-300 text-[9px] font-black uppercase tracking-wider border border-blue-500/30 transition-all"
+                       >
+                         + Insert Category Block
+                       </button>
+                       <button
+                         type="button"
+                         onClick={() => {
+                           const template = `\n\nQ: Another question?\nA: Another answer here.\n`;
+                           handleUpdate(doc.contentKey, (currentContent || doc.defaultContent) + template);
+                         }}
+                         className="px-3 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 text-[9px] font-black uppercase tracking-wider border border-white/10 transition-all"
+                       >
+                         + Insert Q&A Pair
+                       </button>
+                     </div>
+                   )}
 
                    <div className="space-y-2">
                      <div className="flex items-center justify-between ml-1">

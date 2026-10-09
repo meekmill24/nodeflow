@@ -2,13 +2,13 @@ import { Resend } from 'resend';
 
 export const resend = new Resend(process.env.RESEND_API_KEY);
 
-export const sendEmail = async ({ to, subject, html }: { to: string | string[], subject: string, html: string }) => {
+export const sendEmail = async ({ to, subject, html, from }: { to: string | string[], subject: string, html: string, from?: string }) => {
   try {
     const { data, error } = await resend.emails.send({
       // NOTE: smartbugmedia.io domain not yet verified on Resend.
       // Once verified at https://resend.com/domains, change to:
       // 'SmartBugMedia <notifications@smartbugmedia.io>'
-      from: 'SmartBugMedia <onboarding@resend.dev>',
+      from: from || 'SmartBugMedia <onboarding@resend.dev>',
       to,
       subject,
       html,

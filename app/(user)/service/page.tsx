@@ -17,7 +17,8 @@ export default function CustomerServicePage() {
             : `https://wa.me/${whatsappValue}?text=${encodeURIComponent('Hello, I need help with my SmartBugMedia. account.')}`;
  
         const telegramAction = settings?.telegram_url || 'https://t.me/smartbugmedia_ops';
- 
+        const supportEmail = settings?.support_email || 'support@smartbugmedia.com';
+
         return [
             {
                 icon: MessageSquare,
@@ -55,11 +56,11 @@ export default function CustomerServicePage() {
             {
                 icon: Mail,
                 title: 'Governance Email',
-                subtitle: 'support@smartbugmedia.com',
+                subtitle: supportEmail,
                 color: 'bg-accent/20 text-accent-light',
                 badge: '24h SLA',
                 badgeColor: 'bg-accent/20 text-accent-light',
-                action: 'mailto:support@smartbugmedia.com',
+                action: `mailto:${supportEmail}`,
                 target: '_self',
                 description: 'In-depth inquiries regarding institutional partnership and legal compliance.'
             },

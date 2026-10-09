@@ -3,6 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Mail, MessageCircle, ArrowUpRight } from "lucide-react";
+import { useSiteSettings } from "@/context/SettingsContext";
 
 const footerLinks = {
   platform: [
@@ -31,6 +32,9 @@ const footerLinks = {
 };
 
 export function Footer() {
+  const settings = useSiteSettings() as any;
+  const supportEmail = settings?.support_email || 'support@smartbugmedia.com';
+
   return (
     <footer className="relative border-t border-white/5 bg-slate-950/80 backdrop-blur-xl overflow-hidden">
       {/* Ambient glow */}
@@ -56,11 +60,11 @@ export function Footer() {
             {/* Contact */}
             <div className="space-y-3">
               <a
-                href="mailto:support@smartbugmedia.com"
+                href={`mailto:${supportEmail}`}
                 className="flex items-center gap-2.5 text-sm text-slate-500 hover:text-cyan-400 transition-colors group"
               >
                 <Mail size={14} className="group-hover:text-cyan-400 transition-colors" />
-                support@smartbugmedia.com
+                {supportEmail}
               </a>
               <Link
                 href="/service"

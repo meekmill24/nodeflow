@@ -697,10 +697,11 @@ function extractMatchingBundle(
             )}
 
             {/* OPTIMIZATION GRID ENGINE */}
-            <div className="relative flex flex-col items-center justify-center py-10">
+            <div className="relative flex flex-col items-center justify-center py-4 sm:py-8 md:py-10">
                 <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full md:w-[800px] h-[600px] bg-[#3DD6C8]/5 rounded-full blur-[160px] transition-opacity duration-1000 ${isSpinning ? 'opacity-100' : 'opacity-40'}`} />
 
-                <div className="w-full max-w-3xl mx-auto grid grid-cols-5 gap-1.5 md:gap-4 z-10 px-1.5 md:px-4 relative">
+                {/* 5x5 Grid - Enhanced mobile and tablet sizing */}
+                <div className="w-[calc(100%+0.75rem)] -mx-1.5 sm:mx-auto sm:w-full max-w-3xl lg:max-w-4xl grid grid-cols-5 gap-1 sm:gap-2.5 md:gap-3.5 lg:gap-4 z-10 px-0.5 sm:px-2 md:px-4 relative">
                     {Array.from({ length: 25 }).map((_, idx) => {
                         if (idx === 12) {
                             return (
@@ -709,7 +710,7 @@ function extractMatchingBundle(
                                     initial={{ scale: 0, opacity: 0 }}
                                     animate={{ scale: 1, opacity: 1 }}
                                     transition={{ type: 'spring', damping: 15, delay: 0.3 }}
-                                    className="aspect-square flex items-center justify-center"
+                                    className="aspect-square flex items-center justify-center p-0.5 sm:p-0"
                                 >
                                     <button
                                         onClick={handleStart}
@@ -723,20 +724,20 @@ function extractMatchingBundle(
                                             ${(isLocked || hasPendingTask) ? 'bg-slate-950 opacity-20 grayscale cursor-not-allowed' : ''}
                                         `}
                                     >
-                                        <div className="relative z-10 flex flex-col items-center text-center">
-                                            <span className={`text-base md:text-xl font-black italic uppercase tracking-tighter ${
+                                        <div className="relative z-10 flex flex-col items-center text-center px-0.5 sm:px-1">
+                                            <span className={`text-[12px] sm:text-base md:text-xl font-black italic uppercase tracking-tighter leading-none ${
                                                 isSpinning ? 'text-[#3DD6C8]' : (workingHours && !workingHours.isOpen ? 'text-[#0B0B1E]' : 'text-[#0B0B1E]')
                                             }`}>
                                                 {workingHours && !workingHours.isOpen ? 'OFFLINE' : (isLocked ? 'DONE' : (isSpinning ? 'SYNC' : 'START'))}
                                             </span>
                                             {!isSpinning && !isLocked && !hasPendingTask && (
                                                 workingHours && !workingHours.isOpen ? (
-                                                    <Clock size={14} className="text-[#0B0B1E] animate-pulse mt-1" />
+                                                    <Clock size={12} className="text-[#0B0B1E] animate-pulse mt-0.5 sm:mt-1 sm:size-[14px]" />
                                                 ) : (
-                                                    <Pointer size={14} className="text-[#0B0B1E] animate-bounce mt-1" />
+                                                    <Pointer size={12} className="text-[#0B0B1E] animate-bounce mt-0.5 sm:mt-1 sm:size-[14px]" />
                                                 )
                                             )}
-                                            {isSpinning && <div className="w-5 h-5 border-2 border-[#3DD6C8]/30 border-t-[#3DD6C8] rounded-full animate-spin mt-2" />}
+                                            {isSpinning && <div className="w-3.5 h-3.5 sm:w-5 sm:h-5 border-2 border-[#3DD6C8]/30 border-t-[#3DD6C8] rounded-full animate-spin mt-1 sm:mt-2" />}
                                         </div>
                                         <div className="absolute inset-0 bg-gradient-to-t from-white/20 to-transparent group-hover:opacity-100 opacity-0 transition-opacity" />
                                     </button>
@@ -751,12 +752,12 @@ function extractMatchingBundle(
                                 initial={{ opacity: 0, y: 10, scale: 0.9 }}
                                 animate={{ opacity: 1, y: 0, scale: 1 }}
                                 transition={{ delay: idx * 0.02, duration: 0.5 }}
-                                className={`aspect-square bg-slate-900 border p-1 border-white/5 transition-all duration-500 rounded-[20px] relative overflow-hidden ${active ? 'ring-2 ring-[#3DD6C8] shadow-[0_0_30px_rgba(61,214,200,0.3)] z-10' : 'opacity-100'}`}
+                                className={`aspect-square bg-slate-900 border p-0.5 sm:p-1 md:p-1.5 border-white/5 transition-all duration-500 rounded-xl sm:rounded-2xl md:rounded-[22px] relative overflow-hidden ${active ? 'ring-2 ring-[#3DD6C8] shadow-[0_0_30px_rgba(61,214,200,0.3)] z-10' : 'opacity-100'}`}
                             >
                                 {items[itemIdx] ? (
-                                    <img src={items[itemIdx].image_url} className="w-full h-full object-cover rounded-[16px]" alt="" />
+                                    <img src={items[itemIdx].image_url} className="w-full h-full object-cover rounded-[10px] sm:rounded-[14px] md:rounded-[18px]" alt="" />
                                 ) : (
-                                    <div className="w-full h-full bg-white/5 animate-pulse rounded-[16px]" />
+                                    <div className="w-full h-full bg-white/5 animate-pulse rounded-[10px] sm:rounded-[14px] md:rounded-[18px]" />
                                 )}
                                 {active && <div className="absolute inset-0 bg-[#3DD6C8]/10 animate-pulse" />}
                             </motion.div>

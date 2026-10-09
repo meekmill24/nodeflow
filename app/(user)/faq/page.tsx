@@ -14,9 +14,10 @@ import {
     ShieldAlert,
     ArrowLeft
 } from 'lucide-react';
+import { useSiteSettings } from '@/context/SettingsContext';
 import { useState } from 'react';
 
-const FAQS = [
+const DEFAULT_FAQS = [
     {
         category: 'Payments & Accounts',
         icon: CreditCard,
@@ -73,8 +74,100 @@ const FAQS = [
     }
 ];
 
+function getCategoryIcon(categoryName: string) {
+    if (!categoryName) return HelpCircle;
+    const name = categoryName.toLowerCase();
+    if (/payment|account|wallet|bank|money|card|payout/i.test(name)) return CreditCard;
+    if (/operation|task|level|order|work|tier|system/i.test(name)) return TrendingUp;
+    if (/security|compliance|safety|tax|verify|protect/i.test(name)) return ShieldCheck;
+    if (/time|hour|schedule|clock/i.test(name)) return Clock;
+    return HelpCircle;
+}
+
+function parseFAQContent(content?: string) {
+    if (!content || !content.trim()) return null;
+
+    const trimmed = content.trim();
+    if (trimmed.startsWith('[') || trimmed.startsWith('{')) {
+        try {
+            const parsed = JSON.parse(trimmed);
+            if (Array.isArray(parsed) && parsed.length > 0 && parsed[0].category) {
+                return parsed.map((cat: any) => ({
+                    category: cat.category || 'General Inquiries',
+                    icon: getCategoryIcon(cat.category),
+                    qas: (cat.qas || []).map((qa: any) => ({ q: qa.q || '', a: qa.a || '' }))
+                }));
+            }
+        } catch (e) {
+            // Fall through to text parsing
+        }
+    }
+
+    const lines = content.split('\n');
+    const categories: Array<{ category: string; icon: any; qas: Array<{ q: string; a: string }> }> = [];
+    let currentCat = { category: 'General Inquiries', icon: HelpCircle, qas: [] as Array<{ q: string; a: string }> };
+    let currentQ = '';
+    let currentA = '';
+
+    const saveCurrentQA = () => {
+        if (currentQ.trim()) {
+            currentCat.qas.push({ q: currentQ.trim(), a: currentA.trim() });
+            currentQ = '';
+            currentA = '';
+        }
+    };
+
+    for (const rawLine of lines) {
+        const line = rawLine.trim();
+        if (!line) continue;
+
+        const catMatch = line.match(/^\[(?:Category:?\s*)?([^\]]+)\]$/i) || line.match(/^#{1,3}\s+(.+)$/);
+        if (catMatch) {
+            saveCurrentQA();
+            if (currentCat.qas.length > 0) {
+                categories.push(currentCat);
+            }
+            const name = catMatch[1].trim();
+            currentCat = { category: name, icon: getCategoryIcon(name), qas: [] };
+            continue;
+        }
+
+        const qMatch = line.match(/^(?:\*\*|\*|#+)?(?:Q|Question):\s*(.+)$/i);
+        if (qMatch) {
+            saveCurrentQA();
+            currentQ = qMatch[1].replace(/[\*\_]+$/, '').trim();
+            continue;
+        }
+
+        const aMatch = line.match(/^(?:\*\*|\*|#+)?(?:A|Answer):\s*(.+)$/i);
+        if (aMatch) {
+            saveCurrentQA();
+            currentA = aMatch[1].replace(/[\*\_]+$/, '').trim();
+            continue;
+        }
+
+        if (currentQ && currentA) {
+            currentA += ' ' + line;
+        } else if (currentQ && !currentA) {
+            currentA = line;
+        }
+    }
+
+    saveCurrentQA();
+    if (currentCat.qas.length > 0) {
+        categories.push(currentCat);
+    }
+
+    return categories.length > 0 ? categories : null;
+}
+
 export default function FAQPage() {
+    const settings = useSiteSettings() as any;
     const [openIdx, setOpenIdx] = useState<string | null>("cat-0-qa-0");
+
+    const title = settings?.faq_title || 'Support Matrix';
+    const subtitle = settings?.faq_subtitle || 'Integrated Intelligence & Frequently Asked Questions';
+    const activeFaqs = parseFAQContent(settings?.faq_content) || DEFAULT_FAQS;
 
     const toggle = (id: string) => {
         setOpenIdx(openIdx === id ? null : id);
@@ -98,8 +191,17 @@ export default function FAQPage() {
             {/* Header */}
             <div className="flex flex-col md:flex-row items-center justify-between gap-6">
                 <div className="space-y-2 text-center md:text-left">
-                    <h1 className="text-4xl font-black text-white uppercase italic tracking-tighter">Support <span className="text-primary-light">Matrix</span></h1>
-                    <p className="text-[10px] font-black text-white/30 uppercase tracking-[0.4em]">Integrated Intelligence & Frequently Asked Questions</p>
+                    <h1 className="text-4xl font-black text-white uppercase italic tracking-tighter">
+                        {title.includes(' ') ? (
+                            <>
+                                {title.split(' ').slice(0, -1).join(' ')}{' '}
+                                <span className="text-primary-light">{title.split(' ').slice(-1)[0]}</span>
+                            </>
+                        ) : (
+                            <span className="text-primary-light">{title}</span>
+                        )}
+                    </h1>
+                    <p className="text-[10px] font-black text-white/30 uppercase tracking-[0.4em]">{subtitle}</p>
                 </div>
                 <div className="p-4 bg-primary/10 border border-primary/20 rounded-2xl flex items-center gap-4">
                     <ShieldCheck size={24} className="text-primary-light" />
@@ -112,7 +214,7 @@ export default function FAQPage() {
 
             {/* Categories */}
             <div className="space-y-10">
-                {FAQS.map((cat, ci) => (
+                {activeFaqs.map((cat: any, ci: number) => (
                     <div key={ci} className="space-y-6">
                         <div className="flex items-center gap-3">
                             <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center">
@@ -122,7 +224,7 @@ export default function FAQPage() {
                         </div>
 
                         <div className="grid grid-cols-1 gap-4">
-                            {cat.qas.map((qa, qi) => {
+                            {cat.qas.map((qa: any, qi: number) => {
                                 const id = `cat-${ci}-qa-${qi}`;
                                 const isOpen = openIdx === id;
                                 return (
