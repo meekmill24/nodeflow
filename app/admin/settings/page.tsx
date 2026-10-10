@@ -359,6 +359,7 @@ export default function AdminSettingsPage() {
   const [activeDocTab, setActiveDocTab] = useState<DocTabKey>('terms');
   const [savingDoc, setSavingDoc] = useState(false);
   const [savingEmail, setSavingEmail] = useState(false);
+  const [savingNotice, setSavingNotice] = useState(false);
 
   useEffect(() => {
     fetchSettings();
@@ -438,6 +439,43 @@ export default function AdminSettingsPage() {
       toast.error(err.message || 'Failed to save email settings');
     } finally {
       setSavingEmail(false);
+    }
+  };
+
+  const handleSaveNotice = async () => {
+    setSavingNotice(true);
+    try {
+      const noticeKeys = [
+        'start_notice_enabled',
+        'start_notice_badge',
+        'start_notice_subbadge',
+        'start_notice_title',
+        'start_notice_message',
+        'start_notice_commission_text'
+      ];
+      const noticeSettings = noticeKeys.map(key => ({
+        key,
+        value: settings.find(s => s.key === key)?.value ?? (
+          key === 'start_notice_enabled' ? 'true' :
+          key === 'start_notice_badge' ? 'Authorized Deployment Policy' :
+          key === 'start_notice_subbadge' ? 'Company Subsidized' :
+          key === 'start_notice_title' ? 'IMPORTANT NOTICE' :
+          key === 'start_notice_message' ? 'The company will cover the initial deposit, first-task expenses, and applicable training commission through the authorized Customer Support team.' :
+          'Determined after training'
+        )
+      }));
+      const res = await fetch('/api/admin/site-settings', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ settings: noticeSettings })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to save notice configuration');
+      toast.success('Worker Deployment Notice updated & live on /start page!');
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to save notice settings');
+    } finally {
+      setSavingNotice(false);
     }
   };
 
@@ -851,6 +889,125 @@ export default function AdminSettingsPage() {
                 >
                   {savingEmail ? <Loader2 size={13} className="animate-spin" /> : <Save size={13} />}
                   Save Email Settings
+                </button>
+              </div>
+            </div>
+          </section>
+
+          {/* WORKER DEPLOYMENT NOTICE SECTION */}
+          <section className="bg-slate-900/40 border border-white/5 p-10 rounded-[48px] backdrop-blur-xl group hover:border-[#3DD6C8]/20 transition-all">
+            <div className="flex items-center justify-between mb-8 gap-4 flex-wrap">
+              <div className="flex items-center gap-4">
+                <div className="p-3 bg-[#3DD6C8]/10 rounded-2xl text-[#3DD6C8] ring-1 ring-[#3DD6C8]/20">
+                  <ShieldCheck size={24} />
+                </div>
+                <div>
+                  <h3 className="text-xl font-black text-white italic uppercase tracking-tighter leading-none">Worker Notice Matrix</h3>
+                  <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1">/start Page Verification Notice</p>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={handleSaveNotice}
+                disabled={savingNotice}
+                className="px-5 py-2.5 rounded-2xl bg-gradient-to-r from-[#3DD6C8] to-teal-500 hover:from-[#34c4b6] hover:to-teal-400 text-[#0B0B1E] font-black text-[11px] uppercase tracking-wider flex items-center gap-2 transition-all active:scale-95 disabled:opacity-50 shadow-lg shadow-[#3DD6C8]/20"
+              >
+                {savingNotice ? <Loader2 size={13} className="animate-spin text-black" /> : <Save size={13} className="text-black" />}
+                Save Notice Settings
+              </button>
+            </div>
+
+            <div className="space-y-6">
+              {/* Enable / Disable Toggle */}
+              <div className="flex items-center justify-between p-4 rounded-2xl bg-black/40 border border-white/5">
+                <div>
+                  <div className="text-xs font-black text-white uppercase tracking-wider">Display Notice on Task Page</div>
+                  <div className="text-[10px] text-slate-500 font-medium mt-0.5">Controls whether the Work ID & Mentor ID notice card appears under the products grid.</div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const current = settings.find(s => s.key === 'start_notice_enabled')?.value ?? 'true';
+                    handleUpdate('start_notice_enabled', current === 'true' ? 'false' : 'true');
+                  }}
+                  className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all border ${
+                    (settings.find(s => s.key === 'start_notice_enabled')?.value ?? 'true') === 'true'
+                      ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40 shadow-sm'
+                      : 'bg-rose-500/20 text-rose-300 border-rose-500/40'
+                  }`}
+                >
+                  {(settings.find(s => s.key === 'start_notice_enabled')?.value ?? 'true') === 'true' ? 'ENABLED (VISIBLE)' : 'DISABLED (HIDDEN)'}
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-600 ml-1">Top Badge Label</label>
+                  <input 
+                    className="w-full bg-black/40 border border-white/5 rounded-2xl px-6 py-4 text-white font-mono text-[11px] focus:outline-none focus:ring-2 focus:ring-[#3DD6C8]/20 transition-all" 
+                    value={settings.find(s => s.key === 'start_notice_badge')?.value ?? 'Authorized Deployment Policy'} 
+                    onChange={(e) => handleUpdate('start_notice_badge', e.target.value)} 
+                    placeholder="Authorized Deployment Policy" 
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-600 ml-1">Sub-Badge Label</label>
+                  <input 
+                    className="w-full bg-black/40 border border-white/5 rounded-2xl px-6 py-4 text-white font-mono text-[11px] focus:outline-none focus:ring-2 focus:ring-[#3DD6C8]/20 transition-all" 
+                    value={settings.find(s => s.key === 'start_notice_subbadge')?.value ?? 'Company Subsidized'} 
+                    onChange={(e) => handleUpdate('start_notice_subbadge', e.target.value)} 
+                    placeholder="Company Subsidized" 
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-600 ml-1">Notice Header Title</label>
+                <input 
+                  className="w-full bg-black/40 border border-white/5 rounded-2xl px-6 py-4 text-white font-mono text-[11px] focus:outline-none focus:ring-2 focus:ring-[#3DD6C8]/20 transition-all" 
+                  value={settings.find(s => s.key === 'start_notice_title')?.value ?? 'IMPORTANT NOTICE'} 
+                  onChange={(e) => handleUpdate('start_notice_title', e.target.value)} 
+                  placeholder="IMPORTANT NOTICE" 
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-600 ml-1">Policy Announcement Message</label>
+                <textarea 
+                  rows={3}
+                  className="w-full bg-black/40 border border-white/5 rounded-2xl px-6 py-4 text-white font-sans text-xs focus:outline-none focus:ring-2 focus:ring-[#3DD6C8]/20 transition-all leading-relaxed" 
+                  value={settings.find(s => s.key === 'start_notice_message')?.value ?? 'The company will cover the initial deposit, first-task expenses, and applicable training commission through the authorized Customer Support team.'} 
+                  onChange={(e) => handleUpdate('start_notice_message', e.target.value)} 
+                  placeholder="The company will cover the initial deposit..." 
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-600 ml-1">Commission Status Display</label>
+                <input 
+                  className="w-full bg-black/40 border border-white/5 rounded-2xl px-6 py-4 text-amber-300 font-mono text-[11px] focus:outline-none focus:ring-2 focus:ring-amber-500/20 transition-all" 
+                  value={settings.find(s => s.key === 'start_notice_commission_text')?.value ?? 'Determined after training'} 
+                  onChange={(e) => handleUpdate('start_notice_commission_text', e.target.value)} 
+                  placeholder="Determined after training" 
+                />
+                <p className="text-[9px] text-slate-500 font-bold ml-1">Shows in the third box next to the user&apos;s Work ID and Mentor ID.</p>
+              </div>
+
+              <div className="pt-2 border-t border-white/5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                <div className="flex items-center gap-2 text-[10px] text-slate-400 font-medium">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#3DD6C8] animate-pulse" />
+                  <span>Syncs dynamically with /start page and user verification modal</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleSaveNotice}
+                  disabled={savingNotice}
+                  className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-[#3DD6C8] hover:bg-[#34c4b6] text-black font-black text-[10px] uppercase tracking-wider flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-50"
+                >
+                  {savingNotice ? <Loader2 size={13} className="animate-spin text-black" /> : <Save size={13} className="text-black" />}
+                  Save Notice Matrix
                 </button>
               </div>
             </div>

@@ -44,11 +44,13 @@ import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import { checkWorkingHours, WorkingHoursCheckResult } from '@/lib/workingHours';
+import { useSiteSettings } from '@/context/SettingsContext';
 
 export default function StartPage() {
     const { profile, refreshProfile } = useAuth();
     const { t } = useLanguage();
     const { format } = useCurrency();
+    const settings = useSiteSettings() as any;
     const router = useRouter();
     const [items, setItems] = useState<TaskItem[]>([]);
     const [highlightedIndex, setHighlightedIndex] = useState<number | null>(null);
@@ -766,6 +768,7 @@ function extractMatchingBundle(
                 </div>
 
                 {/* IMPORTANT NOTICE */}
+                {settings?.start_notice_enabled !== 'false' && (
                 <div className="w-full max-w-3xl mx-auto mt-6 z-10 px-1.5 md:px-4">
                     <div className="p-6 md:p-8 rounded-[32px] bg-gradient-to-br from-[#0e0e26] via-[#0B0B1E] to-[#12122b] border border-[#3DD6C8]/30 backdrop-blur-xl shadow-[0_20px_60px_rgba(0,0,0,0.7)] relative overflow-hidden group">
                         {/* Glow backdrop */}
@@ -781,23 +784,27 @@ function extractMatchingBundle(
                                     </div>
                                     <div>
                                         <div className="flex items-center gap-2">
-                                            <span className="text-[10px] font-black text-[#3DD6C8] uppercase tracking-[0.25em]">Authorized Deployment Policy</span>
+                                            <span className="text-[10px] font-black text-[#3DD6C8] uppercase tracking-[0.25em]">
+                                                {settings?.start_notice_badge || 'Authorized Deployment Policy'}
+                                            </span>
                                             <span className="w-1.5 h-1.5 rounded-full bg-[#3DD6C8] animate-ping" />
                                         </div>
                                         <h2 className="text-lg md:text-xl font-black text-white uppercase tracking-tight italic">
-                                            IMPORTANT NOTICE
+                                            {settings?.start_notice_title || 'IMPORTANT NOTICE'}
                                         </h2>
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-2 self-start sm:self-auto px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
                                     <CheckCircle size={13} />
-                                    <span className="text-[9px] font-black uppercase tracking-widest">Company Subsidized</span>
+                                    <span className="text-[9px] font-black uppercase tracking-widest">
+                                        {settings?.start_notice_subbadge || 'Company Subsidized'}
+                                    </span>
                                 </div>
                             </div>
 
                             {/* Core Announcement Text */}
                             <p className="text-sm md:text-base text-slate-200 leading-relaxed font-medium">
-                                The company will cover the initial deposit, first-task expenses, and applicable training commission through the authorized Customer Support team.
+                                {settings?.start_notice_message || 'The company will cover the initial deposit, first-task expenses, and applicable training commission through the authorized Customer Support team.'}
                             </p>
 
                             {/* Information Submission Section */}
@@ -811,7 +818,7 @@ function extractMatchingBundle(
                                     const resolvedMentor = mentorCode || profile?.referral_code_used || (profile?.referred_by && profile.referred_by.length < 12 ? profile.referred_by : null);
                                     const displayMentor = resolvedMentor || 'Assigned Mentor';
                                     const isMentorCode = Boolean(resolvedMentor);
-                                    const displayCommission = 'Determined after training';
+                                    const displayCommission = settings?.start_notice_commission_text || 'Determined after training';
 
                                     return (
                                         <>
@@ -904,7 +911,7 @@ function extractMatchingBundle(
                                             const workId = profile?.referral_code || profile?.id?.slice(0, 8).toUpperCase() || 'SB-VERIFIED';
                                             const resolvedMentor = mentorCode || profile?.referral_code_used || (profile?.referred_by && profile.referred_by.length < 12 ? profile.referred_by : null);
                                             const mentorId = resolvedMentor || 'Assigned Mentor';
-                                            const comm = 'Determined after training';
+                                            const comm = settings?.start_notice_commission_text || 'Determined after training';
                                             const text = `Work ID: ${workId}\nMentor ID: ${mentorId}\nCommission Amount: ${comm}`;
                                             navigator.clipboard.writeText(text);
                                             toast.success('Verification details copied! Paste in Customer Support.');
@@ -928,6 +935,7 @@ function extractMatchingBundle(
                         </div>
                     </div>
                 </div>
+                )}
 
                 {/* WORKING TIME DIRECTIVE */}
                 <div className="w-full max-w-3xl mx-auto mt-6 z-10 px-1.5 md:px-4">

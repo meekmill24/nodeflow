@@ -2,7 +2,7 @@
 import { useEffect, useState, useCallback } from 'react'; 
 import { supabase } from '@/lib/supabase/index'; 
 import type { Profile } from '@/lib/types'; 
-import { Search, UserPlus, Edit2, Trash2, Save, X, Shield, ShieldAlert, Wallet, TrendingUp, Mail, Phone, Calendar, RefreshCcw, DollarSign, Lock, Eye, EyeOff, Zap, CheckCircle, Layers, Target, Users, ShieldCheck, BanIcon, PlusCircle, MinusCircle, ArrowRight, Banknote, ArrowUpFromLine, CreditCard, Activity } from 'lucide-react';
+import { Search, UserPlus, Edit2, Trash2, Save, X, Shield, ShieldAlert, Wallet, TrendingUp, Mail, Phone, Calendar, RefreshCcw, DollarSign, Lock, Eye, EyeOff, Zap, CheckCircle, Layers, Target, Users, ShieldCheck, BanIcon, PlusCircle, MinusCircle, ArrowRight, Banknote, ArrowUpFromLine, CreditCard, Activity, Copy } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function AdminUsersPage() { 
@@ -319,12 +319,21 @@ export default function AdminUsersPage() {
     }
   };
 
-  const filteredUsers = users.filter(u => 
-    u.username?.toLowerCase().includes(searchQuery.toLowerCase()) || 
-    u.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    u.phone?.includes(searchQuery) ||
-    u.id.includes(searchQuery)
-  );
+  const filteredUsers = users.filter(u => {
+    const q = searchQuery.toLowerCase().trim();
+    if (!q) return true;
+    const workId = ((u.referral_code || u.id.slice(0, 8)) + '').toLowerCase();
+    const mentorId = ((u.referral_code_used || u.referred_by || '') + '').toLowerCase();
+    return (
+      u.username?.toLowerCase().includes(q) || 
+      u.email?.toLowerCase().includes(q) ||
+      u.phone?.includes(q) ||
+      u.phone_number?.includes(q) ||
+      u.id.toLowerCase().includes(q) ||
+      workId.includes(q) ||
+      mentorId.includes(q)
+    );
+  });
 
   const stats = {
     totalUsers: users.length,
@@ -345,8 +354,8 @@ export default function AdminUsersPage() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-600 group-focus-within:text-[#3DD6C8] transition-colors" size={16} />
             <input 
               type="text" 
-              placeholder="Filter by Node/Identity/ID..." 
-              className="pl-10 pr-4 py-3 bg-slate-900/50 border border-slate-800 rounded-2xl focus:outline-none focus:ring-4 focus:ring-[#3DD6C8]/10 focus:border-[#3DD6C8]/50 w-full sm:w-80 transition-all text-sm placeholder:text-slate-800"
+              placeholder="Search Node, Email, Work ID (415D), Mentor ID (3A37)..." 
+              className="pl-10 pr-4 py-3 bg-slate-900/50 border border-slate-800 rounded-2xl focus:outline-none focus:ring-4 focus:ring-[#3DD6C8]/10 focus:border-[#3DD6C8]/50 w-full sm:w-96 transition-all text-sm placeholder:text-slate-600 font-medium"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -419,6 +428,47 @@ export default function AdminUsersPage() {
                         <div className="text-[9px] text-slate-600 mt-1 flex items-center gap-1 font-bold uppercase tracking-widest">
                           <Calendar size={10} />
                           Active since {new Date(user.created_at).toLocaleDateString()}
+                        </div>
+
+                        {/* Work ID & Mentor ID Verification Badges */}
+                        <div className="flex flex-wrap items-center gap-1.5 mt-2">
+                          <div 
+                            onClick={() => {
+                              const wid = user.referral_code || user.id.slice(0, 8).toUpperCase();
+                              navigator.clipboard.writeText(wid);
+                              toast.success(`Work ID copied: ${wid}`);
+                            }}
+                            title="Click to copy Work ID"
+                            className="cursor-pointer inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#3DD6C8]/10 hover:bg-[#3DD6C8]/20 border border-[#3DD6C8]/30 text-[#3DD6C8] text-[10px] font-mono font-bold transition-all shadow-sm active:scale-95"
+                          >
+                            <span className="text-[9px] uppercase tracking-wider text-[#3DD6C8]/70 font-sans font-black">Work ID:</span>
+                            <span>{user.referral_code || user.id.slice(0, 8).toUpperCase()}</span>
+                            <Copy size={10} className="opacity-60" />
+                          </div>
+
+                          {(() => {
+                            const mentor = user.referral_code_used || (user.referred_by && user.referred_by.length < 12 ? user.referred_by : null);
+                            return (
+                              <div 
+                                onClick={() => {
+                                  if (mentor) {
+                                    navigator.clipboard.writeText(mentor);
+                                    toast.success(`Mentor ID copied: ${mentor}`);
+                                  }
+                                }}
+                                title={mentor ? "Click to copy Mentor ID" : "No Mentor registered"}
+                                className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold transition-all shadow-sm ${
+                                  mentor 
+                                    ? 'cursor-pointer bg-teal-500/10 hover:bg-teal-500/20 border border-teal-500/30 text-teal-300 active:scale-95' 
+                                    : 'bg-white/5 border border-white/10 text-slate-500'
+                                }`}
+                              >
+                                <span className="text-[9px] uppercase tracking-wider opacity-70 font-sans font-black">Mentor ID:</span>
+                                <span>{mentor || 'NONE'}</span>
+                                {mentor && <Copy size={10} className="opacity-60" />}
+                              </div>
+                            );
+                          })()}
                         </div>
                       </div>
                     </div>
