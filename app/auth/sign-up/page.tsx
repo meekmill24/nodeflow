@@ -126,58 +126,47 @@ function SignUpForm() {
         }
 
         try {
-            if (!email) {
-                const res = await fetch('/api/auth/register', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, password, phone, withdrawalPassword, referral })
-                });
-                const apiData = await res.json();
-                if (!res.ok) throw new Error(apiData.error || 'Registration failed');
+            const res = await fetch('/api/auth/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    email: email.trim(), 
+                    username: username.trim(), 
+                    password, 
+                    phone: phone.trim(), 
+                    withdrawalPassword, 
+                    referral: referral.trim() 
+                })
+            });
+            const apiData = await res.json();
+            if (!res.ok) throw new Error(apiData.error || 'Registration failed');
 
+            if (apiData.requireEmailVerification) {
+                // Email confirmation link sent via Resend API
+                router.push(`/auth/sign-up-success?email=${encodeURIComponent(apiData.email || email.trim())}`);
+            } else {
+                // Auto-confirmed or fast-track account: Log in immediately
+                const loginIdentifier = apiData.email || apiData.fakeEmail || email.trim() || username.trim();
                 const { error: signInError } = await supabase.auth.signInWithPassword({
-                    email: apiData.fakeEmail,
+                    email: loginIdentifier,
                     password
                 });
-                if (signInError) throw signInError;
+                if (signInError) {
+                    // If signInWithPassword encounters an issue, route to login with credentials pre-filled
+                    router.push('/auth/login');
+                    return;
+                }
 
-                await fetch('/api/auth/welcome-email', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email: apiData.fakeEmail, username: username || apiData.fakeEmail })
-                }).catch(e => console.error('Silent Email Error:', e));
-                
-                router.push('/home')
-            } else {
-                const { data, error: signUpError } = await supabase.auth.signUp({
-                    email: email,
-                    password,
-                    options: {
-                        data: {
-                            username: username,
-                            display_name: username,
-                            phone_number: phone,
-                            withdrawal_password: withdrawalPassword,
-                            referral_code_used: referral
-                        },
-                        emailRedirectTo: `${window.location.origin}/auth/callback`,
-                    },
-                })
-                if (signUpError) throw signUpError
-                
-                if (data.user) {
-                    await fetch('/api/profile', {
-                        method: 'PUT',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ username, display_name: username, phone_number: phone }),
-                    })
-                    await fetch('/api/auth/welcome-email', {
+                // Send welcome email quietly in background
+                if (email.trim()) {
+                    fetch('/api/auth/welcome-email', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ email: email, username: username || email })
+                        body: JSON.stringify({ email: email.trim(), username: username.trim() })
                     }).catch(e => console.error('Silent Email Error:', e));
                 }
-                router.push(`/auth/sign-up-success?email=${encodeURIComponent(email)}`)
+
+                router.push('/home');
             }
         } catch (error: unknown) {
             setError(error instanceof Error ? error.message : 'An error occurred')

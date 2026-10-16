@@ -14,8 +14,7 @@ import { Label } from '@/components/ui/label'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
-import NextImage from 'next/image'
-import { ArrowRight, ArrowLeft, ShieldCheck, Mail, Lock, Sparkles, Loader2 } from 'lucide-react'
+import { ArrowRight, ArrowLeft, ShieldCheck, Mail, Lock, Sparkles, Loader2, AlertCircle, CheckCircle } from 'lucide-react'
 
 export default function Page() {
   const [email, setEmail] = useState('');
@@ -23,6 +22,8 @@ export default function Page() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isResending, setIsResending] = useState(false);
+  const [resendSuccess, setResendSuccess] = useState<string | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -46,20 +47,24 @@ export default function Page() {
     setError(null)
 
     try {
-      let loginEmail = email;
+      let loginEmail = email.trim();
 
-      // Check if the input is an email, if not, try to fetch email from profiles by username
-      if (!email.includes('@')) {
-        const { data: profile, error: profileError } = await supabase
-          .from('profiles')
-          .select('email')
-          .eq('username', email)
-          .single() as { data: { email: string } | null, error: any };
-
-        if (profileError || !profile || !profile.email) {
-          loginEmail = `${email}@smartbugmedia.io`;
-        } else {
-          loginEmail = profile.email;
+      // Check if the input is a username instead of an email, and resolve via server endpoint
+      if (!loginEmail.includes('@')) {
+        try {
+          const res = await fetch('/api/auth/resolve-identifier', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ identifier: loginEmail })
+          });
+          const resolveData = await res.json();
+          if (resolveData?.email) {
+            loginEmail = resolveData.email;
+          } else {
+            loginEmail = `${loginEmail.toLowerCase()}@smartbugmedia.io`;
+          }
+        } catch {
+          loginEmail = `${loginEmail.toLowerCase()}@smartbugmedia.io`;
         }
       }
 
@@ -73,6 +78,37 @@ export default function Page() {
       setError(error instanceof Error ? error.message : 'An error occurred')
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  const handleResendVerification = async () => {
+    setIsResending(true);
+    setResendSuccess(null);
+    try {
+      let targetEmail = email.trim();
+      if (!targetEmail.includes('@')) {
+        const res = await fetch('/api/auth/resolve-identifier', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ identifier: targetEmail })
+        });
+        const data = await res.json();
+        if (data?.email) targetEmail = data.email;
+      }
+
+      const resendRes = await fetch('/api/auth/resend-verification', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: targetEmail })
+      });
+      const resendData = await resendRes.json();
+      if (!resendRes.ok) throw new Error(resendData.error || 'Failed to resend');
+      setResendSuccess(resendData.message || 'Verification email resent! Please check your inbox.');
+      setError(null);
+    } catch (err: any) {
+      setError(err.message || 'Failed to resend verification email');
+    } finally {
+      setIsResending(false);
     }
   }
 
@@ -176,8 +212,29 @@ export default function Page() {
                 </div>
 
                 {error && (
-                  <div className="bg-red-50 text-red-600 p-3 rounded-xl text-xs font-medium border border-red-100 animate-in fade-in slide-in-from-top-1">
-                    {error}
+                  <div className="bg-red-500/10 text-red-400 p-3.5 rounded-2xl text-xs font-medium border border-red-500/20 animate-in fade-in slide-in-from-top-1 space-y-2.5">
+                    <div className="flex items-start gap-2">
+                      <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-red-400" />
+                      <span className="leading-relaxed">{error}</span>
+                    </div>
+                    {error.toLowerCase().includes('not confirmed') && (
+                      <button
+                        type="button"
+                        disabled={isResending}
+                        onClick={handleResendVerification}
+                        className="w-full py-2.5 px-3 bg-[#3DD6C8]/15 hover:bg-[#3DD6C8]/25 text-[#3DD6C8] border border-[#3DD6C8]/30 rounded-xl font-black text-[10px] uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95 shadow-sm"
+                      >
+                        {isResending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Mail className="w-3.5 h-3.5" />}
+                        <span>Resend Verification Email</span>
+                      </button>
+                    )}
+                  </div>
+                )}
+
+                {resendSuccess && (
+                  <div className="bg-emerald-500/10 text-emerald-400 p-3.5 rounded-2xl text-xs font-medium border border-emerald-500/20 animate-in fade-in slide-in-from-top-1 flex items-center gap-2">
+                    <CheckCircle className="w-4 h-4 shrink-0 text-emerald-400" />
+                    <span>{resendSuccess}</span>
                   </div>
                 )}
 

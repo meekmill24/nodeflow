@@ -53,6 +53,8 @@ export default function StartPage() {
     const settings = useSiteSettings() as any;
     const router = useRouter();
     const [items, setItems] = useState<TaskItem[]>([]);
+    const [allPoolItems, setAllPoolItems] = useState<TaskItem[]>([]);
+    const [updatingSlotIndices, setUpdatingSlotIndices] = useState<number[]>([]);
     const [highlightedIndex, setHighlightedIndex] = useState<number | null>(null);
     const [selectedItem, setSelectedItem] = useState<TaskItem | null>(null);
     const [isSpinning, setIsSpinning] = useState(false);
@@ -158,6 +160,7 @@ export default function StartPage() {
                 if (availableItems.length < 24 && allItemsFromDb.length > 0) availableItems = allItemsFromDb;
                 const shuffled = [...availableItems].sort(() => 0.5 - Math.random());
                 setItems(shuffled.slice(0, 24));
+                setAllPoolItems(allItemsFromDb.length > 0 ? allItemsFromDb : availableItems);
                 if (itemsRes.data) (window as any)._allPoolItems = itemsRes.data;
 
                 // Resolve mentor referral code if available
@@ -196,6 +199,78 @@ export default function StartPage() {
         }
         return () => clearInterval(spinInterval);
     }, [isSpinning, items.length, selectedItem]);
+
+    // Dynamically cycle and animate product images every 3 seconds when idle
+    useEffect(() => {
+        if (
+            isSpinning || 
+            modalOpen || 
+            bundleModal || 
+            showCompletionModal || 
+            showMinBalanceModal || 
+            showWorkingHoursModal || 
+            items.length < 24 || 
+            allPoolItems.length === 0
+        ) {
+            return;
+        }
+
+        const interval = setInterval(() => {
+            // Pick 4 to 6 random slots to animate and update
+            const numToChange = Math.floor(Math.random() * 3) + 4; // 4, 5, or 6
+            const slotIndices = Array.from({ length: 24 }, (_, i) => i);
+            const shuffledSlots = slotIndices.sort(() => 0.5 - Math.random()).slice(0, numToChange);
+
+            setItems(prevItems => {
+                if (prevItems.length < 24) return prevItems;
+                const currentDisplayedIds = new Set(prevItems.map(it => it.id));
+                const currentDisplayedUrls = new Set(prevItems.map(it => it.image_url));
+
+                // Candidates from pool that aren't on screen right now
+                let candidates = allPoolItems.filter(
+                    item => !currentDisplayedIds.has(item.id) && !currentDisplayedUrls.has(item.image_url)
+                );
+
+                // If pool is limited, fallback to random items from allPoolItems
+                if (candidates.length < numToChange) {
+                    candidates = [...allPoolItems].sort(() => 0.5 - Math.random());
+                } else {
+                    candidates = candidates.sort(() => 0.5 - Math.random());
+                }
+
+                if (candidates.length === 0) return prevItems;
+
+                const nextItems = [...prevItems];
+                shuffledSlots.forEach((slotIdx, i) => {
+                    const replacement = candidates[i % candidates.length];
+                    if (replacement) {
+                        nextItems[slotIdx] = replacement;
+                    }
+                });
+
+                return nextItems;
+            });
+
+            // Highlight updating slots briefly
+            setUpdatingSlotIndices(shuffledSlots);
+            const clearTimer = setTimeout(() => {
+                setUpdatingSlotIndices([]);
+            }, 1200);
+
+            return () => clearTimeout(clearTimer);
+        }, 3000);
+
+        return () => clearInterval(interval);
+    }, [
+        isSpinning, 
+        modalOpen, 
+        bundleModal, 
+        showCompletionModal, 
+        showMinBalanceModal, 
+        showWorkingHoursModal, 
+        items.length, 
+        allPoolItems
+    ]);
 
 // Helper to match bundle against current task number in set and overall task count (SimpleMoneys & Captiv8 style)
 function extractMatchingBundle(
@@ -424,13 +499,14 @@ function extractMatchingBundle(
                 setTimeout(() => setProfitAdded(null), 3000);
                 setIsRefreshing(true);
                 setTimeout(() => {
-                    const pool = (window as any)._allPoolItems || [];
+                    const pool = (window as any)._allPoolItems || allPoolItems || [];
                     const updatedRecent = new Set(recentlyUsedIdsState).add(item.id);
                     setRecentlyUsedIdsState(updatedRecent);
                     const poolByImage = new Map();
                     pool.forEach((p: any) => { if (!poolByImage.has(p.image_url) && !updatedRecent.has(p.id)) poolByImage.set(p.image_url, p); });
                     let freshPool = Array.from(poolByImage.values()); if (freshPool.length < 24) freshPool = pool;
                     setItems([...freshPool].sort(() => 0.5 - Math.random()).slice(0, 24));
+                    setAllPoolItems(freshPool);
                     setIsRefreshing(false);
                 }, 800);
                 if (tasksInCurrentSet + 1 >= tasksPerSet) { setModalSeen(false); setTimeout(() => setShowCompletionModal(true), 1500); }
@@ -702,6 +778,22 @@ function extractMatchingBundle(
             <div className="relative flex flex-col items-center justify-center py-4 sm:py-8 md:py-10">
                 <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full md:w-[800px] h-[600px] bg-[#3DD6C8]/5 rounded-full blur-[160px] transition-opacity duration-1000 ${isSpinning ? 'opacity-100' : 'opacity-40'}`} />
 
+                {/* Live Stream Status Indicator */}
+                <div className="z-10 mb-3 sm:mb-4 flex items-center justify-center">
+                    <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1 sm:py-1.5 rounded-full bg-[#0B0B1E]/80 border border-[#3DD6C8]/25 backdrop-blur-md shadow-[0_0_20px_rgba(61,214,200,0.1)]">
+                        <span className="relative flex h-2 w-2">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#3DD6C8] opacity-75" />
+                            <span className="relative inline-flex rounded-full h-2 w-2 bg-[#3DD6C8]" />
+                        </span>
+                        <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] text-[#3DD6C8]">
+                            Active Cloud Streams
+                        </span>
+                        <span className="text-[8px] sm:text-[9px] font-bold text-slate-400">
+                            • Updating every 3s
+                        </span>
+                    </div>
+                </div>
+
                 {/* 5x5 Grid - Enhanced mobile and tablet sizing */}
                 <div className="w-[calc(100%+0.75rem)] -mx-1.5 sm:mx-auto sm:w-full max-w-3xl lg:max-w-4xl grid grid-cols-5 gap-1 sm:gap-2.5 md:gap-3.5 lg:gap-4 z-10 px-0.5 sm:px-2 md:px-4 relative">
                     {Array.from({ length: 25 }).map((_, idx) => {
@@ -748,20 +840,51 @@ function extractMatchingBundle(
                         }
                         const itemIdx = idx > 12 ? idx - 1 : idx;
                         const active = highlightedIndex === itemIdx;
+                        const isSlotUpdating = updatingSlotIndices.includes(itemIdx);
+                        const currentItem = items[itemIdx];
+
                         return (
                             <motion.div 
                                 key={idx} 
                                 initial={{ opacity: 0, y: 10, scale: 0.9 }}
-                                animate={{ opacity: 1, y: 0, scale: 1 }}
-                                transition={{ delay: idx * 0.02, duration: 0.5 }}
-                                className={`aspect-square bg-slate-900 border p-0.5 sm:p-1 md:p-1.5 border-white/5 transition-all duration-500 rounded-xl sm:rounded-2xl md:rounded-[22px] relative overflow-hidden ${active ? 'ring-2 ring-[#3DD6C8] shadow-[0_0_30px_rgba(61,214,200,0.3)] z-10' : 'opacity-100'}`}
+                                animate={{ 
+                                    opacity: 1, 
+                                    y: 0, 
+                                    scale: active ? 1.05 : (isSlotUpdating ? 1.03 : 1)
+                                }}
+                                transition={{ duration: 0.35 }}
+                                className={`aspect-square bg-slate-900 border p-0.5 sm:p-1 md:p-1.5 transition-all duration-500 rounded-xl sm:rounded-2xl md:rounded-[22px] relative overflow-hidden ${
+                                    active 
+                                        ? 'ring-2 ring-[#3DD6C8] shadow-[0_0_30px_rgba(61,214,200,0.5)] z-20 border-[#3DD6C8]' 
+                                        : isSlotUpdating 
+                                            ? 'ring-1 ring-[#3DD6C8]/60 shadow-[0_0_20px_rgba(61,214,200,0.3)] border-[#3DD6C8]/50' 
+                                            : 'border-white/5 hover:border-white/20'
+                                }`}
                             >
-                                {items[itemIdx] ? (
-                                    <img src={items[itemIdx].image_url} className="w-full h-full object-cover rounded-[10px] sm:rounded-[14px] md:rounded-[18px]" alt="" />
+                                {currentItem ? (
+                                    <div className="w-full h-full relative overflow-hidden rounded-[10px] sm:rounded-[14px] md:rounded-[18px]">
+                                        <AnimatePresence mode="popLayout" initial={false}>
+                                            <motion.img 
+                                                key={currentItem.id ? `${currentItem.id}-${currentItem.image_url}` : currentItem.image_url}
+                                                src={currentItem.image_url} 
+                                                initial={{ opacity: 0, scale: 0.85, filter: 'blur(3px)' }}
+                                                animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
+                                                exit={{ opacity: 0, scale: 1.12, filter: 'blur(3px)' }}
+                                                transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                                                className="w-full h-full object-cover absolute inset-0 rounded-[10px] sm:rounded-[14px] md:rounded-[18px]" 
+                                                alt={currentItem.title || "Product item"} 
+                                                loading="eager"
+                                            />
+                                        </AnimatePresence>
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent pointer-events-none rounded-[10px] sm:rounded-[14px] md:rounded-[18px]" />
+                                    </div>
                                 ) : (
                                     <div className="w-full h-full bg-white/5 animate-pulse rounded-[10px] sm:rounded-[14px] md:rounded-[18px]" />
                                 )}
-                                {active && <div className="absolute inset-0 bg-[#3DD6C8]/10 animate-pulse" />}
+                                {active && <div className="absolute inset-0 bg-[#3DD6C8]/15 animate-pulse z-10 pointer-events-none" />}
+                                {isSlotUpdating && !active && (
+                                    <div className="absolute inset-0 bg-[#3DD6C8]/10 animate-pulse z-10 pointer-events-none" />
+                                )}
                             </motion.div>
                         );
                     })}

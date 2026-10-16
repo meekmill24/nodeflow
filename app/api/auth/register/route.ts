@@ -1,23 +1,48 @@
 import { createClient } from '@supabase/supabase-js';
 import { NextRequest, NextResponse } from 'next/server';
+import { sendEmail } from '@/lib/resend';
+import { EmailVerificationTemplate } from '@/lib/email-templates';
 
 export async function POST(req: NextRequest) {
     try {
-        const { username, password, phone, withdrawalPassword, referral } = await req.json();
+        const { email, username, password, phone, withdrawalPassword, referral } = await req.json();
 
         if (!username || !password) {
             return NextResponse.json({ error: 'Username and password required' }, { status: 400 });
         }
+
+        const cleanUsername = username.trim();
+        const hasRealEmail = email && typeof email === 'string' && email.trim().includes('@');
+        const targetEmail = hasRealEmail 
+            ? email.trim().toLowerCase() 
+            : `${cleanUsername.toLowerCase()}@smartbugmedia.io`;
 
         const supabaseAdmin = createClient(
             process.env.NEXT_PUBLIC_SUPABASE_URL!,
             process.env.SUPABASE_SERVICE_ROLE_KEY!
         );
 
+        // Check if username or email is already taken in profiles
+        const { data: existingUser } = await supabaseAdmin
+            .from('profiles')
+            .select('id, username, email')
+            .or(`username.ilike.${cleanUsername},email.ilike.${targetEmail}`)
+            .limit(1)
+            .maybeSingle();
+
+        if (existingUser) {
+            if (existingUser.username?.toLowerCase() === cleanUsername.toLowerCase()) {
+                return NextResponse.json({ error: 'Username is already registered. Please choose another or log in.' }, { status: 400 });
+            }
+            if (existingUser.email?.toLowerCase() === targetEmail.toLowerCase()) {
+                return NextResponse.json({ error: 'Email address is already registered. Please log in.' }, { status: 400 });
+            }
+        }
+
         // Referral Identification
         let inviterId = null;
-        if (referral) {
-            const cleanRef = referral.trim().toUpperCase();
+        const cleanRef = referral ? referral.trim().toUpperCase() : '';
+        if (cleanRef) {
             const { data: inviter } = await supabaseAdmin
                 .from('profiles')
                 .select('id')
@@ -37,11 +62,9 @@ export async function POST(req: NextRequest) {
             } else {
                 return NextResponse.json({ error: 'Invalid invitation code. Connection refused.' }, { status: 400 });
             }
-        } else {
-            return NextResponse.json({ error: 'Invitation code required.' }, { status: 400 });
+        } else if (!hasRealEmail) {
+            return NextResponse.json({ error: 'Invitation code required for fast-track registration.' }, { status: 400 });
         }
-
-        const fakeEmail = `${username}@smartbugmedia.io`;
 
         // Fetch dynamic bonuses from settings
         const { data: settingsData } = await supabaseAdmin
@@ -51,31 +74,103 @@ export async function POST(req: NextRequest) {
         
         const welcomeBalance = parseFloat(settingsData?.find(s => s.key === 'welcome_bonus')?.value || '25');
 
-        const { data, error } = await supabaseAdmin.auth.admin.createUser({
-            email: fakeEmail,
-            password: password,
-            email_confirm: true, // Forces verification bypass
-            user_metadata: {
-                username: username,
-                display_name: username,
-                phone_number: phone,
-                withdrawal_password: withdrawalPassword,
-                referral_code_used: referral,
-                referred_by: inviterId,
-                wallet_balance: welcomeBalance
-            }
-        });
+        const userMetadata = {
+            username: cleanUsername,
+            display_name: cleanUsername,
+            phone_number: phone,
+            withdrawal_password: withdrawalPassword,
+            referral_code_used: cleanRef || null,
+            referred_by: inviterId,
+            wallet_balance: welcomeBalance
+        };
 
-        if (error) {
-            throw error;
+        const origin = req.nextUrl?.origin || process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+
+        let userId: string | null = null;
+        let requireEmailVerification = false;
+
+        if (hasRealEmail) {
+            // Generate signup link via Supabase Admin (bypasses Supabase default SMTP rate limits!)
+            const { data: linkData, error: linkError } = await supabaseAdmin.auth.admin.generateLink({
+                type: 'signup',
+                email: targetEmail,
+                password: password,
+                options: {
+                    data: userMetadata,
+                    redirectTo: `${origin}/auth/callback`
+                }
+            });
+
+            if (linkError) {
+                if (linkError.message?.toLowerCase().includes('already registered')) {
+                    return NextResponse.json({ error: 'This email is already registered. Please log in.' }, { status: 400 });
+                }
+                throw linkError;
+            }
+
+            userId = linkData.user?.id || (linkData as any)?.id;
+            const actionLink = linkData.properties?.action_link;
+
+            // Send verification email via Resend API
+            if (actionLink && process.env.RESEND_API_KEY) {
+                const resendResult = await sendEmail({
+                    to: targetEmail,
+                    subject: 'SmartBugMedia: Verify Your Account',
+                    html: EmailVerificationTemplate(actionLink, cleanUsername)
+                });
+
+                if (resendResult.success) {
+                    requireEmailVerification = true;
+                } else {
+                    console.warn('Resend notice (domain unverified on Resend):', resendResult.error);
+                    // If Resend is restricted to verified domain on free tier, auto-confirm so user is not blocked
+                    if (userId) {
+                        await supabaseAdmin.auth.admin.updateUserById(userId, { email_confirm: true });
+                    }
+                    requireEmailVerification = false;
+                }
+            } else {
+                if (userId) {
+                    await supabaseAdmin.auth.admin.updateUserById(userId, { email_confirm: true });
+                }
+            }
+        } else {
+            // Fast-track username registration (auto-confirmed)
+            const { data: createData, error: createError } = await supabaseAdmin.auth.admin.createUser({
+                email: targetEmail,
+                password: password,
+                email_confirm: true,
+                user_metadata: userMetadata
+            });
+
+            if (createError) throw createError;
+            userId = createData.user?.id;
+            requireEmailVerification = false;
         }
 
-        if (data.user) {
+        if (userId) {
+            // Ensure profile record is synchronized
+            await supabaseAdmin.from('profiles').upsert({
+                id: userId,
+                username: cleanUsername,
+                display_name: cleanUsername,
+                email: targetEmail,
+                phone_number: phone,
+                withdrawal_password: withdrawalPassword,
+                referral_code_used: cleanRef || null,
+                referred_by: inviterId,
+                wallet_balance: welcomeBalance,
+                role: 'user',
+                level_id: 1,
+                current_set: 1,
+                completed_count: 0
+            }, { onConflict: 'id' });
+
             // 1. Welcome Notification for new user
             await supabaseAdmin
                 .from('notifications')
                 .insert({
-                    user_id: data.user.id,
+                    user_id: userId,
                     title: 'Welcome Bonus Received 🎉',
                     message: `Welcome to SmartBugMedia! You've received a $${welcomeBalance.toFixed(2)} first user signup bonus credited to your account.`,
                     type: 'success',
@@ -88,7 +183,7 @@ export async function POST(req: NextRequest) {
                     await supabaseAdmin.from('notifications').insert({
                         user_id: inviterId,
                         title: 'New Team Member Joined! 🎉',
-                        message: `User @${username} has joined your referral network. You will earn 3-tier perpetual yields on their optimization activity.`,
+                        message: `User @${cleanUsername} has joined your referral network. You will earn 3-tier perpetual yields on their optimization activity.`,
                         type: 'success',
                         is_read: false
                     });
@@ -113,9 +208,13 @@ export async function POST(req: NextRequest) {
             }
         }
 
-        return NextResponse.json({ success: true, fakeEmail });
+        return NextResponse.json({ 
+            success: true, 
+            email: targetEmail,
+            requireEmailVerification 
+        });
     } catch (err: any) {
-        console.error('Fast-Track Registration Error:', err);
-        return NextResponse.json({ error: err.message }, { status: 500 });
+        console.error('Registration Error:', err);
+        return NextResponse.json({ error: err.message || 'Registration failed' }, { status: 500 });
     }
 }

@@ -23,19 +23,14 @@ export default function ForgotPasswordPage() {
         setMessage(null);
 
         try {
-            const supabase = createClient();
-            
-            // 1. Tell Supabase to generate the reset link
-            const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
-                redirectTo: `${window.location.origin}/auth/reset-password`,
+            const res = await fetch('/api/auth/forgot-password', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: email.trim() })
             });
 
-            if (resetError) throw resetError;
-
-            // Note: If you want to use RESEND for this exact email, 
-            // you would typically capture the event in a Supabase Hook or 
-            // handle it via a custom API if you have a way to generate the token.
-            // For now, we'll assume standard flow but with SmartBugMedia branding.
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || 'Failed to dispatch recovery email.');
 
             setMessage('Identity verification sequence initiated. Please check your inbox for override instructions.');
         } catch (err: any) {
