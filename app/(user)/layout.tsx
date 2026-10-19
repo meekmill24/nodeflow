@@ -11,17 +11,17 @@ import { useState, useRef, useEffect } from 'react';
 import AnimatePage from '@/components/AnimatePage';
 
 export default function UserLayout({ children }: { children: React.ReactNode }) {
-    const { user, loading } = useAuth();
+    const { user, loading, isSigningOut } = useAuth();
     const router = useRouter();
     const pathname = usePathname();
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const mainRef = useRef<HTMLElement>(null); // Declare useRef for the main container
 
     useEffect(() => {
-        if (!loading && !user) {
+        if (!loading && !user && !isSigningOut) {
             router.replace('/auth/login');
         }
-    }, [user, loading, router]);
+    }, [user, loading, isSigningOut, router]);
 
     // Effect to reset scroll position on pathname change
     useEffect(() => {

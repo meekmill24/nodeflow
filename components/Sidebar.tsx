@@ -20,7 +20,8 @@ import {
     Activity,
     Cpu,
     TrendingUp,
-    Download
+    Download,
+    Loader2
 } from 'lucide-react';
 
 const menuItems = [
@@ -40,7 +41,7 @@ interface SidebarProps {
 
 export default function Sidebar({ isOpen, onClose }: SidebarProps) {
     const pathname = usePathname();
-    const { profile, signOut } = useAuth();
+    const { profile, signOut, isSigningOut } = useAuth();
     const { t, language } = useLanguage();
     const { format } = useCurrency();
     const { theme } = useTheme();
@@ -59,7 +60,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
             <aside className={`
                 fixed top-0 left-0 h-screen w-72 z-[70] transition-all duration-500 transform lg:translate-x-0
                 ${isOpen ? 'translate-x-0' : '-translate-x-full'}
-                flex flex-col bg-[#0B0B1E]/95 backdrop-blur-3xl border-r border-white/5 shadow-[30px_0_60px_rgba(0,0,0,0.8)]
+                flex flex-col bg-[#0B0B1E]/95 backdrop-blur-3xl border-r border-white/5 shadow-[30px_0_60px_rgba(0,0,0,0.8)] overflow-hidden
             `}>
                 
                 {/* Branding Block */}
@@ -146,24 +147,36 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                 </div>
 
                 {/* Account Identity Shard */}
-                <div className="p-8 mt-auto border-t border-white/5 bg-black/20">
-                    <div className="flex items-center justify-between mb-4">
-                        <Link href="/profile" onClick={onClose} className="flex items-center gap-4 group">
-                             <div className="w-11 h-11 rounded-full bg-gradient-to-br from-[#3DD6C8]/20 to-transparent border border-[#3DD6C8]/30 flex items-center justify-center relative group-hover:scale-110 transition-all duration-500">
-                                <span className="text-[#3DD6C8] font-black text-sm italic">{profile?.username?.[0].toUpperCase() || 'U'}</span>
-                                <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-[#3DD6C8] border-2 border-[#0B0B1E] flex items-center justify-center">
+                <div className="px-4 py-4 sm:px-5 sm:py-4.5 mt-auto border-t border-white/5 bg-black/30 shrink-0">
+                    <div className="flex items-center justify-between gap-2.5 mb-3.5 min-w-0">
+                        <Link 
+                            href="/profile" 
+                            onClick={onClose} 
+                            className="flex items-center gap-3 group min-w-0 flex-1 overflow-hidden"
+                            title={profile?.username || 'User Profile'}
+                        >
+                             <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#3DD6C8]/20 to-transparent border border-[#3DD6C8]/30 flex items-center justify-center relative group-hover:scale-105 transition-all duration-300 shrink-0">
+                                <span className="text-[#3DD6C8] font-black text-sm italic">{profile?.username?.[0]?.toUpperCase() || 'U'}</span>
+                                <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-[#3DD6C8] border-2 border-[#0B0B1E] flex items-center justify-center">
                                     <div className="w-1 h-1 rounded-full bg-[#0B0B1E] animate-pulse" />
                                 </div>
                              </div>
-                             <div className="flex flex-col">
-                                <span className="text-xs font-black text-white group-hover:text-[#3DD6C8] transition-colors">{profile?.username || 'User'}</span>
-                                <span className="text-[8px] font-black text-white/30 uppercase tracking-[0.2em] mt-1 italic">
+                             <div className="flex flex-col min-w-0 flex-1">
+                                <span className="text-xs font-black text-white group-hover:text-[#3DD6C8] transition-colors truncate block">
+                                    {profile?.username || 'User'}
+                                </span>
+                                <span className="text-[8px] font-black text-white/30 uppercase tracking-[0.18em] mt-0.5 italic truncate block">
                                     {profile?.level?.name ? profile.level.name : `VIP Lv.${profile?.level_id || 1}`}
                                 </span>
                              </div>
                         </Link>
-                        <button onClick={() => signOut()} className="p-2.5 rounded-xl bg-white/5 text-white/40 hover:text-rose-500 hover:bg-rose-500/10 border border-white/5 hover:border-rose-500/20 transition-all duration-300">
-                            <LogOut size={16} />
+                        <button 
+                            onClick={() => signOut()} 
+                            disabled={isSigningOut}
+                            title="Sign Out"
+                            className="p-2.5 rounded-xl bg-white/5 text-white/40 hover:text-rose-500 hover:bg-rose-500/10 border border-white/5 hover:border-rose-500/20 transition-all duration-300 disabled:opacity-50 shrink-0"
+                        >
+                            {isSigningOut ? <Loader2 size={16} className="animate-spin text-rose-500" /> : <LogOut size={16} />}
                         </button>
                     </div>
 

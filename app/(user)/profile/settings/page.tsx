@@ -10,7 +10,7 @@ import Link from 'next/link';
 import { useState, useEffect } from 'react';
 
 export default function SettingsPage() {
-    const { user, profile, refreshProfile, signOut } = useAuth();
+    const { user, profile, refreshProfile, signOut, isSigningOut } = useAuth();
     const { theme, toggleTheme } = useTheme();
     const { t, availableLanguages, setLanguage: updateContextLanguage } = useLanguage();
     const { setCurrency: updateContextCurrency } = useCurrency();
@@ -469,9 +469,17 @@ export default function SettingsPage() {
                                 </button>
                                 <button 
                                     onClick={() => signOut()}
-                                    className="p-4 rounded-xl bg-danger text-white font-black hover:bg-danger-hover transition-colors shadow-lg shadow-danger/30 uppercase text-xs tracking-widest"
+                                    disabled={isSigningOut}
+                                    className="p-4 rounded-xl bg-danger text-white font-black hover:bg-danger-hover transition-colors shadow-lg shadow-danger/30 uppercase text-xs tracking-widest disabled:opacity-50 flex items-center justify-center gap-2"
                                 >
-                                    Sign Out
+                                    {isSigningOut ? (
+                                        <>
+                                            <Loader2 size={16} className="animate-spin" />
+                                            <span>Signing Out...</span>
+                                        </>
+                                    ) : (
+                                        'Sign Out'
+                                    )}
                                 </button>
                             </div>
                         </div>

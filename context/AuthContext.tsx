@@ -5,11 +5,13 @@ import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase/index';
 import type { Profile } from '@/lib/types';
 import type { User } from '@supabase/supabase-js';
+import { LogOut, Loader2 } from 'lucide-react';
 
 interface AuthContextType {
     user: User | null;
     profile: Profile | null;
     loading: boolean;
+    isSigningOut: boolean;
     signOut: () => Promise<void>;
     refreshProfile: () => Promise<void>;
     mutate: () => Promise<void>;
@@ -19,6 +21,7 @@ const AuthContext = createContext<AuthContextType>({
     user: null,
     profile: null,
     loading: true,
+    isSigningOut: false,
     signOut: async () => { },
     refreshProfile: async () => { },
     mutate: async () => { },
@@ -30,6 +33,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [user, setUser] = useState<User | null>(null);
     const [profile, setProfile] = useState<Profile | null>(null);
     const [loading, setLoading] = useState(true);
+    const [isSigningOut, setIsSigningOut] = useState(false);
     const userRef = useRef<User | null>(null);
     const router = useRouter();
 
@@ -208,15 +212,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }, [user?.id, fetchProfile]);
 
     const signOut = useCallback(async () => {
+        if (isSigningOut) return;
+        setIsSigningOut(true);
         try {
-            await supabase.auth.signOut();
+            await Promise.allSettled([
+                supabase.auth.signOut(),
+                new Promise((resolve) => setTimeout(resolve, 1400)),
+            ]);
         } catch (err) {
             console.error('SignOut error:', err);
+        } finally {
+            setUser(null);
+            setProfile(null);
+            router.replace('/');
+            setTimeout(() => {
+                setIsSigningOut(false);
+            }, 1000);
         }
-        setUser(null);
-        setProfile(null);
-        router.replace('/auth/login');
-    }, [router]);
+    }, [isSigningOut, router]);
 
     useEffect(() => {
         console.log("PROFILE STATE UPDATE:", profile);
@@ -226,8 +239,50 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }, [loading, user, profile, signOut]);
 
     return (
-        <AuthContext.Provider value={{ user, profile, loading, signOut, refreshProfile, mutate: refreshProfile }}>
+        <AuthContext.Provider value={{ user, profile, loading, isSigningOut, signOut, refreshProfile, mutate: refreshProfile }}>
             {children}
+            {isSigningOut && (
+                <div className="fixed inset-0 z-[999999] bg-[#070714]/95 backdrop-blur-2xl flex flex-col items-center justify-center p-6 text-center select-none transition-all duration-500 animate-in fade-in">
+                    {/* Ambient glow backgrounds */}
+                    <div className="absolute w-96 h-96 rounded-full bg-rose-500/15 blur-[120px] pointer-events-none" />
+                    <div className="absolute w-80 h-80 rounded-full bg-[#3DD6C8]/10 blur-[100px] pointer-events-none" />
+
+                    {/* Concentric rotating portal */}
+                    <div className="relative flex items-center justify-center mb-8">
+                        <div className="w-32 h-32 rounded-full border border-rose-500/20 border-t-rose-500 border-r-rose-400 animate-spin" style={{ animationDuration: '2s' }} />
+                        <div className="absolute w-24 h-24 rounded-full border border-[#3DD6C8]/30 border-b-[#3DD6C8] animate-spin" style={{ animationDuration: '1.4s', animationDirection: 'reverse' }} />
+                        <div className="absolute w-16 h-16 rounded-2xl bg-gradient-to-tr from-rose-600 to-rose-400 flex items-center justify-center text-white shadow-[0_0_40px_rgba(244,63,94,0.55)]">
+                            <LogOut size={28} className="animate-pulse" />
+                        </div>
+                    </div>
+
+                    {/* Status Pill */}
+                    <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-rose-500/10 border border-rose-500/30 text-rose-400 text-[10px] font-black uppercase tracking-[0.25em] mb-4 shadow-[0_0_20px_rgba(244,63,94,0.2)]">
+                        <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-ping" />
+                        Security Protocol Active
+                    </div>
+
+                    {/* Heading */}
+                    <h2 className="text-2xl md:text-3xl font-black text-white italic uppercase tracking-wider mb-2 drop-shadow-lg">
+                        Signing Out
+                    </h2>
+                    <p className="text-xs text-white/50 tracking-widest uppercase font-mono mb-8 max-w-sm">
+                        Ending session & safely clearing cache...
+                    </p>
+
+                    {/* Animated Progress Bar */}
+                    <div className="w-72 max-w-full h-1.5 bg-white/5 rounded-full overflow-hidden border border-white/10 relative shadow-inner">
+                        <div className="h-full bg-gradient-to-r from-rose-500 via-[#3DD6C8] to-rose-500 rounded-full animate-pulse w-full" />
+                    </div>
+                    <div className="flex justify-between w-72 max-w-full text-[9px] font-mono text-white/30 uppercase tracking-widest mt-3">
+                        <span>SmartBug Media</span>
+                        <span className="flex items-center gap-1.5 text-rose-400">
+                            <Loader2 size={10} className="animate-spin" />
+                            Disconnecting
+                        </span>
+                    </div>
+                </div>
+            )}
         </AuthContext.Provider>
     );
 }

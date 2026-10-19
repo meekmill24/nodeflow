@@ -6,7 +6,7 @@ import { supabase } from '@/lib/supabase/index';
 import Link from 'next/link'; 
 import { usePathname } from 'next/navigation'; 
 import { 
-  LayoutDashboard, Users, Layers, Grid3X3, Share2, Receipt, LogOut, DollarSign, Menu, X, ArrowDownToLine, ArrowUpFromLine, Package, Bell, Settings, AlertCircle, Wallet as WalletIcon, ArrowUpRight, Wallet, ShieldCheck, Headphones
+  LayoutDashboard, Users, Layers, Grid3X3, Share2, Receipt, LogOut, DollarSign, Menu, X, ArrowDownToLine, ArrowUpFromLine, Package, Bell, Settings, AlertCircle, Wallet as WalletIcon, ArrowUpRight, Wallet, ShieldCheck, Headphones, Loader2
 } from 'lucide-react'; 
 import AnimatePage from '@/components/AnimatePage'; 
 import NotificationCenter from '@/components/NotificationCenter';
@@ -27,7 +27,7 @@ const navItems = [
 ]; 
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) { 
-  const { user, profile, loading, signOut } = useAuth(); 
+  const { user, profile, loading, signOut, isSigningOut } = useAuth(); 
   const router = useRouter(); 
   const pathname = usePathname(); 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -169,10 +169,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
           <button 
             onClick={() => signOut()}
-            className="mt-auto flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:text-red-400 hover:bg-red-400/10 transition-colors"
+            disabled={isSigningOut}
+            className="mt-auto flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:text-red-400 hover:bg-red-400/10 transition-colors disabled:opacity-50"
           >
-            <LogOut size={20} />
-            <span className="font-medium">Sign Out</span>
+            {isSigningOut ? <Loader2 size={20} className="animate-spin text-red-400" /> : <LogOut size={20} />}
+            <span className="font-medium">{isSigningOut ? 'Signing Out...' : 'Sign Out'}</span>
           </button>
         </div>
       </aside>

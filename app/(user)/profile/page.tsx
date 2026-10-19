@@ -36,7 +36,7 @@ import { supabase } from '@/lib/supabase/index';
 import { toast } from 'sonner';
 
 export default function ProfilePage() {
-    const { profile, signOut } = useAuth();
+    const { profile, signOut, isSigningOut } = useAuth();
     const { t } = useLanguage();
     const { format } = useCurrency();
     const [uploading, setUploading] = useState(false);
@@ -62,40 +62,45 @@ export default function ProfilePage() {
             <input type="file" ref={fileInputRef} onChange={handleAvatarUpload} accept="image/*" className="hidden" />
 
             {/* IDENTITY SHARD HEADER */}
-            <div className="relative group overflow-hidden rounded-[48px] bg-slate-900 border border-white/5 p-10 md:p-14 shadow-2xl">
+            <div className="relative group overflow-hidden rounded-[32px] sm:rounded-[40px] md:rounded-[48px] bg-slate-900 border border-white/5 p-6 sm:p-8 md:p-10 lg:p-12 shadow-2xl">
                  <div className="absolute top-0 right-0 w-80 h-80 bg-[#3DD6C8]/5 blur-[100px] rounded-full pointer-events-none" />
-                 <div className="relative z-10 flex flex-col md:flex-row md:items-center gap-10">
-                    <div className="relative group/avatar cursor-pointer" onClick={() => !uploading && fileInputRef.current?.click()}>
-                        <div className="w-24 h-24 md:w-32 md:h-32 rounded-[32px] md:rounded-[40px] bg-gradient-to-br from-[#3DD6C8]/20 to-transparent border border-white/10 p-[3px] shadow-2xl relative transition-transform hover:scale-105 active:scale-95 duration-500 overflow-hidden">
-                             <div className="w-full h-full rounded-[29px] md:rounded-[37px] bg-slate-950 flex items-center justify-center border border-white/5 overflow-hidden">
+                 <div className="relative z-10 flex flex-col sm:flex-row sm:items-center gap-6 sm:gap-8 md:gap-10 min-w-0">
+                    <div className="relative group/avatar cursor-pointer shrink-0 self-start sm:self-center" onClick={() => !uploading && fileInputRef.current?.click()}>
+                        <div className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-[28px] sm:rounded-[32px] md:rounded-[40px] bg-gradient-to-br from-[#3DD6C8]/20 to-transparent border border-white/10 p-[3px] shadow-2xl relative transition-transform hover:scale-105 active:scale-95 duration-500 overflow-hidden">
+                             <div className="w-full h-full rounded-[25px] sm:rounded-[29px] md:rounded-[37px] bg-slate-950 flex items-center justify-center border border-white/5 overflow-hidden">
                                 {profile?.avatar_url ? (
                                     <img src={profile.avatar_url} className="w-full h-full object-cover" alt="Avatar" />
                                 ) : (
-                                    <span className="text-4xl font-black text-white italic">{profile?.username?.[0].toUpperCase() || 'U'}</span>
+                                    <span className="text-3xl sm:text-4xl font-black text-white italic">{profile?.username?.[0]?.toUpperCase() || 'U'}</span>
                                 )}
                                 <div className="absolute inset-0 bg-black/60 opacity-0 group-hover/avatar:opacity-100 flex flex-col items-center justify-center transition-all duration-300">
-                                    <Upload size={24} className="text-[#3DD6C8] animate-bounce" />
-                                    <span className="text-[8px] font-black text-white uppercase tracking-widest mt-2">{uploading ? 'UPLOADING' : 'EDIT IDENTITY'}</span>
+                                    <Upload size={22} className="text-[#3DD6C8] animate-bounce" />
+                                    <span className="text-[8px] font-black text-white uppercase tracking-widest mt-1.5">{uploading ? 'UPLOADING' : 'EDIT IDENTITY'}</span>
                                 </div>
                              </div>
                         </div>
                         {uploading && (
-                            <div className="absolute inset-0 flex items-center justify-center bg-black/60 rounded-[32px] md:rounded-[40px]">
-                                <Loader2 className="animate-spin text-[#3DD6C8]" size={32} />
+                            <div className="absolute inset-0 flex items-center justify-center bg-black/60 rounded-[28px] sm:rounded-[32px] md:rounded-[40px]">
+                                <Loader2 className="animate-spin text-[#3DD6C8]" size={28} />
                             </div>
                         )}
-                        <div className="absolute -bottom-1 -right-1 w-10 h-10 rounded-2xl bg-[#0B0B1E] border-4 border-slate-900 flex items-center justify-center">
-                            <div className="w-2.5 h-2.5 rounded-full bg-[#3DD6C8] animate-pulse" />
+                        <div className="absolute -bottom-1 -right-1 w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 rounded-xl sm:rounded-2xl bg-[#0B0B1E] border-3 sm:border-4 border-slate-900 flex items-center justify-center">
+                            <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-[#3DD6C8] animate-pulse" />
                         </div>
                     </div>
 
-                    <div className="flex flex-col flex-1">
-                        <div className="flex flex-wrap items-center gap-3 mb-3">
-                             <span className="px-3 py-1 bg-[#3DD6C8]/10 text-[#3DD6C8] border border-[#3DD6C8]/20 rounded-full text-[9px] font-black uppercase tracking-[0.2em] italic">Identity Verified</span>
+                    <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
+                        <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-2.5 sm:mb-3">
+                             <span className="px-2.5 py-0.5 sm:px-3 sm:py-1 bg-[#3DD6C8]/10 text-[#3DD6C8] border border-[#3DD6C8]/20 rounded-full text-[9px] font-black uppercase tracking-[0.2em] italic">Identity Verified</span>
                              <span className="text-[9px] font-black text-white/30 uppercase tracking-[0.4em]">Node Protocol 3.1</span>
                         </div>
-                        <h2 className="text-3xl md:text-5xl font-black text-white uppercase tracking-tighter italic leading-none mb-4">{profile?.username || 'Node User'}</h2>
-                        <div className="flex items-center gap-4">
+                        <h2 
+                            title={profile?.username || 'Node User'}
+                            className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black text-white uppercase tracking-tight italic leading-tight mb-3.5 sm:mb-4 truncate max-w-full block"
+                        >
+                            {profile?.username || 'Node User'}
+                        </h2>
+                        <div className="flex flex-wrap items-center gap-3 sm:gap-4">
                              <div 
                                 onClick={() => {
                                     if (profile?.referral_code) {
@@ -111,7 +116,7 @@ export default function ProfilePage() {
                                     <Activity size={10} className="text-[#3DD6C8] opacity-0 group-hover/ref:opacity-100 transition-opacity" />
                                 </div>
                              </div>
-                             <div className="h-6 w-[1px] bg-white/10" />
+                             <div className="h-6 w-[1px] bg-white/10 hidden sm:block" />
                              <div className="flex flex-col">
                                 <span className="text-[8px] font-black text-white/40 uppercase tracking-[0.3em] mb-1 leading-none">USER LEVEL</span>
                                 <span className="text-xs font-black text-[#3DD6C8] tracking-widest leading-none uppercase">
@@ -129,22 +134,22 @@ export default function ProfilePage() {
             </div>
 
             {/* ASSET CONTROL MATRIX */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                 {[
                     { label: t('available_balance'), value: format(profile?.wallet_balance || 0), desc: 'Liquidity Matrix', icon: Wallet, color: 'text-white' },
                     { label: t('daily_profits'), value: format(profile?.profit || 0), desc: 'Rebate Velocity', icon: Zap, color: 'text-amber-400' },
                     { label: t('referral_bonus'), value: format(profile?.referral_earned || 0), desc: 'Network Yield', icon: Network, color: 'text-[#3DD6C8]' },
                 ].map((asset, i) => (
-                    <div key={i} className="bg-[#0B0B1E] border border-white/5 p-8 rounded-[40px] shadow-xl relative overflow-hidden group hover:border-white/10 transition-all duration-700">
-                         <div className="flex items-center justify-between mb-6 relative z-10">
+                    <div key={i} className="bg-[#0B0B1E] border border-white/5 p-6 sm:p-8 rounded-[32px] sm:rounded-[40px] shadow-xl relative overflow-hidden group hover:border-white/10 transition-all duration-700 min-w-0">
+                         <div className="flex items-center justify-between mb-4 sm:mb-6 relative z-10">
                             <div className="w-10 h-10 rounded-2xl bg-white/5 flex items-center justify-center text-white/40 group-hover:text-white transition-colors">
                                 <asset.icon size={20} />
                             </div>
                             <span className="text-[8px] font-black text-white/20 uppercase tracking-[0.4em] italic">{asset.desc}</span>
                          </div>
-                         <div className="space-y-1 relative z-10">
-                            <span className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em]">{asset.label}</span>
-                            <h3 className={`text-4xl font-black italic uppercase tracking-tighter ${asset.color}`}>{asset.value}</h3>
+                         <div className="space-y-1 relative z-10 min-w-0">
+                            <span className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em] block truncate">{asset.label}</span>
+                            <h3 className={`text-2xl sm:text-3xl lg:text-4xl font-black italic uppercase tracking-tighter truncate ${asset.color}`}>{asset.value}</h3>
                          </div>
                          <div className="absolute inset-0 bg-gradient-to-tr from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                     </div>
@@ -229,19 +234,35 @@ export default function ProfilePage() {
             {/* EXIT PROTOCOL */}
             <button 
                 onClick={() => signOut()}
-                className="w-full bg-rose-500/10 border border-rose-500/20 p-8 rounded-[40px] flex items-center justify-between group hover:bg-rose-500/20 transition-all active:scale-95 shadow-2xl"
+                disabled={isSigningOut}
+                className="w-full bg-rose-500/10 border border-rose-500/20 p-8 rounded-[40px] flex items-center justify-between group hover:bg-rose-500/20 transition-all active:scale-95 shadow-2xl relative overflow-hidden disabled:opacity-80 disabled:pointer-events-none"
             >
-                <div className="flex items-center gap-6">
+                {isSigningOut && (
+                    <div className="absolute inset-0 bg-gradient-to-r from-rose-500/10 via-rose-500/20 to-rose-500/10 animate-pulse pointer-events-none" />
+                )}
+                <div className="flex items-center gap-6 relative z-10">
                     <div className="w-14 h-14 rounded-2xl bg-rose-500 flex items-center justify-center text-[#0B0B1E] shadow-[0_0_30px_rgba(244,63,94,0.4)] group-hover:scale-110 transition-transform">
-                        <LogOut size={26} />
+                        {isSigningOut ? (
+                            <Loader2 size={26} className="animate-spin text-[#0B0B1E]" />
+                        ) : (
+                            <LogOut size={26} />
+                        )}
                     </div>
                     <div className="flex flex-col items-start">
-                        <span className="text-xl font-black text-white italic uppercase tracking-tighter font-black">Deactivate Identity</span>
-                        <span className="text-[9px] font-black text-rose-500/60 uppercase tracking-[0.3em] italic leading-none">Disconnect Session • SmartBugMedia</span>
+                        <span className="text-xl font-black text-white italic uppercase tracking-tighter">
+                            {isSigningOut ? 'Signing Out...' : 'Sign Out'}
+                        </span>
+                        <span className="text-[9px] font-black text-rose-500/60 uppercase tracking-[0.3em] italic leading-none">
+                            {isSigningOut ? 'Terminating Session Keys • Redirecting...' : 'Disconnect Session • SmartBugMedia'}
+                        </span>
                     </div>
                 </div>
-                <div className="w-12 h-12 rounded-full border border-rose-500/30 flex items-center justify-center text-rose-500 group-hover:translate-x-2 transition-transform">
-                    <ArrowRight size={24} />
+                <div className="w-12 h-12 rounded-full border border-rose-500/30 flex items-center justify-center text-rose-500 group-hover:translate-x-2 transition-transform relative z-10">
+                    {isSigningOut ? (
+                        <Loader2 size={22} className="animate-spin text-rose-400" />
+                    ) : (
+                        <ArrowRight size={24} />
+                    )}
                 </div>
             </button>
         </div>

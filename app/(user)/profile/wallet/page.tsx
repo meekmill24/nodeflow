@@ -7,7 +7,7 @@ import { ArrowLeft, Wallet, Shield, CheckCircle, AlertCircle, Loader2, LogOut } 
 import Link from 'next/link';
 
 export default function BindWalletPage() {
-    const { profile, refreshProfile, signOut } = useAuth();
+    const { profile, refreshProfile, signOut, isSigningOut } = useAuth();
     type BoundNetwork = 'USDT-TRC20' | 'USDT-BEP20' | 'USDC' | 'BNB' | 'PAYPALUSD' | 'ETH' | 'BTC';
     const [network, setNetwork] = useState<BoundNetwork>('USDT-TRC20');
     const [walletAddress, setWalletAddress] = useState('');
@@ -231,9 +231,17 @@ export default function BindWalletPage() {
                                 </button>
                                 <button 
                                     onClick={() => signOut()}
-                                    className="p-4 rounded-xl bg-danger text-white font-black hover:bg-danger-hover transition-colors shadow-lg shadow-danger/30 uppercase text-xs tracking-widest"
+                                    disabled={isSigningOut}
+                                    className="p-4 rounded-xl bg-danger text-white font-black hover:bg-danger-hover transition-colors shadow-lg shadow-danger/30 uppercase text-xs tracking-widest disabled:opacity-50 flex items-center justify-center gap-2"
                                 >
-                                    Sign Out
+                                    {isSigningOut ? (
+                                        <>
+                                            <Loader2 size={16} className="animate-spin" />
+                                            <span>Signing Out...</span>
+                                        </>
+                                    ) : (
+                                        'Sign Out'
+                                    )}
                                 </button>
                             </div>
                         </div>

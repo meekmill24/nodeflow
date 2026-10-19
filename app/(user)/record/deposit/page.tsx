@@ -230,8 +230,16 @@ export default function DepositRecordPage() {
                             <div key={tx.id} className="glass-card p-5 space-y-3 animate-slide-up border-white/5" style={{ animationDelay: `${idx * 0.05}s` }}>
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-3">
-                                        <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center shrink-0">
-                                            <ArrowDownToLine size={18} className="text-emerald-400" />
+                                        <div className="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center shrink-0 overflow-hidden relative">
+                                            {tx.proof_url ? (
+                                                <img 
+                                                    src={tx.proof_url} 
+                                                    alt="Proof" 
+                                                    className="w-full h-full object-cover" 
+                                                />
+                                            ) : (
+                                                <ArrowDownToLine size={18} className="text-emerald-400" />
+                                            )}
                                         </div>
                                         <div>
                                             <div className="flex items-center gap-2 mb-0.5">

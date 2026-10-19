@@ -193,69 +193,71 @@ export default function HomePage() {
             </div>
 
             {/* FINANCIAL SNAPSHOT MATRIX */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="md:col-span-3 lg:col-span-1 bg-[#0B0B1E] border border-white/5 p-8 rounded-[40px] shadow-2xl backdrop-blur-3xl relative overflow-hidden group hover:border-white/10 transition-all duration-700">
-                    <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 lg:gap-6">
+                <div className="md:col-span-2 xl:col-span-1 bg-[#0B0B1E] border border-white/5 p-6 sm:p-7 xl:p-8 rounded-[32px] sm:rounded-[40px] shadow-2xl backdrop-blur-3xl relative overflow-hidden group hover:border-white/10 transition-all duration-700 min-w-0">
+                    <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity pointer-events-none">
                         <Wallet size={120} />
                     </div>
-                    <div className="flex items-center gap-4 mb-6">
-                        <div className="p-3 rounded-2xl bg-[#3DD6C8]/10 text-[#3DD6C8] transition-all duration-500 group-hover:scale-110">
+                    <div className="flex items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
+                        <div className="p-2.5 sm:p-3 rounded-2xl bg-[#3DD6C8]/10 text-[#3DD6C8] transition-all duration-500 group-hover:scale-110 shrink-0">
                             <Wallet size={20} />
                         </div>
-                        <span className="text-[10px] font-black text-white/30 uppercase tracking-[0.4em]">{t('available_balance')}</span>
+                        <span className="text-[10px] font-black text-white/30 uppercase tracking-[0.4em] truncate">{t('available_balance')}</span>
                     </div>
-                    <div className="space-y-1">
-                        <h2 className="text-5xl md:text-6xl font-black text-white tracking-tighter italic uppercase drop-shadow-[0_0_15px_rgba(255,255,255,0.1)]">
+                    <div className="space-y-1 min-w-0">
+                        <h2 className="text-3xl sm:text-4xl md:text-5xl xl:text-6xl font-black text-white tracking-tighter italic uppercase drop-shadow-[0_0_15px_rgba(255,255,255,0.1)] truncate block">
                             {format(profile?.wallet_balance || 0)}
                         </h2>
                         <p className="text-[9px] font-black text-white/30 uppercase tracking-[0.2em]">{t('tether_holdings')}</p>
                     </div>
-                    <div className="pt-6 flex items-center gap-3 max-w-md">
+                    <div className="pt-5 sm:pt-6 flex items-center gap-2.5 sm:gap-3 w-full max-w-md min-w-0">
                         <Link 
                             href="/deposit"
-                            className="flex-1 py-3 px-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(16,185,129,0.25)] active:scale-95 transition-all text-center"
+                            className="flex-1 min-w-0 py-3 px-3 sm:px-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-black text-[11px] sm:text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 sm:gap-2 shadow-[0_0_20px_rgba(16,185,129,0.25)] active:scale-95 transition-all text-center truncate"
                         >
-                            <ArrowDownLeft size={15} /> {t('deposit')}
+                            <ArrowDownLeft size={15} className="shrink-0" />
+                            <span className="truncate">{t('deposit')}</span>
                         </Link>
                         <Link 
                             href="/withdraw"
-                            className="flex-1 py-3 px-4 rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(6,182,212,0.25)] active:scale-95 transition-all text-center"
+                            className="flex-1 min-w-0 py-3 px-3 sm:px-4 rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-black text-[11px] sm:text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 sm:gap-2 shadow-[0_0_20px_rgba(6,182,212,0.25)] active:scale-95 transition-all text-center truncate"
                         >
-                            <ArrowUpRight size={15} /> {t('withdraw')}
+                            <ArrowUpRight size={15} className="shrink-0" />
+                            <span className="truncate">{t('withdraw')}</span>
                         </Link>
                     </div>
                 </div>
 
-                <div className="bg-[#0B0B1E] border border-white/5 p-8 rounded-[40px] shadow-2xl backdrop-blur-3xl relative overflow-hidden group hover:border-white/10 transition-all duration-700">
-                    <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
+                <div className="bg-[#0B0B1E] border border-white/5 p-6 sm:p-7 xl:p-8 rounded-[32px] sm:rounded-[40px] shadow-2xl backdrop-blur-3xl relative overflow-hidden group hover:border-white/10 transition-all duration-700 min-w-0">
+                    <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity pointer-events-none">
                         <Zap size={120} />
                     </div>
-                    <div className="flex items-center gap-4 mb-6">
-                        <div className="p-3 rounded-2xl bg-amber-400/10 text-amber-400 transition-all duration-500 group-hover:scale-110">
+                    <div className="flex items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
+                        <div className="p-2.5 sm:p-3 rounded-2xl bg-amber-400/10 text-amber-400 transition-all duration-500 group-hover:scale-110 shrink-0">
                             <Zap size={20} />
                         </div>
-                        <span className="text-[10px] font-black text-white/30 uppercase tracking-[0.4em]">{t('today_profit')}</span>
+                        <span className="text-[10px] font-black text-white/30 uppercase tracking-[0.4em] truncate">{t('today_profit')}</span>
                     </div>
-                    <div className="space-y-1">
-                        <h2 className="text-5xl md:text-6xl font-black text-amber-400 tracking-tighter italic uppercase drop-shadow-[0_0_15px_rgba(251,191,36,0.2)]">
+                    <div className="space-y-1 min-w-0">
+                        <h2 className="text-3xl sm:text-4xl md:text-5xl xl:text-6xl font-black text-amber-400 tracking-tighter italic uppercase drop-shadow-[0_0_15px_rgba(251,191,36,0.2)] truncate block">
                             {format(profile?.profit || 0)}
                         </h2>
                         <p className="text-[9px] font-black text-white/30 uppercase tracking-[0.2em]">{t('secured_rebates')}</p>
                     </div>
                 </div>
 
-                <div className="bg-[#0B0B1E] border border-white/5 p-8 rounded-[40px] shadow-2xl backdrop-blur-3xl relative overflow-hidden group hover:border-white/10 transition-all duration-700">
-                    <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
+                <div className="bg-[#0B0B1E] border border-white/5 p-6 sm:p-7 xl:p-8 rounded-[32px] sm:rounded-[40px] shadow-2xl backdrop-blur-3xl relative overflow-hidden group hover:border-white/10 transition-all duration-700 min-w-0">
+                    <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity pointer-events-none">
                         <Network size={120} />
                     </div>
-                    <div className="flex items-center gap-4 mb-6">
-                        <div className="p-3 rounded-2xl bg-indigo-400/10 text-indigo-400 transition-all duration-500 group-hover:scale-110">
+                    <div className="flex items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
+                        <div className="p-2.5 sm:p-3 rounded-2xl bg-indigo-400/10 text-indigo-400 transition-all duration-500 group-hover:scale-110 shrink-0">
                             <Network size={20} />
                         </div>
-                        <span className="text-[10px] font-black text-white/30 uppercase tracking-[0.4em]">{t('referral_bonus')}</span>
+                        <span className="text-[10px] font-black text-white/30 uppercase tracking-[0.4em] truncate">{t('referral_bonus')}</span>
                     </div>
-                    <div className="space-y-1">
-                        <h2 className="text-5xl md:text-6xl font-black text-indigo-400 tracking-tighter italic uppercase drop-shadow-[0_0_15px_rgba(129,140,248,0.2)]">
+                    <div className="space-y-1 min-w-0">
+                        <h2 className="text-3xl sm:text-4xl md:text-5xl xl:text-6xl font-black text-indigo-400 tracking-tighter italic uppercase drop-shadow-[0_0_15px_rgba(129,140,248,0.2)] truncate block">
                             {format(profile?.referral_earned || 0)}
                         </h2>
                         <p className="text-[9px] font-black text-white/30 uppercase tracking-[0.2em]">{t('network_yield')}</p>

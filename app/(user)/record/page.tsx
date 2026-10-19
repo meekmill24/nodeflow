@@ -414,8 +414,28 @@ export default function RecordPage() {
                         {/* Left info */}
                         <div className="flex items-start gap-4">
                             <div className="relative shrink-0">
-                                <div className="w-14 h-14 md:w-16 md:h-16 rounded-2xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 shadow-[0_0_20px_rgba(245,158,11,0.3)]">
-                                    <Sparkles size={28} className="animate-pulse" />
+                                <div className="w-14 h-14 md:w-16 md:h-16 rounded-2xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 shadow-[0_0_20px_rgba(245,158,11,0.3)] overflow-hidden relative">
+                                    {(currentPendingBundle.taskItem?.image_url || (currentPendingBundle.taskItems && currentPendingBundle.taskItems[0]?.image_url)) ? (
+                                        <img 
+                                            src={currentPendingBundle.taskItem?.image_url || currentPendingBundle.taskItems?.[0]?.image_url} 
+                                            alt={currentPendingBundle.name}
+                                            className="w-full h-full object-cover"
+                                            onError={(e) => {
+                                                (e.currentTarget as HTMLImageElement).style.display = 'none';
+                                                const p = e.currentTarget.parentElement;
+                                                if (p) {
+                                                    const fb = p.querySelector('.bundle-banner-fallback');
+                                                    if (fb) (fb as HTMLElement).style.display = 'flex';
+                                                }
+                                            }}
+                                        />
+                                    ) : null}
+                                    <div 
+                                        className="bundle-banner-fallback w-full h-full flex items-center justify-center"
+                                        style={{ display: (currentPendingBundle.taskItem?.image_url || (currentPendingBundle.taskItems && currentPendingBundle.taskItems[0]?.image_url)) ? 'none' : 'flex' }}
+                                    >
+                                        <Sparkles size={28} className="animate-pulse" />
+                                    </div>
                                 </div>
                                 <span className="absolute -bottom-1 -right-1 flex h-4 w-4">
                                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
@@ -562,13 +582,38 @@ export default function RecordPage() {
                                 {/* Details */}
                                 <div className="flex flex-col px-4 md:px-6 py-4 md:py-5 border-r md:border-white/5 justify-center bg-white/[0.02] md:bg-transparent">
                                     <div className="flex items-center gap-3">
-                                        <div className="w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary-light shrink-0">
-                                            <Zap size={18} />
+                                        <div className="w-12 h-12 rounded-xl bg-black/40 border border-white/10 overflow-hidden flex items-center justify-center shrink-0 relative shadow-inner group-hover:border-primary/40 transition-colors">
+                                            {task.task_item?.image_url ? (
+                                                <img 
+                                                    src={task.task_item.image_url} 
+                                                    alt={task.task_item.title || 'Product'} 
+                                                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                                                    onError={(e) => {
+                                                        (e.currentTarget as HTMLImageElement).style.display = 'none';
+                                                        const p = e.currentTarget.parentElement;
+                                                        if (p) {
+                                                            const fb = p.querySelector('.record-img-fallback');
+                                                            if (fb) (fb as HTMLElement).style.display = 'flex';
+                                                        }
+                                                    }}
+                                                />
+                                            ) : null}
+                                            <div 
+                                                className="record-img-fallback w-full h-full flex items-center justify-center bg-primary/10 text-primary-light"
+                                                style={{ display: task.task_item?.image_url ? 'none' : 'flex' }}
+                                            >
+                                                <Zap size={18} />
+                                            </div>
                                         </div>
                                         <div className="flex flex-col min-w-0">
                                             <span className="text-[12px] font-black text-white uppercase tracking-tight truncate max-w-[200px] md:max-w-none">
                                                 {task.task_item?.title || `${t('task')} #${task.task_item_id}`}
                                             </span>
+                                            {task.task_item?.category && (
+                                                <span className="text-[9px] font-bold text-white/40 uppercase tracking-wider truncate">
+                                                    {task.task_item.category}
+                                                </span>
+                                            )}
                                             {task.is_bundle && (
                                                 <span className="text-[9px] font-black text-amber-500 uppercase tracking-widest mt-0.5 flex items-center gap-1.5 animate-pulse">
                                                     <div className="w-1.5 h-1.5 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.6)]" />

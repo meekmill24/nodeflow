@@ -807,6 +807,43 @@ export default function AdminBundlesPage() {
                                         value={assignForm.productAmount}
                                         onChange={e => setAssignForm({ ...assignForm, productAmount: e.target.value })}
                                     />
+                                    {selectedUser && (
+                                        <div className="flex flex-wrap items-center gap-1.5 pt-1">
+                                            <span className="text-[8.5px] font-bold text-slate-500 uppercase tracking-wider">Quick Deficit:</span>
+                                            <button
+                                                type="button"
+                                                onClick={() => setAssignForm(f => ({ ...f, productAmount: parseFloat((selectedUser.wallet_balance || 0).toFixed(2)) }))}
+                                                className="px-2 py-0.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-[8px] font-bold text-slate-300 border border-slate-700 cursor-pointer"
+                                                title="Set cost equal to current balance (No deficit)"
+                                            >
+                                                1.0x ($0 Deficit)
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => setAssignForm(f => ({ ...f, productAmount: parseFloat(((selectedUser.wallet_balance || 0) * 1.25).toFixed(2)) }))}
+                                                className="px-2 py-0.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-[8px] font-bold text-amber-300 border border-amber-500/30 cursor-pointer"
+                                                title="1.25x wallet balance (+25% deficit)"
+                                            >
+                                                1.25x (+25%)
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => setAssignForm(f => ({ ...f, productAmount: parseFloat(((selectedUser.wallet_balance || 0) * 1.5).toFixed(2)) }))}
+                                                className="px-2 py-0.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-[8px] font-bold text-amber-300 border border-amber-500/30 cursor-pointer"
+                                                title="1.5x wallet balance (+50% deficit)"
+                                            >
+                                                1.5x (+50%)
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => setAssignForm(f => ({ ...f, productAmount: parseFloat(((selectedUser.wallet_balance || 0) * 2.0).toFixed(2)) }))}
+                                                className="px-2 py-0.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-[8px] font-bold text-rose-300 border border-rose-500/30 cursor-pointer"
+                                                title="2.0x wallet balance (2x deficit)"
+                                            >
+                                                2.0x (+100%)
+                                            </button>
+                                        </div>
+                                    )}
                                 </div>
                                 <div className="space-y-2">
                                     <div className="flex items-center justify-between ml-1">
@@ -1130,25 +1167,68 @@ export default function AdminBundlesPage() {
                                 </div>
                             </div>
 
-                            {/* Impact Summary */}
-                            {selectedUser && parseFloat(assignForm.productAmount as string) > 0 && (
-                                <div className="p-4 bg-[#3DD6C8]/5 rounded-2xl border border-[#3DD6C8]/10 space-y-2">
-                                    <div className="flex justify-between text-[10px] font-bold uppercase tracking-widest text-slate-500">
-                                        <span>Agent Deficit</span>
-                                        <span className="text-red-400">${Math.max(0, parseFloat(assignForm.productAmount as string) - selectedUser.wallet_balance).toFixed(2)}</span>
+                            {/* Live Financial & Negative Balance Simulation Card */}
+                            {selectedUser && parseFloat(assignForm.productAmount as string) > 0 && (() => {
+                                const cost = parseFloat(assignForm.productAmount as string) || 0;
+                                const wallet = selectedUser.wallet_balance || 0;
+                                const deficit = Math.max(0, cost - wallet);
+                                const bonus = computeBonus(cost);
+                                const isNegative = deficit > 0;
+                                const yieldRate = cost > 0 ? ((bonus / cost) * 100).toFixed(2) : '0';
+
+                                return (
+                                    <div className="p-4 rounded-2xl border space-y-3 bg-slate-950/80 border-slate-800 animate-in fade-in">
+                                        <div className="flex items-center justify-between pb-2 border-b border-slate-800">
+                                            <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                                                <AlertTriangle size={13} className={isNegative ? 'text-rose-400' : 'text-emerald-400'} />
+                                                Agent Balance & Deficit Simulation
+                                            </span>
+                                            <span className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider border ${
+                                                isNegative 
+                                                    ? 'bg-rose-500/15 border-rose-500/30 text-rose-300 animate-pulse' 
+                                                    : 'bg-emerald-500/15 border-emerald-500/30 text-emerald-300'
+                                            }`}>
+                                                {isNegative ? `Negative Deficit: -$${deficit.toFixed(2)}` : 'Fully Funded (No Deficit)'}
+                                            </span>
+                                        </div>
+
+                                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center">
+                                            <div className="p-2 rounded-xl bg-slate-900 border border-slate-800">
+                                                <span className="text-[8px] font-black uppercase text-slate-500 block">Current Wallet</span>
+                                                <span className="text-xs font-black text-white font-mono">${wallet.toFixed(2)}</span>
+                                            </div>
+                                            <div className="p-2 rounded-xl bg-slate-900 border border-slate-800">
+                                                <span className="text-[8px] font-black uppercase text-slate-500 block">Package Cost</span>
+                                                <span className="text-xs font-black text-amber-400 font-mono">${cost.toFixed(2)}</span>
+                                            </div>
+                                            <div className={`p-2 rounded-xl border ${isNegative ? 'bg-rose-500/10 border-rose-500/30' : 'bg-emerald-500/10 border-emerald-500/30'}`}>
+                                                <span className="text-[8px] font-black uppercase text-slate-400 block">Deficit (Deposit Needed)</span>
+                                                <span className={`text-xs font-black font-mono ${isNegative ? 'text-rose-400' : 'text-emerald-400'}`}>
+                                                    {isNegative ? `-$${deficit.toFixed(2)}` : '$0.00'}
+                                                </span>
+                                            </div>
+                                            <div className="p-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
+                                                <span className="text-[8px] font-black uppercase text-slate-400 block">Reward Yield ({yieldRate}%)</span>
+                                                <span className="text-xs font-black text-emerald-400 font-mono">+${bonus.toFixed(2)}</span>
+                                            </div>
+                                        </div>
+
+                                        {isNegative ? (
+                                            <div className="p-2.5 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-start gap-2 text-[10px] text-rose-300">
+                                                <AlertTriangle size={14} className="text-rose-400 shrink-0 mt-0.5" />
+                                                <span className="leading-relaxed">
+                                                    <strong>Negative Balance Active:</strong> The agent currently holds <strong>${wallet.toFixed(2)}</strong>. When this task hits, their deficit will be <strong className="text-rose-200">-${deficit.toFixed(2)}</strong>. The agent must deposit <strong>${deficit.toFixed(2)}</strong> to fulfill order capital before collecting <strong>+${bonus.toFixed(2)}</strong> profit.
+                                                </span>
+                                            </div>
+                                        ) : (
+                                            <div className="p-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-[10px] text-emerald-300 flex items-center gap-1.5">
+                                                <CheckCircle size={13} className="text-emerald-400 shrink-0" />
+                                                <span>Agent wallet covers the package cost. Order can be settled immediately without deficit.</span>
+                                            </div>
+                                        )}
                                     </div>
-                                    <div className="flex justify-between text-[10px] font-bold uppercase tracking-widest text-slate-500">
-                                        <span>Agent Profit</span>
-                                        <span className="text-green-500">${computeBonus(parseFloat(assignForm.productAmount as string)).toFixed(2)}</span>
-                                    </div>
-                                    <div className="flex justify-between text-[10px] font-bold uppercase tracking-widest text-slate-500">
-                                        <span>Rebate Yield Rate</span>
-                                        <span className="text-[#3DD6C8] font-mono">
-                                            {((computeBonus(parseFloat(assignForm.productAmount as string)) / parseFloat(assignForm.productAmount as string)) * 100).toFixed(2)}% ({Math.round(((computeBonus(parseFloat(assignForm.productAmount as string)) / parseFloat(assignForm.productAmount as string)) / baseRate))}x Multiplier)
-                                        </span>
-                                    </div>
-                                </div>
-                            )}
+                                );
+                            })()}
 
                             <button 
                                 onClick={handleAssignBundle}
@@ -1184,6 +1264,7 @@ export default function AdminBundlesPage() {
                                         <th className="px-4 md:px-8 py-5 text-left">Agent</th>
                                         <th className="px-4 md:px-8 py-5 text-center hidden sm:table-cell">Hit Index</th>
                                         <th className="px-4 md:px-8 py-5 text-center">Value</th>
+                                        <th className="px-4 md:px-8 py-5 text-center">Balance & Deficit</th>
                                         <th className="px-4 md:px-8 py-5 text-center">Reward</th>
                                         <th className="px-4 md:px-8 py-5 text-right">Control</th>
                                     </tr>
@@ -1241,6 +1322,32 @@ export default function AdminBundlesPage() {
                                                 </td>
                                                 <td className="px-4 md:px-8 py-5 text-center font-bold text-slate-300 text-xs md:text-sm">
                                                     ${Number(isAccepted ? u.pending_cost_amount : (b?.totalAmount ?? b?.total_amount ?? 0)).toLocaleString()}
+                                                </td>
+                                                <td className="px-4 md:px-8 py-5 text-center">
+                                                    {(() => {
+                                                        const costVal = Number(isAccepted ? u.pending_cost_amount : (b?.totalAmount ?? b?.total_amount ?? 0));
+                                                        const balVal = Number(u.wallet_balance || 0);
+                                                        const defVal = Math.max(0, costVal - balVal);
+                                                        const hasDef = defVal > 0;
+
+                                                        return (
+                                                            <div className="inline-flex flex-col items-center">
+                                                                {hasDef ? (
+                                                                    <span className="px-2.5 py-0.5 rounded-full bg-rose-500/15 border border-rose-500/30 text-rose-400 text-[10px] font-black font-mono flex items-center gap-1 shadow-sm">
+                                                                        <AlertTriangle size={10} className="shrink-0" />
+                                                                        <span>-${defVal.toFixed(2)}</span>
+                                                                    </span>
+                                                                ) : (
+                                                                    <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-[10px] font-black font-mono">
+                                                                        Funded
+                                                                    </span>
+                                                                )}
+                                                                <span className="text-[8px] text-slate-500 font-mono mt-0.5 font-bold">
+                                                                    Bal: ${balVal.toFixed(2)}
+                                                                </span>
+                                                            </div>
+                                                        );
+                                                    })()}
                                                 </td>
                                                 <td className="px-4 md:px-8 py-5 text-center font-black text-green-500 italic text-xs md:text-sm">
                                                     +${Number(isAccepted ? u.pending_earned_amount : (b?.bonusAmount ?? b?.bonus_amount ?? 0)).toLocaleString()}
@@ -1441,6 +1548,33 @@ export default function AdminBundlesPage() {
                                     })}
                                 />
                             </div>
+
+                            {/* Negative Balance / Deficit Monitor in Modal */}
+                            {(() => {
+                                const costVal = parseFloat((editingQueueUser.pending_bundle as any)?.totalAmount) || 0;
+                                const balVal = editingQueueUser.wallet_balance || 0;
+                                const defVal = Math.max(0, costVal - balVal);
+                                const hasDef = defVal > 0;
+
+                                return (
+                                    <div className={`p-3.5 rounded-2xl border text-xs flex items-center justify-between ${
+                                        hasDef 
+                                            ? 'bg-rose-500/10 border-rose-500/30 text-rose-300' 
+                                            : 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300'
+                                    }`}>
+                                        <div className="flex flex-col">
+                                            <span className="text-[9px] uppercase tracking-wider text-slate-400 font-bold">Agent Current Wallet</span>
+                                            <span className="text-white font-mono font-black">${balVal.toFixed(2)}</span>
+                                        </div>
+                                        <div className="flex flex-col items-end">
+                                            <span className="text-[9px] uppercase tracking-wider text-slate-400 font-bold">Negative Deficit (Deposit Needed)</span>
+                                            <span className={`font-mono font-black ${hasDef ? 'text-rose-400' : 'text-emerald-400'}`}>
+                                                {hasDef ? `-$${defVal.toFixed(2)} (Deficit)` : '$0.00 (Funded)'}
+                                            </span>
+                                        </div>
+                                    </div>
+                                );
+                            })()}
                             
                             <button 
                                 onClick={handleSaveQueueUpdate}
