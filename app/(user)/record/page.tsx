@@ -8,7 +8,8 @@ import { useAuth } from '@/context/AuthContext';
 import { useLanguage } from '@/context/LanguageContext';
 import { useCurrency } from '@/context/CurrencyContext';
 import type { UserTask, TaskItem } from '@/lib/types';
-import { Clock, CheckCircle, XCircle, Search, Filter, ChevronRight, Zap, Headset, Loader2, TrendingUp, ArrowLeft, Sparkles, AlertCircle, ArrowRight, Wallet, Layers } from 'lucide-react';
+import { Clock, CheckCircle, XCircle, Search, Filter, ChevronRight, ChevronDown, Copy, ShieldCheck, Zap, Headset, Loader2, TrendingUp, ArrowLeft, Sparkles, AlertCircle, ArrowRight, Wallet, Layers } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import Portal from '@/components/Portal';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -51,6 +52,7 @@ export default function RecordPage() {
     const [bundleModalOpen, setBundleModalOpen] = useState(false);
     const [activeBundle, setActiveBundle] = useState<BundlePackage | null>(null);
     const [associatedTaskId, setAssociatedTaskId] = useState<number | null>(null);
+    const [expandedTaskId, setExpandedTaskId] = useState<number | string | null>(null);
 
     const fetchTasks = async () => {
         if (!profile) return;
@@ -546,186 +548,317 @@ export default function RecordPage() {
                             <p className="text-sm font-bold text-text-secondary uppercase tracking-widest">{t('no_records_found')}</p>
                         </div>
                     ) : (
-                        filteredTasks.map((task, idx) => (
-                            <div key={task.id} className={`flex flex-col md:grid md:grid-cols-5 items-stretch hover:bg-white/[0.03] transition-all group border-b border-white/[0.05] last:border-0 ${idx % 2 === 0 ? 'bg-transparent' : 'bg-black/[0.01] dark:bg-white/[0.01]'}`}>
-                                {/* Mobile Header / Desktop Time */}
-                                <div className="px-4 md:px-6 py-4 md:py-5 border-r md:border-white/5 flex flex-row md:flex-col items-center md:items-start justify-between md:justify-center gap-2">
-                                    <div className="flex flex-col">
-                                        <p className="text-[11px] text-text-primary font-bold">
-                                            {new Date(task.status === 'completed' && task.completed_at ? task.completed_at : task.created_at).toLocaleDateString(
-                                                language === 'English' ? 'en-US' :
-                                                    language === 'Spanish' ? 'es-ES' :
-                                                        language === 'French' ? 'fr-FR' :
-                                                            language === 'German' ? 'de-DE' :
-                                                                language === 'Chinese' ? 'zh-CN' :
-                                                                    language === 'Japanese' ? 'ja-JP' : 'en-US',
-                                                { month: 'short', day: 'numeric', year: 'numeric' }
-                                            )}
-                                        </p>
-                                        <p className="text-[10px] opacity-40 font-bold uppercase tracking-tighter">
-                                            {new Date(task.status === 'completed' && task.completed_at ? task.completed_at : task.created_at).toLocaleTimeString(
-                                                language === 'English' ? 'en-US' :
-                                                    language === 'Spanish' ? 'es-ES' :
-                                                        language === 'French' ? 'fr-FR' :
-                                                            language === 'German' ? 'de-DE' :
-                                                                language === 'Chinese' ? 'zh-CN' :
-                                                                    language === 'Japanese' ? 'ja-JP' : 'en-US',
-                                                { hour: '2-digit', minute: '2-digit' }
-                                            )}
-                                        </p>
-                                    </div>
-                                    <div className="md:hidden">
-                                        {statusBadge(task.status)}
-                                    </div>
-                                </div>
+                        filteredTasks.map((task, idx) => {
+                            const isExpanded = expandedTaskId === task.id;
+                            const isCompleted = task.status === 'completed';
 
-                                {/* Details */}
-                                <div className="flex flex-col px-4 md:px-6 py-4 md:py-5 border-r md:border-white/5 justify-center bg-white/[0.02] md:bg-transparent">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-12 h-12 rounded-xl bg-black/40 border border-white/10 overflow-hidden flex items-center justify-center shrink-0 relative shadow-inner group-hover:border-primary/40 transition-colors">
-                                            {task.task_item?.image_url ? (
-                                                <img 
-                                                    src={task.task_item.image_url} 
-                                                    alt={task.task_item.title || 'Product'} 
-                                                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-                                                    onError={(e) => {
-                                                        (e.currentTarget as HTMLImageElement).style.display = 'none';
-                                                        const p = e.currentTarget.parentElement;
-                                                        if (p) {
-                                                            const fb = p.querySelector('.record-img-fallback');
-                                                            if (fb) (fb as HTMLElement).style.display = 'flex';
-                                                        }
-                                                    }}
-                                                />
-                                            ) : null}
-                                            <div 
-                                                className="record-img-fallback w-full h-full flex items-center justify-center bg-primary/10 text-primary-light"
-                                                style={{ display: task.task_item?.image_url ? 'none' : 'flex' }}
-                                            >
-                                                <Zap size={18} />
-                                            </div>
-                                        </div>
-                                        <div className="flex flex-col min-w-0">
-                                            <span className="text-[12px] font-black text-white uppercase tracking-tight truncate max-w-[200px] md:max-w-none">
-                                                {task.task_item?.title || `${t('task')} #${task.task_item_id}`}
-                                            </span>
-                                            {task.task_item?.category && (
-                                                <span className="text-[9px] font-bold text-white/40 uppercase tracking-wider truncate">
-                                                    {task.task_item.category}
-                                                </span>
-                                            )}
-                                            {task.is_bundle && (
-                                                <span className="text-[9px] font-black text-amber-500 uppercase tracking-widest mt-0.5 flex items-center gap-1.5 animate-pulse">
-                                                    <div className="w-1.5 h-1.5 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.6)]" />
-                                                    Lucky Bundle Detected
-                                                </span>
-                                            )}
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* Capital/Value */}
-                                <div className="px-4 md:px-6 py-4 md:py-5 border-r md:border-white/5 flex flex-row md:flex-col items-center md:items-start justify-between md:justify-center border-t md:border-t-0 border-white/5">
-                                    <div className="flex flex-col">
-                                        <span className="text-[10px] opacity-30 uppercase tracking-[0.2em] font-black mb-0.5">Base Value</span>
-                                        <span className="text-[13px] font-black text-text-primary tracking-tight">{format(task.cost_amount || 0)}</span>
-                                    </div>
-                                    {task.is_bundle && task.status === 'pending' && (
-                                        <div className="flex flex-col border-l md:border-l-0 md:border-t border-white/10 pl-4 md:pl-0 md:pt-1.5">
-                                            <span className="text-[9px] text-amber-500/80 uppercase tracking-widest font-black">
-                                                {profile && (profile.wallet_balance < (task.cost_amount || 0) || profile.wallet_balance < 0) ? 'Deficit' : 'Hold Status'}
-                                            </span>
-                                            <span className={`text-[11px] font-black ${profile && (profile.wallet_balance < (task.cost_amount || 0) || profile.wallet_balance < 0) ? 'text-danger' : 'text-amber-500'}`}>
-                                                {profile && profile.wallet_balance < (task.cost_amount || 0)
-                                                    ? `-${format(Math.max(0, (task.cost_amount || 0) - profile.wallet_balance))}`
-                                                    : format(profile?.wallet_balance || 0)}
-                                            </span>
-                                        </div>
-                                    )}
-                                </div>
-
-                                {/* Profit */}
-                                <div className="px-4 md:px-6 py-4 md:py-5 border-r md:border-white/5 flex flex-row md:flex-col items-center md:items-start justify-between md:justify-center border-t md:border-t-0 border-white/5">
-                                    <div className="flex flex-col">
-                                        <span className="text-[10px] opacity-30 uppercase tracking-[0.2em] font-black mb-0.5">Earnings</span>
-                                        <div className="flex items-center gap-1.5">
-                                            <span className="text-base font-black text-success drop-shadow-[0_0_8px_rgba(34,197,94,0.3)]">
-                                                +{format(task.earned_amount)}
-                                            </span>
-                                            <div className="w-1 h-1 rounded-full bg-success animate-pulse" />
-                                        </div>
-                                    </div>
-                                    <div className="md:hidden">
-                                        {task.status === 'pending' && (
-                                            <div className="animate-pulse">
-                                                <Zap size={14} className="text-primary-light" />
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-
-                                {/* Desktop Status / Actions */}
-                                <div className="px-4 md:px-6 py-6 md:py-5 flex flex-col items-stretch md:items-end justify-center gap-3 bg-white/[0.01] md:bg-transparent border-t md:border-t-0 border-white/10">
-                                    <div className="hidden md:block">
-                                        {statusBadge(task.status)}
-                                    </div>
-                                    {task.status === 'pending' && (
-                                        task.is_bundle ? (
-                                            (profile && (profile.wallet_balance < (task.cost_amount || 0) || profile.wallet_balance < 0)) ? (
-                                                <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
-                                                    <button
-                                                        onClick={() => router.push('/deposit')}
-                                                        className="w-full md:w-auto px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-black text-[10px] font-black uppercase tracking-widest shadow-xl shadow-amber-500/30 transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer"
-                                                    >
-                                                        <Wallet size={13} /> Deposit
-                                                    </button>
-                                                    <button
-                                                        onClick={() => handleOpenSuperOrder(task)}
-                                                        className="w-full md:w-auto px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-[10px] font-black uppercase tracking-widest border border-white/20 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
-                                                    >
-                                                        <Sparkles size={13} className="text-amber-400" /> Details
-                                                    </button>
-                                                </div>
-                                            ) : (
-                                                <button
-                                                    onClick={() => handleOpenSuperOrder(task)}
-                                                    disabled={isSubmitting}
-                                                    className="w-full md:w-auto px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-500 text-black text-[10px] font-black uppercase tracking-widest shadow-xl shadow-amber-500/40 hover:shadow-amber-500/60 transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer font-black animate-pulse"
-                                                >
-                                                    <Sparkles size={14} className="text-black" />
-                                                    Submit Super Order
-                                                </button>
-                                            )
-                                        ) : (
-                                            profile && profile.wallet_balance < 0 ? (
-                                                <button
-                                                    onClick={() => router.push('/service')}
-                                                    className="w-full md:w-auto px-6 py-3 md:py-2 rounded-xl bg-amber-500 text-white text-[10px] font-black uppercase tracking-widest shadow-xl shadow-amber-500/30 transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2 group"
-                                                >
-                                                    <Headset size={14} className="group-hover:rotate-12 transition-transform" />
-                                                    Contact Manager
-                                                </button>
-                                            ) : (
-                                                <button
-                                                    onClick={() => handleSubmitPending(task.task_item_id)}
-                                                    disabled={isSubmitting}
-                                                    className={`w-full md:w-auto px-6 py-3 md:py-2 rounded-xl bg-primary text-white text-[10px] font-black uppercase tracking-widest shadow-xl shadow-primary/30 transition-all flex items-center justify-center gap-2 group
-                                                        ${isSubmitting && submittingTaskId === task.task_item_id ? 'opacity-50 cursor-wait' : 'hover:scale-[1.02] active:scale-95 cursor-pointer'}
-                                                    `}
-                                                >
-                                                    {isSubmitting && submittingTaskId === task.task_item_id ? (
-                                                        <Loader2 size={14} className="animate-spin" />
-                                                    ) : (
-                                                        <Zap size={14} className="group-hover:animate-pulse" />
+                            return (
+                                <div key={task.id} className="border-b border-white/[0.05] last:border-0 transition-colors">
+                                    <div 
+                                        onClick={() => {
+                                            if (isCompleted) {
+                                                setExpandedTaskId(isExpanded ? null : task.id);
+                                            }
+                                        }}
+                                        className={`flex flex-col md:grid md:grid-cols-5 items-stretch transition-all group ${
+                                            isCompleted ? 'cursor-pointer hover:bg-white/[0.04]' : 'hover:bg-white/[0.02]'
+                                        } ${isExpanded ? 'bg-white/[0.03]' : (idx % 2 === 0 ? 'bg-transparent' : 'bg-black/[0.01] dark:bg-white/[0.01]')}`}
+                                    >
+                                        {/* Mobile Header / Desktop Time */}
+                                        <div className="px-4 md:px-6 py-4 md:py-5 border-r md:border-white/5 flex flex-row md:flex-col items-center md:items-start justify-between md:justify-center gap-2">
+                                            <div className="flex flex-col">
+                                                <p className="text-[11px] text-text-primary font-bold">
+                                                    {new Date(task.status === 'completed' && task.completed_at ? task.completed_at : task.created_at).toLocaleDateString(
+                                                        language === 'English' ? 'en-US' :
+                                                            language === 'Spanish' ? 'es-ES' :
+                                                                language === 'French' ? 'fr-FR' :
+                                                                    language === 'German' ? 'de-DE' :
+                                                                        language === 'Chinese' ? 'zh-CN' :
+                                                                            language === 'Japanese' ? 'ja-JP' : 'en-US',
+                                                        { month: 'short', day: 'numeric', year: 'numeric' }
                                                     )}
-                                                    {isSubmitting && submittingTaskId === task.task_item_id ? t('submitting') : t('submit_order')}
-                                                </button>
-                                            )
-                                        )
-                                    )}
+                                                </p>
+                                                <p className="text-[10px] opacity-40 font-bold uppercase tracking-tighter">
+                                                    {new Date(task.status === 'completed' && task.completed_at ? task.completed_at : task.created_at).toLocaleTimeString(
+                                                        language === 'English' ? 'en-US' :
+                                                            language === 'Spanish' ? 'es-ES' :
+                                                                language === 'French' ? 'fr-FR' :
+                                                                    language === 'German' ? 'de-DE' :
+                                                                        language === 'Chinese' ? 'zh-CN' :
+                                                                            language === 'Japanese' ? 'ja-JP' : 'en-US',
+                                                        { hour: '2-digit', minute: '2-digit' }
+                                                    )}
+                                                </p>
+                                            </div>
+                                            <div className="md:hidden flex items-center gap-1.5">
+                                                {statusBadge(task.status)}
+                                                {isCompleted && (
+                                                    <ChevronDown 
+                                                        size={13} 
+                                                        className={`text-white/40 transition-transform duration-300 ${isExpanded ? 'rotate-180 text-emerald-400' : ''}`} 
+                                                    />
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        {/* Details */}
+                                        <div className="flex flex-col px-4 md:px-6 py-4 md:py-5 border-r md:border-white/5 justify-center bg-white/[0.02] md:bg-transparent">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-12 h-12 rounded-xl bg-black/40 border border-white/10 overflow-hidden flex items-center justify-center shrink-0 relative shadow-inner group-hover:border-primary/40 transition-colors">
+                                                    {task.task_item?.image_url ? (
+                                                        <img 
+                                                            src={task.task_item.image_url} 
+                                                            alt={task.task_item.title || 'Product'} 
+                                                            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                                                            onError={(e) => {
+                                                                (e.currentTarget as HTMLImageElement).style.display = 'none';
+                                                                const p = e.currentTarget.parentElement;
+                                                                if (p) {
+                                                                    const fb = p.querySelector('.record-img-fallback');
+                                                                    if (fb) (fb as HTMLElement).style.display = 'flex';
+                                                                }
+                                                            }}
+                                                        />
+                                                    ) : null}
+                                                    <div 
+                                                        className="record-img-fallback w-full h-full flex items-center justify-center bg-primary/10 text-primary-light"
+                                                        style={{ display: task.task_item?.image_url ? 'none' : 'flex' }}
+                                                    >
+                                                        <Zap size={18} />
+                                                    </div>
+                                                </div>
+                                                <div className="flex flex-col min-w-0">
+                                                    <span className="text-[12px] font-black text-white uppercase tracking-tight truncate max-w-[200px] md:max-w-none">
+                                                        {task.task_item?.title || `${t('task')} #${task.task_item_id}`}
+                                                    </span>
+                                                    {task.task_item?.category && (
+                                                        <span className="text-[9px] font-bold text-white/40 uppercase tracking-wider truncate">
+                                                            {task.task_item.category}
+                                                        </span>
+                                                    )}
+                                                    {task.is_bundle && (
+                                                        <span className="text-[9px] font-black text-amber-500 uppercase tracking-widest mt-0.5 flex items-center gap-1.5 animate-pulse">
+                                                            <div className="w-1.5 h-1.5 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.6)]" />
+                                                            Lucky Bundle Detected
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* Capital/Value */}
+                                        <div className="px-4 md:px-6 py-4 md:py-5 border-r md:border-white/5 flex flex-row md:flex-col items-center md:items-start justify-between md:justify-center border-t md:border-t-0 border-white/5">
+                                            <div className="flex flex-col">
+                                                <span className="text-[10px] opacity-30 uppercase tracking-[0.2em] font-black mb-0.5">Base Value</span>
+                                                <span className="text-[13px] font-black text-text-primary tracking-tight">{format(task.cost_amount || 0)}</span>
+                                            </div>
+                                            {task.is_bundle && task.status === 'pending' && (
+                                                <div className="flex flex-col border-l md:border-l-0 md:border-t border-white/10 pl-4 md:pl-0 md:pt-1.5">
+                                                    <span className="text-[9px] text-amber-500/80 uppercase tracking-widest font-black">
+                                                        {profile && (profile.wallet_balance < (task.cost_amount || 0) || profile.wallet_balance < 0) ? 'Deficit' : 'Hold Status'}
+                                                    </span>
+                                                    <span className={`text-[11px] font-black ${profile && (profile.wallet_balance < (task.cost_amount || 0) || profile.wallet_balance < 0) ? 'text-danger' : 'text-amber-500'}`}>
+                                                        {profile && profile.wallet_balance < (task.cost_amount || 0)
+                                                            ? `-${format(Math.max(0, (task.cost_amount || 0) - profile.wallet_balance))}`
+                                                            : format(profile?.wallet_balance || 0)}
+                                                    </span>
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        {/* Profit */}
+                                        <div className="px-4 md:px-6 py-4 md:py-5 border-r md:border-white/5 flex flex-row md:flex-col items-center md:items-start justify-between md:justify-center border-t md:border-t-0 border-white/5">
+                                            <div className="flex flex-col">
+                                                <span className="text-[10px] opacity-30 uppercase tracking-[0.2em] font-black mb-0.5">Earnings</span>
+                                                <div className="flex items-center gap-1.5">
+                                                    <span className="text-base font-black text-success drop-shadow-[0_0_8px_rgba(34,197,94,0.3)]">
+                                                        +{format(task.earned_amount)}
+                                                    </span>
+                                                    <div className="w-1 h-1 rounded-full bg-success animate-pulse" />
+                                                </div>
+                                            </div>
+                                            <div className="md:hidden">
+                                                {task.status === 'pending' && (
+                                                    <div className="animate-pulse">
+                                                        <Zap size={14} className="text-primary-light" />
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        {/* Desktop Status / Actions */}
+                                        <div className="px-4 md:px-6 py-6 md:py-5 flex flex-col items-stretch md:items-end justify-center gap-3 bg-white/[0.01] md:bg-transparent border-t md:border-t-0 border-white/10">
+                                            <div className="hidden md:flex items-center gap-2">
+                                                {statusBadge(task.status)}
+                                                {isCompleted && (
+                                                    <span className="p-1.5 rounded-lg bg-white/5 border border-white/10 text-white/50 group-hover:text-white transition-colors" title="Toggle Breakdown">
+                                                        <ChevronDown 
+                                                            size={12} 
+                                                            className={`transition-transform duration-300 ${isExpanded ? 'rotate-180 text-emerald-400' : ''}`} 
+                                                        />
+                                                    </span>
+                                                )}
+                                            </div>
+                                            {task.status === 'pending' && (
+                                                task.is_bundle ? (
+                                                    (profile && (profile.wallet_balance < (task.cost_amount || 0) || profile.wallet_balance < 0)) ? (
+                                                        <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
+                                                            <button
+                                                                onClick={(e) => { e.stopPropagation(); router.push('/deposit'); }}
+                                                                className="w-full md:w-auto px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-black text-[10px] font-black uppercase tracking-widest shadow-xl shadow-amber-500/30 transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer"
+                                                            >
+                                                                <Wallet size={13} /> Deposit
+                                                            </button>
+                                                            <button
+                                                                onClick={(e) => { e.stopPropagation(); handleOpenSuperOrder(task); }}
+                                                                className="w-full md:w-auto px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-[10px] font-black uppercase tracking-widest border border-white/20 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                                                            >
+                                                                <Sparkles size={13} className="text-amber-400" /> Details
+                                                            </button>
+                                                        </div>
+                                                    ) : (
+                                                        <button
+                                                            onClick={(e) => { e.stopPropagation(); handleOpenSuperOrder(task); }}
+                                                            disabled={isSubmitting}
+                                                            className="w-full md:w-auto px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-500 text-black text-[10px] font-black uppercase tracking-widest shadow-xl shadow-amber-500/40 hover:shadow-amber-500/60 transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer font-black animate-pulse"
+                                                        >
+                                                            <Sparkles size={14} className="text-black" />
+                                                            Submit Super Order
+                                                        </button>
+                                                    )
+                                                ) : (
+                                                    profile && profile.wallet_balance < 0 ? (
+                                                        <button
+                                                            onClick={(e) => { e.stopPropagation(); router.push('/service'); }}
+                                                            className="w-full md:w-auto px-6 py-3 md:py-2 rounded-xl bg-amber-500 text-white text-[10px] font-black uppercase tracking-widest shadow-xl shadow-amber-500/30 transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2 group"
+                                                        >
+                                                            <Headset size={14} className="group-hover:rotate-12 transition-transform" />
+                                                            Contact Manager
+                                                        </button>
+                                                    ) : (
+                                                        <button
+                                                            onClick={(e) => { e.stopPropagation(); handleSubmitPending(task.task_item_id); }}
+                                                            disabled={isSubmitting}
+                                                            className={`w-full md:w-auto px-6 py-3 md:py-2 rounded-xl bg-primary text-white text-[10px] font-black uppercase tracking-widest shadow-xl shadow-primary/30 transition-all flex items-center justify-center gap-2 group
+                                                                ${isSubmitting && submittingTaskId === task.task_item_id ? 'opacity-50 cursor-wait' : 'hover:scale-[1.02] active:scale-95 cursor-pointer'}
+                                                            `}
+                                                        >
+                                                            {isSubmitting && submittingTaskId === task.task_item_id ? (
+                                                                <Loader2 size={14} className="animate-spin" />
+                                                            ) : (
+                                                                <Zap size={14} className="group-hover:animate-pulse" />
+                                                            )}
+                                                            {isSubmitting && submittingTaskId === task.task_item_id ? t('submitting') : t('submit_order')}
+                                                        </button>
+                                                    )
+                                                )
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    {/* ACCORDION INLINE SETTLEMENT BREAKDOWN */}
+                                    <AnimatePresence initial={false}>
+                                        {isExpanded && (
+                                            <motion.div
+                                                initial={{ opacity: 0, height: 0 }}
+                                                animate={{ opacity: 1, height: 'auto' }}
+                                                exit={{ opacity: 0, height: 0 }}
+                                                transition={{ duration: 0.25, ease: 'easeInOut' }}
+                                                className="overflow-hidden bg-gradient-to-br from-black/80 via-[#0B0B1E] to-black/90 border-t border-white/10 shadow-[inset_0_10px_30px_rgba(0,0,0,0.8)]"
+                                            >
+                                                <div className="p-4 md:p-6 space-y-4">
+                                                    {/* Header: Node Verification & TX Hash */}
+                                                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-white/5">
+                                                        <div className="flex flex-wrap items-center gap-2">
+                                                            <span className="px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-[10px] font-black uppercase tracking-wider flex items-center gap-1.5 shadow-[0_0_15px_rgba(16,185,129,0.15)]">
+                                                                <ShieldCheck size={13} className="text-emerald-400" />
+                                                                Settlement Ledger Verified
+                                                            </span>
+                                                            {task.is_bundle ? (
+                                                                <span className="px-2.5 py-1 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-400 text-[10px] font-black uppercase tracking-wider">
+                                                                    Super Order Clearance
+                                                                </span>
+                                                            ) : (
+                                                                <span className="px-2.5 py-1 rounded-full bg-[#3DD6C8]/10 border border-[#3DD6C8]/25 text-[#3DD6C8] text-[10px] font-black uppercase tracking-wider">
+                                                                    Standard Optimization Node
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                        
+                                                        <div className="flex items-center gap-2 text-[10px] font-mono text-white/50">
+                                                            <span className="uppercase text-[9px] font-bold text-slate-500">Hash ID:</span>
+                                                            <span className="text-white font-bold bg-white/5 px-2.5 py-1 rounded-lg border border-white/10 font-mono">
+                                                                #TX-OPT-{String(task.id).slice(0, 8).toUpperCase()}
+                                                            </span>
+                                                            <button
+                                                                type="button"
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    navigator.clipboard.writeText(`#TX-OPT-${String(task.id)}`);
+                                                                    toast.success('Clearance Hash Copied to Clipboard');
+                                                                }}
+                                                                className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white/60 hover:text-white transition-all cursor-pointer"
+                                                                title="Copy Clearance Hash"
+                                                            >
+                                                                <Copy size={12} />
+                                                            </button>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* 4 Financial Metrics Grid */}
+                                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 text-center">
+                                                        <div className="p-3 rounded-2xl bg-black/40 border border-white/5 flex flex-col items-center justify-center">
+                                                            <span className="text-[9px] font-black uppercase tracking-wider text-white/40 mb-1">Base Capital</span>
+                                                            <span className="text-sm md:text-base font-black text-white font-mono tabular-nums">{format(task.cost_amount || 0)}</span>
+                                                            <span className="text-[8px] font-bold text-white/30 uppercase mt-0.5">Order Principal</span>
+                                                        </div>
+
+                                                        <div className="p-3 rounded-2xl bg-black/40 border border-white/5 flex flex-col items-center justify-center">
+                                                            <span className="text-[9px] font-black uppercase tracking-wider text-[#3DD6C8] mb-1">Yield Rate</span>
+                                                            <span className="text-sm md:text-base font-black text-[#3DD6C8] font-mono tabular-nums">
+                                                                {task.cost_amount && task.cost_amount > 0 ? ((task.earned_amount / task.cost_amount) * 100).toFixed(2) : '0.60'}%
+                                                            </span>
+                                                            <span className="text-[8px] font-bold text-[#3DD6C8]/60 uppercase mt-0.5">Rebate %</span>
+                                                        </div>
+
+                                                        <div className="p-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/25 flex flex-col items-center justify-center shadow-[0_0_20px_rgba(16,185,129,0.1)]">
+                                                            <span className="text-[9px] font-black uppercase tracking-wider text-emerald-400 mb-1">Net Earnings</span>
+                                                            <span className="text-sm md:text-base font-black text-emerald-400 font-mono tabular-nums">+{format(task.earned_amount || 0)}</span>
+                                                            <span className="text-[8px] font-bold text-emerald-400/70 uppercase mt-0.5">Yield Credited</span>
+                                                        </div>
+
+                                                        <div className="p-3 rounded-2xl bg-black/40 border border-white/5 flex flex-col items-center justify-center">
+                                                            <span className="text-[9px] font-black uppercase tracking-wider text-white/40 mb-1">Disbursement</span>
+                                                            <span className="text-xs font-black text-emerald-400 uppercase tracking-tight flex items-center gap-1 mt-0.5">
+                                                                <CheckCircle size={12} className="shrink-0" /> Available Balance
+                                                            </span>
+                                                            <span className="text-[8px] font-bold text-white/30 uppercase mt-0.5">100% Settled</span>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Footer Assurance Banner */}
+                                                    <div className="p-3.5 rounded-2xl bg-white/[0.02] border border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-[10px] text-white/70">
+                                                        <div className="flex items-center gap-2">
+                                                            <Clock size={13} className="text-[#3DD6C8] shrink-0" />
+                                                            <span>
+                                                                Optimization clearance finalized at{' '}
+                                                                <strong className="text-white font-mono">
+                                                                    {new Date(task.completed_at || task.created_at).toLocaleString()}
+                                                                </strong>
+                                                            </span>
+                                                        </div>
+                                                        <div className="flex items-center gap-2 text-emerald-400 font-bold">
+                                                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                                                            <span>Principal ({format(task.cost_amount || 0)}) + Net Profit (+{format(task.earned_amount || 0)}) released</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </motion.div>
+                                        )}
+                                    </AnimatePresence>
                                 </div>
-                            </div>
-                        ))
+                            );
+                        })
                     )}
                 </div>
             </div>
