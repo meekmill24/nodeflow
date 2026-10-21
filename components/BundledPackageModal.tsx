@@ -317,28 +317,27 @@ export default function BundledPackageModal({
                                         <Sparkles size={11} /> Profit Calculation
                                     </span>
                                     <span className="text-[8px] font-bold text-white/40 uppercase tracking-widest">
-                                        Rate: {effectiveRate.toFixed(2)}% Yield
+                                        Formula: Value × Rate = Profit
                                     </span>
                                 </div>
 
                                 {/* Multi-Item Formula Breakdown Equation */}
                                 {calculatedItems.length >= 2 ? (
                                     <div className="space-y-1.5">
-                                        <div className="p-2.5 rounded-xl bg-black/60 border border-white/10 flex items-center justify-center gap-1.5 font-mono text-[10px] sm:text-xs font-black">
-                                            <span className="text-white/80">({format(calculatedItems[0].price)} @ {calculatedItems[0].rate.toFixed(1)}%)</span>
+                                        <div className="p-2.5 rounded-xl bg-black/60 border border-white/10 flex items-center justify-center gap-1 font-mono text-[10px] sm:text-xs font-black">
+                                            <span className="text-white/80">({format(calculatedItems[0].price)} × {calculatedItems[0].rate.toFixed(1)}%)</span>
                                             <span className="text-amber-400 font-bold">+</span>
-                                            <span className="text-white/80">({format(calculatedItems[1].price)} @ {calculatedItems[1].rate.toFixed(1)}%)</span>
-                                            <span className="text-white/40">➔</span>
+                                            <span className="text-white/80">({format(calculatedItems[1].price)} × {calculatedItems[1].rate.toFixed(1)}%)</span>
+                                            <span className="text-white/40">=</span>
                                             <span className="text-emerald-400 font-bold">+{format(bundle.bonusAmount)}</span>
                                         </div>
                                     </div>
                                 ) : (
                                     <div className="p-3 rounded-xl bg-black/60 border border-white/10 flex items-center justify-center gap-2 sm:gap-3 font-mono text-xs sm:text-sm font-black">
                                         <span className="text-white">{format(bundle.totalAmount)}</span>
-                                        <span className="px-2 py-0.5 rounded-md bg-amber-400/15 border border-amber-400/30 text-amber-400 text-xs font-bold">
-                                            {effectiveRate.toFixed(2)}%
-                                        </span>
-                                        <span className="text-white/40">➔</span>
+                                        <span className="text-amber-400 font-bold">×</span>
+                                        <span className="text-amber-400 font-bold">{effectiveRate.toFixed(2)}%</span>
+                                        <span className="text-white/40">=</span>
                                         <span className="text-emerald-400 font-bold">+{format(bundle.bonusAmount)}</span>
                                     </div>
                                 )}
@@ -350,7 +349,7 @@ export default function BundledPackageModal({
                                         </>
                                     ) : (
                                         <>
-                                            Order Value of <strong className="text-white">{format(bundle.totalAmount)}</strong> at the <strong className="text-amber-400">{effectiveRate.toFixed(2)}%</strong> reward rate yields <strong className="text-emerald-400">+{format(bundle.bonusAmount)}</strong> in profit. Upon completion, both the order principal and your profit yield will settle into your available balance.
+                                            Order Value of <strong className="text-white">{format(bundle.totalAmount)}</strong> multiplied by the <strong className="text-amber-400">{effectiveRate.toFixed(2)}%</strong> reward rate yields <strong className="text-emerald-400">+{format(bundle.bonusAmount)}</strong> in profit. Upon completion, both the order principal and your profit yield will settle into your available balance.
                                         </>
                                     )}
                                 </p>
