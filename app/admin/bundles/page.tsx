@@ -1233,7 +1233,7 @@ export default function AdminBundlesPage() {
                                         </span>
                                     </div>
                                     <div className="font-mono font-black text-[#3DD6C8]">
-                                        Rebate: {((computeBonus(parseFloat(assignForm.productAmount as string) || 100) / (parseFloat(assignForm.productAmount as string) || 100)) * 100).toFixed(2)}%
+                                        Rebate: {((computeBonus(parseFloat(assignForm.productAmount as string) || 100) / (parseFloat(assignForm.productAmount as string) || 100)) * 100).toFixed(2)}% <span className="text-amber-400 font-bold text-[9px]">(6x–50x)</span>
                                     </div>
                                 </div>
                             </div>

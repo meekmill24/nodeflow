@@ -258,7 +258,7 @@ export default function BundledPackageModal({
                                             <div className="flex flex-col items-center border-x border-white/10 px-1">
                                                 <span className="text-[7.5px] font-black text-amber-400 uppercase tracking-wider">Rate</span>
                                                 <span className="text-xs font-black text-amber-400 italic tabular-nums mt-0.5">{(item.rate ?? effectiveRate).toFixed(1)}%</span>
-                                                <span className="text-[6.5px] font-black text-amber-400/70 uppercase">REBATE</span>
+                                                <span className="text-[6.5px] font-black text-amber-400/80 uppercase tracking-wider">REBATE (6X - 50X)</span>
                                             </div>
                                             <div className="flex flex-col items-center">
                                                 <span className="text-[7.5px] font-black text-emerald-400 uppercase tracking-wider">Profit</span>
@@ -301,7 +301,7 @@ export default function BundledPackageModal({
                                 <div className="flex flex-col items-center border-x border-white/10 px-2">
                                     <span className="text-[8px] font-black text-amber-400 uppercase tracking-[0.2em] mb-1.5">Rate</span>
                                     <span className="text-sm font-black text-amber-400 tracking-tight italic tabular-nums">{effectiveRate.toFixed(2)}%</span>
-                                    <span className="text-[7px] font-black text-amber-400/70 uppercase mt-1">REBATE</span>
+                                    <span className="text-[7px] font-black text-amber-400/80 uppercase mt-1 tracking-wider">REBATE (6X - 50X)</span>
                                 </div>
                                 <div className="flex flex-col items-center">
                                     <span className="text-[8px] font-black text-emerald-400 uppercase tracking-[0.2em] mb-1.5">Total Profit</span>
@@ -317,7 +317,7 @@ export default function BundledPackageModal({
                                         <Sparkles size={11} /> Profit Calculation
                                     </span>
                                     <span className="text-[8px] font-bold text-white/40 uppercase tracking-widest">
-                                        Formula: Value × Rate = Profit
+                                        Formula: Value × Rate = Profit (6X - 50X)
                                     </span>
                                 </div>
 
