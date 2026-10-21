@@ -127,21 +127,22 @@ export default function ItemDetailModal({
                                     <Sparkles size={11} /> Profit Calculation
                                 </span>
                                 <span className="text-[8px] font-bold text-white/40 uppercase tracking-widest">
-                                    Value × Rate = Profit
+                                    Rate: {ratePercentage}% Yield
                                 </span>
                             </div>
 
-                            {/* Value × Rate = Profit Equation */}
+                            {/* Value @ Rate = Profit Equation */}
                             <div className="p-2.5 rounded-xl bg-black/60 border border-white/10 flex items-center justify-center gap-2 font-mono text-xs font-black">
                                 <span className="text-white">{format(displayProductValue)}</span>
-                                <span className="text-[#3DD6C8] font-bold">×</span>
-                                <span className="text-[#3DD6C8] font-bold">{ratePercentage}%</span>
-                                <span className="text-white/40">=</span>
+                                <span className="px-2 py-0.5 rounded-md bg-[#3DD6C8]/15 border border-[#3DD6C8]/30 text-[#3DD6C8] text-xs font-bold">
+                                    {ratePercentage}%
+                                </span>
+                                <span className="text-white/40">➔</span>
                                 <span className="text-emerald-400 font-bold">+{format(profitAmount)}</span>
                             </div>
 
                             <p className="text-[9px] text-white/60 leading-relaxed font-medium">
-                                <strong className="text-white">Explanation:</strong> Order Value of <strong className="text-white">{format(displayProductValue)}</strong> multiplied by the <strong className="text-[#3DD6C8]">{ratePercentage}%</strong> commission rate yields <strong className="text-emerald-400">+{format(profitAmount)}</strong> in profit upon submission.
+                                <strong className="text-white">Explanation:</strong> Order Value of <strong className="text-white">{format(displayProductValue)}</strong> at the <strong className="text-[#3DD6C8]">{ratePercentage}%</strong> commission rate yields <strong className="text-emerald-400">+{format(profitAmount)}</strong> in profit upon submission.
                             </p>
                         </div>
                     </div>
