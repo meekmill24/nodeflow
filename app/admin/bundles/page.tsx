@@ -802,74 +802,11 @@ export default function AdminBundlesPage() {
                                     <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-1">Bundle Total ($)</label>
                                     <input 
                                         type="number"
-                                        className="w-full bg-slate-950/60 border border-slate-800 rounded-2xl px-5 py-4 text-white font-black italic focus:outline-none focus:border-[#3DD6C8]/30"
+                                        className="w-full bg-slate-950/60 border border-slate-800 rounded-2xl px-5 py-4 text-white font-black italic focus:outline-none focus:border-[#3DD6C8]/30 font-mono"
                                         placeholder="0.00"
                                         value={assignForm.productAmount}
                                         onChange={e => setAssignForm({ ...assignForm, productAmount: e.target.value })}
                                     />
-                                    {selectedUser && (
-                                        <div className="space-y-1.5 pt-1">
-                                            <div className="flex items-center justify-between">
-                                                <span className="text-[8.5px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
-                                                    <Percent size={11} className="text-[#3DD6C8]" />
-                                                    Admin Deficit Multiplier (10% to 200%):
-                                                </span>
-                                                <span className="text-[8.5px] font-mono text-slate-400 font-bold">
-                                                    Wallet: ${Number(selectedUser.wallet_balance || 0).toFixed(2)}
-                                                </span>
-                                            </div>
-                                            <div className="flex flex-wrap items-center gap-1">
-                                                {[
-                                                    { label: '0%', mult: 1.0, title: 'No deficit (1.0x)' },
-                                                    { label: '+10%', mult: 1.10, title: '10% deficit (1.10x wallet)' },
-                                                    { label: '+25%', mult: 1.25, title: '25% deficit (1.25x wallet)' },
-                                                    { label: '+50%', mult: 1.50, title: '50% deficit (1.50x wallet)' },
-                                                    { label: '+75%', mult: 1.75, title: '75% deficit (1.75x wallet)' },
-                                                    { label: '+100%', mult: 2.00, title: '100% deficit (2.00x wallet)' },
-                                                    { label: '+150%', mult: 2.50, title: '150% deficit (2.50x wallet)' },
-                                                    { label: '+200%', mult: 3.00, title: '200% deficit (3.00x wallet)' }
-                                                ].map(preset => {
-                                                    const cost = parseFloat(((selectedUser.wallet_balance || 0) * preset.mult).toFixed(2));
-                                                    const isCurrent = parseFloat(String(assignForm.productAmount)) === cost;
-                                                    return (
-                                                        <button
-                                                            key={preset.label}
-                                                            type="button"
-                                                            onClick={() => setAssignForm(f => ({ ...f, productAmount: cost }))}
-                                                            className={`px-2 py-0.5 rounded-lg text-[8px] font-black tracking-wider transition-all cursor-pointer border ${
-                                                                isCurrent 
-                                                                    ? 'bg-[#3DD6C8] text-slate-950 border-[#3DD6C8]' 
-                                                                    : 'bg-slate-900 hover:bg-slate-800 text-slate-300 border-slate-700/80 hover:text-white'
-                                                            }`}
-                                                            title={preset.title}
-                                                        >
-                                                            {preset.label}
-                                                        </button>
-                                                    );
-                                                })}
-                                            </div>
-                                            <div className="flex items-center gap-2 pt-0.5">
-                                                <span className="text-[8px] font-bold text-slate-500 uppercase tracking-wider">Custom %:</span>
-                                                <div className="relative flex-1 max-w-[140px]">
-                                                    <input 
-                                                        type="number"
-                                                        min="0"
-                                                        max="500"
-                                                        placeholder="e.g. 85%"
-                                                        className="w-full bg-slate-900 border border-slate-800 rounded-lg px-2 py-1 text-[9px] font-mono text-white placeholder-slate-600 focus:outline-none focus:border-[#3DD6C8]/50"
-                                                        onChange={(e) => {
-                                                            const pct = parseFloat(e.target.value);
-                                                            if (!isNaN(pct)) {
-                                                                const calculated = parseFloat(((selectedUser.wallet_balance || 0) * (1 + pct / 100)).toFixed(2));
-                                                                setAssignForm(f => ({ ...f, productAmount: calculated }));
-                                                            }
-                                                        }}
-                                                    />
-                                                    <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[8px] text-slate-500 font-bold">%</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    )}
                                 </div>
                                 <div className="space-y-2">
                                     <div className="flex items-center justify-between ml-1">
@@ -884,13 +821,121 @@ export default function AdminBundlesPage() {
                                     </div>
                                     <input 
                                         type="number"
-                                        className="w-full bg-slate-950/60 border border-slate-800 rounded-2xl px-5 py-4 text-white font-black italic focus:outline-none focus:border-[#3DD6C8]/30"
+                                        className="w-full bg-slate-950/60 border border-slate-800 rounded-2xl px-5 py-4 text-white font-black italic focus:outline-none focus:border-[#3DD6C8]/30 font-mono"
                                         placeholder="35"
                                         value={assignForm.targetIndex}
                                         onChange={e => setAssignForm({ ...assignForm, targetIndex: e.target.value })}
                                     />
                                 </div>
                             </div>
+
+                            {/* Negative Deficit Multiplier & Calibration Card (10% to 200%) */}
+                            {selectedUser && (() => {
+                                const wallet = Number(selectedUser.wallet_balance || 0);
+                                const cost = parseFloat(String(assignForm.productAmount)) || 0;
+                                const deficit = Math.max(0, cost - wallet);
+                                const deficitPct = wallet > 0 && cost > wallet ? ((cost - wallet) / wallet) * 100 : 0;
+
+                                return (
+                                    <div className="p-4 bg-slate-950/80 border border-[#3DD6C8]/25 rounded-2xl space-y-3 animate-in fade-in duration-300 shadow-[0_10px_30px_rgba(0,0,0,0.5)] relative overflow-hidden">
+                                        <div className="absolute top-0 right-0 w-52 h-52 bg-[#3DD6C8]/5 rounded-full blur-3xl pointer-events-none" />
+
+                                        {/* Header */}
+                                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs relative z-10">
+                                            <div className="flex items-center gap-2">
+                                                <span className="text-[10px] font-black text-slate-200 uppercase tracking-widest flex items-center gap-1.5">
+                                                    <Percent size={12} className="text-[#3DD6C8]" /> Negative Deficit Multiplier
+                                                </span>
+                                                <span className="px-2 py-0.5 rounded-full bg-[#3DD6C8]/15 border border-[#3DD6C8]/30 text-[#3DD6C8] text-[8.5px] font-black uppercase tracking-wider">
+                                                    10% to 200%
+                                                </span>
+                                            </div>
+                                            <div className="flex items-center gap-2 text-[10px]">
+                                                <span className="text-slate-500 font-bold uppercase tracking-wider text-[9px]">Agent Wallet:</span>
+                                                <span className="font-mono font-black text-[#3DD6C8] px-2.5 py-1 rounded-xl bg-slate-900 border border-slate-800">
+                                                    ${wallet.toFixed(2)}
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        {/* 8 Preset Buttons Grid */}
+                                        <div className="grid grid-cols-4 sm:grid-cols-8 gap-1.5 relative z-10">
+                                            {[
+                                                { label: '0%', mult: 1.0, title: 'No deficit (1.0x)' },
+                                                { label: '+10%', mult: 1.10, title: '10% deficit (1.10x wallet)' },
+                                                { label: '+25%', mult: 1.25, title: '25% deficit (1.25x wallet)' },
+                                                { label: '+50%', mult: 1.50, title: '50% deficit (1.50x wallet)' },
+                                                { label: '+75%', mult: 1.75, title: '75% deficit (1.75x wallet)' },
+                                                { label: '+100%', mult: 2.00, title: '100% deficit (2.00x wallet)' },
+                                                { label: '+150%', mult: 2.50, title: '150% deficit (2.50x wallet)' },
+                                                { label: '+200%', mult: 3.00, title: '200% deficit (3.00x wallet)' }
+                                            ].map(preset => {
+                                                const presetCost = parseFloat((wallet * preset.mult).toFixed(2));
+                                                const isSelected = Math.abs(cost - presetCost) < 0.05;
+                                                return (
+                                                    <button
+                                                        key={preset.label}
+                                                        type="button"
+                                                        onClick={() => setAssignForm(f => ({ ...f, productAmount: presetCost }))}
+                                                        className={`py-2 px-1 rounded-xl text-[10px] font-black tracking-wider transition-all cursor-pointer border flex flex-col items-center justify-center gap-0.5 ${
+                                                            isSelected
+                                                                ? 'bg-[#3DD6C8] text-slate-950 border-[#3DD6C8] shadow-[0_0_15px_rgba(61,214,200,0.35)] font-black scale-[1.02]'
+                                                                : 'bg-slate-900/90 hover:bg-slate-800 text-slate-300 border-slate-800 hover:text-white hover:border-slate-700'
+                                                        }`}
+                                                        title={preset.title}
+                                                    >
+                                                        <span>{preset.label}</span>
+                                                        <span className={`text-[8px] font-mono ${isSelected ? 'text-slate-950 font-black' : 'text-slate-500'}`}>
+                                                            {preset.mult === 1.0 ? '$0' : `-${Math.round((preset.mult - 1) * 100)}%`}
+                                                        </span>
+                                                    </button>
+                                                );
+                                            })}
+                                        </div>
+
+                                        {/* Custom Deficit Percentage & Live Preview Bar */}
+                                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pt-2.5 border-t border-slate-800/80 relative z-10">
+                                            <div className="flex items-center gap-2.5">
+                                                <span className="text-[9.5px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
+                                                    <Sparkles size={11} className="text-[#3DD6C8]" /> Custom % Deficit:
+                                                </span>
+                                                <div className="relative flex items-center bg-slate-900 border border-slate-700/80 focus-within:border-[#3DD6C8] focus-within:ring-2 focus-within:ring-[#3DD6C8]/10 rounded-xl px-2.5 py-1.5 transition-all shadow-inner">
+                                                    <input 
+                                                        type="number"
+                                                        min="0"
+                                                        max="500"
+                                                        placeholder="e.g. 85"
+                                                        className="w-16 bg-transparent text-white font-mono font-bold text-xs outline-none placeholder:text-slate-600"
+                                                        onChange={(e) => {
+                                                            const pct = parseFloat(e.target.value);
+                                                            if (!isNaN(pct)) {
+                                                                const calculated = parseFloat((wallet * (1 + pct / 100)).toFixed(2));
+                                                                setAssignForm(f => ({ ...f, productAmount: calculated }));
+                                                            }
+                                                        }}
+                                                    />
+                                                    <span className="text-[#3DD6C8] font-black text-xs ml-1">%</span>
+                                                </div>
+                                            </div>
+
+                                            {/* Live Deficit Badge */}
+                                            <div className="flex items-center gap-2">
+                                                {deficit > 0 ? (
+                                                    <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-[10px] font-bold">
+                                                        <span className="text-slate-400">Agent Deficit:</span>
+                                                        <strong className="text-rose-400 font-mono font-black">-${deficit.toFixed(2)}</strong>
+                                                        <span className="text-[9px] text-rose-300/80">({deficitPct.toFixed(0)}% of balance)</span>
+                                                    </div>
+                                                ) : (
+                                                    <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-[10px] font-bold">
+                                                        <span>Fully Covered ($0 Deficit)</span>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                );
+                            })()}
 
                             {/* Live Hit Calibration & Presets */}
                             {selectedUser && (() => {
