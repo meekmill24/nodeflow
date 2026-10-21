@@ -91,10 +91,11 @@ export default function StartPage() {
     const currentSet = profile?.current_set || 1;
     const isProfileIncomplete = !profile?.phone || profile?.phone === '';
 
-    const tasksInCurrentSet = (completedCount % tasksPerSet === 0 && completedCount > 0) ? tasksPerSet : (completedCount % tasksPerSet);
-    const isLocked = tasksInCurrentSet >= tasksPerSet;
+    const effectiveTasksPerSet = Number((profile as any)?.tasks_per_set_override || profile?.level?.tasks_per_set || tasksPerSet || 40);
+    const isLocked = completedCount >= effectiveTasksPerSet;
+    const tasksInCurrentSet = isLocked ? effectiveTasksPerSet : (completedCount % effectiveTasksPerSet);
     const isAllSetsDone = currentSet >= setsPerDay && isLocked;
-    const totalTasks = tasksPerSet;
+    const totalTasks = effectiveTasksPerSet;
 
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -325,10 +326,17 @@ function extractMatchingBundle(
             setShowWorkingHoursModal(true);
             return;
         }
+
+        // Strict Task Set Completion Gate: Absolutely NO task starts if set is completed
+        const freshCompleted = Number(profile?.completed_count ?? completedCount ?? 0);
+        const freshTasksPerSet = Number((profile as any)?.tasks_per_set_override || profile?.level?.tasks_per_set || tasksPerSet || 40);
+        if (freshCompleted >= freshTasksPerSet || isLocked) {
+            setShowCompletionModal(true);
+            setLockMessage(isAllSetsDone ? t('daily_limit_reached') : t('set_complete_contact_support').replace('{set}', String(currentSet)));
+            return;
+        }
         
         // Fast-path: Check if user has an assigned/pending bundle at or past current task
-        const freshCompleted = Number(profile?.completed_count ?? completedCount ?? 0);
-        const freshTasksPerSet = Number((profile as any)?.tasks_per_set_override || tasksPerSet || 40);
         const freshTasksInSet = (freshCompleted % freshTasksPerSet === 0 && freshCompleted > 0) ? freshTasksPerSet : (freshCompleted % freshTasksPerSet);
         const currentTaskInSet = freshTasksInSet + 1;
         const overallTaskNumber = freshCompleted + 1;
@@ -342,11 +350,6 @@ function extractMatchingBundle(
             return;
         }
 
-        if (isLocked) {
-            if (!modalSeen) setShowCompletionModal(true);
-            else setLockMessage(isAllSetsDone ? t('daily_limit_reached') : t('set_complete_contact_support').replace('{set}', String(currentSet)));
-            return;
-        }
         if (hasPendingTask) { router.push('/record'); return; }
 
         // If direct match already confirmed, open bundle modal directly
@@ -363,7 +366,15 @@ function extractMatchingBundle(
             try {
                 const { data: freshProfile } = await supabase.from('profiles').select('*').eq('id', profile?.id).single();
                 const freshCompletedCount = Number((freshProfile as any)?.completed_count ?? completedCount ?? 0);
-                const freshTasksPerSetCount = Number((freshProfile as any)?.tasks_per_set_override || tasksPerSet || 40);
+                const freshTasksPerSetCount = Number((freshProfile as any)?.tasks_per_set_override || (freshProfile as any)?.level?.tasks_per_set || tasksPerSet || 40);
+                
+                // Secondary strict guard in async spin cycle
+                if (freshCompletedCount >= freshTasksPerSetCount) {
+                    setIsSpinning(false);
+                    setShowCompletionModal(true);
+                    return;
+                }
+
                 const freshTasksInSetCount = (freshCompletedCount % freshTasksPerSetCount === 0 && freshCompletedCount > 0) ? freshTasksPerSetCount : (freshCompletedCount % freshTasksPerSetCount);
                 const cTaskInSet = freshTasksInSetCount + 1;
                 const oTaskNumber = freshCompletedCount + 1;
@@ -462,6 +473,14 @@ function extractMatchingBundle(
     const handleSubmitTask = async (item: TaskItem, providedCost?: number) => {
         if (isSubmitting) return;
 
+        // Strict Set Completion Gate: Disallow task completion if current set is finished
+        const freshCompleted = Number(profile?.completed_count ?? completedCount ?? 0);
+        const freshTasksPerSet = Number((profile as any)?.tasks_per_set_override || profile?.level?.tasks_per_set || tasksPerSet || 40);
+        if (freshCompleted >= freshTasksPerSet || isLocked) {
+            setShowCompletionModal(true);
+            return;
+        }
+
         // Working Hours Gate: Disallow task completion if operational desk is closed
         if (workingHours && !workingHours.isOpen) {
             setShowWorkingHoursModal(true);
@@ -509,7 +528,10 @@ function extractMatchingBundle(
                     setAllPoolItems(freshPool);
                     setIsRefreshing(false);
                 }, 800);
-                if (tasksInCurrentSet + 1 >= tasksPerSet) { setModalSeen(false); setTimeout(() => setShowCompletionModal(true), 1500); }
+                if (tasksInCurrentSet + 1 >= effectiveTasksPerSet || freshCompleted + 1 >= freshTasksPerSet) { 
+                    setModalSeen(false); 
+                    setTimeout(() => setShowCompletionModal(true), 1200); 
+                }
             }
             await refreshProfile();
         } catch (err: any) { alert(err.message); } finally { setIsSubmitting(false); }
@@ -522,6 +544,13 @@ function extractMatchingBundle(
 
     const handleBundleAccept = async (bundle: BundlePackage) => {
         if (!profile) return;
+        const freshCompleted = Number(profile?.completed_count ?? completedCount ?? 0);
+        const freshTasksPerSet = Number((profile as any)?.tasks_per_set_override || profile?.level?.tasks_per_set || tasksPerSet || 40);
+        if (freshCompleted >= freshTasksPerSet || isLocked) {
+            setShowCompletionModal(true);
+            return;
+        }
+
         setIsSubmitting(true);
         try {
             const profitEarned = Number(bundle.bonusAmount || 0);
@@ -555,10 +584,9 @@ function extractMatchingBundle(
             setTimeout(() => setProfitAdded(null), 3500);
 
             const updatedCount = data.completed_count || ((profile.completed_count || 0) + 1);
-            const freshTasksInSet = (updatedCount % tasksPerSet === 0 && updatedCount > 0) ? tasksPerSet : (updatedCount % tasksPerSet);
-            if (freshTasksInSet >= tasksPerSet) {
+            if (updatedCount >= freshTasksPerSet) {
                 setModalSeen(false);
-                setTimeout(() => setShowCompletionModal(true), 1500);
+                setTimeout(() => setShowCompletionModal(true), 1200);
             }
         } catch (err: any) {
             console.error("Error accepting bundle:", err);
@@ -807,8 +835,14 @@ function extractMatchingBundle(
                                     className="aspect-square flex items-center justify-center p-0.5 sm:p-0"
                                 >
                                     <button
-                                        onClick={handleStart}
-                                        disabled={isSpinning || isLocked || hasPendingTask}
+                                        onClick={() => {
+                                            if (isLocked) {
+                                                setShowCompletionModal(true);
+                                                return;
+                                            }
+                                            handleStart();
+                                        }}
+                                        disabled={isSpinning || hasPendingTask}
                                         className={`
                                             w-full h-full rounded-full flex flex-col items-center justify-center transition-all duration-500 relative overflow-hidden group
                                             ${isSpinning ? 'scale-95 bg-slate-800 ring-4 ring-[#3DD6C8]/20' : 'hover:scale-105 active:scale-95'}

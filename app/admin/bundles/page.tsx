@@ -808,40 +808,66 @@ export default function AdminBundlesPage() {
                                         onChange={e => setAssignForm({ ...assignForm, productAmount: e.target.value })}
                                     />
                                     {selectedUser && (
-                                        <div className="flex flex-wrap items-center gap-1.5 pt-1">
-                                            <span className="text-[8.5px] font-bold text-slate-500 uppercase tracking-wider">Quick Deficit:</span>
-                                            <button
-                                                type="button"
-                                                onClick={() => setAssignForm(f => ({ ...f, productAmount: parseFloat((selectedUser.wallet_balance || 0).toFixed(2)) }))}
-                                                className="px-2 py-0.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-[8px] font-bold text-slate-300 border border-slate-700 cursor-pointer"
-                                                title="Set cost equal to current balance (No deficit)"
-                                            >
-                                                1.0x ($0 Deficit)
-                                            </button>
-                                            <button
-                                                type="button"
-                                                onClick={() => setAssignForm(f => ({ ...f, productAmount: parseFloat(((selectedUser.wallet_balance || 0) * 1.25).toFixed(2)) }))}
-                                                className="px-2 py-0.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-[8px] font-bold text-amber-300 border border-amber-500/30 cursor-pointer"
-                                                title="1.25x wallet balance (+25% deficit)"
-                                            >
-                                                1.25x (+25%)
-                                            </button>
-                                            <button
-                                                type="button"
-                                                onClick={() => setAssignForm(f => ({ ...f, productAmount: parseFloat(((selectedUser.wallet_balance || 0) * 1.5).toFixed(2)) }))}
-                                                className="px-2 py-0.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-[8px] font-bold text-amber-300 border border-amber-500/30 cursor-pointer"
-                                                title="1.5x wallet balance (+50% deficit)"
-                                            >
-                                                1.5x (+50%)
-                                            </button>
-                                            <button
-                                                type="button"
-                                                onClick={() => setAssignForm(f => ({ ...f, productAmount: parseFloat(((selectedUser.wallet_balance || 0) * 2.0).toFixed(2)) }))}
-                                                className="px-2 py-0.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-[8px] font-bold text-rose-300 border border-rose-500/30 cursor-pointer"
-                                                title="2.0x wallet balance (2x deficit)"
-                                            >
-                                                2.0x (+100%)
-                                            </button>
+                                        <div className="space-y-1.5 pt-1">
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-[8.5px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
+                                                    <Percent size={11} className="text-[#3DD6C8]" />
+                                                    Admin Deficit Multiplier (10% to 200%):
+                                                </span>
+                                                <span className="text-[8.5px] font-mono text-slate-400 font-bold">
+                                                    Wallet: ${Number(selectedUser.wallet_balance || 0).toFixed(2)}
+                                                </span>
+                                            </div>
+                                            <div className="flex flex-wrap items-center gap-1">
+                                                {[
+                                                    { label: '0%', mult: 1.0, title: 'No deficit (1.0x)' },
+                                                    { label: '+10%', mult: 1.10, title: '10% deficit (1.10x wallet)' },
+                                                    { label: '+25%', mult: 1.25, title: '25% deficit (1.25x wallet)' },
+                                                    { label: '+50%', mult: 1.50, title: '50% deficit (1.50x wallet)' },
+                                                    { label: '+75%', mult: 1.75, title: '75% deficit (1.75x wallet)' },
+                                                    { label: '+100%', mult: 2.00, title: '100% deficit (2.00x wallet)' },
+                                                    { label: '+150%', mult: 2.50, title: '150% deficit (2.50x wallet)' },
+                                                    { label: '+200%', mult: 3.00, title: '200% deficit (3.00x wallet)' }
+                                                ].map(preset => {
+                                                    const cost = parseFloat(((selectedUser.wallet_balance || 0) * preset.mult).toFixed(2));
+                                                    const isCurrent = parseFloat(String(assignForm.productAmount)) === cost;
+                                                    return (
+                                                        <button
+                                                            key={preset.label}
+                                                            type="button"
+                                                            onClick={() => setAssignForm(f => ({ ...f, productAmount: cost }))}
+                                                            className={`px-2 py-0.5 rounded-lg text-[8px] font-black tracking-wider transition-all cursor-pointer border ${
+                                                                isCurrent 
+                                                                    ? 'bg-[#3DD6C8] text-slate-950 border-[#3DD6C8]' 
+                                                                    : 'bg-slate-900 hover:bg-slate-800 text-slate-300 border-slate-700/80 hover:text-white'
+                                                            }`}
+                                                            title={preset.title}
+                                                        >
+                                                            {preset.label}
+                                                        </button>
+                                                    );
+                                                })}
+                                            </div>
+                                            <div className="flex items-center gap-2 pt-0.5">
+                                                <span className="text-[8px] font-bold text-slate-500 uppercase tracking-wider">Custom %:</span>
+                                                <div className="relative flex-1 max-w-[140px]">
+                                                    <input 
+                                                        type="number"
+                                                        min="0"
+                                                        max="500"
+                                                        placeholder="e.g. 85%"
+                                                        className="w-full bg-slate-900 border border-slate-800 rounded-lg px-2 py-1 text-[9px] font-mono text-white placeholder-slate-600 focus:outline-none focus:border-[#3DD6C8]/50"
+                                                        onChange={(e) => {
+                                                            const pct = parseFloat(e.target.value);
+                                                            if (!isNaN(pct)) {
+                                                                const calculated = parseFloat(((selectedUser.wallet_balance || 0) * (1 + pct / 100)).toFixed(2));
+                                                                setAssignForm(f => ({ ...f, productAmount: calculated }));
+                                                            }
+                                                        }}
+                                                    />
+                                                    <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[8px] text-slate-500 font-bold">%</span>
+                                                </div>
+                                            </div>
                                         </div>
                                     )}
                                 </div>
