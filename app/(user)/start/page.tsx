@@ -844,25 +844,38 @@ function extractMatchingBundle(
                                         }}
                                         disabled={isSpinning || hasPendingTask}
                                         className={`
-                                            w-full h-full rounded-full flex flex-col items-center justify-center transition-all duration-500 relative overflow-hidden group
+                                            w-full h-full rounded-full flex flex-col items-center justify-center transition-all duration-500 relative overflow-hidden group cursor-pointer
                                             ${isSpinning ? 'scale-95 bg-slate-800 ring-4 ring-[#3DD6C8]/20' : 'hover:scale-105 active:scale-95'}
-                                            ${workingHours && !workingHours.isOpen 
-                                                ? 'bg-gradient-to-br from-amber-500 to-amber-600 shadow-[0_0_40px_rgba(245,158,11,0.35)]' 
-                                                : (!isSpinning ? 'bg-[#3DD6C8] shadow-[0_0_40px_rgba(61,214,200,0.3)]' : '')}
-                                            ${(isLocked || hasPendingTask) ? 'bg-slate-950 opacity-20 grayscale cursor-not-allowed' : ''}
+                                            ${isLocked
+                                                ? 'bg-gradient-to-br from-slate-900 via-slate-900 to-emerald-950/60 border-2 border-emerald-500/50 shadow-[0_0_35px_rgba(16,185,129,0.3)]'
+                                                : (workingHours && !workingHours.isOpen 
+                                                    ? 'bg-gradient-to-br from-amber-500 to-amber-600 shadow-[0_0_40px_rgba(245,158,11,0.35)]' 
+                                                    : (!isSpinning ? 'bg-[#3DD6C8] shadow-[0_0_40px_rgba(61,214,200,0.3)]' : ''))}
+                                            ${hasPendingTask ? 'bg-slate-950 opacity-40 grayscale cursor-not-allowed' : ''}
                                         `}
                                     >
                                         <div className="relative z-10 flex flex-col items-center text-center px-0.5 sm:px-1">
-                                            <span className={`text-[12px] sm:text-base md:text-xl font-black italic uppercase tracking-tighter leading-none ${
-                                                isSpinning ? 'text-[#3DD6C8]' : (workingHours && !workingHours.isOpen ? 'text-[#0B0B1E]' : 'text-[#0B0B1E]')
+                                            <span className={`text-[11px] sm:text-base md:text-lg font-black italic uppercase tracking-tighter leading-none ${
+                                                isSpinning 
+                                                    ? 'text-[#3DD6C8]' 
+                                                    : (isLocked 
+                                                        ? 'text-emerald-400 drop-shadow-[0_0_10px_rgba(52,211,153,0.5)]' 
+                                                        : (workingHours && !workingHours.isOpen ? 'text-[#0B0B1E]' : 'text-[#0B0B1E]'))
                                             }`}>
-                                                {workingHours && !workingHours.isOpen ? 'OFFLINE' : (isLocked ? 'DONE' : (isSpinning ? 'SYNC' : 'START'))}
+                                                {workingHours && !workingHours.isOpen ? 'OFFLINE' : (isLocked ? 'COMPLETED' : (isSpinning ? 'SYNC' : 'START'))}
                                             </span>
-                                            {!isSpinning && !isLocked && !hasPendingTask && (
-                                                workingHours && !workingHours.isOpen ? (
-                                                    <Clock size={12} className="text-[#0B0B1E] animate-pulse mt-0.5 sm:mt-1 sm:size-[14px]" />
-                                                ) : (
-                                                    <Pointer size={12} className="text-[#0B0B1E] animate-bounce mt-0.5 sm:mt-1 sm:size-[14px]" />
+                                            {isLocked ? (
+                                                <div className="flex items-center gap-1 text-[7px] sm:text-[9px] font-black text-emerald-300 uppercase tracking-widest mt-1">
+                                                    <CheckCircle size={10} className="text-emerald-400 shrink-0" />
+                                                    <span>SET {currentSet} DONE</span>
+                                                </div>
+                                            ) : (
+                                                !isSpinning && !hasPendingTask && (
+                                                    workingHours && !workingHours.isOpen ? (
+                                                        <Clock size={12} className="text-[#0B0B1E] animate-pulse mt-0.5 sm:mt-1 sm:size-[14px]" />
+                                                    ) : (
+                                                        <Pointer size={12} className="text-[#0B0B1E] animate-bounce mt-0.5 sm:mt-1 sm:size-[14px]" />
+                                                    )
                                                 )
                                             )}
                                             {isSpinning && <div className="w-3.5 h-3.5 sm:w-5 sm:h-5 border-2 border-[#3DD6C8]/30 border-t-[#3DD6C8] rounded-full animate-spin mt-1 sm:mt-2" />}
