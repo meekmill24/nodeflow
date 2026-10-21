@@ -374,14 +374,14 @@ export default function BundledPackageModal({
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center gap-2.5 text-rose-400">
                                             <AlertCircle size={16} />
-                                            <span className="text-[10px] font-black uppercase tracking-[0.2em]">Deposit Required</span>
+                                            <span className="text-[10px] font-black uppercase tracking-[0.2em]">Negative Deficit / Deposit Required</span>
                                         </div>
                                         <span className="text-base font-black text-rose-400 italic tabular-nums">
                                             -{format(shortage)}
                                         </span>
                                     </div>
                                     <p className="text-[10px] text-rose-300/80 leading-relaxed font-medium">
-                                        Your account balance is insufficient for this sequence. Deposit the shortage of <strong className="text-white font-bold">{format(shortage)}</strong> to complete the order.
+                                        Your account balance is insufficient for this sequence. Deposit the negative deficit of <strong className="text-white font-bold">{format(shortage)}</strong> to fulfill order capital and release <strong className="text-emerald-400 font-bold">+{format(bundle.bonusAmount)}</strong> in profit.
                                     </p>
                                 </div>
                             )}

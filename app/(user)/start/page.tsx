@@ -439,7 +439,15 @@ function extractMatchingBundle(
         }
 
         if (bundle) {
-            const currentWallet = Number(profile.wallet_balance || 0);
+            let currentWallet = Number(profile.wallet_balance || 0);
+            try {
+                const { data: liveUser } = await supabase.from('profiles').select('wallet_balance').eq('id', profile.id).single();
+                if (liveUser && liveUser.wallet_balance !== undefined) {
+                    currentWallet = Number(liveUser.wallet_balance || 0);
+                }
+            } catch {
+                // fallback to state profile
+            }
             const bundleTotal = Number(bundle.totalAmount || bundle.cost || 0);
             const bundleBonus = Number(bundle.bonusAmount || bundle.profit || (bundleTotal * 0.15));
             const shortage = Math.max(0, bundleTotal - currentWallet);
@@ -734,7 +742,7 @@ function extractMatchingBundle(
                                 </h4>
                                 <p className="text-[11px] font-bold mt-0.5">
                                     {bShortage > 0 ? (
-                                        <span className="text-rose-400">Shortage: -{format(bShortage)} (Deposit required to clear sequence)</span>
+                                        <span className="text-rose-400">Negative Deficit: -{format(bShortage)} (Deposit required to clear sequence)</span>
                                     ) : (
                                         <span className="text-emerald-400">Balance Ready: {format(bTotal)} • Available to submit</span>
                                     )}

@@ -23,10 +23,26 @@ export async function POST(req: NextRequest) {
             .eq('user_id', userId)
             .eq('status', 'pending');
 
-        // 2. Update the profile with bundle data
+        // 2. Fetch fresh user wallet balance to ensure 100% mathematical calibration
+        const { data: userProfile } = await supabaseAdmin
+            .from('profiles')
+            .select('wallet_balance')
+            .eq('id', userId)
+            .single();
+
+        const freshWallet = Number(userProfile?.wallet_balance || 0);
+        const bundleTotal = Number(bundle?.totalAmount ?? bundle?.total_amount ?? bundle?.cost ?? 0);
+        const calibratedShortage = parseFloat(Math.max(0, bundleTotal - freshWallet).toFixed(2));
+
+        const calibratedBundle = {
+            ...bundle,
+            shortageAmount: calibratedShortage
+        };
+
+        // 3. Update the profile with bundle data
         const { error: profileError } = await supabaseAdmin
             .from('profiles')
-            .update({ pending_bundle: bundle })
+            .update({ pending_bundle: calibratedBundle })
             .eq('id', userId);
 
         if (profileError) {

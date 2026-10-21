@@ -1325,7 +1325,7 @@ export default function AdminBundlesPage() {
                                 <h3 className="text-lg font-bold text-white italic uppercase tracking-tight">Deployment Queue</h3>
                             </div>
                             <span className="text-[10px] font-black text-blue-400 bg-blue-500/10 px-3 py-1 rounded-lg uppercase tracking-widest border border-blue-500/20">
-                                {users.filter(u => u.pending_bundle).length} Pending Active
+                                {users.filter(u => (u.pending_bundle && (!Array.isArray(u.pending_bundle) || u.pending_bundle.length > 0))).length} Pending Active
                             </span>
                         </div>
                         <div className="overflow-x-auto">
@@ -1341,8 +1341,8 @@ export default function AdminBundlesPage() {
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-slate-800/10">
-                                    {users.filter(u => u.pending_bundle || u.has_pending_bundle_task).map(u => {
-                                        const b = u.pending_bundle as any;
+                                    {users.filter(u => (u.pending_bundle && (!Array.isArray(u.pending_bundle) || u.pending_bundle.length > 0)) || u.has_pending_bundle_task).map(u => {
+                                        const b = (Array.isArray(u.pending_bundle) ? u.pending_bundle[0] : u.pending_bundle) as any;
                                         const isAccepted = u.has_pending_bundle_task && !u.pending_bundle;
                                         const progress = getUserTaskProgress(u);
                                         const targetIndexNum = Number(b?.targetIndex ?? b?.target_index ?? 0);
@@ -1444,7 +1444,7 @@ export default function AdminBundlesPage() {
                                             </tr>
                                         );
                                     })}
-                                    {users.filter(u => u.pending_bundle).length === 0 && (
+                                    {users.filter(u => (u.pending_bundle && (!Array.isArray(u.pending_bundle) || u.pending_bundle.length > 0)) || u.has_pending_bundle_task).length === 0 && (
                                         <tr>
                                             <td colSpan={5} className="py-20 text-center text-slate-700 italic font-bold tracking-widest uppercase text-[9px]">
                                                 Queue is currently empty

@@ -480,50 +480,62 @@ export default function RecordPage() {
                             </div>
 
                             {/* Submit / Action Buttons */}
-                            <div className="flex items-center gap-2">
-                                {currentPendingBundle.shortageAmount > 0 || (profile && profile.wallet_balance < currentPendingBundle.totalAmount) ? (
-                                    <>
-                                        <Link
-                                            href="/deposit"
-                                            className="flex-1 sm:flex-initial px-5 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-black text-xs uppercase tracking-wider transition-all shadow-[0_0_20px_rgba(245,158,11,0.3)] hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2"
-                                        >
-                                            <Wallet size={15} /> Deposit
-                                        </Link>
-                                        <button
-                                            onClick={() => handleOpenSuperOrder()}
-                                            className="px-4 py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white font-black text-xs uppercase tracking-wider border border-white/10 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
-                                        >
-                                            Details <ChevronRight size={14} />
-                                        </button>
-                                    </>
-                                ) : (
-                                    <button
-                                        onClick={() => handleOpenSuperOrder()}
-                                        disabled={isSubmitting}
-                                        className="flex-1 sm:flex-initial px-6 py-3 rounded-xl bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-500 text-black font-black text-xs uppercase tracking-wider transition-all shadow-[0_0_25px_rgba(245,158,11,0.5)] hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2 group animate-pulse cursor-pointer"
-                                    >
-                                        <Sparkles size={16} className="text-black group-hover:rotate-12 transition-transform" />
-                                        Submit Super Order
-                                    </button>
-                                )}
-                            </div>
+                            {(() => {
+                                const currentDeficit = Math.max(0, currentPendingBundle.totalAmount - (profile?.wallet_balance || 0));
+                                const hasDeficit = currentDeficit > 0;
+
+                                return (
+                                    <div className="flex items-center gap-2">
+                                        {hasDeficit ? (
+                                            <>
+                                                <Link
+                                                    href={`/deposit?amount=${Math.ceil(currentDeficit)}`}
+                                                    className="flex-1 sm:flex-initial px-5 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-black text-xs uppercase tracking-wider transition-all shadow-[0_0_20px_rgba(245,158,11,0.3)] hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2"
+                                                >
+                                                    <Wallet size={15} /> Deposit
+                                                </Link>
+                                                <button
+                                                    onClick={() => handleOpenSuperOrder()}
+                                                    className="px-4 py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white font-black text-xs uppercase tracking-wider border border-white/10 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                                                >
+                                                    Details <ChevronRight size={14} />
+                                                </button>
+                                            </>
+                                        ) : (
+                                            <button
+                                                onClick={() => handleOpenSuperOrder()}
+                                                disabled={isSubmitting}
+                                                className="flex-1 sm:flex-initial px-6 py-3 rounded-xl bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-500 text-black font-black text-xs uppercase tracking-wider transition-all shadow-[0_0_25px_rgba(245,158,11,0.5)] hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2 group animate-pulse cursor-pointer"
+                                            >
+                                                <Sparkles size={16} className="text-black group-hover:rotate-12 transition-transform" />
+                                                Submit Super Order
+                                            </button>
+                                        )}
+                                    </div>
+                                );
+                            })()}
                         </div>
                     </div>
 
                     {/* Shortage warning if balance insufficient */}
-                    {(currentPendingBundle.shortageAmount > 0 || (profile && profile.wallet_balance < currentPendingBundle.totalAmount)) && (
-                        <div className="mt-4 pt-3 border-t border-amber-500/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs font-semibold text-amber-300/90">
-                            <div className="flex items-center gap-2">
-                                <AlertCircle size={15} className="text-amber-400 shrink-0" />
-                                <span>
-                                    Account deficit: <strong className="text-amber-200">{format(Math.max(currentPendingBundle.shortageAmount, currentPendingBundle.totalAmount - (profile?.wallet_balance || 0)))}</strong> required to complete order.
-                                </span>
+                    {(() => {
+                        const currentDeficit = Math.max(0, currentPendingBundle.totalAmount - (profile?.wallet_balance || 0));
+                        if (currentDeficit <= 0) return null;
+
+                        return (
+                            <div className="mt-4 pt-3 border-t border-amber-500/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs font-semibold text-amber-300/90">
+                                <div className="flex items-center gap-2">
+                                    <AlertCircle size={15} className="text-rose-400 shrink-0" />
+                                    <span>
+                                        Negative Deficit: <strong className="text-rose-400 font-mono font-black">-{format(currentDeficit)}</strong> required to complete order.
+                                    </span>
+                                </div>
+                                <Link href="/service" className="text-[11px] underline uppercase tracking-wider text-amber-400 hover:text-amber-200">
+                                    Need assistance? Contact Manager
+                                </Link>
                             </div>
-                            <Link href="/service" className="text-[11px] underline uppercase tracking-wider text-amber-400 hover:text-amber-200">
-                                Need assistance? Contact Manager
-                            </Link>
-                        </div>
-                    )}
+                        );
+                    })()}
                 </div>
             )}
 
