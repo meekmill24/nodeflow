@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { supabase } from '@/lib/supabase/index';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/context/AuthContext';
+import { useEffect } from 'react';
 import { Shield, Lock, User, AlertCircle, Loader2 } from 'lucide-react';
 
 export default function AdminLogin() {
@@ -10,7 +12,29 @@ export default function AdminLogin() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  // Track whether we're waiting for the AuthContext profile to hydrate after login
+  const [awaitingProfile, setAwaitingProfile] = useState(false);
   const router = useRouter();
+  const { profile, loading: authLoading, refreshProfile } = useAuth();
+
+  // Once we've confirmed admin login and are waiting, watch for the profile to load
+  useEffect(() => {
+    if (!awaitingProfile) return;
+    if (authLoading) return; // still loading, keep waiting
+
+    if (profile?.role === 'admin') {
+      // Profile loaded and confirmed admin — safe to navigate
+      router.replace('/admin');
+    } else if (profile && (profile.role as string) !== 'admin') {
+      // Profile loaded but not admin — sign out and show error
+      supabase.auth.signOut();
+      setAwaitingProfile(false);
+      setLoading(false);
+      setError('Access Denied. Administrator privileges required.');
+    }
+    // If profile is null but authLoading is false, we keep waiting a bit longer
+    // (profile fetch is async and may still be in flight)
+  }, [awaitingProfile, profile, authLoading, router]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,8 +71,13 @@ export default function AdminLogin() {
           throw new Error('Access Denied. Administrator privileges required.');
         }
 
-        router.replace('/admin');
-        router.refresh();
+        // Admin confirmed — trigger a profile refresh and wait for AuthContext to hydrate
+        // before navigating. This avoids the race condition where the layout's guard
+        // runs before `profile` is set and boots the user back to login.
+        await refreshProfile();
+        setAwaitingProfile(true);
+        // Note: setLoading(false) intentionally NOT called here — we keep the
+        // spinner running until the useEffect above navigates or shows an error.
       }
     } catch (err: any) {
       console.error("Admin Login Sequence Failure:", err);
@@ -57,7 +86,6 @@ export default function AdminLogin() {
       } else {
         setError(err.message || 'Authentication failed');
       }
-    } finally {
       setLoading(false);
     }
   };

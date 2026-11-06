@@ -32,21 +32,36 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const pathname = usePathname(); 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [pendingCounts, setPendingCounts] = useState({ deposits: 0, withdrawals: 0 });
+  // Grace period: after auth loading finishes, give the profile a moment to hydrate
+  // before redirecting. This prevents the race condition where a just-logged-in admin
+  // gets bounced back to /admin/login because profile hasn't loaded yet.
+  const [profileGracePending, setProfileGracePending] = useState(false);
 
   useEffect(() => {
-    if (!loading) {
-      // Check if user is already on the login page
-      if (pathname === '/admin/login') {
-        if (user && profile?.role === 'admin') {
-          router.replace('/admin');
-        }
-        return;
-      }
+    if (loading) return; // AuthContext still initializing
 
-      // Normal protection for /admin/* pages:
-      if (!user || !profile || profile.role !== 'admin') {
-        router.push('/admin/login');
+    if (pathname === '/admin/login') {
+      if (user && profile?.role === 'admin') {
+        router.replace('/admin');
       }
+      return;
+    }
+
+    // User is logged in but profile not yet loaded — start a short grace period
+    // to allow the profile fetch (which is a separate async call) to complete.
+    if (user && !profile) {
+      setProfileGracePending(true);
+      const timer = setTimeout(() => {
+        setProfileGracePending(false);
+      }, 1500);
+      return () => clearTimeout(timer);
+    }
+
+    setProfileGracePending(false);
+
+    // Normal protection for /admin/* pages:
+    if (!user || !profile || profile.role !== 'admin') {
+      router.push('/admin/login');
     }
   }, [user, profile, loading, router, pathname]);
 
@@ -72,8 +87,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     return <>{children}</>;
   }
 
-  // Non-blocking loading state: Show the shell if we have a user, otherwise wait for auth
-  if (loading && !user) {
+  // Show loader while auth is initializing OR while we're in the profile grace period
+  if (loading || profileGracePending || (user && !profile)) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{background:'#0F0F23'}}>
         <div className="flex flex-col items-center gap-4 animate-pulse">

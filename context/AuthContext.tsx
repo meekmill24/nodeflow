@@ -44,21 +44,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             // Try standard client first (respects RLS)
             let { data, error } = await supabase
                 .from('profiles')
-                .select('*, level:levels(*)')
+                .select('*')
                 .eq('id', userId)
                 .maybeSingle();
 
-            // FALLBACK: If RLS blocked it but we have a session, try the Server-Side API
-            if (!data) {
-                console.warn("Client-side profile fetch empty. Transitioning to server-side authority...");
-                const res = await fetch(`/api/auth/profile?userId=${userId}`);
-                if (res.ok) {
-                    const serverData = await res.json();
-                    if (serverData && !serverData.error) {
-                        data = serverData;
-                        error = null;
-                        console.log("Profile resolved via Server-Side Bridge.");
+            // FALLBACK: If client query failed or RLS blocked it, use the Server-Side API bridge
+            if (!data || error) {
+                console.warn("Client-side profile fetch empty or restricted. Transitioning to server-side authority...");
+                try {
+                    const res = await fetch(`/api/auth/profile?userId=${userId}`);
+                    if (res.ok) {
+                        const serverData = await res.json();
+                        if (serverData && !serverData.error) {
+                            data = serverData;
+                            error = null;
+                            console.log("Profile resolved via Server-Side Bridge.");
+                        }
                     }
+                } catch (bridgeErr) {
+                    console.error("Server-side bridge error:", bridgeErr);
                 }
             }
 
@@ -87,7 +91,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             console.error('Unexpected error fetching profile:', err);
             setProfile(null);
         }
-    }, [supabase]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []); // supabase is a module-level singleton — stable reference, not a reactive dep
 
     const refreshProfile = useCallback(async () => {
         const { data: { user: currentUser } } = await supabase.auth.getUser();

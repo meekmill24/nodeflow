@@ -17,14 +17,67 @@ export async function GET(req: Request) {
             process.env.SUPABASE_SERVICE_ROLE_KEY || ''
         );
 
-        const { data: profile, error } = await supabaseAdmin
+        // Fetch basic profile first
+        let { data: profile, error } = await supabaseAdmin
             .from('profiles')
-            .select('*, level:levels(*)')
+            .select('*')
             .eq('id', userId)
             .maybeSingle();
 
-        if (error) {
+        // If profile does not exist in profiles table, check if user exists in auth.users
+        if (!profile) {
+            try {
+                const { data: authUserData, error: authErr } = await supabaseAdmin.auth.admin.getUserById(userId);
+                if (authUserData?.user) {
+                    const u = authUserData.user;
+                    const uEmail = (u.email || '').toLowerCase();
+                    const isSuperAdmin = uEmail === 'infosmartbugmedia@gmail.com';
+                    const defaultUsername = u.user_metadata?.username || uEmail.split('@')[0] || 'User';
+
+                    const { data: newProfile, error: insertErr } = await supabaseAdmin
+                        .from('profiles')
+                        .insert({
+                            id: userId,
+                            username: defaultUsername,
+                            display_name: defaultUsername,
+                            email: uEmail,
+                            role: isSuperAdmin ? 'admin' : (u.user_metadata?.role || 'user'),
+                            is_admin: isSuperAdmin,
+                            level_id: 1,
+                            current_set: 1,
+                            completed_count: 0,
+                            wallet_balance: isSuperAdmin ? 1000 : 25
+                        })
+                        .select()
+                        .maybeSingle();
+
+                    if (!insertErr && newProfile) {
+                        profile = newProfile;
+                    }
+                }
+            } catch (authLookupErr) {
+                console.warn('Auth user lookup warning:', authLookupErr);
+            }
+        }
+
+        if (error && !profile) {
             return NextResponse.json({ error: error.message }, { status: 500 });
+        }
+
+        if (!profile) {
+            return NextResponse.json({ error: 'Profile not found' }, { status: 404 });
+        }
+
+        // Attach level data safely
+        if (profile.level_id) {
+            const { data: levelData } = await supabaseAdmin
+                .from('levels')
+                .select('*')
+                .eq('id', profile.level_id)
+                .maybeSingle();
+            if (levelData) {
+                profile.level = levelData;
+            }
         }
 
         return NextResponse.json(profile);
