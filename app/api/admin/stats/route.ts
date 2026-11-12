@@ -1,10 +1,25 @@
 import { createClient } from '@supabase/supabase-js';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET() {
+// In-memory cache to prevent Supabase Disk IO exhaustion from rapid-fire stats polling
+let cachedStats: any = null;
+let lastCacheTimestamp = 0;
+const CACHE_TTL_MS = 20 * 1000; // 20 seconds TTL
+
+export async function GET(req: NextRequest) {
     try {
+        const { searchParams } = new URL(req.url);
+        const forceFresh = searchParams.get('fresh') === 'true';
+
+        const now = Date.now();
+        if (!forceFresh && cachedStats && (now - lastCacheTimestamp) < CACHE_TTL_MS) {
+            return NextResponse.json(cachedStats, {
+                headers: { 'X-Cache': 'HIT', 'Cache-Control': 'public, max-age=20' }
+            });
+        }
+
         const url = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
         const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SECRET_KEY;
 
@@ -49,7 +64,7 @@ export async function GET() {
         const totalTasksCount = (allProfiles.data || []).reduce((sum: number, p: any) => sum + (p.completed_count || 0), 0);
         const todayVolume = sumAmounts(todayTx);
 
-        return NextResponse.json({
+        const result = {
             totalUsers: users.count ?? 0,
             totalLevels: levels.count ?? 0,
             totalTasks: tasks.count ?? 0,
@@ -63,6 +78,13 @@ export async function GET() {
             todayProfit: totalProfit,
             todayTasks: totalTasksCount,
             todayVolume: todayVolume,
+        };
+
+        cachedStats = result;
+        lastCacheTimestamp = now;
+
+        return NextResponse.json(result, {
+            headers: { 'X-Cache': 'MISS', 'Cache-Control': 'public, max-age=20' }
         });
     } catch (err: any) {
         return NextResponse.json({ error: err.message }, { status: 500 });
