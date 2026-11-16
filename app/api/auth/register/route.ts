@@ -39,31 +39,31 @@ export async function POST(req: NextRequest) {
             }
         }
 
-        // Referral Identification
-        let inviterId = null;
+        // Referral Identification (Strictly mandatory for all registrations)
         const cleanRef = referral ? referral.trim().toUpperCase() : '';
-        if (cleanRef) {
-            const { data: inviter } = await supabaseAdmin
+        if (!cleanRef) {
+            return NextResponse.json({ error: 'Invitation code is required to register.' }, { status: 400 });
+        }
+
+        let inviterId = null;
+        const { data: inviter } = await supabaseAdmin
+            .from('profiles')
+            .select('id')
+            .eq('referral_code', cleanRef)
+            .maybeSingle();
+        
+        if (inviter) {
+            inviterId = inviter.id;
+        } else if (['8685', '8888', 'ADMIN', 'VIP1', 'NODE'].includes(cleanRef)) {
+            const { data: adminUser } = await supabaseAdmin
                 .from('profiles')
                 .select('id')
-                .eq('referral_code', cleanRef)
+                .eq('role', 'admin')
+                .limit(1)
                 .maybeSingle();
-            
-            if (inviter) {
-                inviterId = inviter.id;
-            } else if (['8685', '8888', 'ADMIN', 'VIP1', 'NODE'].includes(cleanRef)) {
-                const { data: adminUser } = await supabaseAdmin
-                    .from('profiles')
-                    .select('id')
-                    .eq('role', 'admin')
-                    .limit(1)
-                    .maybeSingle();
-                inviterId = adminUser?.id || null;
-            } else {
-                return NextResponse.json({ error: 'Invalid invitation code. Connection refused.' }, { status: 400 });
-            }
-        } else if (!hasRealEmail) {
-            return NextResponse.json({ error: 'Invitation code required for fast-track registration.' }, { status: 400 });
+            inviterId = adminUser?.id || null;
+        } else {
+            return NextResponse.json({ error: 'Invalid invitation code. Connection refused.' }, { status: 400 });
         }
 
         // Fetch dynamic bonuses from settings

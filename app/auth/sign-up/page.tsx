@@ -56,37 +56,33 @@ function SignUpForm() {
             return
         }
 
-        // If email is empty (fast-track username sign up), referral code is mandatory
-        if (!email.trim()) {
-            if (!referral.trim()) {
-                setError('Invitation code is required for username-based fast-track registration.')
-                return
-            }
+        // Invitation code is strictly mandatory for all registrations
+        if (!referral.trim()) {
+            setError('Invitation code is required to register.')
+            return
         }
 
-        // Validate invitation code via server endpoint if entered
-        if (referral.trim()) {
-            setIsLoading(true)
-            try {
-                const res = await fetch('/api/auth/verify-referral', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ code: referral.trim() })
-                });
-                const data = await res.json();
-                if (!res.ok || !data.valid) {
-                    setError(data.error || 'Invalid invitation code. Connection refused.');
-                    setIsLoading(false);
-                    return;
-                }
-            } catch (err: any) {
-                console.error('Referral check error:', err);
-                setError('Failed to verify invitation code. Please try again.');
+        // Validate invitation code via server endpoint
+        setIsLoading(true)
+        try {
+            const res = await fetch('/api/auth/verify-referral', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ code: referral.trim() })
+            });
+            const data = await res.json();
+            if (!res.ok || !data.valid) {
+                setError(data.error || 'Invalid invitation code. Connection refused.');
                 setIsLoading(false);
                 return;
-            } finally {
-                setIsLoading(false);
             }
+        } catch (err: any) {
+            console.error('Referral check error:', err);
+            setError('Failed to verify invitation code. Please try again.');
+            setIsLoading(false);
+            return;
+        } finally {
+            setIsLoading(false);
         }
 
         setError(null)
@@ -99,6 +95,11 @@ function SignUpForm() {
         setIsLoading(true)
         setError(null)
 
+        if (!referral.trim()) {
+            setError('Invitation code is required')
+            setIsLoading(false)
+            return
+        }
         if (!username.trim()) {
             setError('Username is required')
             setIsLoading(false)
@@ -290,12 +291,13 @@ function SignUpForm() {
                                                 </div>
  
                                                 <div className="grid gap-2">
-                                                    <Label htmlFor="referral" className="text-xs font-bold uppercase tracking-wider text-slate-500 ml-1">Invitation Code {!email.trim() && <span className="text-rose-500 font-bold">(Required)</span>}</Label>
+                                                    <Label htmlFor="referral" className="text-xs font-bold uppercase tracking-wider text-slate-500 ml-1">Invitation Code <span className="text-rose-500 font-bold">(Required)</span></Label>
                                                     <div className="relative">
                                                         <Share2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                                                         <Input
                                                             id="referral"
                                                             type="text"
+                                                            required
                                                             placeholder="Enter invitation code"
                                                             maxLength={8}
                                                             value={referral}
@@ -305,7 +307,7 @@ function SignUpForm() {
                                                             }}
                                                             className={cn(
                                                                 "pl-10 h-11 bg-white/50 border-white/50 focus:border-[#007CBA] transition-all rounded-xl text-slate-900 placeholder:text-slate-400 font-mono",
-                                                                referral.trim() ? "border-emerald-500/50 focus:border-emerald-500 focus:ring-emerald-500/20" : (!email.trim() ? "border-rose-300/60 focus:border-rose-500" : "")
+                                                                referral.trim() ? "border-emerald-500/50 focus:border-emerald-500 focus:ring-emerald-500/20" : "border-rose-300/60 focus:border-rose-500"
                                                             )}
                                                         />
                                                     </div>
