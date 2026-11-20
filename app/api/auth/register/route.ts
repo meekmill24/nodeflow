@@ -45,26 +45,17 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: 'Invitation code is required to register.' }, { status: 400 });
         }
 
-        let inviterId = null;
         const { data: inviter } = await supabaseAdmin
             .from('profiles')
             .select('id')
             .eq('referral_code', cleanRef)
             .maybeSingle();
         
-        if (inviter) {
-            inviterId = inviter.id;
-        } else if (['8685', '8888', 'ADMIN', 'VIP1', 'NODE'].includes(cleanRef)) {
-            const { data: adminUser } = await supabaseAdmin
-                .from('profiles')
-                .select('id')
-                .eq('role', 'admin')
-                .limit(1)
-                .maybeSingle();
-            inviterId = adminUser?.id || null;
-        } else {
+        if (!inviter) {
             return NextResponse.json({ error: 'Invalid invitation code. Connection refused.' }, { status: 400 });
         }
+
+        const inviterId = inviter.id;
 
         // Fetch dynamic bonuses from settings
         const { data: settingsData } = await supabaseAdmin

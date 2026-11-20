@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
             process.env.SUPABASE_SERVICE_ROLE_KEY!
         );
 
-        // First check in database profiles table
+        // Check in database profiles table
         const { data: inviter, error } = await supabaseAdmin
             .from('profiles')
             .select('id, referral_code, username')
@@ -28,23 +28,6 @@ export async function POST(req: NextRequest) {
                 code: cleanCode, 
                 inviterId: inviter.id,
                 inviterUsername: inviter.username 
-            });
-        }
-
-        // Master system invitation codes fallback
-        if (['8685', '8888', 'ADMIN', 'VIP1', 'NODE'].includes(cleanCode)) {
-            const { data: adminProfile } = await supabaseAdmin
-                .from('profiles')
-                .select('id, referral_code, username')
-                .eq('role', 'admin')
-                .limit(1)
-                .maybeSingle();
-
-            return NextResponse.json({ 
-                valid: true, 
-                code: cleanCode, 
-                inviterId: adminProfile?.id || null,
-                inviterUsername: adminProfile?.username || 'System Administrator' 
             });
         }
 
