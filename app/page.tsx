@@ -627,7 +627,7 @@ export default function LandingPage() {
 
               {/* Side-by-Side CTA Buttons — zero overlap, zero clipping */}
               <div className="hero-cta flex flex-row items-center gap-1 sm:gap-3 mb-2.5 sm:mb-8 w-full">
-                <Link href="/auth/sign-up" className="flex-1 min-w-0">
+                <Link href="/auth/sign-up" prefetch={true} className="flex-1 min-w-0">
                   <button className="w-full px-1 sm:px-6 py-1.5 sm:py-3.5 bg-cyan-500 text-slate-950 rounded-lg sm:rounded-2xl font-black text-[7.5px] min-[360px]:text-[8px] min-[390px]:text-[9px] sm:text-xs uppercase tracking-tight sm:tracking-widest shadow-[0_0_20px_rgba(6,182,212,0.3)] hover:scale-105 active:scale-95 transition-all duration-300 flex items-center justify-center gap-0.5 sm:gap-2 whitespace-nowrap overflow-hidden">
                     <span>Start</span> <span className="hidden min-[370px]:inline">Earning</span> <ArrowUpRight size={10} className="sm:w-4 sm:h-4 shrink-0" />
                   </button>
@@ -1158,7 +1158,7 @@ export default function LandingPage() {
                   You executed all 3 optimization cycles and generated <strong className="text-emerald-400">$2.25 USDT</strong> in demo commissions.
                 </p>
                 <div className="flex flex-col sm:flex-row items-center gap-4 w-full justify-center">
-                  <Link href="/auth/sign-up" className="w-full sm:w-auto">
+                  <Link href="/auth/sign-up" prefetch={true} className="w-full sm:w-auto">
                     <button className="w-full sm:w-auto px-8 py-4 bg-cyan-500 text-slate-950 rounded-xl font-black text-xs uppercase tracking-widest shadow-lg shadow-cyan-500/20 hover:scale-105 active:scale-95 transition-all">
                       Claim Real Earnings
                     </button>
@@ -1308,7 +1308,7 @@ export default function LandingPage() {
             <div className="text-center p-6 sm:p-10 rounded-[24px] sm:rounded-[28px] bg-gradient-to-r from-violet-500/10 via-indigo-500/10 to-cyan-500/10 border border-violet-500/20">
               <p className="text-slate-400 text-sm mb-2">Ready to build your own passive income stream?</p>
               <p className="text-white font-black text-xl sm:text-2xl md:text-3xl italic uppercase tracking-tight mb-6">Your referral link is waiting for you.</p>
-              <Link href="/auth/sign-up">
+              <Link href="/auth/sign-up" prefetch={true}>
                 <button className="w-full sm:w-auto px-6 sm:px-10 py-3.5 sm:py-4 bg-violet-500 text-white rounded-xl font-black text-xs uppercase tracking-widest shadow-lg shadow-violet-500/20 hover:scale-105 active:scale-95 transition-all">
                   Start Earning Referral Commissions
                 </button>
@@ -1584,7 +1584,7 @@ export default function LandingPage() {
                     <h4 className="font-black italic uppercase text-white text-xs sm:text-sm mb-0.5 sm:mb-1">Start Earning Now</h4>
                     <p className="text-slate-500 text-[9px] sm:text-xs font-medium">Referral link activates instantly upon signup.</p>
                   </div>
-                  <Link href="/auth/sign-up" className="w-full sm:w-auto">
+                  <Link href="/auth/sign-up" prefetch={true} className="w-full sm:w-auto">
                     <button className="w-full sm:w-auto shrink-0 px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl sm:rounded-[16px] bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-[9px] sm:text-[11px] uppercase tracking-wider sm:tracking-[0.25em] transition-all hover:shadow-lg hover:shadow-emerald-500/30 hover:scale-105 active:scale-95 whitespace-nowrap">
                       Join &amp; Refer →
                     </button>
@@ -1773,7 +1773,7 @@ export default function LandingPage() {
                         </div>
                         <p className="text-white font-black text-sm sm:text-lg uppercase tracking-tight mb-1">Telemetry Connected!</p>
                         <p className="text-slate-400 text-[10px] sm:text-xs max-w-xs mb-3">Your $5 welcome credit has been reserved.</p>
-                        <Link href="/auth/sign-up" className="w-full">
+                        <Link href="/auth/sign-up" prefetch={true} className="w-full">
                           <button className="w-full py-2.5 sm:py-3 bg-cyan-500 text-slate-950 rounded-xl font-black text-xs uppercase tracking-wider shadow-lg shadow-cyan-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all">
                             Complete Setup →
                           </button>
@@ -2022,7 +2022,7 @@ export default function LandingPage() {
 
               {/* Side-by-Side CTA buttons across Mobile, Tablet & PC */}
               <div className="flex flex-row items-center justify-center gap-2 sm:gap-5 pt-2">
-                <Link href="/auth/sign-up" className="flex-1 sm:flex-none">
+                <Link href="/auth/sign-up" prefetch={true} className="flex-1 sm:flex-none">
                   <button className="w-full sm:w-auto px-4 sm:px-14 py-3 sm:py-5 bg-slate-950 text-white rounded-xl sm:rounded-3xl font-black text-[9px] sm:text-xs uppercase tracking-wider sm:tracking-[0.3em] shadow-2xl hover:scale-105 hover:shadow-slate-950/30 transition-all whitespace-nowrap">
                     Get Started — Free
                   </button>

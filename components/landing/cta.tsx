@@ -89,14 +89,16 @@ export function CTA() {
             className="mt-12 flex flex-col sm:flex-row gap-4 justify-center"
           >
             <Link
-              href="/signup"
+              href="/auth/sign-up"
+              prefetch={true}
               className="group inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-accent to-emerald-600 px-8 py-4 text-base font-semibold text-primary-foreground hover:opacity-90 transition-all shadow-lg shadow-accent/20"
             >
               Create Free Account
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
             </Link>
             <Link
-              href="/login"
+              href="/auth/login"
+              prefetch={true}
               className="inline-flex items-center justify-center rounded-full border border-border px-8 py-4 text-base font-medium text-foreground hover:bg-secondary transition-colors"
             >
               Sign In to Dashboard

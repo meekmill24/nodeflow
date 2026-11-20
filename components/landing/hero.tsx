@@ -144,7 +144,8 @@ export function Hero() {
               className="mt-10 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start"
             >
               <Link
-                href="/signup"
+                href="/auth/sign-up"
+                prefetch={true}
                 className="group inline-flex items-center justify-center gap-2 rounded-full bg-primary px-8 py-4 text-base font-semibold text-primary-foreground hover:bg-primary/90 transition-all duration-300"
               >
                 Start Earning Now
