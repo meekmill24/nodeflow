@@ -45,14 +45,14 @@ export default function DepositPage() {
     const settings = useSiteSettings() as any;
     
     const depositAddress = useMemo(() => {
-        if (network === 'BTC') return settings?.wallet_btc || '1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa';
-        if (network === 'ETH') return settings?.wallet_eth || settings?.wallet_erc20 || '0x0000000000000000000000000000000000000000';
-        if (network === 'ERC20') return settings?.wallet_erc20 || '0x0000000000000000000000000000000000000000';
-        if (network === 'BEP20') return settings?.wallet_bep20 || '0x0000000000000000000000000000000000000000';
-        if (network === 'USDC') return settings?.wallet_usdc || settings?.wallet_erc20 || '0x0000000000000000000000000000000000000000';
-        if (network === 'BNB') return settings?.wallet_bnb || settings?.wallet_bep20 || '0x0000000000000000000000000000000000000000';
-        if (network === 'PAYPALUSD') return settings?.wallet_paypalusd || settings?.wallet_erc20 || '0x0000000000000000000000000000000000000000';
-        return settings?.wallet_trc20 || 'TRx9mK2pQbN7cVh3dJwXeGfLkAoYsUP5rI8';
+        if (network === 'BTC') return settings?.wallet_btc || '';
+        if (network === 'ETH') return settings?.wallet_eth || settings?.wallet_erc20 || '';
+        if (network === 'ERC20') return settings?.wallet_erc20 || '';
+        if (network === 'BEP20') return settings?.wallet_bep20 || '';
+        if (network === 'USDC') return settings?.wallet_usdc || settings?.wallet_erc20 || '';
+        if (network === 'BNB') return settings?.wallet_bnb || settings?.wallet_bep20 || '';
+        if (network === 'PAYPALUSD') return settings?.wallet_paypalusd || settings?.wallet_erc20 || '';
+        return settings?.wallet_trc20 || '';
     }, [network, settings]);
 
     const finalAmount = customAmount || amount;
@@ -382,16 +382,26 @@ export default function DepositPage() {
                     </h3>
 
                     <div className="glass-card-glow p-8 flex flex-col items-center gap-6 border border-white/10">
-                        <div className="bg-white p-6 rounded-[32px] shadow-2xl relative group">
-                            <div className="absolute inset-0 bg-primary/20 blur-2xl opacity-0 group-hover:opacity-100 transition-opacity" />
-                            <QRCodeSVG
-                                value={depositAddress}
-                                size={200}
-                                bgColor="#ffffff"
-                                fgColor="#000000"
-                                level="H"
-                            />
-                        </div>
+                        {depositAddress ? (
+                            <div className="bg-white p-6 rounded-[32px] shadow-2xl relative group">
+                                <div className="absolute inset-0 bg-primary/20 blur-2xl opacity-0 group-hover:opacity-100 transition-opacity" />
+                                <QRCodeSVG
+                                    value={depositAddress}
+                                    size={200}
+                                    bgColor="#ffffff"
+                                    fgColor="#000000"
+                                    level="H"
+                                />
+                            </div>
+                        ) : (
+                            <div className="p-8 rounded-[32px] border border-amber-500/30 bg-amber-500/10 text-center max-w-sm">
+                                <AlertCircle className="w-10 h-10 text-amber-400 mx-auto mb-3" />
+                                <p className="text-xs font-bold text-white mb-1 uppercase tracking-wider">Node Address Under Maintenance</p>
+                                <p className="text-[11px] text-amber-300/80 leading-relaxed">
+                                    The receiving address for {network} is currently updating. Please select another network or reach out to customer service.
+                                </p>
+                            </div>
+                        )}
 
                         <div className="w-full space-y-4">
                             <div className="text-center">
@@ -399,11 +409,14 @@ export default function DepositPage() {
                                     {network === 'ETH' ? 'ETH Address (ERC-20)' : network === 'BTC' ? 'BTC Address' : network === 'USDC' ? 'USDC Address' : network === 'BNB' ? 'BNB Chain Address' : network === 'PAYPALUSD' ? 'PYUSD Address' : `${network} Address`}
                                 </p>
                                 <div className="glass-card px-4 py-4 border border-white/20 flex items-center justify-between group overflow-hidden bg-black/40">
-                                    <span className="text-sm md:text-base font-black font-mono text-white truncate max-w-[220px] tracking-tight">{depositAddress}</span>
+                                    <span className="text-sm md:text-base font-black font-mono text-white truncate max-w-[220px] tracking-tight">
+                                        {depositAddress || 'Address not configured'}
+                                    </span>
                                     <button 
                                         type="button"
+                                        disabled={!depositAddress}
                                         onClick={copyAddress}
-                                        className="text-primary-light hover:text-white transition-all scale-125 ml-2 relative z-10"
+                                        className="text-primary-light hover:text-white transition-all scale-125 ml-2 relative z-10 disabled:opacity-30 disabled:cursor-not-allowed"
                                     >
                                         {copied ? <CheckCircle size={20} /> : <Copy size={20} />}
                                     </button>
@@ -413,7 +426,7 @@ export default function DepositPage() {
 
                             <button
                                 onClick={handleSubmitDeposit}
-                                disabled={loading || !finalAmount || !proofFile}
+                                disabled={loading || !finalAmount || !proofFile || !depositAddress}
                                 className="w-full bg-primary text-white py-4 rounded-2xl font-black uppercase tracking-[0.2em] text-xs shadow-xl shadow-primary/25 hover:bg-primary-light transition-all flex items-center justify-center gap-2 disabled:opacity-50"
                             >
                                 {loading ? (

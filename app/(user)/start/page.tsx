@@ -622,14 +622,14 @@ function extractMatchingBundle(
                                     <h2 className="text-2xl font-black text-white italic uppercase tracking-tighter mb-3">Account Suspended</h2>
                                     <p className="text-slate-400 text-sm font-medium leading-relaxed">Your account has been temporarily frozen by the system administrator. Please contact customer support to resolve this issue.</p>
                                 </div>
-                                <a
-                                    href="https://wa.me/1234567890"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
+                                <Link
+                                    href={settings?.support_whatsapp ? `https://wa.me/${String(settings.support_whatsapp).replace(/[^0-9]/g, '')}` : (settings?.telegram_url || '/service')}
+                                    target={settings?.support_whatsapp || settings?.telegram_url ? "_blank" : undefined}
+                                    rel={settings?.support_whatsapp || settings?.telegram_url ? "noopener noreferrer" : undefined}
                                     className="w-full py-4 bg-[#3DD6C8] text-white rounded-[24px] font-black uppercase tracking-widest text-[11px] text-center hover:bg-[#3DD6C8]/90 transition-all shadow-xl shadow-[#3DD6C8]/20 active:scale-95"
                                 >
                                     Contact Support
-                                </a>
+                                </Link>
                             </div>
                         </div>
                     </div>
