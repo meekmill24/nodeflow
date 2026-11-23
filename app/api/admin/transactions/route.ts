@@ -36,9 +36,36 @@ export async function GET(req: NextRequest) {
             query = query.eq('status', status);
         }
 
-        const { data, error } = await query.order('created_at', { ascending: false });
+        let { data, error } = await query.order('created_at', { ascending: false });
 
-        if (error) throw error;
+        // Fallback: If PostgREST foreign key relationship to profiles is missing in schema cache,
+        // perform resilient manual join with profiles in-memory so deposits and withdrawals never fail
+        if (error) {
+            console.warn('PostgREST transactions->profiles join failed, using resilient fallback:', error.message);
+            let fallbackQuery = supabaseAdmin.from('transactions').select('*');
+            if (type !== 'all') fallbackQuery = fallbackQuery.eq('type', type);
+            if (status && status !== 'all') fallbackQuery = fallbackQuery.eq('status', status);
+
+            const { data: txs, error: txError } = await fallbackQuery.order('created_at', { ascending: false });
+            if (txError) throw txError;
+
+            const userIds = [...new Set((txs || []).map((t: any) => t.user_id).filter(Boolean))];
+            let profileMap = new Map();
+            if (userIds.length > 0) {
+                const { data: profs } = await supabaseAdmin
+                    .from('profiles')
+                    .select('username, wallet_balance, id, email')
+                    .in('id', userIds);
+                (profs || []).forEach((p: any) => profileMap.set(p.id, p));
+            }
+
+            data = (txs || []).map((t: any) => ({
+                ...t,
+                profile: profileMap.get(t.user_id) || null
+            }));
+            error = null;
+        }
+
         return NextResponse.json(data || []);
     } catch (err: any) {
         return NextResponse.json({ error: err.message }, { status: 500 });

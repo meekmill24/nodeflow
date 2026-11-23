@@ -102,12 +102,15 @@ export default function AdminDashboard() {
         const data = await res.json();
         if (data) setStats(data);
 
-        const { data: recent } = await supabase
-          .from('transactions')
-          .select('id, type, amount, status, created_at, profile:profiles(username)')
-          .order('created_at', { ascending: false })
-          .limit(8); 
-        if (recent) setRecentTx(recent as any); 
+        try {
+          const txRes = await fetch('/api/admin/transactions?type=all');
+          if (txRes.ok) {
+            const allTxs = await txRes.json();
+            if (Array.isArray(allTxs)) setRecentTx(allTxs.slice(0, 8));
+          }
+        } catch (txErr) {
+          console.warn('Recent transactions fetch fallback:', txErr);
+        } 
 
         // Load users for banner targeting via Admin API (bypasses client-side RLS)
         let allUsers: any[] = [];

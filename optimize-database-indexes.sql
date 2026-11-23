@@ -61,9 +61,10 @@ CREATE INDEX IF NOT EXISTS idx_site_settings_key
   ON public.site_settings(key);
 
 
--- 7. VACUUM ANALYZE to update PostgreSQL query planner statistics immediately
-VACUUM ANALYZE public.transactions;
-VACUUM ANALYZE public.profiles;
-VACUUM ANALYZE public.notifications;
-VACUUM ANALYZE public.user_tasks;
-VACUUM ANALYZE public.task_items;
+-- 7. ANALYZE to update PostgreSQL query planner statistics immediately
+ANALYZE public.transactions;
+ANALYZE public.profiles;
+ANALYZE public.notifications;
+ANALYZE public.user_tasks;
+ANALYZE public.task_items;
+

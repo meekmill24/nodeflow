@@ -44,7 +44,9 @@ CREATE TABLE IF NOT EXISTS public.profiles (
     profit NUMERIC DEFAULT 0.00,
     total_earned NUMERIC DEFAULT 0.00,
     freeze_balance NUMERIC DEFAULT 0.00,
+    bonus_balance NUMERIC DEFAULT 0.00,
     referral_earned NUMERIC DEFAULT 0.00,
+    pending_bundle JSONB DEFAULT '[]'::jsonb,
     referred_users_count INT DEFAULT 0,
     avatar_url TEXT,
     completed_count INT DEFAULT 0,
@@ -304,3 +306,4 @@ CREATE POLICY "Public Upload avatars" ON storage.objects FOR INSERT WITH CHECK (
 
 CREATE POLICY "Public Access product_images" ON storage.objects FOR SELECT USING (bucket_id = 'product_images');
 CREATE POLICY "Public Upload product_images" ON storage.objects FOR INSERT WITH CHECK (bucket_id = 'product_images');
+
