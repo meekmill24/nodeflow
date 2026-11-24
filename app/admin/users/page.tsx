@@ -88,6 +88,33 @@ export default function AdminUsersPage() {
     };
   }, [fetchUsers, fetchPermissions]); 
 
+  const handleQuickSetTask = async (user: Profile) => {
+    const current = user.completed_count || 0;
+    const maxTasks = user.tasks_per_set_override || levels.find(l => l.id === user.level_id)?.tasks_per_set || 40;
+    const input = prompt(`Change completed task count for ${user.username}:\n(Current: ${current} / ${maxTasks} in set)\nEnter new task count:`, String(current));
+    if (input === null || input.trim() === '') return;
+    const newCount = parseInt(input);
+    if (isNaN(newCount) || newCount < 0) {
+      toast.error('Invalid task number. Please enter 0 or higher.');
+      return;
+    }
+    try {
+      const res = await fetch('/api/admin/update-user', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: user.id,
+          updateData: { completed_count: newCount }
+        })
+      });
+      if (!res.ok) throw new Error('Failed to update task count');
+      toast.success(`Task count for ${user.username} updated to ${newCount}`);
+      fetchUsers(false);
+    } catch (err: any) {
+      toast.error(err.message);
+    }
+  };
+
   const handleSetWithdrawalPermission = async (userId: string, permission: 'allow' | 'block' | 'require_tasks') => {
     setUpdatingPerm(true);
     try {
@@ -497,16 +524,21 @@ export default function AdminUsersPage() {
                           })()}
                         </div>
 
-                        {/* Mobile-visible Task Badge */}
+                        {/* Mobile-visible Task Badge (Clickable to change task #) */}
                         {(() => {
                           const tPerSet = user.tasks_per_set_override || levels.find(l => l.id === user.level_id)?.tasks_per_set || 40;
                           const totalCompleted = Number(user.completed_count || 0);
                           const currentInSet = (totalCompleted > 0 && totalCompleted % tPerSet === 0) ? tPerSet : (totalCompleted % tPerSet);
                           return (
                             <div className="sm:hidden mt-2">
-                              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#3DD6C8]/15 text-[#3DD6C8] border border-[#3DD6C8]/30 font-mono text-[9px] font-bold">
+                              <span 
+                                onClick={() => handleQuickSetTask(user)}
+                                title="Click to edit task number"
+                                className="cursor-pointer inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#3DD6C8]/15 text-[#3DD6C8] hover:bg-[#3DD6C8]/30 border border-[#3DD6C8]/30 font-mono text-[9px] font-bold active:scale-95 transition-all shadow-sm"
+                              >
                                 <Activity size={10} className="text-[#3DD6C8]" />
-                                TASK {currentInSet} / {tPerSet} ({totalCompleted} TOTAL)
+                                <span>TASK {currentInSet} / {tPerSet} ({totalCompleted} TOTAL)</span>
+                                <Edit2 size={8} className="opacity-70 text-[#3DD6C8]" />
                               </span>
                             </div>
                           );
@@ -591,19 +623,45 @@ export default function AdminUsersPage() {
                             </span>
                           </div>
                         )}
-                        {(() => {
-                          const tPerSet = user.tasks_per_set_override || levels.find(l => l.id === user.level_id)?.tasks_per_set || 40;
-                          const totalCompleted = Number(user.completed_count || 0);
-                          const currentInSet = (totalCompleted > 0 && totalCompleted % tPerSet === 0) ? tPerSet : (totalCompleted % tPerSet);
-                          return (
-                            <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-tight my-1">
-                              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#3DD6C8]/15 text-[#3DD6C8] border border-[#3DD6C8]/30 font-mono font-bold shadow-sm">
-                                <Activity size={11} className="text-[#3DD6C8]" />
-                                TASK {currentInSet} / {tPerSet} IN SET ({totalCompleted} TOTAL)
+                        {editingId === user.id ? (
+                          <div className="flex flex-col gap-1 p-2 rounded-xl bg-black/60 border border-[#3DD6C8]/40 my-1">
+                            <span className="text-[8px] font-black uppercase text-[#3DD6C8] tracking-widest flex items-center gap-1">
+                              <Activity size={9} /> Edit Completed Tasks
+                            </span>
+                            <div className="flex items-center gap-2">
+                              <input 
+                                type="number"
+                                min="0"
+                                max="500"
+                                className="bg-black border border-[#3DD6C8]/60 rounded-lg px-2.5 py-1 text-white text-xs font-mono font-bold focus:outline-none w-20 text-center"
+                                value={editData.completed_count !== undefined ? editData.completed_count : (user.completed_count || 0)}
+                                onChange={(e) => setEditData({ ...editData, completed_count: parseInt(e.target.value) || 0 })}
+                              />
+                              <span className="text-[9px] text-slate-400 font-bold uppercase">
+                                / {user.tasks_per_set_override || levels.find(l => l.id === (editData.level_id || user.level_id))?.tasks_per_set || 40} in set
                               </span>
                             </div>
-                          );
-                        })()}
+                          </div>
+                        ) : (
+                          (() => {
+                            const tPerSet = user.tasks_per_set_override || levels.find(l => l.id === user.level_id)?.tasks_per_set || 40;
+                            const totalCompleted = Number(user.completed_count || 0);
+                            const currentInSet = (totalCompleted > 0 && totalCompleted % tPerSet === 0) ? tPerSet : (totalCompleted % tPerSet);
+                            return (
+                              <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-tight my-1">
+                                <span 
+                                  onClick={() => handleQuickSetTask(user)}
+                                  title="Click to quickly change task count"
+                                  className="cursor-pointer inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#3DD6C8]/15 text-[#3DD6C8] hover:bg-[#3DD6C8]/30 border border-[#3DD6C8]/30 hover:border-[#3DD6C8]/60 font-mono font-bold shadow-sm active:scale-95 transition-all group/badge"
+                                >
+                                  <Activity size={11} className="text-[#3DD6C8]" />
+                                  <span>TASK {currentInSet} / {tPerSet} IN SET ({totalCompleted} TOTAL)</span>
+                                  <Edit2 size={9} className="opacity-60 group-hover/badge:opacity-100 text-[#3DD6C8]" />
+                                </span>
+                              </div>
+                            );
+                          })()
+                        )}
                         {user.pending_bundle && (
                           <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500/15 text-amber-400 border border-amber-500/30 text-[8px] font-black uppercase tracking-wider w-fit">
                             <Zap size={10} /> BUNDLE TASK #{(user.pending_bundle as any).targetIndex} (${(user.pending_bundle as any).totalAmount})
