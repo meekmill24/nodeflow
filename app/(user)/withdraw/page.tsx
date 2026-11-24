@@ -355,12 +355,6 @@ export default function WithdrawPage() {
             return;
         }
         if (preset === 'MAX') {
-            if (isFirstWithdrawal && !isForceAllowed) {
-                // First withdrawal is strictly capped at $30 introductory trial
-                setAmount('30');
-                return;
-            }
-
             const fullBalance = Math.max(0, balance);
             setAmount(fullBalance > 0 ? (fullBalance % 1 === 0 ? fullBalance.toFixed(0) : fullBalance.toFixed(2)) : fullBalance.toFixed(2));
 
@@ -952,10 +946,9 @@ export default function WithdrawPage() {
 
                             {/* Preset Buttons (MIN and MAX Only) */}
                             {(() => {
-                                const isMinActive = parsedAmount === minWithdrawal;
                                 const isFirstTrial = isFirstWithdrawal && !isForceAllowed;
-                                const maxTrialAmount = isFirstTrial ? 30 : balance;
-                                const isMaxActive = maxTrialAmount > 0 && Math.abs(parsedAmount - maxTrialAmount) < 0.001;
+                                const isMinActive = parsedAmount === minWithdrawal;
+                                const isMaxActive = balance > 0 && Math.abs(parsedAmount - balance) < 0.001;
 
                                 return (
                                     <div className="space-y-2 pt-1">
@@ -963,12 +956,12 @@ export default function WithdrawPage() {
                                             <span className="text-[9px] font-black text-white/50 uppercase tracking-[0.2em]">Select Preset Amount:</span>
                                             <span className="text-[9px] font-mono text-white/40">
                                                 {isFirstTrial 
-                                                    ? 'Introductory Trial: Capped at $30.00' 
+                                                    ? 'Trial Quota: $30.00 • Account Balance Available' 
                                                     : `Min: $${minWithdrawal.toLocaleString()} • Tier Limit: ${tierRangeLabel}`}
                                             </span>
                                         </div>
                                         <div className="grid grid-cols-2 gap-3">
-                                            {/* MIN Button */}
+                                            {/* MIN Button - Trial Quota for First-Time / Min Payout */}
                                             <button
                                                 type="button"
                                                 onClick={() => handleSelectPreset('MIN')}
@@ -982,14 +975,14 @@ export default function WithdrawPage() {
                                                     <span className={`text-[10px] font-black uppercase tracking-wider ${
                                                         isMinActive ? 'text-[#3DD6C8]' : 'text-white/50 group-hover:text-white/70'
                                                     }`}>
-                                                        Min Payout
+                                                        {isFirstTrial ? 'Trial Quota' : 'Min Payout'}
                                                     </span>
                                                     <span className={`text-[9px] font-black uppercase tracking-widest px-2.5 py-0.5 rounded-full shrink-0 transition-all ${
                                                         isMinActive 
                                                             ? 'bg-[#3DD6C8] text-[#0B0F1F] font-black shadow-[0_0_10px_rgba(61,214,200,0.4)]' 
                                                             : 'bg-white/10 text-white/50 group-hover:bg-white/15 group-hover:text-white/80'
                                                     }`}>
-                                                        MIN
+                                                        {isFirstTrial ? 'TRIAL' : 'MIN'}
                                                     </span>
                                                 </div>
                                                 <div className="flex items-baseline gap-1">
@@ -1001,7 +994,7 @@ export default function WithdrawPage() {
                                                 </div>
                                             </button>
 
-                                            {/* MAX Button - Shows Full Account Balance or $30 First Trial Cap */}
+                                            {/* MAX Button - Shows Full Account Balance */}
                                             <button
                                                 type="button"
                                                 onClick={() => handleSelectPreset('MAX')}
@@ -1015,23 +1008,21 @@ export default function WithdrawPage() {
                                                     <span className={`text-[10px] font-black uppercase tracking-wider truncate mr-1 ${
                                                         isMaxActive ? 'text-emerald-400' : 'text-emerald-400/70 group-hover:text-emerald-400'
                                                     }`}>
-                                                        {isFirstTrial ? 'Trial Quota' : 'Account Balance'}
+                                                        Account Balance
                                                     </span>
                                                     <span className={`text-[9px] font-black uppercase tracking-widest px-2.5 py-0.5 rounded-full shrink-0 transition-all ${
                                                         isMaxActive 
                                                             ? 'bg-emerald-400 text-[#0B0F1F] font-black shadow-[0_0_10px_rgba(52,211,153,0.4)]' 
                                                             : 'bg-emerald-500/15 text-emerald-400 group-hover:bg-emerald-500/25 group-hover:text-emerald-300'
                                                     }`}>
-                                                        {isFirstTrial ? 'MAX ($30)' : 'MAX'}
+                                                        MAX
                                                     </span>
                                                 </div>
                                                 <div className="flex items-baseline gap-1">
                                                     <span className={`text-base sm:text-xl font-mono font-black truncate ${
                                                         isMaxActive ? 'text-white' : 'text-white/90'
                                                     }`}>
-                                                        {isFirstTrial 
-                                                            ? '$30.00' 
-                                                            : `$${balance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+                                                        ${balance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                                     </span>
                                                 </div>
                                             </button>
@@ -1181,11 +1172,14 @@ export default function WithdrawPage() {
                         {/* 6. SUBMISSION CTA */}
                         <div className="space-y-4 pt-2">
                             <button
-                                type={isSecondaryLocked || isDailyLimitReached || isExceedingMax ? "button" : "submit"}
+                                type={isSecondaryLocked || isDailyLimitReached || isExceedingMax || isFirstTrialCapExceeded ? "button" : "submit"}
                                 onClick={() => {
                                     if (isSecondaryLocked) {
                                         setLimitModalReason('second_withdrawal');
                                         setShowLimitModal(true);
+                                    } else if (isFirstTrialCapExceeded) {
+                                        setAmount('30');
+                                        toast.info('Initial payout capped at $30.00. Set to Trial Quota ($30.00).');
                                     } else if (isExceedingMax) {
                                         setLimitModalReason('single_max');
                                         setShowLimitModal(true);
@@ -1194,11 +1188,11 @@ export default function WithdrawPage() {
                                         setShowLimitModal(true);
                                     }
                                 }}
-                                disabled={loading || (isBlockedByAdmin || (!isSecondaryLocked && !isTaskRequirementMet))}
+                                disabled={loading || (isBlockedByAdmin || (!isSecondaryLocked && !isFirstTrialCapExceeded && !isTaskRequirementMet))}
                                 className={`w-full py-5 sm:py-6 rounded-[24px] font-black uppercase tracking-[0.25em] text-xs sm:text-sm transition-all duration-300 flex items-center justify-center gap-3 ${
-                                    isBlockedByAdmin || (!isSecondaryLocked && !isTaskRequirementMet)
+                                    isBlockedByAdmin || (!isSecondaryLocked && !isFirstTrialCapExceeded && !isTaskRequirementMet)
                                         ? 'bg-slate-800/80 text-slate-500 border border-slate-700/60 cursor-not-allowed shadow-none'
-                                        : (isSecondaryLocked || isExceedingMax || isDailyLimitReached)
+                                        : (isSecondaryLocked || isFirstTrialCapExceeded || isExceedingMax || isDailyLimitReached)
                                         ? 'bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-[#0B0B1E] shadow-[0_15px_40px_rgba(245,158,11,0.35)] cursor-pointer active:scale-98'
                                         : 'bg-gradient-to-r from-rose-500 via-rose-600 to-rose-700 text-white shadow-[0_15px_40px_rgba(244,63,94,0.35)] hover:shadow-[0_20px_50px_rgba(244,63,94,0.5)] hover:-translate-y-0.5 active:translate-y-0 cursor-pointer'
                                 } disabled:opacity-50 disabled:translate-y-0`}
@@ -1217,6 +1211,11 @@ export default function WithdrawPage() {
                                     <>
                                         <BanIcon size={18} className="text-rose-400" />
                                         <span>Withdrawals Restricted By Admin</span>
+                                    </>
+                                ) : isFirstTrialCapExceeded ? (
+                                    <>
+                                        <AlertCircle size={18} className="text-[#0B0B1E]" />
+                                        <span>Trial Capped at $30 • Tap to Set $30 Quota</span>
                                     </>
                                 ) : !isTaskRequirementMet ? (
                                     <>
