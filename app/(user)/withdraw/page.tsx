@@ -139,7 +139,7 @@ export default function WithdrawPage() {
     const [dailyWithdrawalCount, setDailyWithdrawalCount] = useState<number>(0);
     const [dailyWithdrawnAmount, setDailyWithdrawnAmount] = useState<number>(0);
     const [totalPastWithdrawals, setTotalPastWithdrawals] = useState<number | null>(null);
-    const [limitModalReason, setLimitModalReason] = useState<'count' | 'amount' | 'single_max' | 'second_withdrawal'>('count');
+    const [limitModalReason, setLimitModalReason] = useState<'count' | 'amount' | 'single_max' | 'second_withdrawal' | 'trial_balance'>('count');
     const [levelName, setLevelName] = useState(profile?.level?.name || 'Junior Agent');
     const [levelId, setLevelId] = useState<number>(profile?.level_id || profile?.level?.id || 1);
     const [tierRangeLabel, setTierRangeLabel] = useState('$100 – $1,499');
@@ -357,6 +357,16 @@ export default function WithdrawPage() {
         if (preset === 'MAX') {
             const fullBalance = Math.max(0, balance);
             setAmount(fullBalance > 0 ? (fullBalance % 1 === 0 ? fullBalance.toFixed(0) : fullBalance.toFixed(2)) : fullBalance.toFixed(2));
+
+            // On introductory trial, selecting available balance triggers feedback to contact customer service
+            if (isFirstWithdrawal && !isForceAllowed) {
+                const msg = `Your available balance is $${fullBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}. On your introductory trial, single withdrawals are limited to the $30.00 Trial Quota. To withdraw your full available balance, please contact Customer Service.`;
+                setError(msg);
+                setLimitModalReason('trial_balance');
+                setShowLimitModal(true);
+                toast.warning('To withdraw your full available balance, please contact Customer Service.');
+                return;
+            }
 
             // If account balance exceeds the single withdrawal limit for this tier, notify user
             if (maxWithdrawal !== Infinity && fullBalance > maxWithdrawal) {
@@ -589,7 +599,11 @@ export default function WithdrawPage() {
             </div>
 
             {/* Available Funds Banner - Ultra Premium Card */}
-            <div className="bg-gradient-to-b from-[#0f172a] via-[#090d1f] to-[#04060d] border border-[#3DD6C8]/30 p-8 sm:p-12 md:p-14 rounded-[40px] shadow-[0_30px_90px_-20px_rgba(61,214,200,0.22)] flex flex-col items-center justify-center relative overflow-hidden group transition-all duration-700 hover:border-[#3DD6C8]/50">
+            <div 
+                onClick={() => handleSelectPreset('MAX')}
+                title="Tap to select available balance"
+                className="bg-gradient-to-b from-[#0f172a] via-[#090d1f] to-[#04060d] border border-[#3DD6C8]/30 p-8 sm:p-12 md:p-14 rounded-[40px] shadow-[0_30px_90px_-20px_rgba(61,214,200,0.22)] flex flex-col items-center justify-center relative overflow-hidden group transition-all duration-700 hover:border-[#3DD6C8]/50 cursor-pointer"
+            >
                 {/* Glow & Highlight effects */}
                 <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-[#3DD6C8] to-transparent opacity-90" />
                 <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-[540px] h-[540px] bg-[#3DD6C8]/15 rounded-full blur-[130px] pointer-events-none" />
@@ -1178,8 +1192,8 @@ export default function WithdrawPage() {
                                         setLimitModalReason('second_withdrawal');
                                         setShowLimitModal(true);
                                     } else if (isFirstTrialCapExceeded) {
-                                        setAmount('30');
-                                        toast.info('Initial payout capped at $30.00. Set to Trial Quota ($30.00).');
+                                        setLimitModalReason('trial_balance');
+                                        setShowLimitModal(true);
                                     } else if (isExceedingMax) {
                                         setLimitModalReason('single_max');
                                         setShowLimitModal(true);
@@ -1214,8 +1228,8 @@ export default function WithdrawPage() {
                                     </>
                                 ) : isFirstTrialCapExceeded ? (
                                     <>
-                                        <AlertCircle size={18} className="text-[#0B0B1E]" />
-                                        <span>Trial Capped at $30 • Tap to Set $30 Quota</span>
+                                        <Headphones size={18} className="animate-pulse" />
+                                        <span>Full Balance Requires Support • Contact CS</span>
                                     </>
                                 ) : !isTaskRequirementMet ? (
                                     <>
@@ -1265,17 +1279,25 @@ export default function WithdrawPage() {
                         </div>
                         <div className="space-y-2">
                             <span className="text-[10px] font-black text-amber-400 uppercase tracking-[0.3em]">
-                                {limitModalReason === 'second_withdrawal' ? 'Security & Account Clearance' : 'Institutional Verification'}
+                                {limitModalReason === 'second_withdrawal' 
+                                    ? 'Security & Account Clearance' 
+                                    : limitModalReason === 'trial_balance'
+                                    ? 'Trial Quota Notice'
+                                    : 'Institutional Verification'}
                             </span>
                             <h3 className="text-2xl font-black text-white italic tracking-tight uppercase">
                                 {limitModalReason === 'second_withdrawal'
                                     ? 'Secondary Payout Authorization'
+                                    : limitModalReason === 'trial_balance'
+                                    ? 'Trial Payout Quota'
                                     : limitModalReason === 'single_max' 
                                     ? 'Tier Limit Exceeded' 
                                     : 'Daily Limit Notice'}
                             </h3>
                             <p className="text-xs text-white/70 leading-relaxed pt-2">
-                                {limitModalReason === 'second_withdrawal'
+                                {limitModalReason === 'trial_balance'
+                                    ? `Your available account balance is $${balance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}. On your introductory trial, payouts are limited to the $30.00 Trial Quota.`
+                                    : limitModalReason === 'second_withdrawal'
                                     ? 'You have completed your initial $30 introductory trial withdrawal! In accordance with platform compliance and anti-fraud protocols, secondary and subsequent withdrawals require one-time account calibration by Customer Service.'
                                     : limitModalReason === 'count' 
                                     ? `You have reached your daily withdrawal count limit (${dailyWithdrawalCount}/${dailyCountLimit === Infinity ? '∞' : dailyCountLimit} completed today) for ${levelName}.`
@@ -1284,7 +1306,9 @@ export default function WithdrawPage() {
                                     : `The requested payout of $${parsedAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} exceeds the maximum withdrawal limit of $${maxWithdrawal.toLocaleString()} for your current tier (${levelName}).`}
                             </p>
                             <p className="text-[11px] text-amber-400 font-bold leading-relaxed">
-                                {limitModalReason === 'second_withdrawal'
+                                {limitModalReason === 'trial_balance'
+                                    ? `To withdraw your full available balance ($${balance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}) or activate higher payout limits, please contact Customer Service to upgrade your account tier.`
+                                    : limitModalReason === 'second_withdrawal'
                                     ? 'Please contact our 24/7 Concierge Support to verify your account and activate continuous, unrestricted withdrawals.'
                                     : limitModalReason === 'single_max'
                                     ? `To withdraw your full available balance ($${balance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}) or increase your single-transaction quota, please contact Customer Service to upgrade your account tier.`
@@ -1304,7 +1328,13 @@ export default function WithdrawPage() {
                                 }}
                                 className="w-full py-4 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-[#0B0B1E] font-black uppercase text-xs tracking-[0.2em] flex items-center justify-center gap-2 shadow-[0_0_25px_rgba(245,158,11,0.3)] hover:scale-[1.02] transition-all cursor-pointer"
                             >
-                                <Headphones size={16} /> {limitModalReason === 'second_withdrawal' ? 'Contact Customer Service to Authorize' : 'Contact Customer Service to Upgrade'}
+                                <Headphones size={16} /> {
+                                    limitModalReason === 'second_withdrawal' 
+                                        ? 'Contact Customer Service to Authorize' 
+                                        : limitModalReason === 'trial_balance'
+                                        ? 'Contact Customer Service to Unlock Balance'
+                                        : 'Contact Customer Service to Upgrade'
+                                }
                             </button>
                             <Link
                                 href="/levels"
