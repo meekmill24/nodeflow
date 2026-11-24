@@ -47,10 +47,10 @@ export default function AdminUsersPage() {
     }
   }, []);
 
-  const fetchUsers = useCallback(async () => { 
-    setLoading(true);
+  const fetchUsers = useCallback(async (silent = false, fresh = true) => { 
+    if (!silent) setLoading(true);
     try {
-        const res = await fetch('/api/admin/users');
+        const res = await fetch(`/api/admin/users${fresh ? '?fresh=true' : ''}`);
         if (!res.ok) {
             const err = await res.json();
             throw new Error(err.error || 'Identity list retrieval failed');
@@ -58,16 +58,34 @@ export default function AdminUsersPage() {
         const data = await res.json();
         if (data) setUsers(data as Profile[]); 
     } catch (err: any) {
-        toast.error(`Matrix Calibration Error: ${err.message}`);
+        if (!silent) toast.error(`Matrix Calibration Error: ${err.message}`);
         console.error("Users Fetch Sync Loss:", err);
     } finally {
-        setLoading(false);
+        if (!silent) setLoading(false);
     }
   }, []); 
 
   useEffect(() => { 
-    fetchUsers(); 
+    fetchUsers(false, true); 
     fetchPermissions();
+
+    // 1. Live Realtime listener on profiles table
+    const channel = supabase
+      .channel('admin-users-profiles-sync')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'profiles' }, () => {
+        fetchUsers(true, true);
+      })
+      .subscribe();
+
+    // 2. Fallback polling every 12 seconds so admin view always stays fresh
+    const pollTimer = setInterval(() => {
+      fetchUsers(true, true);
+    }, 12000);
+
+    return () => {
+      supabase.removeChannel(channel);
+      clearInterval(pollTimer);
+    };
   }, [fetchUsers, fetchPermissions]); 
 
   const handleSetWithdrawalPermission = async (userId: string, permission: 'allow' | 'block' | 'require_tasks') => {
@@ -360,6 +378,14 @@ export default function AdminUsersPage() {
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
+          <button 
+            onClick={() => fetchUsers(false, true)}
+            title="Refresh participant list"
+            disabled={loading}
+            className="flex items-center justify-center gap-2 px-5 py-4 bg-slate-900/60 border border-slate-800 text-slate-300 hover:text-white rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-slate-800 transition-all active:scale-95 disabled:opacity-50"
+          >
+            <RefreshCcw size={14} className={loading ? "animate-spin text-[#3DD6C8]" : ""} /> REFRESH
+          </button>
           <button 
             onClick={() => setShowCreateModal(true)}
             className="flex items-center justify-center gap-2 px-6 py-4 bg-white text-black rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-purple-400 hover:text-white transition-all shadow-xl shadow-white/5 active:scale-95"
