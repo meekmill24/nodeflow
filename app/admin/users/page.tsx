@@ -496,6 +496,21 @@ export default function AdminUsersPage() {
                             );
                           })()}
                         </div>
+
+                        {/* Mobile-visible Task Badge */}
+                        {(() => {
+                          const tPerSet = user.tasks_per_set_override || levels.find(l => l.id === user.level_id)?.tasks_per_set || 40;
+                          const totalCompleted = Number(user.completed_count || 0);
+                          const currentInSet = (totalCompleted > 0 && totalCompleted % tPerSet === 0) ? tPerSet : (totalCompleted % tPerSet);
+                          return (
+                            <div className="sm:hidden mt-2">
+                              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#3DD6C8]/15 text-[#3DD6C8] border border-[#3DD6C8]/30 font-mono text-[9px] font-bold">
+                                <Activity size={10} className="text-[#3DD6C8]" />
+                                TASK {currentInSet} / {tPerSet} ({totalCompleted} TOTAL)
+                              </span>
+                            </div>
+                          );
+                        })()}
                       </div>
                     </div>
                   </td>
