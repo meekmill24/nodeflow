@@ -307,3 +307,126 @@ CREATE POLICY "Public Upload avatars" ON storage.objects FOR INSERT WITH CHECK (
 CREATE POLICY "Public Access product_images" ON storage.objects FOR SELECT USING (bucket_id = 'product_images');
 CREATE POLICY "Public Upload product_images" ON storage.objects FOR INSERT WITH CHECK (bucket_id = 'product_images');
 
+
+
+-- ============================================================
+-- 6. RPC FUNCTIONS FOR TASK ENGINE & SALARY
+-- ============================================================
+
+CREATE OR REPLACE FUNCTION public.complete_user_task(
+  p_task_item_id INT,
+  p_cost_amount NUMERIC DEFAULT NULL
+)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_user_id UUID;
+  v_profile RECORD;
+  v_level RECORD;
+  v_item RECORD;
+  v_cost_amount NUMERIC;
+  v_commission_rate NUMERIC;
+  v_earned_amount NUMERIC;
+  v_new_balance NUMERIC;
+  v_task_id INT;
+BEGIN
+  v_user_id := auth.uid();
+  IF v_user_id IS NULL THEN
+    RAISE EXCEPTION 'Identity Shard not found.';
+  END IF;
+
+  SELECT * INTO v_profile FROM public.profiles WHERE id = v_user_id;
+  IF NOT FOUND THEN
+    RAISE EXCEPTION 'Identity Shard not found.';
+  END IF;
+
+  IF v_profile.is_frozen IS TRUE THEN
+    RAISE EXCEPTION 'Account node is frozen. Contact support.';
+  END IF;
+
+  SELECT * INTO v_item FROM public.task_items WHERE id = p_task_item_id;
+  IF NOT FOUND THEN
+    RAISE EXCEPTION 'Node Item not found.';
+  END IF;
+
+  v_cost_amount := COALESCE(p_cost_amount, v_profile.wallet_balance);
+  IF v_profile.wallet_balance < v_cost_amount THEN
+    RAISE EXCEPTION 'Insufficient Liquidity for Optimization.';
+  END IF;
+
+  SELECT * INTO v_level FROM public.levels WHERE id = v_profile.level_id;
+  v_commission_rate := COALESCE(v_level.commission_rate, 0.004);
+  v_earned_amount := ROUND((v_cost_amount * v_commission_rate)::NUMERIC, 2);
+  v_new_balance := ROUND((v_profile.wallet_balance + v_earned_amount)::NUMERIC, 2);
+
+  INSERT INTO public.user_tasks (
+    user_id,
+    task_item_id,
+    status,
+    cost_amount,
+    earned_amount,
+    is_bundle,
+    completed_at,
+    created_at
+  ) VALUES (
+    v_user_id,
+    p_task_item_id,
+    'completed',
+    v_cost_amount,
+    v_earned_amount,
+    FALSE,
+    NOW(),
+    NOW()
+  ) RETURNING id INTO v_task_id;
+
+  INSERT INTO public.transaction_ledger (
+    user_id,
+    amount,
+    type,
+    description,
+    created_at
+  ) VALUES (
+    v_user_id,
+    v_earned_amount,
+    'task_rebate',
+    'Yield optimization from ' || COALESCE(v_level.name, 'Node LV.1'),
+    NOW()
+  );
+
+  UPDATE public.profiles SET
+    completed_count = COALESCE(completed_count, 0) + 1,
+    wallet_balance = v_new_balance,
+    profit = ROUND((COALESCE(profit, 0) + v_earned_amount)::NUMERIC, 2),
+    total_earned = ROUND((COALESCE(total_earned, 0) + v_earned_amount)::NUMERIC, 2),
+    updated_at = NOW()
+  WHERE id = v_user_id;
+
+  RETURN jsonb_build_object(
+    'success', TRUE,
+    'task_id', v_task_id,
+    'is_bundle', FALSE,
+    'new_balance', v_new_balance,
+    'earned_amount', v_earned_amount
+  );
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION public.claim_salary_bonus()
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+BEGIN
+  RETURN jsonb_build_object(
+    'success', FALSE,
+    'message', 'Salary protocol offline. Contact admin.'
+  );
+END;
+$$;
+
+GRANT EXECUTE ON FUNCTION public.complete_user_task(INT, NUMERIC) TO authenticated, service_role, anon;
+GRANT EXECUTE ON FUNCTION public.claim_salary_bonus() TO authenticated, service_role, anon;
