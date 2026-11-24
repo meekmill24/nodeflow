@@ -1232,13 +1232,13 @@ export default function AdminUsersPage() {
                 </div>
                 <div>
                   <div className="text-xs font-black text-white uppercase tracking-wider group-hover:text-emerald-300 transition-colors flex items-center gap-2">
-                    Force Allow (VIP Override)
+                    Force Allow (VIP Clearance)
                     {withdrawalPermissions[withdrawalModalUser.id] === 'allow' && (
                       <span className="px-2 py-0.5 rounded-full bg-emerald-500 text-black text-[8px] font-black">ACTIVE</span>
                     )}
                   </div>
                   <p className="text-[10px] text-slate-400 mt-1 leading-relaxed">
-                    User can withdraw immediately regardless of task set progress.
+                    Authorizes user for secondary and continuous payouts beyond the initial $30 introductory trial.
                   </p>
                 </div>
               </button>
@@ -1259,13 +1259,13 @@ export default function AdminUsersPage() {
                 </div>
                 <div>
                   <div className="text-xs font-black text-white uppercase tracking-wider group-hover:text-amber-300 transition-colors flex items-center gap-2">
-                    Require Task Set Completion (Default)
+                    Standard Rule (First $30 Only • CS Clearance for 2nd)
                     {(!withdrawalPermissions[withdrawalModalUser.id] || withdrawalPermissions[withdrawalModalUser.id] === 'require_tasks') && (
                       <span className="px-2 py-0.5 rounded-full bg-amber-500 text-black text-[8px] font-black">ACTIVE</span>
                     )}
                   </div>
                   <p className="text-[10px] text-slate-400 mt-1 leading-relaxed">
-                    Withdrawal is unlocked ONLY once all tasks in the current set are completed.
+                    Initial withdrawal capped at $30 (after completing task set). Secondary withdrawals require user to contact Customer Service.
                   </p>
                 </div>
               </button>

