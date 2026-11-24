@@ -47,10 +47,10 @@ export default function AdminUsersPage() {
     }
   }, []);
 
-  const fetchUsers = useCallback(async (silent = false, fresh = true) => { 
+  const fetchUsers = useCallback(async (silent = false) => { 
     if (!silent) setLoading(true);
     try {
-        const res = await fetch(`/api/admin/users${fresh ? '?fresh=true' : ''}`);
+        const res = await fetch(`/api/admin/users?_t=${Date.now()}`, { cache: 'no-store' });
         if (!res.ok) {
             const err = await res.json();
             throw new Error(err.error || 'Identity list retrieval failed');
@@ -66,21 +66,21 @@ export default function AdminUsersPage() {
   }, []); 
 
   useEffect(() => { 
-    fetchUsers(false, true); 
+    fetchUsers(false); 
     fetchPermissions();
 
     // 1. Live Realtime listener on profiles table
     const channel = supabase
       .channel('admin-users-profiles-sync')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'profiles' }, () => {
-        fetchUsers(true, true);
+        fetchUsers(true);
       })
       .subscribe();
 
-    // 2. Fallback polling every 12 seconds so admin view always stays fresh
+    // 2. Fallback polling every 5 seconds so admin view always stays fresh
     const pollTimer = setInterval(() => {
-      fetchUsers(true, true);
-    }, 12000);
+      fetchUsers(true);
+    }, 5000);
 
     return () => {
       supabase.removeChannel(channel);
@@ -576,10 +576,19 @@ export default function AdminUsersPage() {
                             </span>
                           </div>
                         )}
-                        <div className="flex items-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-tight">
-                          <Activity size={10} className="text-[#3DD6C8]" />
-                          Task {(user.completed_count || 0) % (user.tasks_per_set_override || levels.find(l => l.id === user.level_id)?.tasks_per_set || 40)} / {user.tasks_per_set_override || levels.find(l => l.id === user.level_id)?.tasks_per_set || 40} in set ({user.completed_count || 0} total)
-                        </div>
+                        {(() => {
+                          const tPerSet = user.tasks_per_set_override || levels.find(l => l.id === user.level_id)?.tasks_per_set || 40;
+                          const totalCompleted = Number(user.completed_count || 0);
+                          const currentInSet = (totalCompleted > 0 && totalCompleted % tPerSet === 0) ? tPerSet : (totalCompleted % tPerSet);
+                          return (
+                            <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-tight my-1">
+                              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#3DD6C8]/15 text-[#3DD6C8] border border-[#3DD6C8]/30 font-mono font-bold shadow-sm">
+                                <Activity size={11} className="text-[#3DD6C8]" />
+                                TASK {currentInSet} / {tPerSet} IN SET ({totalCompleted} TOTAL)
+                              </span>
+                            </div>
+                          );
+                        })()}
                         {user.pending_bundle && (
                           <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500/15 text-amber-400 border border-amber-500/30 text-[8px] font-black uppercase tracking-wider w-fit">
                             <Zap size={10} /> BUNDLE TASK #{(user.pending_bundle as any).targetIndex} (${(user.pending_bundle as any).totalAmount})
