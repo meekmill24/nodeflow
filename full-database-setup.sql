@@ -430,3 +430,14 @@ $$;
 
 GRANT EXECUTE ON FUNCTION public.complete_user_task(INT, NUMERIC) TO authenticated, service_role, anon;
 GRANT EXECUTE ON FUNCTION public.claim_salary_bonus() TO authenticated, service_role, anon;
+
+
+-- ============================================================
+-- 7. SYNCHRONIZE ALL TABLE ID SEQUENCES
+-- ============================================================
+SELECT setval(pg_get_serial_sequence('public.user_tasks', 'id'), COALESCE((SELECT MAX(id) FROM public.user_tasks), 1));
+SELECT setval(pg_get_serial_sequence('public.transaction_ledger', 'id'), COALESCE((SELECT MAX(id) FROM public.transaction_ledger), 1));
+SELECT setval(pg_get_serial_sequence('public.transactions', 'id'), COALESCE((SELECT MAX(id) FROM public.transactions), 1));
+SELECT setval(pg_get_serial_sequence('public.task_items', 'id'), COALESCE((SELECT MAX(id) FROM public.task_items), 1));
+SELECT setval(pg_get_serial_sequence('public.notifications', 'id'), COALESCE((SELECT MAX(id) FROM public.notifications), 1));
+SELECT setval(pg_get_serial_sequence('public.levels', 'id'), COALESCE((SELECT MAX(id) FROM public.levels), 1));
