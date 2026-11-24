@@ -98,7 +98,42 @@ export async function POST(req: NextRequest) {
             console.warn('Super Order referral commission error:', refErr);
         }
 
-        // 3. Update existing pending task in user_tasks, or clean up pending tasks
+        // 3. Update existing pending task in user_tasks, or create a completed task entry
+        // First resolve a guaranteed-valid task_item_id from task_items catalog
+        let resolvedTaskItemId: number | null = null;
+        const candidateId = Number(taskId || bundleId);
+        if (!isNaN(candidateId) && candidateId > 0 && candidateId < 1000000) {
+            const { data: itemCheck } = await supabaseAdmin
+                .from('task_items')
+                .select('id')
+                .eq('id', candidateId)
+                .maybeSingle();
+            if (itemCheck) resolvedTaskItemId = itemCheck.id;
+        }
+
+        // Check if profile.pending_bundle had a taskItemIds list
+        if (!resolvedTaskItemId && (profile as any)?.pending_bundle?.taskItemIds?.[0]) {
+            const candidateFromBundle = Number((profile as any).pending_bundle.taskItemIds[0]);
+            if (!isNaN(candidateFromBundle)) {
+                const { data: itemCheck } = await supabaseAdmin
+                    .from('task_items')
+                    .select('id')
+                    .eq('id', candidateFromBundle)
+                    .maybeSingle();
+                if (itemCheck) resolvedTaskItemId = itemCheck.id;
+            }
+        }
+
+        // Safe fallback to first available task item in catalog
+        if (!resolvedTaskItemId) {
+            const { data: fallbackItem } = await supabaseAdmin
+                .from('task_items')
+                .select('id')
+                .limit(1)
+                .maybeSingle();
+            resolvedTaskItemId = fallbackItem?.id || 1931;
+        }
+
         if (taskId) {
             await supabaseAdmin
                 .from('user_tasks')
@@ -144,19 +179,33 @@ export async function POST(req: NextRequest) {
                         .in('id', remainingIds);
                 }
             } else {
-                const numericId = typeof bundleId === 'string' ? Number(bundleId.replace(/\D/g, '')) : Number(bundleId);
-                const taskItemId = !isNaN(numericId) && numericId > 0 ? numericId : 2171;
                 await supabaseAdmin
                     .from('user_tasks')
                     .insert({
                         user_id: userId,
-                        task_item_id: taskItemId,
+                        task_item_id: resolvedTaskItemId,
                         status: 'completed',
                         earned_amount: profitEarned,
                         cost_amount: bundleCost,
                         is_bundle: true,
                         completed_at: new Date().toISOString()
                     });
+            }
+        }
+
+        // 4. Record the super order yield into transaction_ledger
+        if (profitEarned > 0) {
+            try {
+                await supabaseAdmin
+                    .from('transaction_ledger')
+                    .insert({
+                        user_id: userId,
+                        amount: profitEarned,
+                        type: 'task_rebate',
+                        description: 'Super Order Yield Optimization'
+                    });
+            } catch (ledgerErr) {
+                console.warn('Ledger insert non-blocking warning:', ledgerErr);
             }
         }
 
